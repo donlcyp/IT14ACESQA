@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
     <title>AJJ CRISBER Engineering Services - Quality Assurance</title>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -12,8 +15,16 @@
             --white: #ffffff;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
+            --gray-600: #6b7280;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
             --blue-1: #1c57b6;
+            --blue-600: #2563eb;
+            --red-600: #dc2626;
             --black-1: #313131;
+            --sidebar-bg: #c4c4c4;
+            --header-bg: #4a5568;
+            --main-bg: #e2e8f0;
             --text-lg-medium-font-family: "Inter", sans-serif;
             --text-lg-medium-font-weight: 500;
             --text-lg-medium-font-size: 18px;
@@ -43,96 +54,251 @@
 
         body {
             font-family: var(--text-md-normal-font-family);
-            background-color: #aab0be;
+            background-color: var(--main-bg);
+            overflow-x: hidden;
         }
 
-        .qa-1 {
-            width: 100%;
-            max-width: 1440px;
-            margin: 0 auto;
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #dc2626;
+            position: relative;
+        }
+
+        .logo .aces-text {
+            color: #dc2626;
+        }
+
+        .logo .aces-text:nth-child(2),
+        .logo .aces-text:nth-child(4) {
+            color: #2563eb;
+        }
+
+        .sidebar-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: var(--text-headline-small-bold-font-size);
+            font-weight: var(--text-headline-small-bold-font-weight);
+            color: black;
+        }
+
+        .nav-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .hamburger-menu {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--gray-700);
+            cursor: pointer;
+        }
+
+        .chevron {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .nav-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-family: var(--text-md-normal-font-family);
+            font-size: var(--text-md-normal-font-size);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-item.active {
+            background-color: white;
+            color: black;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-section {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .logout-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-family: var(--text-md-normal-font-family);
+            font-size: var(--text-md-normal-font-size);
+            transition: all 0.2s ease;
+        }
+
+        .logout-item:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--header-bg), #2d3748);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
         }
 
-        .rectangle-15 {
-            width: 100%;
-            height: 86px;
-            background: linear-gradient(90deg, #4a90e2, #87cefa);
+        .header::after {
+            content: '';
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         }
 
-        .ajj-crisber-engineering-services {
-            color: #000000;
+        .header-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .header-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            color: white;
             font-family: "Zen Dots", sans-serif;
             font-size: 24px;
             font-weight: 400;
-            position: absolute;
-            left: 80px;
-            top: 30px;
+            flex: 1;
         }
 
-        .menu {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            width: 40px;
-            height: 40px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            color: #000;
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-left: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .menu i {
-            color: #000;
-        }
-
-        .panel-2 {
-            width: calc(100% - 40px);
-            max-width: 1289px;
-            height: 90%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            position: absolute;
-            left: 20px;
-            top: 100px;
-        }
-
-        .card-header {
+        /* QA Specific Styles */
+        .qa-header {
             background: #f5f5f5;
             border-radius: 10px;
             box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-            width: calc(100% - 40px);
-            max-width: 1180px;
-            margin: 120px auto 0;
+            margin-bottom: 30px;
             padding: 20px;
         }
 
-        .content {
+        .qa-content {
             display: flex;
             align-items: center;
             gap: 16px;
             flex-wrap: wrap;
         }
 
-        .text-and-supporting-text {
+        .qa-title-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .text-and-badge {
+        .qa-title-badge {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .text {
+        .qa-title {
             color: #101828;
             font-family: var(--text-lg-medium-font-family);
             font-size: var(--text-lg-medium-font-size);
@@ -140,14 +306,20 @@
             line-height: var(--text-lg-medium-line-height);
         }
 
-        .badge {
+        .qa-badge {
             width: 100px;
             height: 20px;
             background: linear-gradient(90deg, #e0e0e0, #f0f0f0);
             border-radius: 10px;
         }
 
-        .button {
+        .qa-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .qa-button {
             background: none;
             border: none;
             cursor: pointer;
@@ -155,7 +327,7 @@
             border-radius: 8px;
         }
 
-        .button-base {
+        .qa-button-base {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -165,23 +337,12 @@
             box-shadow: var(--shadow-xs);
         }
 
-        .frame {
-            font-size: 16px;
-            color: #344054;
-        }
-
-        .input-dropdown-base {
+        .qa-search-form {
             width: 100%;
             max-width: 350px;
         }
 
-        .input-with-label {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .input {
+        .qa-search-input {
             background: var(--white);
             border: 1px solid var(--gray-300);
             border-radius: 8px;
@@ -191,19 +352,19 @@
             box-shadow: var(--shadow-xs);
         }
 
-        .content2 {
+        .qa-search-content {
             display: flex;
             align-items: center;
             gap: 8px;
             flex: 1;
         }
 
-        .search {
+        .qa-search-icon {
             font-size: 16px;
             color: #344054;
         }
 
-        .text2 {
+        .qa-search-field {
             color: var(--gray-500);
             font-family: var(--text-md-normal-font-family);
             font-size: var(--text-md-normal-font-size);
@@ -214,13 +375,13 @@
             flex: 1;
         }
 
-        .button-7 {
+        .qa-filter-button {
             background: none;
             border: none;
             cursor: pointer;
         }
 
-        .button-base2 {
+        .qa-filter-base {
             background: #ffffff;
             border-radius: 8px;
             padding: 10px 16px;
@@ -230,12 +391,12 @@
             box-shadow: var(--shadow-xs);
         }
 
-        .filter-lines {
+        .qa-filter-icon {
             font-size: 16px;
             color: #344054;
         }
 
-        .text3 {
+        .qa-filter-text {
             color: #344054;
             font-family: var(--text-sm-medium-font-family);
             font-size: var(--text-sm-medium-font-size);
@@ -243,16 +404,15 @@
             line-height: var(--text-sm-medium-line-height);
         }
 
-        .cards {
+        /* Cards Section */
+        .qa-cards {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            margin: 20px auto;
-            width: calc(100% - 40px);
-            max-width: 1180px;
+            margin-bottom: 30px;
         }
 
-        .card-1, .card-2, .card-3 {
+        .qa-card {
             background: #ffffff;
             border-radius: 12px;
             padding: 16px;
@@ -262,90 +422,105 @@
             transition: transform 0.2s ease;
         }
 
-        .card-1:hover, .card-2:hover, .card-3:hover {
+        .qa-card:hover {
             transform: translateY(-4px);
         }
 
-        .content3 {
+        .qa-card-content {
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .with-picture {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .picture, .picture2, .picture3 {
+        .qa-card-picture {
             width: 32px;
             height: 32px;
             border-radius: 50%;
         }
 
-        .picture { background: #520d0d; }
-        .picture2 { background: #1b59f8; }
-        .picture3 { background: #f81bc8; }
-
-        .headline-and-details {
+        .qa-card-info {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            flex: 1;
         }
 
-        .assumption-school, .dr-a-p-medical-center, .first-pacific-inn {
+        .qa-card-title {
             color: #000000;
             font-family: "Source Code Pro", sans-serif;
             font-size: 18px;
             font-weight: 500;
         }
 
-        .client-name-mrs-maria-lopez-inspected-by-engr-dela-cruz,
-        .client-name-dr-arturo-pingoy-inspected-by-engr-ramirez,
-        .client-name-mr-ramon-cruz-inspected-by-engr-flores {
+        .qa-card-details {
             color: #3c3c43;
             font-family: "Source Code Pro", sans-serif;
             font-size: 14px;
             font-weight: 400;
+            line-height: 1.4;
         }
 
-        ._30-mins-ago {
+        .qa-card-time {
             color: rgba(102, 102, 102, 0.6);
             font-family: "Source Code Pro", sans-serif;
             font-size: 12px;
             text-align: right;
+            margin-bottom: 12px;
         }
 
-        .new-button, .button-base4 {
-            background: none;
+        .qa-delete-button {
+            background: #ff0000;
             border: none;
-            cursor: pointer;
-        }
-
-        .button-base3, .button-base4 {
+            border-radius: 8px;
+            padding: 8px 16px;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            color: #ffffff;
+            color: white;
+            cursor: pointer;
             transition: opacity 0.2s ease;
         }
 
-        .button-base3 {
-            background: #0084ff;
+        .qa-delete-button:hover {
+            opacity: 0.9;
         }
 
-        .button-base4 {
-            background: #ff0000;
-        }
-
-        .qlementine-icons-new-16, .mingcute-edit-line {
+        .qa-delete-icon {
             font-size: 16px;
         }
 
-        .text4 {
+        .qa-delete-text {
+            color: #ffffff;
+            font-family: var(--text-sm-medium-font-family);
+            font-size: var(--text-sm-medium-font-size);
+            font-weight: var(--text-sm-medium-font-weight);
+            line-height: var(--text-sm-medium-line-height);
+        }
+
+        /* New Button */
+        .qa-new-button {
+            background: #0084ff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .qa-new-button:hover {
+            opacity: 0.9;
+        }
+
+        .qa-new-icon {
+            font-size: 16px;
+        }
+
+        .qa-new-text {
             color: #ffffff;
             font-family: var(--text-sm-medium-font-family);
             font-size: var(--text-sm-medium-font-size);
@@ -374,7 +549,7 @@
             opacity: 1;
         }
 
-        .modal {
+        .qa-modal-content {
             background: var(--white);
             border-radius: 8px;
             border: 1px solid var(--gray-400);
@@ -385,7 +560,7 @@
             position: relative;
         }
 
-        .icon {
+        .qa-modal-icon {
             width: 40px;
             height: 40px;
             background: #4a90e2;
@@ -395,7 +570,7 @@
             top: 19px;
         }
 
-        .add-quality-assurance-record {
+        .qa-modal-title {
             color: var(--black-1);
             font-family: var(--text-headline-small-bold-font-family);
             font-size: var(--text-headline-small-bold-font-size);
@@ -404,7 +579,7 @@
             margin: 60px 0 20px;
         }
 
-        .input, .input2, .input3 {
+        .qa-modal-input {
             display: flex;
             flex-direction: column;
             gap: 2px;
@@ -412,12 +587,7 @@
             margin-bottom: 16px;
         }
 
-        .frame-5 {
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .label {
+        .qa-modal-label {
             color: var(--black-1);
             font-family: var(--text-md-normal-font-family);
             font-size: var(--text-sm-medium-font-size);
@@ -425,7 +595,7 @@
             line-height: var(--text-sm-medium-line-height);
         }
 
-        .input-md {
+        .qa-modal-field {
             background: var(--white);
             border: 1px solid #c0d5de;
             border-radius: 4px;
@@ -435,7 +605,7 @@
             gap: 4px;
         }
 
-        .input-md input {
+        .qa-modal-field input {
             border: none;
             background: transparent;
             flex: 1;
@@ -444,33 +614,22 @@
             color: #313131;
         }
 
-        .input-md input::placeholder {
+        .qa-modal-field input::placeholder {
             color: #d9d9d9;
         }
 
-        .input-md input:focus {
+        .qa-modal-field input:focus {
             outline: none;
         }
 
-        .vector, .vector2, .gridicons-dropdown {
-            display: none; /* Hide placeholders */
-        }
-
-        .utility-icons-heroicons-mini {
-            width: 16px;
-            height: 16px;
-            background: #666;
-            border-radius: 4px;
-        }
-
-        .btns {
+        .qa-modal-buttons {
             display: flex;
             gap: 12px;
             justify-content: flex-end;
             margin-top: 20px;
         }
 
-        .button, .button3 {
+        .qa-modal-button {
             border-radius: 4px;
             padding: 8px 12px;
             display: flex;
@@ -478,14 +637,16 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: var(--shadow-xs);
-        }
-
-        .button {
-            background: var(--white);
             border: 1px solid var(--gray-400);
+            background: var(--white);
         }
 
-        .button2 {
+        .qa-modal-button.primary {
+            background: var(--blue-1);
+            border: 1px solid var(--blue-1);
+        }
+
+        .qa-modal-button-text {
             color: var(--black-1);
             font-family: var(--text-md-normal-font-family);
             font-size: var(--text-sm-medium-font-size);
@@ -493,223 +654,312 @@
             line-height: var(--text-sm-medium-line-height);
         }
 
-        .button3 {
-            background: var(--blue-1);
-        }
-
-        .button4 {
+        .qa-modal-button.primary .qa-modal-button-text {
             color: var(--white);
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: var(--text-sm-medium-font-size);
             font-weight: var(--text-headline-small-bold-font-weight);
-            line-height: var(--text-sm-medium-line-height);
         }
 
-        .button:hover, .button3:hover {
+        .qa-modal-button:hover {
             opacity: 0.9;
         }
 
-        button:focus-visible, input:focus-visible {
-            outline: 2px solid #4a90e2;
-            outline-offset: 2px;
-        }
-
-        .error {
+        .qa-error {
             color: #dc3545;
             font-size: 0.875em;
             margin-top: 0.25rem;
         }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .qa-1 {
-                padding: 10px;
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
             }
 
-            .card-header, .cards {
-                margin: 100px auto 0;
+            .sidebar.open {
+                transform: translateX(0);
             }
 
-            .cards {
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header-title {
+                font-size: 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .qa-cards {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .card-1, .card-2, .card-3 {
+            .qa-card {
                 max-width: 100%;
-            }
-
-            .ajj-crisber-engineering-services {
-                left: 60px;
-                font-size: 20px;
-            }
-
-            .modal {
-                width: 90%;
             }
         }
     </style>
 </head>
+
 <body>
-    <main class="qa-1">
-        <div class="rectangle-15"></div>
-        <header>
-            <button class="menu" aria-label="Open menu"><i class="fas fa-bars"></i></button>
-            <h1 class="ajj-crisber-engineering-services">AJJ CRISBER Engineering Services</h1>
-        </header>
-        <div class="panel-2"></div>
-        <section class="card-header">
-            <div class="content">
-                <div class="text-and-supporting-text">
-                    <div class="text-and-badge">
-                        <h2 class="text">Quality Assurance</h2>
-                        <div class="badge"></div>
-                    </div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="aces-text">A</span><span class="aces-text">C</span><span
+                        class="aces-text">E</span><span class="aces-text">S</span>
                 </div>
-                <button class="button" aria-label="Additional options">
-                    <div class="button-base">
-                        <i class="frame fas fa-ellipsis-h"></i>
-                    </div>
+                <div class="sidebar-title">ACES</div>
+            </div>
+
+            <div class="nav-toggle">
+                <button class="hamburger-menu" id="navToggle">
+                    <i class="fas fa-bars"></i>
                 </button>
-                <form action="{{ route('quality-assurance') }}" method="GET">
-                    <div class="input-dropdown-base">
-                        <div class="input-with-label">
-                            <div class="input">
-                                <div class="content2">
-                                    <i class="search fas fa-search"></i>
-                                    <input class="text2" name="search" placeholder="Search" type="search" aria-label="Search quality assurance records" value="{{ request('search') }}" />
+                <span class="chevron">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="{{ route('dashboard') }}" class="nav-item">
+                    <i class="nav-icon fas fa-smile"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('quality-assurance') }}" class="nav-item active">
+                    <i class="nav-icon fas fa-bolt"></i>
+                    <span>Quality Assurance</span>
+                </a>
+                <a href="{{ route('audit') }}" class="nav-item">
+                    <i class="nav-icon fas fa-gavel"></i>
+                    <span>Audit</span>
+                </a>
+                <a href="{{ route('finance') }}" class="nav-item">
+                    <i class="nav-icon fas fa-chart-bar"></i>
+                    <span>Finance</span>
+                </a>
+                <a href="{{ route('projects') }}" class="nav-item">
+                    <i class="nav-icon fas fa-tasks"></i>
+                    <span>Projects</span>
+                </a>
+                <a href="{{ route('employee-attendance') }}" class="nav-item">
+                    <i class="nav-icon fas fa-hard-hat"></i>
+                    <span>Employee Attendance</span>
+                </a>
+            </nav>
+
+            <div class="logout-section">
+                <a href="#" class="logout-item">
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <button class="header-menu" id="headerMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
+            </header>
+
+            <!-- Content Area -->
+            <section class="content-area">
+                <!-- QA Header -->
+                <div class="qa-header">
+                    <div class="qa-content">
+                        <div class="qa-title-section">
+                            <div class="qa-title-badge">
+                                <h2 class="qa-title">Quality Assurance</h2>
+                                <div class="qa-badge"></div>
+                            </div>
+                        </div>
+                        <button class="qa-button" aria-label="Additional options">
+                            <div class="qa-button-base">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </div>
+                        </button>
+                        <form action="{{ route('quality-assurance') }}" method="GET" class="qa-search-form">
+                            <div class="qa-search-input">
+                                <div class="qa-search-content">
+                                    <i class="qa-search-icon fas fa-search"></i>
+                                    <input class="qa-search-field" name="search" placeholder="Search" type="search"
+                                        aria-label="Search quality assurance records" value="{{ request('search') }}" />
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
-                <button class="button-7" aria-label="Filter options">
-                    <div class="button-base2">
-                        <i class="filter-lines fas fa-filter"></i>
-                        <span class="text3">Filters</span>
-                    </div>
-                </button>
-            </div>
-        </section>
-
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <section class="cards" aria-label="Quality assurance records">
-            @foreach($records as $index => $record)
-                <article class="card-{{ $index + 1 }}">
-                    <div class="content3">
-                        <div class="with-picture">
-                            <div class="picture{{ $index === 0 ? '' : ($index === 1 ? '2' : '3') }}" style="background-color: {{ $record->color }}"></div>
-                            <div class="headline-and-details">
-                                <h3 class="{{ $index === 0 ? 'assumption-school' : ($index === 1 ? 'dr-a-p-medical-center' : 'first-pacific-inn') }}">{{ $record->title }}</h3>
-                                <p class="{{ $index === 0 ? 'client-name-mrs-maria-lopez-inspected-by-engr-dela-cruz' : ($index === 1 ? 'client-name-dr-arturo-pingoy-inspected-by-engr-ramirez' : 'client-name-mr-ramon-cruz-inspected-by-engr-flores') }}">
-                                    Client Name: {{ $record->client }}<br />Inspected by: {{ $record->inspector }}
-                                </p>
+                        </form>
+                        <button class="qa-filter-button" aria-label="Filter options">
+                            <div class="qa-filter-base">
+                                <i class="qa-filter-icon fas fa-filter"></i>
+                                <span class="qa-filter-text">Filters</span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="_30-mins-ago">{{ $record->time }}</div>
-                    <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="button-base4" aria-label="Delete record">
-                            <i class="mingcute-edit-line fas fa-trash"></i>
-                            <span class="text4">Delete</span>
-                        </button>
-                    </form>
-                </article>
-            @endforeach
-        </section>
-        <div class="new-button">
-            <button class="button-base3" onclick="document.querySelector('.qa-modal').classList.add('active')" aria-label="Add new record">
-                <i class="qlementine-icons-new-16 fas fa-plus"></i>
-                <span class="text4">New</span>
-            </button>
-        </div>
-        <div class="qa-modal">
-            <div class="modal">
-                <div class="icon"></div>
-                <h2 class="add-quality-assurance-record">Add Quality Assurance Record</h2>
-                <form action="{{ route('quality-assurance.store') }}" method="POST">
-                    @csrf
-                    <div class="input">
-                        <div class="frame-5">
-                            <label class="label" for="project-name">Project Name</label>
-                        </div>
-                        <div class="input-md">
-                            <input type="text" id="project-name" name="title" placeholder="Enter Project Name" required />
-                        </div>
-                        @error('title')
-                            <span class="error text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="input2">
-                        <div class="frame-5">
-                            <label class="label" for="client-name">Client Name</label>
-                        </div>
-                        <div class="input-md">
-                            <input type="text" id="client-name" name="client" placeholder="Enter Client Name" required />
-                        </div>
-                        @error('client')
-                            <span class="error text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="input3">
-                        <div class="frame-5">
-                            <label class="label" for="inspector-name">Inspector Name</label>
-                        </div>
-                        <div class="input-md">
-                            <input type="text" id="inspector-name" name="inspector" placeholder="Enter Inspector Name" required />
-                            <div class="utility-icons-heroicons-mini"></div>
-                        </div>
-                        @error('inspector')
-                            <span class="error text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="input">
-                        <div class="frame-5">
-                            <label class="label" for="time">Time</label>
-                        </div>
-                        <div class="input-md">
-                            <input type="text" id="time" name="time" placeholder="Time (e.g., 30 mins ago)" required />
-                        </div>
-                        @error('time')
-                            <span class="error text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="input">
-                        <div class="frame-5">
-                            <label class="label" for="color">Color</label>
-                        </div>
-                        <div class="input-md">
-                            <input type="text" id="color" name="color" placeholder="Color (e.g., #520d0d)" required />
-                        </div>
-                        @error('color')
-                            <span class="error text-danger small">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="btns">
-                        <button type="button" class="button" onclick="document.querySelector('.qa-modal').classList.remove('active')">
-                            <span class="button2">Cancel</span>
-                        </button>
-                        <button type="submit" class="button3">
-                            <span class="button4">Add</span>
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </main>
+                </div>
+
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <!-- QA Cards -->
+                <div class="qa-cards" aria-label="Quality assurance records">
+                    @foreach($records as $index => $record)
+                        <article class="qa-card">
+                            <div class="qa-card-content">
+                                <div class="qa-card-picture" style="background-color: {{ $record->color }}"></div>
+                                <div class="qa-card-info">
+                                    <h3 class="qa-card-title">{{ $record->title }}</h3>
+                                    <p class="qa-card-details">
+                                        Client Name: {{ $record->client }}<br />
+                                        Inspected by: {{ $record->inspector }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="qa-card-time">{{ $record->time }}</div>
+                            <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="qa-delete-button" aria-label="Delete record">
+                                    <i class="qa-delete-icon fas fa-trash"></i>
+                                    <span class="qa-delete-text">Delete</span>
+                                </button>
+                            </form>
+                        </article>
+                    @endforeach
+                </div>
+
+                <!-- New Button -->
+                <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
+                    aria-label="Add new record">
+                    <i class="qa-new-icon fas fa-plus"></i>
+                    <span class="qa-new-text">New</span>
+                </button>
+
+                <!-- Modal -->
+                <div class="qa-modal">
+                    <div class="qa-modal-content">
+                        <div class="qa-modal-icon"></div>
+                        <h2 class="qa-modal-title">Add Quality Assurance Record</h2>
+                        <form action="{{ route('quality-assurance.store') }}" method="POST">
+                            @csrf
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="project-name">Project Name</label>
+                                <div class="qa-modal-field">
+                                    <input type="text" id="project-name" name="title" placeholder="Enter Project Name"
+                                        required />
+                                </div>
+                                @error('title')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="client-name">Client Name</label>
+                                <div class="qa-modal-field">
+                                    <input type="text" id="client-name" name="client" placeholder="Enter Client Name"
+                                        required />
+                                </div>
+                                @error('client')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="inspector-name">Inspector Name</label>
+                                <div class="qa-modal-field">
+                                    <input type="text" id="inspector-name" name="inspector"
+                                        placeholder="Enter Inspector Name" required />
+                                </div>
+                                @error('inspector')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="time">Time</label>
+                                <div class="qa-modal-field">
+                                    <input type="text" id="time" name="time" placeholder="Time (e.g., 30 mins ago)"
+                                        required />
+                                </div>
+                                @error('time')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="color">Color</label>
+                                <div class="qa-modal-field">
+                                    <input type="text" id="color" name="color" placeholder="Color (e.g., #520d0d)"
+                                        required />
+                                </div>
+                                @error('color')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-buttons">
+                                <button type="button" class="qa-modal-button"
+                                    onclick="document.querySelector('.qa-modal').classList.remove('active')">
+                                    <span class="qa-modal-button-text">Cancel</span>
+                                </button>
+                                <button type="submit" class="qa-modal-button primary">
+                                    <span class="qa-modal-button-text">Add</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
     <script>
-        // Close modal when clicking outside
-        document.querySelector('.qa-modal').addEventListener('click', function(e) {
+        // Sidebar toggle functionality
+        const headerMenu = document.getElementById('headerMenu');
+        const navToggle = document.getElementById('navToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        headerMenu.addEventListener('click', toggleSidebar);
+        navToggle.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on mobile when clicking outside
+        document.addEventListener('click', function (e) {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open', 'collapsed');
+                mainContent.classList.remove('expanded');
+            }
+        });
+
+        // Modal functionality
+        document.querySelector('.qa-modal').addEventListener('click', function (e) {
             if (e.target === this) {
                 this.classList.remove('active');
             }
         });
     </script>
 </body>
+
 </html>
