@@ -99,20 +99,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #dc2626;
-            position: relative;
+            overflow: hidden;
         }
 
-        .logo .aces-text {
-            color: #dc2626;
-        }
-
-        .logo .aces-text:nth-child(2),
-        .logo .aces-text:nth-child(4) {
-            color: #2563eb;
-        }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display:block; }
+        .logo-fallback { width:100%; height:100%; border-radius:50%; display:none; align-items:center; justify-content:center; background:#e5e7eb; color:#111827; font-weight:700; font-family: "Inter", sans-serif; }
 
         .sidebar-title {
             font-family: var(--text-headline-small-bold-font-family);
@@ -749,8 +740,8 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <span class="aces-text">A</span><span class="aces-text">C</span><span
-                        class="aces-text">E</span><span class="aces-text">S</span>
+                    <img src="{{ asset('images/aces-logo.png') }}" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="logo-fallback">ACES</div>
                 </div>
                 <div class="sidebar-title">ACES</div>
             </div>
@@ -803,10 +794,10 @@
         <main class="main-content" id="mainContent">
             <!-- Header -->
             <header class="header">
+                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
                 <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
             <!-- Content Area -->

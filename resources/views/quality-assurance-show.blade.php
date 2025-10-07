@@ -54,9 +54,9 @@
         .sidebar { width: 280px; background-color: var(--sidebar-bg); padding: 20px; display: flex; flex-direction: column; gap: 30px; position: fixed; height: 100vh; left: 0; top: 0; z-index: 1000; transition: transform 0.3s ease; }
         .sidebar.collapsed { transform: translateX(-100%); }
         .sidebar-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-        .logo { width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: #dc2626; position: relative; }
-        .logo .aces-text { color: #dc2626; }
-        .logo .aces-text:nth-child(2), .logo .aces-text:nth-child(4) { color: #2563eb; }
+        .logo { width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #9ca3af; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display:block; }
+        .logo-fallback { width:100%; height:100%; border-radius:50%; display:none; align-items:center; justify-content:center; background:#e5e7eb; color:#111827; font-weight:700; font-family: "Inter", sans-serif; }
         .sidebar-title { font-family: var(--text-headline-small-bold-font-family); font-size: var(--text-headline-small-bold-font-size); font-weight: var(--text-headline-small-bold-font-weight); color: black; }
         .nav-toggle { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .hamburger-menu { background: none; border: none; font-size: 18px; color: var(--gray-700); cursor: pointer; }
@@ -141,7 +141,8 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <span class="aces-text">A</span><span class="aces-text">C</span><span class="aces-text">E</span><span class="aces-text">S</span>
+                    <img src="{{ asset('images/aces-logo.png') }}" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="logo-fallback">ACES</div>
                 </div>
                 <div class="sidebar-title">ACES</div>
             </div>
@@ -164,8 +165,8 @@
 
         <main class="main-content" id="mainContent">
             <header class="header">
-                <button class="header-menu" id="headerMenu"><i class="fas fa-bars"></i></button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
+                <button class="header-menu" id="headerMenu"><i class="fas fa-bars"></i></button>
             </header>
 
             <section class="content-area">
