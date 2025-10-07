@@ -22,6 +22,14 @@ class QualityAssuranceController extends Controller
         return view('quality-assurance', compact('records'));
     }
 
+    public function show(QaRecord $qa_record)
+    {
+        // In a future iteration, fetch related materials for this record.
+        return view('quality-assurance-show', [
+            'record' => $qa_record,
+        ]);
+    }
+
     public function destroy(QaRecord $qa_record)
     {
         $qa_record->delete();

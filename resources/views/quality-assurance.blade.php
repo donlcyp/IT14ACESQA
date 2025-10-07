@@ -528,6 +528,28 @@
             line-height: var(--text-sm-medium-line-height);
         }
 
+        /* Danger button (Delete toggle) */
+        .qa-danger-button {
+            background: #ff3b30;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .qa-danger-button:hover { opacity: 0.9; }
+
+        /* Card delete hover while in delete mode */
+        .qa-card.delete-hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+
         /* Modal Styles */
         .qa-modal {
             display: none;
@@ -817,7 +839,7 @@
                 <!-- QA Cards -->
                 <div class="qa-cards" aria-label="Quality assurance records">
                     @foreach($records as $index => $record)
-                        <article class="qa-card">
+                        <article class="qa-card" data-title="{{ $record->title }}" data-id="{{ $record->id }}" style="cursor: pointer;">
                             <div class="qa-card-content">
                                 <div class="qa-card-picture" style="background-color: {{ $record->color }}"></div>
                                 <div class="qa-card-info">
@@ -829,24 +851,26 @@
                                 </div>
                             </div>
                             <div class="qa-card-time">{{ $record->time }}</div>
-                            <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST">
+                            <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST" onclick="event.stopPropagation()" style="display: none;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="qa-delete-button" aria-label="Delete record">
-                                    <i class="qa-delete-icon fas fa-trash"></i>
-                                    <span class="qa-delete-text">Delete</span>
-                                </button>
                             </form>
                         </article>
                     @endforeach
                 </div>
 
-                <!-- New Button -->
-                <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
-                    aria-label="Add new record">
-                    <i class="qa-new-icon fas fa-plus"></i>
-                    <span class="qa-new-text">New</span>
-                </button>
+                <!-- New & Delete Buttons -->
+                <div style="display:flex; gap:10px;">
+                    <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
+                        aria-label="Add new record">
+                        <i class="qa-new-icon fas fa-plus"></i>
+                        <span class="qa-new-text">New</span>
+                    </button>
+                    <button class="qa-danger-button" id="qaDeleteToggle" aria-label="Toggle delete mode">
+                        <i class="fas fa-trash"></i>
+                        <span class="qa-new-text">Delete</span>
+                    </button>
+                </div>
 
                 <!-- Modal -->
                 <div class="qa-modal">
@@ -888,8 +912,7 @@
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="time">Time</label>
                                 <div class="qa-modal-field">
-                                    <input type="text" id="time" name="time" placeholder="Time (e.g., 30 mins ago)"
-                                        required />
+                                    <input type="time" id="time" name="time" required />
                                 </div>
                                 @error('time')
                                     <span class="qa-error">{{ $message }}</span>
@@ -898,8 +921,7 @@
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="color">Color</label>
                                 <div class="qa-modal-field">
-                                    <input type="text" id="color" name="color" placeholder="Color (e.g., #520d0d)"
-                                        required />
+                                    <input type="color" id="color" name="color" value="#520d0d" required />
                                 </div>
                                 @error('color')
                                     <span class="qa-error">{{ $message }}</span>
@@ -959,6 +981,51 @@
                 this.classList.remove('active');
             }
         });
+
+        // Delete mode for cards
+        let deleteMode = false;
+        const deleteToggle = document.getElementById('qaDeleteToggle');
+        const cards = document.querySelectorAll('.qa-card');
+
+        function updateCardInteractions() {
+            cards.forEach(card => {
+                if (deleteMode) {
+                    card.addEventListener('mouseenter', onCardEnter);
+                    card.addEventListener('mouseleave', onCardLeave);
+                    card.addEventListener('click', onCardDeleteClick);
+                } else {
+                    card.removeEventListener('mouseenter', onCardEnter);
+                    card.removeEventListener('mouseleave', onCardLeave);
+                    card.removeEventListener('click', onCardDeleteClick);
+                    card.classList.remove('delete-hover');
+                    // default click goes to details
+                    card.onclick = function () { window.location = `{{ url('/quality-assurance') }}` + '/' + card.dataset.id; };
+                }
+            });
+        }
+
+        function onCardEnter(e) { e.currentTarget.classList.add('delete-hover'); }
+        function onCardLeave(e) { e.currentTarget.classList.remove('delete-hover'); }
+        function onCardDeleteClick(e) {
+            const card = e.currentTarget;
+            const title = card.dataset.title;
+            const ok = confirm(`Are you sure to delete ${title}?`);
+            if (ok) {
+                const form = card.querySelector('form');
+                if (form) form.submit();
+            }
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        deleteToggle && deleteToggle.addEventListener('click', function () {
+            deleteMode = !deleteMode;
+            this.style.opacity = deleteMode ? '0.9' : '1';
+            updateCardInteractions();
+        });
+
+        // Initialize default click to show
+        updateCardInteractions();
     </script>
 </body>
 
