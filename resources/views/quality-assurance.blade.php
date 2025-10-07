@@ -550,6 +550,19 @@
             border-color: #ef4444;
         }
 
+        /* Delete mode banner */
+        .qa-delete-banner {
+            display: none;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 10px 0 20px;
+            font-family: var(--text-sm-medium-font-family);
+        }
+        .qa-delete-banner.active { display: block; }
+
         /* Modal Styles */
         .qa-modal {
             display: none;
@@ -836,9 +849,13 @@
                     </div>
                 @endif
 
+                <div id="qaDeleteBanner" class="qa-delete-banner">
+                    Delete mode is ON. Click a project card to confirm deletion.
+                </div>
+
                 <!-- QA Cards -->
                 <div class="qa-cards" aria-label="Quality assurance records">
-                    @foreach($records as $index => $record)
+                    @forelse($records as $index => $record)
                         <article class="qa-card" data-title="{{ $record->title }}" data-id="{{ $record->id }}" style="cursor: pointer;">
                             <div class="qa-card-content">
                                 <div class="qa-card-picture" style="background-color: {{ $record->color }}"></div>
@@ -856,7 +873,9 @@
                                 @method('DELETE')
                             </form>
                         </article>
-                    @endforeach
+                    @empty
+                        <div style="color:#6b7280; font-family: var(--text-md-normal-font-family);">No projects yet. Click New to add your first project.</div>
+                    @endforelse
                 </div>
 
                 <!-- New & Delete Buttons -->
@@ -866,10 +885,12 @@
                         <i class="qa-new-icon fas fa-plus"></i>
                         <span class="qa-new-text">New</span>
                     </button>
-                    <button class="qa-danger-button" id="qaDeleteToggle" aria-label="Toggle delete mode">
-                        <i class="fas fa-trash"></i>
-                        <span class="qa-new-text">Delete</span>
-                    </button>
+                    @if(($records ?? collect())->count() > 0)
+                        <button class="qa-danger-button" id="qaDeleteToggle" aria-label="Toggle delete mode">
+                            <i class="fas fa-trash"></i>
+                            <span class="qa-new-text">Delete</span>
+                        </button>
+                    @endif
                 </div>
 
                 <!-- Modal -->
@@ -990,6 +1011,8 @@
         function updateCardInteractions() {
             cards.forEach(card => {
                 if (deleteMode) {
+                    // disable navigation while in delete mode
+                    card.onclick = function (e) { e.preventDefault(); };
                     card.addEventListener('mouseenter', onCardEnter);
                     card.addEventListener('mouseleave', onCardLeave);
                     card.addEventListener('click', onCardDeleteClick);
@@ -1012,7 +1035,10 @@
             const ok = confirm(`Are you sure to delete ${title}?`);
             if (ok) {
                 const form = card.querySelector('form');
-                if (form) form.submit();
+                if (form) {
+                    // Submit the form and keep user on the same page
+                    form.submit();
+                }
             }
             e.preventDefault();
             e.stopPropagation();
@@ -1021,6 +1047,8 @@
         deleteToggle && deleteToggle.addEventListener('click', function () {
             deleteMode = !deleteMode;
             this.style.opacity = deleteMode ? '0.9' : '1';
+            const banner = document.getElementById('qaDeleteBanner');
+            if (banner) banner.classList.toggle('active', deleteMode);
             updateCardInteractions();
         });
 

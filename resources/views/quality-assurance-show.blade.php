@@ -221,48 +221,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>PVC Pipe 4"</td>
-                                <td>PVC-2025-045</td>
-                                <td>Solid Steel Philippines</td>
-                                <td>15</td>
-                                <td>Meter</td>
-                                <td>₱252</td>
-                                <td>₱3,780</td>
-                                <td>2025-07-19</td>
-                                <td>2025-07-19</td>
-                                <td>Pending</td>
-                                <td>Site A</td>
+                                <td colspan="11" style="color:#6b7280;">No materials yet. Use New to add a material.</td>
                             </tr>
-                            <tr>
-                                <td>Sprinkler Head</td>
-                                <td>SPH-2025-112</td>
-                                <td>Solid Steel</td>
-                                <td>21</td>
-                                <td>Piece</td>
-                                <td>₱632</td>
-                                <td>₱13,272</td>
-                                <td>2025-04-13</td>
-                                <td>2025-04-13</td>
-                                <td>Fail</td>
-                                <td>Site A</td>
-                            </tr>
-                            <tr>
-                                <td>Gate Valve 2"</td>
-                                <td>GV-2025-078</td>
-                                <td>Best Buy Supplies</td>
-                                <td>8</td>
-                                <td>Piece</td>
-                                <td>₱420</td>
-                                <td>₱3,360</td>
-                                <td>2025-04-10</td>
-                                <td>2025-04-10</td>
-                                <td>Pass</td>
-                                <td>Site A</td>
-                            </tr>
-                            <tr><td colspan="11">&nbsp;</td></tr>
-                            <tr><td colspan="11">&nbsp;</td></tr>
-                            <tr><td colspan="11">&nbsp;</td></tr>
-                            <tr><td colspan="11">&nbsp;</td></tr>
                         </tbody>
                     </table>
                 </div>
