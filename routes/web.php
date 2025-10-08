@@ -12,6 +12,8 @@ Route::post('/quality-assurance', [App\Http\Controllers\QualityAssuranceControll
 
 Route::delete('/quality-assurance/{qa_record}', [App\Http\Controllers\QualityAssuranceController::class, 'destroy'])->name('quality-assurance.destroy');
 
+Route::get('/quality-assurance/{qa_record}', [App\Http\Controllers\QualityAssuranceController::class, 'show'])->name('quality-assurance.show');
+
 Route::get('/audit', [App\Http\Controllers\AuditController::class, 'index'])->name('audit');
 
 Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');

@@ -99,20 +99,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #dc2626;
-            position: relative;
+            overflow: hidden;
         }
 
-        .logo .aces-text {
-            color: #dc2626;
-        }
-
-        .logo .aces-text:nth-child(2),
-        .logo .aces-text:nth-child(4) {
-            color: #2563eb;
-        }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display:block; }
+        .logo-fallback { width:100%; height:100%; border-radius:50%; display:none; align-items:center; justify-content:center; background:#e5e7eb; color:#111827; font-weight:700; font-family: "Inter", sans-serif; }
 
         .sidebar-title {
             font-family: var(--text-headline-small-bold-font-family);
@@ -528,6 +519,41 @@
             line-height: var(--text-sm-medium-line-height);
         }
 
+        /* Danger button (Delete toggle) */
+        .qa-danger-button {
+            background: #ff3b30;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .qa-danger-button:hover { opacity: 0.9; }
+
+        /* Card delete hover while in delete mode */
+        .qa-card.delete-hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+        }
+
+        /* Delete mode banner */
+        .qa-delete-banner {
+            display: none;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 10px 0 20px;
+            font-family: var(--text-sm-medium-font-family);
+        }
+        .qa-delete-banner.active { display: block; }
+
         /* Modal Styles */
         .qa-modal {
             display: none;
@@ -714,8 +740,8 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <span class="aces-text">A</span><span class="aces-text">C</span><span
-                        class="aces-text">E</span><span class="aces-text">S</span>
+                    <img src="{{ asset('images/aces-logo.png') }}" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="logo-fallback">ACES</div>
                 </div>
                 <div class="sidebar-title">ACES</div>
             </div>
@@ -768,10 +794,10 @@
         <main class="main-content" id="mainContent">
             <!-- Header -->
             <header class="header">
+                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
                 <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
             <!-- Content Area -->
@@ -814,10 +840,14 @@
                     </div>
                 @endif
 
+                <div id="qaDeleteBanner" class="qa-delete-banner">
+                    Delete mode is ON. Click a project card to confirm deletion.
+                </div>
+
                 <!-- QA Cards -->
                 <div class="qa-cards" aria-label="Quality assurance records">
-                    @foreach($records as $index => $record)
-                        <article class="qa-card">
+                    @forelse($records as $index => $record)
+                        <article class="qa-card" data-title="{{ $record->title }}" data-id="{{ $record->id }}" style="cursor: pointer;">
                             <div class="qa-card-content">
                                 <div class="qa-card-picture" style="background-color: {{ $record->color }}"></div>
                                 <div class="qa-card-info">
@@ -829,24 +859,30 @@
                                 </div>
                             </div>
                             <div class="qa-card-time">{{ $record->time }}</div>
-                            <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST">
+                            <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST" onclick="event.stopPropagation()" style="display: none;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="qa-delete-button" aria-label="Delete record">
-                                    <i class="qa-delete-icon fas fa-trash"></i>
-                                    <span class="qa-delete-text">Delete</span>
-                                </button>
                             </form>
                         </article>
-                    @endforeach
+                    @empty
+                        <div style="color:#6b7280; font-family: var(--text-md-normal-font-family);">No projects yet. Click New to add your first project.</div>
+                    @endforelse
                 </div>
 
-                <!-- New Button -->
-                <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
-                    aria-label="Add new record">
-                    <i class="qa-new-icon fas fa-plus"></i>
-                    <span class="qa-new-text">New</span>
-                </button>
+                <!-- New & Delete Buttons -->
+                <div style="display:flex; gap:10px;">
+                    <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
+                        aria-label="Add new record">
+                        <i class="qa-new-icon fas fa-plus"></i>
+                        <span class="qa-new-text">New</span>
+                    </button>
+                    @if(($records ?? collect())->count() > 0)
+                        <button class="qa-danger-button" id="qaDeleteToggle" aria-label="Toggle delete mode">
+                            <i class="fas fa-trash"></i>
+                            <span class="qa-new-text">Delete</span>
+                        </button>
+                    @endif
+                </div>
 
                 <!-- Modal -->
                 <div class="qa-modal">
@@ -888,8 +924,7 @@
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="time">Time</label>
                                 <div class="qa-modal-field">
-                                    <input type="text" id="time" name="time" placeholder="Time (e.g., 30 mins ago)"
-                                        required />
+                                    <input type="time" id="time" name="time" required />
                                 </div>
                                 @error('time')
                                     <span class="qa-error">{{ $message }}</span>
@@ -898,8 +933,7 @@
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="color">Color</label>
                                 <div class="qa-modal-field">
-                                    <input type="text" id="color" name="color" placeholder="Color (e.g., #520d0d)"
-                                        required />
+                                    <input type="color" id="color" name="color" value="#520d0d" required />
                                 </div>
                                 @error('color')
                                     <span class="qa-error">{{ $message }}</span>
@@ -959,6 +993,58 @@
                 this.classList.remove('active');
             }
         });
+
+        // Delete mode for cards
+        let deleteMode = false;
+        const deleteToggle = document.getElementById('qaDeleteToggle');
+        const cards = document.querySelectorAll('.qa-card');
+
+        function updateCardInteractions() {
+            cards.forEach(card => {
+                if (deleteMode) {
+                    // disable navigation while in delete mode
+                    card.onclick = function (e) { e.preventDefault(); };
+                    card.addEventListener('mouseenter', onCardEnter);
+                    card.addEventListener('mouseleave', onCardLeave);
+                    card.addEventListener('click', onCardDeleteClick);
+                } else {
+                    card.removeEventListener('mouseenter', onCardEnter);
+                    card.removeEventListener('mouseleave', onCardLeave);
+                    card.removeEventListener('click', onCardDeleteClick);
+                    card.classList.remove('delete-hover');
+                    // default click goes to details
+                    card.onclick = function () { window.location = `{{ url('/quality-assurance') }}` + '/' + card.dataset.id; };
+                }
+            });
+        }
+
+        function onCardEnter(e) { e.currentTarget.classList.add('delete-hover'); }
+        function onCardLeave(e) { e.currentTarget.classList.remove('delete-hover'); }
+        function onCardDeleteClick(e) {
+            const card = e.currentTarget;
+            const title = card.dataset.title;
+            const ok = confirm(`Are you sure to delete ${title}?`);
+            if (ok) {
+                const form = card.querySelector('form');
+                if (form) {
+                    // Submit the form and keep user on the same page
+                    form.submit();
+                }
+            }
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        deleteToggle && deleteToggle.addEventListener('click', function () {
+            deleteMode = !deleteMode;
+            this.style.opacity = deleteMode ? '0.9' : '1';
+            const banner = document.getElementById('qaDeleteBanner');
+            if (banner) banner.classList.toggle('active', deleteMode);
+            updateCardInteractions();
+        });
+
+        // Initialize default click to show
+        updateCardInteractions();
     </script>
 </body>
 
