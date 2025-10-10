@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\QaRecord;
+use App\Models\Material;
 
 class QualityAssuranceController extends Controller
 {
@@ -19,14 +20,21 @@ class QualityAssuranceController extends Controller
                 ->get()
             : QaRecord::all();
 
-        return view('quality-assurance', compact('records'));
+        // Fetch materials for the materials section
+        $materials = Material::orderBy('created_at', 'desc')->get();
+
+        return view('quality-assurance', compact('records', 'materials'));
     }
 
     public function show(QaRecord $qa_record)
     {
-        // In a future iteration, fetch related materials for this record.
+        // Fetch materials for this specific QA record
+        // For now, we'll show all materials, but in the future this could be filtered by project/record
+        $materials = Material::orderBy('created_at', 'desc')->get();
+        
         return view('quality-assurance-show', [
             'record' => $qa_record,
+            'materials' => $materials,
         ]);
     }
 
@@ -50,5 +58,132 @@ class QualityAssuranceController extends Controller
         QaRecord::create($validated);
 
         return redirect()->route('quality-assurance')->with('success', 'Record created successfully.');
+    }
+
+    // Materials management methods
+    public function storeMaterial(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'batch' => 'nullable|string|max:255',
+                'supplier' => 'nullable|string|max:255',
+                'quantity' => 'required|integer|min:0',
+                'unit' => 'nullable|string|max:50',
+                'price' => 'required|numeric|min:0',
+                'total' => 'required|numeric|min:0',
+                'date_received' => 'nullable|date',
+                'date_inspected' => 'nullable|date',
+                'status' => 'nullable|string|max:50',
+                'location' => 'nullable|string|max:255',
+            ]);
+
+            // Set default status to 'Pending' if not provided
+            if (empty($validated['status'])) {
+                $validated['status'] = 'Pending';
+            }
+
+            Material::create($validated);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Material added successfully!'
+                ]);
+            }
+
+            return redirect()->route('quality-assurance')->with('success', 'Material added successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while saving the material'
+                ], 500);
+            }
+            throw $e;
+        }
+    }
+
+    public function updateMaterial(Request $request, $id)
+    {
+        try {
+            $material = Material::findOrFail($id);
+            
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'batch' => 'nullable|string|max:255',
+                'supplier' => 'nullable|string|max:255',
+                'quantity' => 'required|integer|min:0',
+                'unit' => 'nullable|string|max:50',
+                'price' => 'required|numeric|min:0',
+                'total' => 'required|numeric|min:0',
+                'date_received' => 'nullable|date',
+                'date_inspected' => 'nullable|date',
+                'status' => 'required|string|max:50',
+                'location' => 'nullable|string|max:255',
+            ]);
+
+            $material->update($validated);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Material updated successfully!'
+                ]);
+            }
+
+            return redirect()->route('quality-assurance')->with('success', 'Material updated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while updating the material'
+                ], 500);
+            }
+            throw $e;
+        }
+    }
+
+    public function destroyMaterial(Request $request, $id)
+    {
+        try {
+            $material = Material::findOrFail($id);
+            $material->delete();
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Material deleted successfully!'
+                ]);
+            }
+
+            return redirect()->route('quality-assurance')->with('success', 'Material deleted successfully!');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while deleting the material'
+                ], 500);
+            }
+            throw $e;
+        }
     }
 }

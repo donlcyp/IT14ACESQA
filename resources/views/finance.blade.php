@@ -85,8 +85,12 @@
             transition: transform 0.3s ease;
         }
 
-        .sidebar.collapsed {
+        .sidebar {
             transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
         }
 
         .sidebar-header {
@@ -210,14 +214,11 @@
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-
-        .main-content.expanded {
-            margin-left: 0;
+            width: 100%;
         }
 
         /* Header Styles */

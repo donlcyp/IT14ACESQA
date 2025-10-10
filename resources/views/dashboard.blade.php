@@ -79,8 +79,12 @@
             transition: transform 0.3s ease;
         }
 
-        .sidebar.collapsed {
+        .sidebar {
             transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
         }
 
         .sidebar-header {
@@ -121,25 +125,6 @@
             color: black;
         }
 
-        .nav-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .hamburger-menu {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: var(--gray-700);
-            cursor: pointer;
-        }
-
-        .chevron {
-            font-size: 14px;
-            color: var(--gray-700);
-        }
 
         .nav-menu {
             flex: 1;
@@ -204,14 +189,11 @@
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-
-        .main-content.expanded {
-            margin-left: 0;
+            width: 100%;
         }
 
         /* Header Styles */
@@ -352,15 +334,6 @@
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
             }
 
             .header {
@@ -420,14 +393,6 @@
                 <div class="sidebar-title">ACES</div>
             </div>
 
-            <div class="nav-toggle">
-                <button class="hamburger-menu" id="navToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <span class="chevron">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-            </div>
 
             <nav class="nav-menu">
                 <a href="{{ route('dashboard') }}" class="nav-item active">
@@ -518,32 +483,25 @@
     <script>
         // Sidebar toggle functionality
         const headerMenu = document.getElementById('headerMenu');
-        const navToggle = document.getElementById('navToggle');
         const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
 
         function toggleSidebar() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            sidebar.classList.toggle('open');
         }
 
         headerMenu.addEventListener('click', toggleSidebar);
-        navToggle.addEventListener('click', toggleSidebar);
 
-        // Close sidebar on mobile when clicking outside
+        // Close sidebar when clicking outside
         document.addEventListener('click', function (e) {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
+            if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
+                sidebar.classList.remove('open');
             }
         });
 
-        // Handle window resize
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('open', 'collapsed');
-                mainContent.classList.remove('expanded');
+        // Close sidebar when pressing Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                sidebar.classList.remove('open');
             }
         });
     </script>

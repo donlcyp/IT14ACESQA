@@ -77,10 +77,11 @@
             top: 0;
             z-index: 1000;
             transition: transform 0.3s ease;
+            transform: translateX(-100%);
         }
 
-        .sidebar.collapsed {
-            transform: translateX(-100%);
+        .sidebar.open {
+            transform: translateX(0);
         }
 
         .sidebar-header {
@@ -112,25 +113,6 @@
             color: black;
         }
 
-        .nav-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .hamburger-menu {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: var(--gray-700);
-            cursor: pointer;
-        }
-
-        .chevron {
-            font-size: 14px;
-            color: var(--gray-700);
-        }
 
         .nav-menu {
             flex: 1;
@@ -195,14 +177,11 @@
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-        }
-
-        .main-content.expanded {
-            margin-left: 0;
+            width: 100%;
         }
 
         /* Header Styles */
@@ -397,20 +376,24 @@
 
         /* Cards Section */
         .qa-cards {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
+            width: 100%;
         }
 
         .qa-card {
             background: #ffffff;
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             width: 100%;
-            max-width: 349px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 180px;
         }
 
         .qa-card:hover {
@@ -419,29 +402,35 @@
 
         .qa-card-content {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex: 1;
         }
 
         .qa-card-picture {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            flex-shrink: 0;
         }
 
         .qa-card-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 8px;
             flex: 1;
+            min-width: 0;
         }
 
         .qa-card-title {
             color: #000000;
             font-family: "Source Code Pro", sans-serif;
             font-size: 18px;
-            font-weight: 500;
+            font-weight: 600;
+            line-height: 1.3;
+            margin: 0;
+            word-wrap: break-word;
         }
 
         .qa-card-details {
@@ -449,15 +438,18 @@
             font-family: "Source Code Pro", sans-serif;
             font-size: 14px;
             font-weight: 400;
-            line-height: 1.4;
+            line-height: 1.5;
+            margin: 0;
         }
 
         .qa-card-time {
-            color: rgba(102, 102, 102, 0.6);
+            color: rgba(102, 102, 102, 0.8);
             font-family: "Source Code Pro", sans-serif;
             font-size: 12px;
             text-align: right;
-            margin-bottom: 12px;
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
         }
 
         .qa-delete-button {
@@ -696,18 +688,21 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 1200px) {
+            .qa-cards {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .qa-cards {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
             }
 
             .header {
@@ -723,12 +718,26 @@
             }
 
             .qa-cards {
-                flex-direction: column;
-                align-items: center;
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
 
             .qa-card {
-                max-width: 100%;
+                min-height: 160px;
+                padding: 16px;
+            }
+
+            .qa-card-picture {
+                width: 40px;
+                height: 40px;
+            }
+
+            .qa-card-title {
+                font-size: 16px;
+            }
+
+            .qa-card-details {
+                font-size: 13px;
             }
         }
     </style>
@@ -746,14 +755,6 @@
                 <div class="sidebar-title">ACES</div>
             </div>
 
-            <div class="nav-toggle">
-                <button class="hamburger-menu" id="navToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <span class="chevron">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-            </div>
 
             <nav class="nav-menu">
                 <a href="{{ route('dashboard') }}" class="nav-item">
@@ -762,7 +763,7 @@
                 </a>
                 <a href="{{ route('quality-assurance') }}" class="nav-item active">
                     <i class="nav-icon fas fa-bolt"></i>
-                    <span>Quality Assurance</span>
+                    <span>Project Material Management</span>
                 </a>
                 <a href="{{ route('audit') }}" class="nav-item">
                     <i class="nav-icon fas fa-gavel"></i>
@@ -807,7 +808,7 @@
                     <div class="qa-content">
                         <div class="qa-title-section">
                             <div class="qa-title-badge">
-                                <h2 class="qa-title">Quality Assurance</h2>
+                                <h2 class="qa-title">Project Material Management</h2>
                                 <div class="qa-badge"></div>
                             </div>
                         </div>
@@ -884,11 +885,12 @@
                     @endif
                 </div>
 
-                <!-- Modal -->
+
+                <!-- QA Modal -->
                 <div class="qa-modal">
                     <div class="qa-modal-content">
                         <div class="qa-modal-icon"></div>
-                        <h2 class="qa-modal-title">Add Quality Assurance Record</h2>
+                        <h2 class="qa-modal-title">Add Project Material Record</h2>
                         <form action="{{ route('quality-assurance.store') }}" method="POST">
                             @csrf
                             <div class="qa-modal-input">
@@ -951,6 +953,7 @@
                         </form>
                     </div>
                 </div>
+
             </section>
         </main>
     </div>
@@ -958,32 +961,25 @@
     <script>
         // Sidebar toggle functionality
         const headerMenu = document.getElementById('headerMenu');
-        const navToggle = document.getElementById('navToggle');
         const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
 
         function toggleSidebar() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            sidebar.classList.toggle('open');
         }
 
         headerMenu.addEventListener('click', toggleSidebar);
-        navToggle.addEventListener('click', toggleSidebar);
 
-        // Close sidebar on mobile when clicking outside
+        // Close sidebar when clicking outside
         document.addEventListener('click', function (e) {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
+            if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
+                sidebar.classList.remove('open');
             }
         });
 
-        // Handle window resize
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('open', 'collapsed');
-                mainContent.classList.remove('expanded');
+        // Close sidebar when pressing Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                sidebar.classList.remove('open');
             }
         });
 
@@ -1045,6 +1041,7 @@
 
         // Initialize default click to show
         updateCardInteractions();
+
     </script>
 </body>
 
