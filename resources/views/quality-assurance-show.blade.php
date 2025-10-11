@@ -139,41 +139,187 @@
 
         /* New Material Modal Styles */
         .modal-add, .modal-add * { box-sizing: border-box; }
-        .modal-add { background: #ffffff; border-radius: 8px; height: 616px; position: relative; width: 1100px; max-width: 95vw; max-height: 90vh; overflow: auto; }
-        .container { padding: 32px; width: 100%; height: 616px; position: relative; }
-        .container2 { width: 100%; height: 569px; position: relative; }
-        .container3 { background: #ffffff; border-radius: 8px; border-style: solid; border-color: #e5e7eb; border-width: 1px; padding: 24px; width: 100%; height: 546px; position: relative; }
-        .container4 { width: 100%; height: auto; position: relative; margin-bottom: 16px; }
-        .heading { width: 100%; min-height: 28px; position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .modal-add { 
+            background: #ffffff; 
+            border-radius: 12px; 
+            position: relative; 
+            width: 560px; 
+            max-width: 90vw; 
+            max-height: 90vh; 
+            overflow: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .container { padding: 40px; width: 100%; position: relative; }
+        .container2 { width: 100%; position: relative; }
+        .container3 { background: #ffffff; border-radius: 12px; width: 100%; position: relative; }
+        .container4 { width: 100%; height: auto; position: relative; margin-bottom: 0; }
+        .heading { width: 100%; position: relative; display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
         .modal-head { display: flex; align-items: center; gap: 12px; }
-        .modal-icon { width: 36px; height: 36px; border-radius: 10px; background: #eef2ff; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; }
-        .modal-icon i { color: #1f2937; }
-        .add-material { color: #111827; text-align: left; font-family: "Inter-Bold", sans-serif; font-size: 18px; line-height: 28px; font-weight: 700; }
+        .modal-icon { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 6px; 
+            background: #000000; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-icon i { color: #ffffff; font-size: 14px; }
+        .add-material { 
+            color: #111827; 
+            font-family: "Inter", sans-serif; 
+            font-size: 18px; 
+            font-weight: 600; 
+            margin: 0;
+            line-height: 1.2;
+        }
         .icon { display: none; }
-        .paragraph { display: none; } /* Hide paragraph for now */
-        .container5 { width: 100%; display: flex; flex-direction: column; gap: 16px; }
-        .container6, .container7, .container8, .container9, .container10 { width: 100%; display: flex; flex-direction: column; gap: 8px; margin: 0; }
-        .label { width: 100%; margin: 0; }
-        .supplier, .status, .storage-location, .inspector-name, .date-received { color: #374151; font-family: "Inter-Regular", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .input, .input2, .input3 { background: #ffffff; border-radius: 8px; border: 1px solid #d1d5db; padding: 10px 12px; width: 100%; display: flex; align-items: center; }
-        .input2 { background: rgba(75, 75, 75, 0.1); }
-        .enter-supplier-name, .enter-storage-location, .mm-dd-yyyy { color: #000; font-family: "Inter-Regular", sans-serif; font-size: 16px; line-height: 24px; font-weight: 400; border: none; background: transparent; width: 100%; outline: none; }
-        .enter-supplier-name::placeholder, .enter-storage-location::placeholder, .mm-dd-yyyy::placeholder { color: #cccccc; }
-        .pending { color: #000000; font-family: "Inter-Regular", sans-serif; font-size: 16px; line-height: 24px; font-weight: 400; }
-        .container9 { width: 100%; margin-bottom: 20px; }
-        .engr-jeric-santos { color: #000000; font-family: "Inter-Regular", sans-serif; font-size: 14px; line-height: 20px; font-weight: 400; }
-        .btns { display: flex; flex-direction: row; gap: 12px; align-items: center; justify-content: flex-end; margin-top: 20px; width: 100%; }
-        .button { background: #ffffff; border-radius: 4px; border: 1px solid #e9e9e9; padding: 8px 12px; display: flex; align-items: center; justify-content: center; height: 36px; cursor: pointer; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1); }
-        .button2 { color: #313131; font-family: "Inter-Regular", sans-serif; font-size: 14px; line-height: 20px; font-weight: 400; }
-        .button3 { background: #1c57b6; border-radius: 4px; padding: 8px 12px; display: flex; align-items: center; justify-content: center; height: 36px; cursor: pointer; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1); }
-        .button4 { color: #ffffff; font-family: "Inter-Bold", sans-serif; font-size: 14px; line-height: 20px; font-weight: 700; }
-        .container10 { width: 100%; margin-bottom: 20px; }
+        .paragraph { display: none; }
+        .container5 { width: 100%; display: flex; flex-direction: column; gap: 0; }
+        .container6, .container7, .container8, .container9, .container10 { 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .label { width: 100%; margin-bottom: 0; }
+        .supplier, .status, .storage-location, .inspector-name, .date-received { 
+            color: #374151; 
+            font-family: "Inter", sans-serif; 
+            font-size: 13px; 
+            font-weight: 500; 
+            margin: 0;
+            line-height: 1.4;
+        }
+        .input, .input2, .input3 { 
+            background: #ffffff; 
+            border-radius: 8px; 
+            border: 1px solid #d1d5db; 
+            padding: 10px 14px; 
+            width: 100%; 
+            display: flex; 
+            align-items: center;
+            min-height: 42px;
+        }
+        .input2 { 
+            background: #f3f4f6; 
+            border-color: #e5e7eb;
+        }
+        .enter-supplier-name, .enter-storage-location, .mm-dd-yyyy { 
+            color: #111827; 
+            font-family: "Inter", sans-serif; 
+            font-size: 14px; 
+            font-weight: 400; 
+            border: none; 
+            background: transparent; 
+            width: 100%; 
+            outline: none;
+            margin: 0;
+            padding: 0;
+        }
+        .enter-supplier-name::placeholder, .enter-storage-location::placeholder, .mm-dd-yyyy::placeholder { 
+            color: #9ca3af; 
+        }
+        .pending { 
+            color: #111827; 
+            font-family: "Inter", sans-serif; 
+            font-size: 14px; 
+            font-weight: 400; 
+            margin: 0;
+        }
+        .container9 { width: 100%; }
+        .engr-jeric-santos { 
+            color: #111827; 
+            font-family: "Inter", sans-serif; 
+            font-size: 14px; 
+            font-weight: 400; 
+            margin: 0;
+        }
+        .btns { 
+            display: flex; 
+            flex-direction: row; 
+            gap: 12px; 
+            align-items: center; 
+            justify-content: flex-end; 
+            margin-top: 8px; 
+            width: 100%; 
+        }
+        .button { 
+            background: #ffffff; 
+            border-radius: 8px; 
+            border: 1px solid #d1d5db; 
+            padding: 10px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 40px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
+        .button:hover {
+            background: #f9fafb;
+        }
+        .button2 { 
+            color: #374151; 
+            font-family: "Inter", sans-serif; 
+            font-size: 14px; 
+            font-weight: 500; 
+            margin: 0;
+        }
+        .button3 { 
+            background: #2563eb; 
+            border-radius: 8px; 
+            border: none;
+            padding: 10px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 40px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
+        .button3:hover {
+            background: #1d4ed8;
+        }
+        .button4 { 
+            color: #ffffff; 
+            font-family: "Inter", sans-serif; 
+            font-size: 14px; 
+            font-weight: 500; 
+            margin: 0;
+        }
+        .container10 { width: 100%; }
         .container11 { width: 100%; position: relative; }
         /* prevent right-edge overflow */
         .modal-add .container3, .modal-add-2 .container3 { box-sizing: border-box; overflow: hidden; }
         .modal-add .container3 > *:not(.btns), .modal-add-2 .container3 > *:not(.btns) { max-width: 100%; }
-        .button5 { display: none; } /* Hide button5 for now */
-        .frame { display: none; } /* Hide frame for now */
+        .button5 { display: none; }
+        .frame { display: none; }
+
+        /* Modal close button specific styling */
+        .modal-add .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .modal-add .modal-close:hover {
+            background: #f9fafb;
+        }
+        .modal-add .modal-close i {
+            font-size: 14px;
+            color: #6b7280;
+        }
 
         /* Header right action (Step 2) */
         .add-item-btn { background: #9333ea; color: #ffffff; border-radius: 8px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none; box-shadow: var(--shadow-xs); }
@@ -403,7 +549,7 @@
                 <!-- New/Edit Material Modal - Step 1 -->
                 <div class="qa-modal" id="materialModal" aria-hidden="true">
                     <div class="modal-add" role="dialog" aria-modal="true">
-                        <button class="modal-close" onclick="closeMaterialModal()" style="position: absolute; top: 15px; right: 15px; background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px; cursor: pointer; z-index: 10;">
+                        <button class="modal-close" onclick="closeMaterialModal()">
                             <i class="fas fa-times"></i>
                         </button>
                         <div class="container">
@@ -414,45 +560,50 @@
                                             <div class="modal-head">
                                                 <div class="modal-icon"><i class="fas fa-bolt"></i></div>
                                                 <div class="add-material">Add Material</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="paragraph"></div>
-                                    <!-- Inspector Name -->
-                                    <div class="container9">
-                                        <div class="label"><div class="inspector-name">Inspector Name</div></div>
-                                        <div class="input"><div class="engr-jeric-santos">Engr. Jeric Santos</div></div>
-                                    </div>
-                                    <!-- Supplier -->
+                                </div>
+                                </div>
+                                </div>
+                                    
                                     <div class="container5">
+                                        <!-- Inspector Name -->
+                                        <div class="container9">
+                                            <div class="label"><div class="inspector-name">Inspector Name</div></div>
+                                            <div class="input"><div class="engr-jeric-santos">Engr. Jeric Santos</div></div>
+                                </div>
+                                        
+                                        <!-- Supplier -->
                                         <div class="container6">
                                             <div class="label"><div class="supplier">Supplier</div></div>
                                             <div class="input">
                                                 <input type="text" class="enter-supplier-name" placeholder="Enter supplier name" id="mat_supplier" name="supplier" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Date Received -->
-                                    <div class="container10">
-                                        <div class="label"><div class="date-received">Date Received</div></div>
-                                        <div class="container11">
-                                            <div class="input3">
-                                                <input type="date" class="mm-dd-yyyy" id="mat_received" name="date_received" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Storage Location -->
-                                    <div class="container8">
-                                        <div class="label"><div class="storage-location">Storage Location</div></div>
-                                        <div class="input">
-                                            <input type="text" class="enter-storage-location" placeholder="Enter storage location" id="mat_location" name="location" />
-                                        </div>
-                                    </div>
-                                    <!-- Status (read-only) -->
-                                    <div class="container7">
-                                        <div class="label"><div class="status">Status</div></div>
-                                        <div class="input2"><div class="pending">Pending</div></div>
-                                    </div>
+                                </div>
+                                </div>
+                                        
+                                        <!-- Date Received -->
+                                        <div class="container10">
+                                            <div class="label"><div class="date-received">Date Received</div></div>
+                                            <div class="container11">
+                                                <div class="input3">
+                                                    <input type="date" class="mm-dd-yyyy" id="mat_received" name="date_received" />
+                                </div>
+                                </div>
+                                </div>
+                                        
+                                        <!-- Storage Location -->
+                                        <div class="container8">
+                                            <div class="label"><div class="storage-location">Storage Location</div></div>
+                                            <div class="input">
+                                                <input type="text" class="enter-storage-location" placeholder="Enter storage location" id="mat_location" name="location" />
+                                </div>
+                                </div>
+                                        
+                                        <!-- Status (read-only) -->
+                                        <div class="container7">
+                                            <div class="label"><div class="status">Status</div></div>
+                                            <div class="input2"><div class="pending">Pending</div></div>
+                            </div>
+                            </div>
+                                    
                                     <div class="btns">
                                         <div class="button">
                                             <div class="button2" onclick="closeMaterialModal()">Cancel</div>
@@ -485,14 +636,7 @@
                                             <button class="add-item-btn" onclick="addMaterialRow()"><i class="fas fa-plus"></i><span>Add Item</span></button>
                                         </div>
                                     </div>
-                                    <div class="btns">
-                                        <div class="button2">
-                                            <div class="button3" onclick="showMaterialStep1()">Back</div>
-                                        </div>
-                                        <div class="button4">
-                                            <div class="button5" onclick="saveMaterial()">Save</div>
-                                        </div>
-                                    </div>
+                                    
                                     <div class="container5">
                                         <div class="container6">
                                             <div class="container7">
@@ -500,33 +644,40 @@
                                                     <div class="container9">
                                                         <div class="product">Product</div>
                                                     </div>
+                                                    <div class="container13">
+                                                        <div class="batch-serial-no">Batch/Serial No.</div>
+                                                    </div>
                                                     <div class="container10">
                                                         <div class="quantity">Quantity</div>
                                                     </div>
                                                     <div class="container11">
                                                         <div class="unit-of-measure">Unit of Measure</div>
                                                     </div>
-                                                    <div class="container12">
-                                                        <div class="total">Total (₱)</div>
-                                </div>
-                                                    <div class="container13">
-                                                        <div class="batch-serial-no">Batch/Serial No.</div>
-                                </div>
                                                     <div class="container14">
                                                         <div class="unit-price">Unit Price (₱)</div>
-                                </div>
-                                </div>
-                                </div>
-                                            <div class="container15">
-                                                <div class="container16" id="materialRows">
-                                                    <!-- Material rows will be added here dynamically -->
-                                </div>
-                                </div>
-                                </div>
-                                </div>
+                                                    </div>
+                                                    <div class="container12">
+                                                        <div class="total">Total (₱)</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="container15" id="materialRowsContainer">
+                                                <!-- Material rows will be added here dynamically -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="btns">
+                                        <div class="button">
+                                            <div class="button2" onclick="showMaterialStep1()">Back</div>
+                                        </div>
+                                        <div class="button3">
+                                            <div class="button4" onclick="saveMaterial()">Save</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -707,22 +858,70 @@
                 document.getElementById('mat_location').value = material.location || '';
                 document.getElementById('mat_received').value = material.date_received || '';
                 
-                // Add existing material as a row in step 2
-                materialRows = [{
-                    name: material.name,
-                    batch: material.batch || '',
-                    quantity: material.quantity,
-                    unit: material.unit || '',
-                    price: material.price,
-                    total: material.total
-                }];
+                // Clear existing rows and add the material being edited
+                const container = document.getElementById('materialRowsContainer');
+                container.innerHTML = '';
+                
+                const editRow = document.createElement('div');
+                editRow.className = 'container16';
+                editRow.innerHTML = `
+                    <div style="padding: 12px 24px; width: 240px;">
+                        <div class="input4">
+                            <input type="text" placeholder="Product name" class="material-name" value="${material.name}" />
+                        </div>
+                    </div>
+                    <div style="padding: 12px 24px; width: 155px;">
+                        <div class="input5">
+                            <input type="text" placeholder="Batch/Serial" class="material-batch" value="${material.batch || ''}" />
+                        </div>
+                    </div>
+                    <div style="padding: 12px 24px; width: 114px;">
+                        <div class="input6">
+                            <input type="number" value="${material.quantity}" class="material-quantity" onchange="calculateRowTotal(this)" />
+                        </div>
+                    </div>
+                    <div style="padding: 12px 24px; width: 118px;">
+                        <div class="input7">
+                            <select class="material-unit">
+                                <option value="">Select</option>
+                                <option value="Meter" ${material.unit === 'Meter' ? 'selected' : ''}>Meter</option>
+                                <option value="Feet" ${material.unit === 'Feet' ? 'selected' : ''}>Feet</option>
+                                <option value="Kilogram" ${material.unit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
+                                <option value="Pound" ${material.unit === 'Pound' ? 'selected' : ''}>Pound</option>
+                                <option value="Ton" ${material.unit === 'Ton' ? 'selected' : ''}>Ton</option>
+                                <option value="Piece" ${material.unit === 'Piece' ? 'selected' : ''}>Piece</option>
+                                <option value="Liter" ${material.unit === 'Liter' ? 'selected' : ''}>Liter</option>
+                                <option value="Gallon" ${material.unit === 'Gallon' ? 'selected' : ''}>Gallon</option>
+                                <option value="Box" ${material.unit === 'Box' ? 'selected' : ''}>Box</option>
+                                <option value="Bag" ${material.unit === 'Bag' ? 'selected' : ''}>Bag</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="padding: 12px 24px; width: 106px;">
+                        <div class="input8">
+                            <input type="number" placeholder="0.00" step="0.01" class="material-price" value="${material.price}" onchange="calculateRowTotal(this)" />
+                        </div>
+                    </div>
+                    <div style="padding: 12px 24px; width: 119px;">
+                        <div class="input9">
+                            <input type="number" placeholder="0.00" readonly class="material-total" value="${material.total}" />
+                        </div>
+                    </div>
+                    <div class="container17">
+                        <button class="button6" onclick="removeMaterialRow(this)">
+                            <i class="fas fa-trash" style="color: #ef4444;"></i>
+                        </button>
+                    </div>`;
+                container.appendChild(editRow);
             } else {
                 // Reset form for new material
                 document.getElementById('mat_supplier').value = '';
                 document.getElementById('mat_location').value = '';
                 document.getElementById('mat_received').value = '';
-                materialRows = [];
-                // Initialize with one empty row
+                
+                // Clear existing rows and add one empty row
+                const container = document.getElementById('materialRowsContainer');
+                container.innerHTML = '';
                 addMaterialRow();
             }
 
@@ -745,14 +944,11 @@
             materialModalStep2.classList.add('active');
             materialModal.setAttribute('aria-hidden', 'true');
             materialModalStep2.setAttribute('aria-hidden', 'false');
-            // If using dynamic rows container, ensure at least one row
-            const simpleContainer = document.getElementById('materialRowsContainer');
-            if (simpleContainer) {
-                if (simpleContainer.children.length === 0) {
-                    addMaterialRow();
-                }
-            } else {
-                renderMaterialRows();
+            
+            // Ensure at least one row exists
+            const container = document.getElementById('materialRowsContainer');
+            if (container.children.length === 0) {
+                addMaterialRow();
             }
         }
 
@@ -764,58 +960,58 @@
         }
 
         function addMaterialRow() {
-            const simpleContainer = document.getElementById('materialRowsContainer');
-            if (simpleContainer) {
-                const newRow = document.createElement('div');
-                newRow.className = 'container16';
-                newRow.innerHTML = `
-                    <div style="padding: 12px 24px; width: 240px;">
-                        <div class="input4">
-                            <input type="text" placeholder="Product name" />
-                        </div>
+            const container = document.getElementById('materialRowsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'container16';
+            newRow.innerHTML = `
+                <div style="padding: 12px 24px; width: 240px;">
+                    <div class="input4">
+                        <input type="text" placeholder="Product name" class="material-name" />
                     </div>
-                    <div style="padding: 12px 24px; width: 155px;">
-                        <div class="input5">
-                            <input type="text" placeholder="Batch/Serial" />
-                        </div>
+                </div>
+                <div style="padding: 12px 24px; width: 155px;">
+                    <div class="input5">
+                        <input type="text" placeholder="Batch/Serial" class="material-batch" />
                     </div>
-                    <div style="padding: 12px 24px; width: 114px;">
-                        <div class="input6">
-                            <input type="number" value="0" />
-                        </div>
+                </div>
+                <div style="padding: 12px 24px; width: 114px;">
+                    <div class="input6">
+                        <input type="number" value="0" class="material-quantity" onchange="calculateRowTotal(this)" />
                     </div>
-                    <div style="padding: 12px 24px; width: 118px;">
-                        <div class="input7">
-                            <select>
-                                <option value="">Select</option>
-                                <option value="pcs">Pcs</option>
-                                <option value="kg">Kg</option>
-                                <option value="m">M</option>
-                                <option value="l">L</option>
-                            </select>
-                        </div>
+                </div>
+                <div style="padding: 12px 24px; width: 118px;">
+                    <div class="input7">
+                        <select class="material-unit">
+                            <option value="">Select</option>
+                            <option value="Meter">Meter</option>
+                            <option value="Feet">Feet</option>
+                            <option value="Kilogram">Kilogram</option>
+                            <option value="Pound">Pound</option>
+                            <option value="Ton">Ton</option>
+                            <option value="Piece">Piece</option>
+                            <option value="Liter">Liter</option>
+                            <option value="Gallon">Gallon</option>
+                            <option value="Box">Box</option>
+                            <option value="Bag">Bag</option>
+                        </select>
                     </div>
-                    <div style="padding: 12px 24px; width: 106px;">
-                        <div class="input8">
-                            <input type="number" placeholder="0.00" />
-                        </div>
+                </div>
+                <div style="padding: 12px 24px; width: 106px;">
+                    <div class="input8">
+                        <input type="number" placeholder="0.00" step="0.01" class="material-price" onchange="calculateRowTotal(this)" />
                     </div>
-                    <div style="padding: 12px 24px; width: 119px;">
-                        <div class="input9">
-                            <input type="number" placeholder="0.00" readonly />
-                        </div>
+                </div>
+                <div style="padding: 12px 24px; width: 119px;">
+                    <div class="input9">
+                        <input type="number" placeholder="0.00" readonly class="material-total" />
                     </div>
-                    <div class="container17">
-                        <button class="button6" onclick="removeMaterialRow(this)">
-                            <i class="fas fa-trash" style="color: #ef4444;"></i>
-                        </button>
-                    </div>`;
-                simpleContainer.appendChild(newRow);
-                return;
-            }
-            // fallback to array-driven rows
-            materialRows.push({ name: '', batch: '', quantity: 0, unit: '', price: 0, total: 0 });
-            renderMaterialRows();
+                </div>
+                <div class="container17">
+                    <button class="button6" onclick="removeMaterialRow(this)">
+                        <i class="fas fa-trash" style="color: #ef4444;"></i>
+                    </button>
+                </div>`;
+            container.appendChild(newRow);
         }
 
         function removeMaterialRow(btn) {
@@ -823,71 +1019,20 @@
             if (row) row.remove();
         }
 
-        function removeMaterialRow(index) {
-            materialRows.splice(index, 1);
-            renderMaterialRows();
+        function calculateRowTotal(inputElement) {
+            const row = inputElement.closest('.container16');
+            const quantity = parseFloat(row.querySelector('.material-quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.material-price').value) || 0;
+            const total = quantity * price;
+            row.querySelector('.material-total').value = total.toFixed(2);
         }
 
-        function renderMaterialRows() {
-            const container = document.getElementById('materialRows');
-            container.innerHTML = '';
-            
-            materialRows.forEach((row, index) => {
-                const rowElement = document.createElement('div');
-                rowElement.className = 'container16';
-                rowElement.innerHTML = `
-                    <div class="input4">
-                        <input type="text" placeholder="Product name" value="${row.name}" onchange="updateMaterialRow(${index}, 'name', this.value)" />
-                    </div>
-                    <div class="input2">
-                        <input type="text" placeholder="Batch/Serial" value="${row.batch}" onchange="updateMaterialRow(${index}, 'batch', this.value)" />
-                    </div>
-                    <div class="input">
-                        <input type="number" placeholder="0" value="${row.quantity}" onchange="updateMaterialRow(${index}, 'quantity', this.value); calculateRowTotal(${index})" />
-                    </div>
-                    <div class="input5">
-                        <select onchange="updateMaterialRow(${index}, 'unit', this.value)">
-                            <option value="">Select Unit</option>
-                            <option value="Meter" ${row.unit === 'Meter' ? 'selected' : ''}>Meters</option>
-                            <option value="Feet" ${row.unit === 'Feet' ? 'selected' : ''}>Feet</option>
-                            <option value="Kilogram" ${row.unit === 'Kilogram' ? 'selected' : ''}>Kilograms</option>
-                            <option value="Pound" ${row.unit === 'Pound' ? 'selected' : ''}>Pounds</option>
-                            <option value="Ton" ${row.unit === 'Ton' ? 'selected' : ''}>Tons</option>
-                            <option value="Piece" ${row.unit === 'Piece' ? 'selected' : ''}>Pieces</option>
-                            <option value="Liter" ${row.unit === 'Liter' ? 'selected' : ''}>Liters</option>
-                            <option value="Gallon" ${row.unit === 'Gallon' ? 'selected' : ''}>Gallons</option>
-                            <option value="Box" ${row.unit === 'Box' ? 'selected' : ''}>Boxes</option>
-                            <option value="Bag" ${row.unit === 'Bag' ? 'selected' : ''}>Bags</option>
-                        </select>
-                    </div>
-                    <div class="input6">
-                        <input type="number" step="0.01" placeholder="0.00" value="${row.price}" onchange="updateMaterialRow(${index}, 'price', this.value); calculateRowTotal(${index})" />
-                    </div>
-                    <div class="input3">
-                        <input type="number" step="0.01" placeholder="0.00" value="${row.total}" readonly />
-                    </div>
-                    <div class="container17">
-                        <div class="button6" onclick="removeMaterialRow(${index})">
-                            <i class="fas fa-trash" style="color: #dc3545; cursor: pointer;"></i>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(rowElement);
-            });
-        }
-
-        function updateMaterialRow(index, field, value) {
-            materialRows[index][field] = value;
-        }
-
-        function calculateRowTotal(index) {
-            const row = materialRows[index];
-            row.total = parseFloat(row.quantity || 0) * parseFloat(row.price || 0);
-            renderMaterialRows();
-        }
 
         async function saveMaterial() {
-            if (materialRows.length === 0) {
+            const container = document.getElementById('materialRowsContainer');
+            const rows = container.querySelectorAll('.container16');
+            
+            if (rows.length === 0) {
                 alert('Please add at least one material item.');
                 return;
             }
@@ -896,16 +1041,33 @@
             const location = document.getElementById('mat_location').value;
             const dateReceived = document.getElementById('mat_received').value;
 
+            if (!supplier || !location || !dateReceived) {
+                alert('Please fill in all required fields in Step 1.');
+                return;
+            }
+
             try {
-                for (const row of materialRows) {
+                for (const row of rows) {
+                    const name = row.querySelector('.material-name').value;
+                    const batch = row.querySelector('.material-batch').value;
+                    const quantity = parseFloat(row.querySelector('.material-quantity').value) || 0;
+                    const unit = row.querySelector('.material-unit').value;
+                    const price = parseFloat(row.querySelector('.material-price').value) || 0;
+                    const total = parseFloat(row.querySelector('.material-total').value) || 0;
+
+                    if (!name || quantity <= 0 || price <= 0) {
+                        alert('Please fill in all required fields for each material item.');
+                        return;
+                    }
+
                     const formData = {
-                        name: row.name,
-                        batch: row.batch,
+                        name: name,
+                        batch: batch,
                         supplier: supplier,
-                        quantity: parseFloat(row.quantity),
-                        unit: row.unit,
-                        price: parseFloat(row.price),
-                        total: parseFloat(row.total),
+                        quantity: quantity,
+                        unit: unit,
+                        price: price,
+                        total: total,
                         date_received: dateReceived,
                         date_inspected: dateReceived,
                         status: 'Pending',
@@ -939,12 +1101,6 @@
             }
         }
 
-        // Initialize with one empty row for new materials
-        function initializeNewMaterial() {
-            if (!editMode) {
-                addMaterialRow();
-            }
-        }
 
         // Success message
         function showSuccess(message) {
