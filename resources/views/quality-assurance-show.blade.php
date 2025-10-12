@@ -137,262 +137,287 @@
         .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* New Material Modal Styles */
+        /* New Material Modal Styles - Clean Design */
         .modal-add, .modal-add * { box-sizing: border-box; }
         .modal-add { 
             background: #ffffff; 
-            border-radius: 12px; 
+            border-radius: 16px; 
             position: relative; 
-            width: 560px; 
+            width: 520px; 
             max-width: 90vw; 
             max-height: 90vh; 
             overflow: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-        .container { padding: 40px; width: 100%; position: relative; }
-        .container2 { width: 100%; position: relative; }
-        .container3 { background: #ffffff; border-radius: 12px; width: 100%; position: relative; }
-        .container4 { width: 100%; height: auto; position: relative; margin-bottom: 0; }
-        .heading { width: 100%; position: relative; display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .modal-head { display: flex; align-items: center; gap: 12px; }
-        .modal-icon { 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 6px; 
-            background: #000000; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .modal-icon i { color: #ffffff; font-size: 14px; }
-        .add-material { 
-            color: #111827; 
-            font-family: "Inter", sans-serif; 
-            font-size: 18px; 
-            font-weight: 600; 
-            margin: 0;
-            line-height: 1.2;
-        }
-        .icon { display: none; }
-        .paragraph { display: none; }
-        .container5 { width: 100%; display: flex; flex-direction: column; gap: 0; }
-        .container6, .container7, .container8, .container9, .container10 { 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px;
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 0 24px;
             margin-bottom: 24px;
         }
-        .label { width: 100%; margin-bottom: 0; }
-        .supplier, .status, .storage-location, .inspector-name, .date-received { 
-            color: #374151; 
-            font-family: "Inter", sans-serif; 
-            font-size: 13px; 
-            font-weight: 500; 
-            margin: 0;
-            line-height: 1.4;
-        }
-        .input, .input2, .input3 { 
-            background: #ffffff; 
-            border-radius: 8px; 
-            border: 1px solid #d1d5db; 
-            padding: 10px 14px; 
-            width: 100%; 
-            display: flex; 
+        
+        .modal-title {
+            display: flex;
             align-items: center;
-            min-height: 42px;
+            gap: 12px;
         }
-        .input2 { 
-            background: #f3f4f6; 
-            border-color: #e5e7eb;
-        }
-        .enter-supplier-name, .enter-storage-location, .mm-dd-yyyy { 
-            color: #111827; 
-            font-family: "Inter", sans-serif; 
-            font-size: 14px; 
-            font-weight: 400; 
-            border: none; 
-            background: transparent; 
-            width: 100%; 
-            outline: none;
-            margin: 0;
-            padding: 0;
-        }
-        .enter-supplier-name::placeholder, .enter-storage-location::placeholder, .mm-dd-yyyy::placeholder { 
-            color: #9ca3af; 
-        }
-        .pending { 
-            color: #111827; 
-            font-family: "Inter", sans-serif; 
-            font-size: 14px; 
-            font-weight: 400; 
-            margin: 0;
-        }
-        .container9 { width: 100%; }
-        .engr-jeric-santos { 
-            color: #111827; 
-            font-family: "Inter", sans-serif; 
-            font-size: 14px; 
-            font-weight: 400; 
-            margin: 0;
-        }
-        .btns { 
-            display: flex; 
-            flex-direction: row; 
-            gap: 12px; 
-            align-items: center; 
-            justify-content: flex-end; 
-            margin-top: 8px; 
-            width: 100%; 
-        }
-        .button { 
-            background: #ffffff; 
+        
+        .modal-icon { 
+            width: 40px; 
+            height: 40px; 
             border-radius: 8px; 
-            border: 1px solid #d1d5db; 
-            padding: 10px 20px; 
+            background: #1f2937; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            min-height: 40px; 
-            cursor: pointer; 
-            transition: all 0.2s ease;
         }
-        .button:hover {
+        .modal-icon i { color: #ffffff; font-size: 16px; }
+        
+        .modal-title-text { 
+            color: #111827; 
+            font-family: "Inter", sans-serif; 
+            font-size: 20px; 
+            font-weight: 600; 
+            margin: 0;
+        }
+        
+        .modal-close {
             background: #f9fafb;
-        }
-        .button2 { 
-            color: #374151; 
-            font-family: "Inter", sans-serif; 
-            font-size: 14px; 
-            font-weight: 500; 
-            margin: 0;
-        }
-        .button3 { 
-            background: #2563eb; 
-            border-radius: 8px; 
-            border: none;
-            padding: 10px 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 40px; 
-            cursor: pointer; 
-            transition: all 0.2s ease;
-        }
-        .button3:hover {
-            background: #1d4ed8;
-        }
-        .button4 { 
-            color: #ffffff; 
-            font-family: "Inter", sans-serif; 
-            font-size: 14px; 
-            font-weight: 500; 
-            margin: 0;
-        }
-        .container10 { width: 100%; }
-        .container11 { width: 100%; position: relative; }
-        /* prevent right-edge overflow */
-        .modal-add .container3, .modal-add-2 .container3 { box-sizing: border-box; overflow: hidden; }
-        .modal-add .container3 > *:not(.btns), .modal-add-2 .container3 > *:not(.btns) { max-width: 100%; }
-        .button5 { display: none; }
-        .frame { display: none; }
-
-        /* Modal close button specific styling */
-        .modal-add .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #fff;
             border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 6px 8px;
+            border-radius: 8px;
+            padding: 8px;
             cursor: pointer;
-            z-index: 10;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
         }
-        .modal-add .modal-close:hover {
-            background: #f9fafb;
+        .modal-close:hover {
+            background: #f3f4f6;
         }
-        .modal-add .modal-close i {
+        .modal-close i {
             font-size: 14px;
             color: #6b7280;
         }
-
-        /* Header right action (Step 2) */
-        .add-item-btn { background: #9333ea; color: #ffffff; border-radius: 8px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none; box-shadow: var(--shadow-xs); }
-        .add-item-btn i { font-size: 12px; }
-
-        /* Modal Step 2 Styles */
-        .modal-add-2, .modal-add-2 * { box-sizing: border-box; }
-        .modal-add-2 { background: #ffffff; border-radius: 8px; height: 616px; position: relative; width: 1100px; max-width: 95vw; max-height: 90vh; overflow: auto; }
-        .add-item { color: #ffffff; text-align: center; font-family: "Inter-Regular", sans-serif; font-size: 14px; line-height: 20px; font-weight: 400; }
-        .span { display: none; } /* Hide span for now */
-        .button { background: #9333ea; border-radius: 8px; padding: 8px 16px; width: 100px; height: 33px; cursor: pointer; margin-bottom: 20px; }
-        .container5 { border-radius: 8px; border: 1px solid #e5e7eb; width: 100%; height: 362px; overflow: hidden; margin-bottom: 20px; }
-        .container6 { width: 100%; height: 198px; position: relative; }
-        .container7 { width: 100%; height: 48.5px; position: relative; }
-        .container8 { background: #f9fafb; width: 100%; height: 48.5px; position: relative; display: flex; box-sizing: border-box; padding-right: 8px; }
-        .container9 { padding: 12px 24px; width: 240px; height: 49px; position: relative; display: flex; align-items: center; }
-        .product { color: #4b5563; font-family: "Inter-Medium", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .container10 { padding: 12px 24px; width: 114px; height: 49px; position: relative; display: flex; align-items: center; justify-content: center; }
-        .quantity { color: #4b5563; font-family: "Inter-Medium", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .container11 { padding: 12px 24px; width: 118px; height: 49px; position: relative; display: flex; align-items: center; justify-content: center; }
-        .unit-of-measure { color: #4b5563; font-family: "Inter-Medium", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .container12 { padding: 12px 24px; width: 119px; height: 49px; position: relative; display: flex; align-items: center; justify-content: flex-end; }
-        .total { color: #4b5563; font-family: "Inter-Medium", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .container13 { padding: 12px 24px; width: 155px; height: 49px; position: relative; display: flex; align-items: center; justify-content: center; }
-        .batch-serial-no { color: #4b5563; font-family: "Inter-Medium", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .container14 { padding: 12px 24px; width: 106px; height: 49px; position: relative; display: flex; align-items: center; justify-content: center; }
-        .unit-price { color: #4b5563; font-family: "Inter-Medium", sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
-        .container15 { width: 100%; height: 84px; position: relative; }
-        .container16 { border-top: 1px solid #e5e7eb; width: 100%; height: 84px; position: relative; display: flex; align-items: center; box-sizing: border-box; padding-right: 8px; }
-        ._0 { color: #000000; font-family: "Inter-Regular", sans-serif; font-size: 16px; line-height: 24px; font-weight: 400; }
-        .input2 { background: #ffffff; border-radius: 4px; border: 1px solid #d1d5db; padding: 9px; width: 135px; height: 42px; margin: 0 5px; }
-        .input4 { background: #ffffff; border-radius: 4px; border: 1px solid #d1d5db; padding: 9px; width: 218px; height: 42px; margin: 0 5px; }
-        .input5 { border-radius: 4px; width: 96px; height: 42px; margin: 0 5px; }
-        .input6 { background: #ffffff; border-radius: 4px; border: 1px solid #d1d5db; padding: 9px; width: 177px; height: 42px; margin: 0 5px; }
-        .container17 { padding: 16px 8px; width: 40px; height: 75px; position: relative; display: flex; align-items: center; justify-content: center; }
-        .button6 { background: transparent; width: 18px; height: 18px; cursor: pointer; }
-
-        /* Additional styles for better input appearance */
-        .input input, .input2 input, .input3 input, .input4 input, .input5 select, .input6 input {
-            border: none;
-            background: transparent;
+        
+        .modal-body {
+            padding: 0 24px 24px 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #374151;
+            font-family: "Inter", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
             width: 100%;
-            outline: none;
-            font-size: 16px;
-            color: #000;
-            padding: 0;
-        }
-        
-        .input input::placeholder, .input2 input::placeholder, .input3 input::placeholder, .input4 input::placeholder, .input6 input::placeholder {
-            color: #cccccc;
-        }
-        
-        .input5 select {
-            color: #000;
-            cursor: pointer;
-            border: 1px solid #d1d5db;
             background: #ffffff;
-            border-radius: 4px;
-            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #111827;
+            transition: all 0.2s ease;
         }
         
-        .input5 select option {
-            color: #000;
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .form-input[readonly] {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .modal-footer {
+            padding: 20px 24px 24px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #f3f4f6;
+            margin-top: 24px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            gap: 8px;
+        }
+        
+        .btn-secondary {
+            background: #ffffff;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
         }
 
-        /* Fix for date input */
-        .input3 input[type="date"] {
-            color: #000;
+        /* Modal Step 2 Styles - Clean Table Design */
+        .modal-add-2, .modal-add-2 * { box-sizing: border-box; }
+        .modal-add-2 { 
+            background: #ffffff; 
+            border-radius: 16px; 
+            position: relative; 
+            width: 1000px; 
+            max-width: 95vw; 
+            max-height: 90vh; 
+            overflow: auto; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-
-        .input3 input[type="date"]::-webkit-calendar-picker-indicator {
+        
+        .add-item-btn { 
+            background: #3b82f6; 
+            color: #ffffff; 
+            border-radius: 8px; 
+            padding: 10px 16px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            cursor: pointer; 
+            border: none; 
+            font-size: 14px; 
+            font-weight: 500; 
+            transition: all 0.2s ease; 
+        }
+        .add-item-btn:hover { background: #2563eb; }
+        .add-item-btn i { font-size: 12px; }
+        
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .materials-table thead {
+            background: #f9fafb;
+        }
+        
+        .materials-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .materials-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+        
+        .materials-table tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        .materials-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-input {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #111827;
+            transition: all 0.2s ease;
+        }
+        
+        .table-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .table-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .table-input[readonly] {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+        
+        .table-select {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #111827;
             cursor: pointer;
         }
+        
+        .table-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-btn:hover {
+            background: #fef2f2;
+        }
+
 
         @media (max-width: 768px) {
             .sidebar { width: 100%; }
@@ -406,19 +431,41 @@
                 max-width: 95vw; 
                 max-height: 95vh; 
                 margin: 20px;
+                width: 95vw !important;
             }
-            .container { padding: 20px; }
-            .container3 { padding: 15px; }
-            .container8 { flex-direction: column; height: auto; }
-            .container9, .container10, .container11, .container12, .container13, .container14 { 
-                width: 100%; 
-                padding: 8px 12px; 
-                height: auto; 
+            
+            .modal-header {
+                padding: 20px 20px 0 20px;
+                margin-bottom: 20px;
             }
-            .container16 { flex-direction: column; height: auto; padding: 10px; }
-            .input2, .input4, .input5, .input6 { 
-                width: 100%; 
-                margin: 5px 0; 
+            
+            .modal-body {
+                padding: 0 20px 20px 20px;
+            }
+            
+            .modal-footer {
+                padding: 16px 20px 20px 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            
+            /* Table responsive */
+            .materials-table {
+                font-size: 12px;
+            }
+            
+            .materials-table th,
+            .materials-table td {
+                padding: 8px 6px;
+            }
+            
+            .table-input,
+            .table-select {
+                font-size: 12px;
+                padding: 6px 8px;
             }
         }
     </style>
@@ -549,71 +596,47 @@
                 <!-- New/Edit Material Modal - Step 1 -->
                 <div class="qa-modal" id="materialModal" aria-hidden="true">
                     <div class="modal-add" role="dialog" aria-modal="true">
-                        <button class="modal-close" onclick="closeMaterialModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <div class="container">
-                            <div class="container2">
-                                <div class="container3">
-                                    <div class="container4">
-                                        <div class="heading">
-                                            <div class="modal-head">
-                                                <div class="modal-icon"><i class="fas fa-bolt"></i></div>
-                                                <div class="add-material">Add Material</div>
-                                </div>
-                                </div>
-                                </div>
-                                    
-                                    <div class="container5">
-                                        <!-- Inspector Name -->
-                                        <div class="container9">
-                                            <div class="label"><div class="inspector-name">Inspector Name</div></div>
-                                            <div class="input"><div class="engr-jeric-santos">Engr. Jeric Santos</div></div>
-                                </div>
-                                        
-                                        <!-- Supplier -->
-                                        <div class="container6">
-                                            <div class="label"><div class="supplier">Supplier</div></div>
-                                            <div class="input">
-                                                <input type="text" class="enter-supplier-name" placeholder="Enter supplier name" id="mat_supplier" name="supplier" />
-                                </div>
-                                </div>
-                                        
-                                        <!-- Date Received -->
-                                        <div class="container10">
-                                            <div class="label"><div class="date-received">Date Received</div></div>
-                                            <div class="container11">
-                                                <div class="input3">
-                                                    <input type="date" class="mm-dd-yyyy" id="mat_received" name="date_received" />
-                                </div>
-                                </div>
-                                </div>
-                                        
-                                        <!-- Storage Location -->
-                                        <div class="container8">
-                                            <div class="label"><div class="storage-location">Storage Location</div></div>
-                                            <div class="input">
-                                                <input type="text" class="enter-storage-location" placeholder="Enter storage location" id="mat_location" name="location" />
-                                </div>
-                                </div>
-                                        
-                                        <!-- Status (read-only) -->
-                                        <div class="container7">
-                                            <div class="label"><div class="status">Status</div></div>
-                                            <div class="input2"><div class="pending">Pending</div></div>
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                <div class="modal-icon"><i class="fas fa-bolt"></i></div>
+                                <div class="modal-title-text">Add Material</div>
                             </div>
+                            <button class="modal-close" onclick="closeMaterialModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Inspector Name</label>
+                                <input type="text" class="form-input" value="Engr. Jeric Santos" readonly />
                             </div>
-                                    
-                                    <div class="btns">
-                                        <div class="button">
-                                            <div class="button2" onclick="closeMaterialModal()">Cancel</div>
-                                        </div>
-                                        <div class="button3">
-                                            <div class="button4" onclick="showMaterialStep2()">Next</div>
-                                        </div>
-                                    </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Supplier</label>
+                                <input type="text" class="form-input" placeholder="Enter supplier name" id="mat_supplier" name="supplier" />
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Date Received</label>
+                                    <input type="date" class="form-input" id="mat_received" name="date_received" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <input type="text" class="form-input" value="Pending" readonly />
                                 </div>
                             </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Storage Location</label>
+                                <input type="text" class="form-input" placeholder="Enter storage location" id="mat_location" name="location" />
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="closeMaterialModal()">Cancel</button>
+                            <button class="btn btn-primary" onclick="showMaterialStep2()">Next</button>
                         </div>
                     </div>
                 </div>
@@ -621,62 +644,45 @@
                 <!-- New/Edit Material Modal - Step 2 -->
                 <div class="qa-modal" id="materialModalStep2" aria-hidden="true">
                     <div class="modal-add-2" role="dialog" aria-modal="true">
-                        <button class="modal-close" onclick="closeMaterialModal()" style="position: absolute; top: 15px; right: 15px; background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px; cursor: pointer; z-index: 10;">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <div class="container">
-                            <div class="container2">
-                                <div class="container3">
-                                    <div class="container4">
-                                        <div class="heading">
-                                            <div class="modal-head">
-                                                <div class="modal-icon"><i class="fas fa-bolt"></i></div>
-                                                <div class="add-material">Add Material</div>
-                                            </div>
-                                            <button class="add-item-btn" onclick="addMaterialRow()"><i class="fas fa-plus"></i><span>Add Item</span></button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="container5">
-                                        <div class="container6">
-                                            <div class="container7">
-                                                <div class="container8">
-                                                    <div class="container9">
-                                                        <div class="product">Product</div>
-                                                    </div>
-                                                    <div class="container13">
-                                                        <div class="batch-serial-no">Batch/Serial No.</div>
-                                                    </div>
-                                                    <div class="container10">
-                                                        <div class="quantity">Quantity</div>
-                                                    </div>
-                                                    <div class="container11">
-                                                        <div class="unit-of-measure">Unit of Measure</div>
-                                                    </div>
-                                                    <div class="container14">
-                                                        <div class="unit-price">Unit Price (₱)</div>
-                                                    </div>
-                                                    <div class="container12">
-                                                        <div class="total">Total (₱)</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="container15" id="materialRowsContainer">
-                                                <!-- Material rows will be added here dynamically -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="btns">
-                                        <div class="button">
-                                            <div class="button2" onclick="showMaterialStep1()">Back</div>
-                                        </div>
-                                        <div class="button3">
-                                            <div class="button4" onclick="saveMaterial()">Save</div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                <div class="modal-icon"><i class="fas fa-bolt"></i></div>
+                                <div class="modal-title-text">Add Material Items</div>
                             </div>
+                            <button class="modal-close" onclick="closeMaterialModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <table class="materials-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%;">Product Name</th>
+                                        <th style="width: 18%;">Batch/Serial No.</th>
+                                        <th style="width: 12%;">Quantity</th>
+                                        <th style="width: 15%;">Unit of Measure</th>
+                                        <th style="width: 15%;">Unit Price (₱)</th>
+                                        <th style="width: 15%;">Total (₱)</th>
+                                        <th style="width: 5%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="materialRowsContainer">
+                                    <!-- Material rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" onclick="showMaterialStep1()">Back</button>
+                            <button class="btn btn-primary" onclick="addMaterialRow()">
+                                <i class="fas fa-plus"></i>
+                                <span>Add Item</span>
+                            </button>
+                            <button class="btn btn-primary" onclick="saveMaterial()" style="background: #059669;">
+                                <i class="fas fa-save"></i>
+                                <span>Save</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -690,6 +696,7 @@
         
         // CSRF token for AJAX requests
         const csrfToken = '{{ csrf_token() }}';
+        console.log('CSRF Token:', csrfToken);
 
         let currentFilter = 'Pending';
         let selectedRowIndex = -1;
@@ -862,56 +869,43 @@
                 const container = document.getElementById('materialRowsContainer');
                 container.innerHTML = '';
                 
-                const editRow = document.createElement('div');
-                editRow.className = 'container16';
+                const editRow = document.createElement('tr');
                 editRow.innerHTML = `
-                    <div style="padding: 12px 24px; width: 240px;">
-                        <div class="input4">
-                            <input type="text" placeholder="Product name" class="material-name" value="${material.name}" />
-                        </div>
-                    </div>
-                    <div style="padding: 12px 24px; width: 155px;">
-                        <div class="input5">
-                            <input type="text" placeholder="Batch/Serial" class="material-batch" value="${material.batch || ''}" />
-                        </div>
-                    </div>
-                    <div style="padding: 12px 24px; width: 114px;">
-                        <div class="input6">
-                            <input type="number" value="${material.quantity}" class="material-quantity" onchange="calculateRowTotal(this)" />
-                        </div>
-                    </div>
-                    <div style="padding: 12px 24px; width: 118px;">
-                        <div class="input7">
-                            <select class="material-unit">
-                                <option value="">Select</option>
-                                <option value="Meter" ${material.unit === 'Meter' ? 'selected' : ''}>Meter</option>
-                                <option value="Feet" ${material.unit === 'Feet' ? 'selected' : ''}>Feet</option>
-                                <option value="Kilogram" ${material.unit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
-                                <option value="Pound" ${material.unit === 'Pound' ? 'selected' : ''}>Pound</option>
-                                <option value="Ton" ${material.unit === 'Ton' ? 'selected' : ''}>Ton</option>
-                                <option value="Piece" ${material.unit === 'Piece' ? 'selected' : ''}>Piece</option>
-                                <option value="Liter" ${material.unit === 'Liter' ? 'selected' : ''}>Liter</option>
-                                <option value="Gallon" ${material.unit === 'Gallon' ? 'selected' : ''}>Gallon</option>
-                                <option value="Box" ${material.unit === 'Box' ? 'selected' : ''}>Box</option>
-                                <option value="Bag" ${material.unit === 'Bag' ? 'selected' : ''}>Bag</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="padding: 12px 24px; width: 106px;">
-                        <div class="input8">
-                            <input type="number" placeholder="0.00" step="0.01" class="material-price" value="${material.price}" onchange="calculateRowTotal(this)" />
-                        </div>
-                    </div>
-                    <div style="padding: 12px 24px; width: 119px;">
-                        <div class="input9">
-                            <input type="number" placeholder="0.00" readonly class="material-total" value="${material.total}" />
-                        </div>
-                    </div>
-                    <div class="container17">
-                        <button class="button6" onclick="removeMaterialRow(this)">
-                            <i class="fas fa-trash" style="color: #ef4444;"></i>
+                    <td>
+                        <input type="text" class="table-input" placeholder="Product name" class="material-name" value="${material.name}" />
+                    </td>
+                    <td>
+                        <input type="text" class="table-input" placeholder="Batch/Serial" class="material-batch" value="${material.batch || ''}" />
+                    </td>
+                    <td>
+                        <input type="number" class="table-input material-quantity" value="${material.quantity}" />
+                    </td>
+                    <td>
+                        <select class="table-select material-unit">
+                            <option value="">Select</option>
+                            <option value="Meter" ${material.unit === 'Meter' ? 'selected' : ''}>Meter</option>
+                            <option value="Feet" ${material.unit === 'Feet' ? 'selected' : ''}>Feet</option>
+                            <option value="Kilogram" ${material.unit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
+                            <option value="Pound" ${material.unit === 'Pound' ? 'selected' : ''}>Pound</option>
+                            <option value="Ton" ${material.unit === 'Ton' ? 'selected' : ''}>Ton</option>
+                            <option value="Piece" ${material.unit === 'Piece' ? 'selected' : ''}>Piece</option>
+                            <option value="Liter" ${material.unit === 'Liter' ? 'selected' : ''}>Liter</option>
+                            <option value="Gallon" ${material.unit === 'Gallon' ? 'selected' : ''}>Gallon</option>
+                            <option value="Box" ${material.unit === 'Box' ? 'selected' : ''}>Box</option>
+                            <option value="Bag" ${material.unit === 'Bag' ? 'selected' : ''}>Bag</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="table-input material-price" placeholder="0.00" step="0.01" value="${material.price}" />
+                    </td>
+                    <td>
+                        <input type="number" class="table-input" placeholder="0.00" readonly class="material-total" value="${material.total}" />
+                    </td>
+                    <td>
+                        <button class="delete-btn" onclick="removeMaterialRow(this)">
+                            <i class="fas fa-trash"></i>
                         </button>
-                    </div>`;
+                    </td>`;
                 container.appendChild(editRow);
             } else {
                 // Reset form for new material
@@ -950,6 +944,32 @@
             if (container.children.length === 0) {
                 addMaterialRow();
             }
+            
+            // Focus on the first input field and trigger calculations
+            setTimeout(() => {
+                const firstInput = container.querySelector('.material-name');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+                
+                // Trigger calculation for existing rows
+                const quantityInputs = container.querySelectorAll('.material-quantity');
+                const priceInputs = container.querySelectorAll('.material-price');
+                
+                console.log('Found quantity inputs:', quantityInputs.length);
+                console.log('Found price inputs:', priceInputs.length);
+                
+                // Calculate for all rows that have values
+                quantityInputs.forEach(input => {
+                    console.log('Triggering calculation for quantity input:', input.value);
+                    calculateRowTotal(input);
+                });
+                
+                priceInputs.forEach(input => {
+                    console.log('Triggering calculation for price input:', input.value);
+                    calculateRowTotal(input);
+                });
+            }, 100);
         }
 
         function showMaterialStep1() {
@@ -961,102 +981,186 @@
 
         function addMaterialRow() {
             const container = document.getElementById('materialRowsContainer');
-            const newRow = document.createElement('div');
-            newRow.className = 'container16';
+            const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <div style="padding: 12px 24px; width: 240px;">
-                    <div class="input4">
-                        <input type="text" placeholder="Product name" class="material-name" />
-                    </div>
-                </div>
-                <div style="padding: 12px 24px; width: 155px;">
-                    <div class="input5">
-                        <input type="text" placeholder="Batch/Serial" class="material-batch" />
-                    </div>
-                </div>
-                <div style="padding: 12px 24px; width: 114px;">
-                    <div class="input6">
-                        <input type="number" value="0" class="material-quantity" onchange="calculateRowTotal(this)" />
-                    </div>
-                </div>
-                <div style="padding: 12px 24px; width: 118px;">
-                    <div class="input7">
-                        <select class="material-unit">
-                            <option value="">Select</option>
-                            <option value="Meter">Meter</option>
-                            <option value="Feet">Feet</option>
-                            <option value="Kilogram">Kilogram</option>
-                            <option value="Pound">Pound</option>
-                            <option value="Ton">Ton</option>
-                            <option value="Piece">Piece</option>
-                            <option value="Liter">Liter</option>
-                            <option value="Gallon">Gallon</option>
-                            <option value="Box">Box</option>
-                            <option value="Bag">Bag</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="padding: 12px 24px; width: 106px;">
-                    <div class="input8">
-                        <input type="number" placeholder="0.00" step="0.01" class="material-price" onchange="calculateRowTotal(this)" />
-                    </div>
-                </div>
-                <div style="padding: 12px 24px; width: 119px;">
-                    <div class="input9">
-                        <input type="number" placeholder="0.00" readonly class="material-total" />
-                    </div>
-                </div>
-                <div class="container17">
-                    <button class="button6" onclick="removeMaterialRow(this)">
-                        <i class="fas fa-trash" style="color: #ef4444;"></i>
+                <td>
+                    <input type="text" class="table-input material-name" placeholder="Product name" />
+                </td>
+                <td>
+                    <input type="text" class="table-input material-batch" placeholder="Batch/Serial" />
+                </td>
+                <td>
+                    <input type="number" class="table-input material-quantity" value="0" />
+                </td>
+                <td>
+                    <select class="table-select material-unit">
+                        <option value="">Select</option>
+                        <option value="Meter">Meter</option>
+                        <option value="Feet">Feet</option>
+                        <option value="Kilogram">Kilogram</option>
+                        <option value="Pound">Pound</option>
+                        <option value="Ton">Ton</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Liter">Liter</option>
+                        <option value="Gallon">Gallon</option>
+                        <option value="Box">Box</option>
+                        <option value="Bag">Bag</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="table-input material-price" placeholder="0.00" step="0.01" />
+                </td>
+                <td>
+                    <input type="number" class="table-input material-total" placeholder="0.00" readonly />
+                </td>
+                <td>
+                    <button class="delete-btn" onclick="removeMaterialRow(this)">
+                        <i class="fas fa-trash"></i>
                     </button>
-                </div>`;
+                </td>`;
             container.appendChild(newRow);
+            
+            // Add direct event listeners to the new row
+            const quantityInput = newRow.querySelector('.material-quantity');
+            const priceInput = newRow.querySelector('.material-price');
+            
+            if (quantityInput) {
+                quantityInput.addEventListener('input', () => calculateRowTotal(quantityInput));
+                quantityInput.addEventListener('change', () => calculateRowTotal(quantityInput));
+            }
+            
+            if (priceInput) {
+                priceInput.addEventListener('input', () => calculateRowTotal(priceInput));
+                priceInput.addEventListener('change', () => calculateRowTotal(priceInput));
+            }
         }
 
         function removeMaterialRow(btn) {
-            const row = btn.closest('.container16');
+            const row = btn.closest('tr');
             if (row) row.remove();
         }
 
+        function recalculateAll() {
+            console.log('Manual recalculation triggered');
+            const container = document.getElementById('materialRowsContainer');
+            const rows = container.querySelectorAll('tr');
+            
+            console.log('Found rows to recalculate:', rows.length);
+            
+            rows.forEach((row, index) => {
+                console.log(`Recalculating row ${index + 1}`);
+                const quantityInput = row.querySelector('.material-quantity');
+                const priceInput = row.querySelector('.material-price');
+                
+                if (quantityInput && priceInput) {
+                    console.log(`Row ${index + 1} - Quantity: ${quantityInput.value}, Price: ${priceInput.value}`);
+                    calculateRowTotal(quantityInput);
+                }
+            });
+        }
+
         function calculateRowTotal(inputElement) {
-            const row = inputElement.closest('.container16');
-            const quantity = parseFloat(row.querySelector('.material-quantity').value) || 0;
-            const price = parseFloat(row.querySelector('.material-price').value) || 0;
-            const total = quantity * price;
-            row.querySelector('.material-total').value = total.toFixed(2);
+            console.log('calculateRowTotal called with:', inputElement);
+            const row = inputElement.closest('tr');
+            if (!row) {
+                console.log('No row found for element:', inputElement);
+                return;
+            }
+            
+            const quantityInput = row.querySelector('.material-quantity');
+            const priceInput = row.querySelector('.material-price');
+            const totalInput = row.querySelector('.material-total');
+            
+            console.log('Found inputs:', { quantityInput, priceInput, totalInput });
+            
+            if (quantityInput && priceInput && totalInput) {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+                const total = quantity * price;
+                
+                console.log('Calculation:', quantity, 'x', price, '=', total);
+                
+                totalInput.value = total.toFixed(2);
+                console.log('Total set to:', totalInput.value);
+            } else {
+                console.error('Missing inputs for calculation:', { quantityInput, priceInput, totalInput });
+            }
         }
 
 
         async function saveMaterial() {
             const container = document.getElementById('materialRowsContainer');
-            const rows = container.querySelectorAll('.container16');
+            const rows = container.querySelectorAll('tr');
+            
+            console.log('Found rows:', rows.length);
+            console.log('Container:', container);
             
             if (rows.length === 0) {
                 alert('Please add at least one material item.');
                 return;
             }
 
-            const supplier = document.getElementById('mat_supplier').value;
-            const location = document.getElementById('mat_location').value;
-            const dateReceived = document.getElementById('mat_received').value;
+            const supplierInput = document.getElementById('mat_supplier');
+            const locationInput = document.getElementById('mat_location');
+            const dateReceivedInput = document.getElementById('mat_received');
 
-            if (!supplier || !location || !dateReceived) {
-                alert('Please fill in all required fields in Step 1.');
+            console.log('Step 1 inputs:', { supplierInput, locationInput, dateReceivedInput });
+
+            if (!supplierInput || !locationInput || !dateReceivedInput) {
+                alert('Error: Step 1 form fields are missing. Please refresh the page and try again.');
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
                 return;
             }
 
+            const supplier = supplierInput.value;
+            const location = locationInput.value;
+            const dateReceived = dateReceivedInput.value;
+
+            if (!supplier || !location || !dateReceived) {
+                alert('Please fill in all required fields in Step 1.');
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+                return;
+            }
+
+            // Show loading state
+            const saveBtn = document.querySelector('button[onclick="saveMaterial()"]');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
+            saveBtn.disabled = true;
+
             try {
                 for (const row of rows) {
-                    const name = row.querySelector('.material-name').value;
-                    const batch = row.querySelector('.material-batch').value;
-                    const quantity = parseFloat(row.querySelector('.material-quantity').value) || 0;
-                    const unit = row.querySelector('.material-unit').value;
-                    const price = parseFloat(row.querySelector('.material-price').value) || 0;
-                    const total = parseFloat(row.querySelector('.material-total').value) || 0;
+                    const nameInput = row.querySelector('.material-name');
+                    const batchInput = row.querySelector('.material-batch');
+                    const quantityInput = row.querySelector('.material-quantity');
+                    const unitInput = row.querySelector('.material-unit');
+                    const priceInput = row.querySelector('.material-price');
+                    const totalInput = row.querySelector('.material-total');
+
+                    // Check if all required inputs exist
+                    if (!nameInput || !quantityInput || !priceInput || !totalInput) {
+                        console.error('Missing required inputs in row:', row);
+                        alert('Error: Some form fields are missing. Please refresh the page and try again.');
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
+                        return;
+                    }
+
+                    const name = nameInput.value;
+                    const batch = batchInput ? batchInput.value : '';
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    const unit = unitInput ? unitInput.value : '';
+                    const price = parseFloat(priceInput.value) || 0;
+                    const total = parseFloat(totalInput.value) || 0;
+
+                    console.log('Row data:', { name, batch, quantity, unit, price, total });
 
                     if (!name || quantity <= 0 || price <= 0) {
                         alert('Please fill in all required fields for each material item.');
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
                         return;
                     }
 
@@ -1075,19 +1179,45 @@
                         _token: csrfToken
                     };
 
+                    console.log('Sending form data:', formData);
+
+                    // Use FormData instead of JSON to avoid CSRF issues
+                    const formDataObj = new FormData();
+                    Object.keys(formData).forEach(key => {
+                        formDataObj.append(key, formData[key]);
+                    });
+
+                    console.log('Making fetch request to:', '/quality-assurance/materials');
+                    console.log('Form data:', formData);
+
                     const response = await fetch('/quality-assurance/materials', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken,
                             'X-Requested-With': 'XMLHttpRequest'
                         },
-                        body: JSON.stringify(formData)
+                        body: formDataObj
                     });
 
+                    console.log('Response received:', response);
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        showError(errorData.message || 'An error occurred');
+                        let errorMessage = 'An error occurred while saving the material';
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.message || errorMessage;
+                            if (errorData.errors) {
+                                const errorList = Object.values(errorData.errors).flat().join(', ');
+                                errorMessage = `Validation errors: ${errorList}`;
+                            }
+                        } catch (e) {
+                            errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                        }
+                        showError(errorMessage);
+                        saveBtn.innerHTML = originalText;
+                        saveBtn.disabled = false;
                         return;
                     }
                 }
@@ -1096,8 +1226,20 @@
                 closeMaterialModal();
                 window.location.reload();
             } catch (error) {
-                console.error('Error:', error);
-                showError('Network error occurred');
+                console.error('Error details:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                let errorMessage = 'Network error occurred. Please check your connection and try again.';
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Cannot connect to server. Please make sure the Laravel server is running (php artisan serve).';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = 'CORS error. Please check server configuration.';
+                }
+                
+                showError(errorMessage);
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
@@ -1162,6 +1304,29 @@
         // Initialize table and navigation
         renderTable();
         setActiveNavItem();
+
+        // Add event delegation for calculation
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('material-quantity') || e.target.classList.contains('material-price')) {
+                console.log('Input event triggered for:', e.target);
+                calculateRowTotal(e.target);
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('material-quantity') || e.target.classList.contains('material-price')) {
+                console.log('Change event triggered for:', e.target);
+                calculateRowTotal(e.target);
+            }
+        });
+
+        // Also add keyup event for better responsiveness
+        document.addEventListener('keyup', function(e) {
+            if (e.target.classList.contains('material-quantity') || e.target.classList.contains('material-price')) {
+                console.log('Keyup event triggered for:', e.target);
+                calculateRowTotal(e.target);
+            }
+        });
     </script>
 </body>
 
