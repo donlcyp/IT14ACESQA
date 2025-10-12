@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-    <title>AJJ CRISBER Engineering Services - Quality Assurance</title>
+    <title>AJJ CRISBER Engineering Services - Project Material Management</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -186,16 +186,16 @@
         .modal-close {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 8px; 
             padding: 8px;
             cursor: pointer;
-            display: flex;
+            display: flex; 
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
         }
         .modal-close:hover {
-            background: #f3f4f6;
+            background: #f3f4f6; 
         }
         .modal-close i {
             font-size: 14px;
@@ -213,14 +213,14 @@
         .form-label {
             display: block;
             color: #374151;
-            font-family: "Inter", sans-serif;
-            font-size: 14px;
+            font-family: "Inter", sans-serif; 
+            font-size: 14px; 
             font-weight: 500;
             margin-bottom: 6px;
         }
         
         .form-input {
-            width: 100%;
+            width: 100%; 
             background: #ffffff;
             border: 1px solid #d1d5db;
             border-radius: 8px;
@@ -235,9 +235,15 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
+
+        .form-input:disabled {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
         
         .form-input::placeholder {
-            color: #9ca3af;
+            color: #9ca3af; 
         }
         
         .form-input[readonly] {
@@ -253,8 +259,8 @@
         
         .modal-footer {
             padding: 20px 24px 24px 24px;
-            display: flex;
-            justify-content: flex-end;
+            display: flex; 
+            justify-content: flex-end; 
             gap: 12px;
             border-top: 1px solid #f3f4f6;
             margin-top: 24px;
@@ -262,10 +268,10 @@
         
         .btn {
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 8px; 
             font-size: 14px;
             font-weight: 500;
-            cursor: pointer;
+            cursor: pointer; 
             transition: all 0.2s ease;
             border: none;
             display: inline-flex;
@@ -289,7 +295,7 @@
             color: #ffffff;
         }
         .btn-primary:hover {
-            background: #2563eb;
+            background: #2563eb; 
         }
 
         /* Modal Step 2 Styles - Clean Table Design */
@@ -500,7 +506,9 @@
                     <i class="fas fa-arrow-left"></i> Back to QA Records
                 </a>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
+                <div style="margin-left: auto;">
                 <button class="header-menu" id="headerMenu"><i class="fas fa-bars"></i></button>
+                </div>
             </header>
 
             <section class="content-area">
@@ -524,7 +532,7 @@
                             <div class="project-card">
                                 <div class="project-line-1">
                                     <span class="project-badge" style="width: 20px; height: 20px; border-radius: 50%; background: #3b82f6;"></span>
-                                    <input class="project-title-input" value="Matina IT Park Office" readonly />
+                                    <input class="project-title-input" value="Project Material Management" readonly />
                                 </div>
                                 <div class="project-subrow">
                                     <span>Mr. Carlos Reyes</span>
@@ -601,22 +609,22 @@
                                 <div class="modal-icon"><i class="fas fa-bolt"></i></div>
                                 <div class="modal-title-text">Add Material</div>
                             </div>
-                            <button class="modal-close" onclick="closeMaterialModal()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        
+                        <button class="modal-close" onclick="closeMaterialModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                                </div>
+                                    
                         <div class="modal-body">
                             <div class="form-group">
                                 <label class="form-label">Inspector Name</label>
                                 <input type="text" class="form-input" value="Engr. Jeric Santos" readonly />
-                            </div>
-                            
+                                </div>
+                                        
                             <div class="form-group">
                                 <label class="form-label">Supplier</label>
                                 <input type="text" class="form-input" placeholder="Enter supplier name" id="mat_supplier" name="supplier" />
-                            </div>
-                            
+                                </div>
+                                        
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Date Received</label>
@@ -624,16 +632,20 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Status</label>
-                                    <input type="text" class="form-input" value="Pending" readonly />
+                                    <select class="form-input" id="mat_status" name="status">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Fail">Fail</option>
+                                    </select>
                                 </div>
-                            </div>
-                            
+                                </div>
+                                        
                             <div class="form-group">
                                 <label class="form-label">Storage Location</label>
                                 <input type="text" class="form-input" placeholder="Enter storage location" id="mat_location" name="location" />
-                            </div>
-                        </div>
-                        
+                                </div>
+                                </div>
+                                        
                         <div class="modal-footer">
                             <button class="btn btn-secondary" onclick="closeMaterialModal()">Cancel</button>
                             <button class="btn btn-primary" onclick="showMaterialStep2()">Next</button>
@@ -650,10 +662,10 @@
                                 <div class="modal-title-text">Add Material Items</div>
                             </div>
                             <button class="modal-close" onclick="closeMaterialModal()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        
+                            <i class="fas fa-times"></i>
+                        </button>
+                                    </div>
+                                    
                         <div class="modal-body">
                             <table class="materials-table">
                                 <thead>
@@ -668,14 +680,14 @@
                                     </tr>
                                 </thead>
                                 <tbody id="materialRowsContainer">
-                                    <!-- Material rows will be added here dynamically -->
+                                                <!-- Material rows will be added here dynamically -->
                                 </tbody>
                             </table>
-                        </div>
-                        
+                                    </div>
+                                    
                         <div class="modal-footer">
                             <button class="btn btn-secondary" onclick="showMaterialStep1()">Back</button>
-                            <button class="btn btn-primary" onclick="addMaterialRow()">
+                            <button class="btn btn-primary" id="addItemBtn" onclick="addMaterialRow()">
                                 <i class="fas fa-plus"></i>
                                 <span>Add Item</span>
                             </button>
@@ -864,6 +876,20 @@
                 document.getElementById('mat_supplier').value = material.supplier || '';
                 document.getElementById('mat_location').value = material.location || '';
                 document.getElementById('mat_received').value = material.date_received || '';
+                document.getElementById('mat_status').value = material.status || 'Pending';
+                
+                // Enable status editing for edit mode
+                const statusField = document.getElementById('mat_status');
+                if (statusField) {
+                    statusField.disabled = false;
+                    console.log('Status field enabled for edit mode');
+                }
+                
+                // Hide Add Item button in edit mode
+                const addItemBtn = document.getElementById('addItemBtn');
+                if (addItemBtn) {
+                    addItemBtn.style.display = 'none';
+                }
                 
                 // Clear existing rows and add the material being edited
                 const container = document.getElementById('materialRowsContainer');
@@ -872,34 +898,34 @@
                 const editRow = document.createElement('tr');
                 editRow.innerHTML = `
                     <td>
-                        <input type="text" class="table-input" placeholder="Product name" class="material-name" value="${material.name}" />
+                        <input type="text" class="table-input material-name" placeholder="Product name" value="${material.name}" />
                     </td>
                     <td>
-                        <input type="text" class="table-input" placeholder="Batch/Serial" class="material-batch" value="${material.batch || ''}" />
+                        <input type="text" class="table-input material-batch" placeholder="Batch/Serial" value="${material.batch || ''}" />
                     </td>
                     <td>
                         <input type="number" class="table-input material-quantity" value="${material.quantity}" />
                     </td>
                     <td>
                         <select class="table-select material-unit">
-                            <option value="">Select</option>
-                            <option value="Meter" ${material.unit === 'Meter' ? 'selected' : ''}>Meter</option>
-                            <option value="Feet" ${material.unit === 'Feet' ? 'selected' : ''}>Feet</option>
-                            <option value="Kilogram" ${material.unit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
-                            <option value="Pound" ${material.unit === 'Pound' ? 'selected' : ''}>Pound</option>
-                            <option value="Ton" ${material.unit === 'Ton' ? 'selected' : ''}>Ton</option>
-                            <option value="Piece" ${material.unit === 'Piece' ? 'selected' : ''}>Piece</option>
-                            <option value="Liter" ${material.unit === 'Liter' ? 'selected' : ''}>Liter</option>
-                            <option value="Gallon" ${material.unit === 'Gallon' ? 'selected' : ''}>Gallon</option>
-                            <option value="Box" ${material.unit === 'Box' ? 'selected' : ''}>Box</option>
-                            <option value="Bag" ${material.unit === 'Bag' ? 'selected' : ''}>Bag</option>
-                        </select>
+                                <option value="">Select</option>
+                                <option value="Meter" ${material.unit === 'Meter' ? 'selected' : ''}>Meter</option>
+                                <option value="Feet" ${material.unit === 'Feet' ? 'selected' : ''}>Feet</option>
+                                <option value="Kilogram" ${material.unit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
+                                <option value="Pound" ${material.unit === 'Pound' ? 'selected' : ''}>Pound</option>
+                                <option value="Ton" ${material.unit === 'Ton' ? 'selected' : ''}>Ton</option>
+                                <option value="Piece" ${material.unit === 'Piece' ? 'selected' : ''}>Piece</option>
+                                <option value="Liter" ${material.unit === 'Liter' ? 'selected' : ''}>Liter</option>
+                                <option value="Gallon" ${material.unit === 'Gallon' ? 'selected' : ''}>Gallon</option>
+                                <option value="Box" ${material.unit === 'Box' ? 'selected' : ''}>Box</option>
+                                <option value="Bag" ${material.unit === 'Bag' ? 'selected' : ''}>Bag</option>
+                            </select>
                     </td>
                     <td>
                         <input type="number" class="table-input material-price" placeholder="0.00" step="0.01" value="${material.price}" />
                     </td>
                     <td>
-                        <input type="number" class="table-input" placeholder="0.00" readonly class="material-total" value="${material.total}" />
+                        <input type="number" class="table-input material-total" placeholder="0.00" readonly value="${material.total}" />
                     </td>
                     <td>
                         <button class="delete-btn" onclick="removeMaterialRow(this)">
@@ -912,6 +938,16 @@
                 document.getElementById('mat_supplier').value = '';
                 document.getElementById('mat_location').value = '';
                 document.getElementById('mat_received').value = '';
+                document.getElementById('mat_status').value = 'Pending';
+                
+                // Disable status editing for new materials (only edit can change status)
+                document.getElementById('mat_status').disabled = true;
+                
+                // Show Add Item button for new materials
+                const addItemBtn = document.getElementById('addItemBtn');
+                if (addItemBtn) {
+                    addItemBtn.style.display = 'inline-flex';
+                }
                 
                 // Clear existing rows and add one empty row
                 const container = document.getElementById('materialRowsContainer');
@@ -934,6 +970,14 @@
         }
 
         function showMaterialStep2() {
+            // Debug: Check if Step 1 fields are populated
+            const supplier = document.getElementById('mat_supplier').value;
+            const location = document.getElementById('mat_location').value;
+            const dateReceived = document.getElementById('mat_received').value;
+            const status = document.getElementById('mat_status').value;
+            
+            console.log('Step 1 values before Step 2:', { supplier, location, dateReceived, status });
+            
             materialModal.classList.remove('active');
             materialModalStep2.classList.add('active');
             materialModal.setAttribute('aria-hidden', 'true');
@@ -994,18 +1038,18 @@
                 </td>
                 <td>
                     <select class="table-select material-unit">
-                        <option value="">Select</option>
-                        <option value="Meter">Meter</option>
-                        <option value="Feet">Feet</option>
-                        <option value="Kilogram">Kilogram</option>
-                        <option value="Pound">Pound</option>
-                        <option value="Ton">Ton</option>
-                        <option value="Piece">Piece</option>
-                        <option value="Liter">Liter</option>
-                        <option value="Gallon">Gallon</option>
-                        <option value="Box">Box</option>
-                        <option value="Bag">Bag</option>
-                    </select>
+                            <option value="">Select</option>
+                            <option value="Meter">Meter</option>
+                            <option value="Feet">Feet</option>
+                            <option value="Kilogram">Kilogram</option>
+                            <option value="Pound">Pound</option>
+                            <option value="Ton">Ton</option>
+                            <option value="Piece">Piece</option>
+                            <option value="Liter">Liter</option>
+                            <option value="Gallon">Gallon</option>
+                            <option value="Box">Box</option>
+                            <option value="Bag">Bag</option>
+                        </select>
                 </td>
                 <td>
                     <input type="number" class="table-input material-price" placeholder="0.00" step="0.01" />
@@ -1076,7 +1120,7 @@
             if (quantityInput && priceInput && totalInput) {
                 const quantity = parseFloat(quantityInput.value) || 0;
                 const price = parseFloat(priceInput.value) || 0;
-                const total = quantity * price;
+            const total = quantity * price;
                 
                 console.log('Calculation:', quantity, 'x', price, '=', total);
                 
@@ -1103,11 +1147,34 @@
             const supplierInput = document.getElementById('mat_supplier');
             const locationInput = document.getElementById('mat_location');
             const dateReceivedInput = document.getElementById('mat_received');
+            const statusInput = document.getElementById('mat_status');
 
-            console.log('Step 1 inputs:', { supplierInput, locationInput, dateReceivedInput });
+            console.log('Step 1 inputs:', { supplierInput, locationInput, dateReceivedInput, statusInput });
+            console.log('Status input value:', statusInput ? statusInput.value : 'undefined');
+            console.log('Status input disabled:', statusInput ? statusInput.disabled : 'undefined');
+            
+            // Check each field individually
+            console.log('Field values:', {
+                supplier: supplierInput ? supplierInput.value : 'MISSING',
+                location: locationInput ? locationInput.value : 'MISSING', 
+                dateReceived: dateReceivedInput ? dateReceivedInput.value : 'MISSING',
+                status: statusInput ? statusInput.value : 'MISSING'
+            });
+            
+            // If status field is disabled, enable it temporarily for saving
+            if (statusInput && statusInput.disabled) {
+                console.log('Status field is disabled, enabling temporarily for save');
+                statusInput.disabled = false;
+            }
 
-            if (!supplierInput || !locationInput || !dateReceivedInput) {
-                alert('Error: Step 1 form fields are missing. Please refresh the page and try again.');
+            if (!supplierInput || !locationInput || !dateReceivedInput || !statusInput) {
+                console.error('Missing form fields:', {
+                    supplierInput: !!supplierInput,
+                    locationInput: !!locationInput,
+                    dateReceivedInput: !!dateReceivedInput,
+                    statusInput: !!statusInput
+                });
+                alert('Error: Some form fields are missing. Please refresh the page and try again.');
                 saveBtn.innerHTML = originalText;
                 saveBtn.disabled = false;
                 return;
@@ -1116,6 +1183,9 @@
             const supplier = supplierInput.value;
             const location = locationInput.value;
             const dateReceived = dateReceivedInput.value;
+            const status = statusInput.value;
+            
+            console.log('Form values:', { supplier, location, dateReceived, status });
 
             if (!supplier || !location || !dateReceived) {
                 alert('Please fill in all required fields in Step 1.');
@@ -1174,7 +1244,7 @@
                         total: total,
                         date_received: dateReceived,
                         date_inspected: dateReceived,
-                        status: 'Pending',
+                        status: status,
                         location: location,
                         _token: csrfToken
                     };
@@ -1187,11 +1257,28 @@
                         formDataObj.append(key, formData[key]);
                     });
 
-                    console.log('Making fetch request to:', '/quality-assurance/materials');
+                    // Determine the URL and method based on edit mode
+                    let url, method;
+                    if (editMode) {
+                        // For edit mode, we need to get the material ID
+                        const filtered = materials.filter(m => m.status === currentFilter);
+                        const material = filtered[selectedRowIndex];
+                        url = `/quality-assurance/materials/${material.id}`;
+                        method = 'PUT';
+                        console.log('Edit mode: updating material ID:', material.id);
+                    } else {
+                        // For new mode, create a new material
+                        url = '/quality-assurance/materials';
+                        method = 'POST';
+                        console.log('New mode: creating new material');
+                    }
+
+                    console.log('Making fetch request to:', url);
+                    console.log('Method:', method);
                     console.log('Form data:', formData);
 
-                    const response = await fetch('/quality-assurance/materials', {
-                        method: 'POST',
+                    const response = await fetch(url, {
+                        method: method,
                         headers: {
                             'X-CSRF-TOKEN': csrfToken,
                             'X-Requested-With': 'XMLHttpRequest'
@@ -1206,7 +1293,7 @@
                     if (!response.ok) {
                         let errorMessage = 'An error occurred while saving the material';
                         try {
-                            const errorData = await response.json();
+                        const errorData = await response.json();
                             errorMessage = errorData.message || errorMessage;
                             if (errorData.errors) {
                                 const errorList = Object.values(errorData.errors).flat().join(', ');
@@ -1222,8 +1309,15 @@
                     }
                 }
 
-                showSuccess('Materials added successfully!');
+                if (editMode) {
+                    showSuccess('Material updated successfully!');
+                } else {
+                    showSuccess('Materials added successfully!');
+                }
                 closeMaterialModal();
+                
+                // Update the materials array with the new data
+                // For now, reload the page to get fresh data from server
                 window.location.reload();
             } catch (error) {
                 console.error('Error details:', error);
