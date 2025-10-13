@@ -503,7 +503,7 @@
         <main class="main-content" id="mainContent">
             <header class="header">
                 <a href="{{ route('quality-assurance') }}" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Back to QA Records
+                    <i class="fas fa-arrow-left"></i> Back to Project Materials
                 </a>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
                 <div style="margin-left: auto;">
@@ -516,7 +516,7 @@
                 <nav style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">
                     <a href="{{ route('dashboard') }}" style="color: #3b82f6; text-decoration: none;">Dashboard</a>
                     <span style="margin: 0 8px;">></span>
-                    <a href="{{ route('quality-assurance') }}" style="color: #3b82f6; text-decoration: none;">Quality Assurance</a>
+                    <a href="{{ route('quality-assurance') }}" style="color: #3b82f6; text-decoration: none;">Project Material Management</a>
                     <span style="margin: 0 8px;">></span>
                     <span style="color: #374151;">Material Management</span>
                 </nav>
@@ -531,14 +531,14 @@
                         <div class="qa-title-section">
                             <div class="project-card">
                                 <div class="project-line-1">
-                                    <span class="project-badge" style="width: 20px; height: 20px; border-radius: 50%; background: #3b82f6;"></span>
-                                    <input class="project-title-input" value="Project Material Management" readonly />
+                                    <span class="project-badge" style="width: 20px; height: 20px; border-radius: 50%; background: {{ $record->color }};"></span>
+                                    <input class="project-title-input" value="{{ $record->title }}" readonly />
                                 </div>
                                 <div class="project-subrow">
-                                    <span>Mr. Carlos Reyes</span>
+                                    <span>{{ $record->client }}</span>
                                     <span>•</span>
                                     <span>Inspected by:</span>
-                                    <span class="inspector-chip">Engr. Jeric Santos</span>
+                                    <span class="inspector-chip">{{ $record->inspector }}</span>
                                 </div>
                             </div>
                         </div>
@@ -561,7 +561,7 @@
                     <div class="status-tabs">
                         <button class="tab-btn active" data-status="Pending">Pending</button>
                         <button class="tab-btn" data-status="Approved">Approved</button>
-                        <button class="tab-btn" data-status="Rejected">Fail</button>
+                        <button class="tab-btn" data-status="Fail">Fail</button>
                     </div>
                 </div>
 
@@ -583,21 +583,7 @@
                                 <th>Storage Location</th>
                             </tr>
                         </thead>
-                        <tbody id="materialsTableBody">
-                            <tr>
-                                <td>PVC Pipe 4"</td>
-                                <td>PVC-2025-045</td>
-                                <td>Solid Steel Philippines</td>
-                                <td>15</td>
-                                <td>Meter</td>
-                                <td>₱252.00</td>
-                                <td>₱3,780.00</td>
-                                <td>Jul 19, 2025</td>
-                                <td>Jul 19, 2025</td>
-                                <td><span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; background: #fff3cd; color: #856404;">Pending</span></td>
-                                <td>Site A</td>
-                            </tr>
-                        </tbody>
+                        <tbody id="materialsTableBody"></tbody>
                     </table>
                 </div>
 
@@ -617,7 +603,7 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label class="form-label">Inspector Name</label>
-                                <input type="text" class="form-input" value="Engr. Jeric Santos" readonly />
+                                <input type="text" class="form-input" value="{{ $record->inspector }}" readonly />
                                 </div>
                                         
                             <div class="form-group">
@@ -705,6 +691,8 @@
     <script>
         // Materials data from database
         let materials = @json($materials);
+        // Current record id for scoping API requests
+        const currentRecordId = {{ $record->id }};
         
         // CSRF token for AJAX requests
         const csrfToken = '{{ csrf_token() }}';
@@ -787,6 +775,7 @@
                 'Pending': 'background: #fff3cd; color: #856404;',
                 'Approved': 'background: #d4edda; color: #155724;',
                 'Rejected': 'background: #f8d7da; color: #721c24;',
+                'Fail': 'background: #f8d7da; color: #721c24;', // treat Fail same as Rejected
                 'In Use': 'background: #cfe2ff; color: #084298;',
                 'Depleted': 'background: #e2e3e5; color: #383d41;'
             };
@@ -1264,12 +1253,16 @@
                         const filtered = materials.filter(m => m.status === currentFilter);
                         const material = filtered[selectedRowIndex];
                         url = `/quality-assurance/materials/${material.id}`;
-                        method = 'PUT';
+                        // Use POST with _method override so Laravel parses form-data properly
+                        method = 'POST';
+                        formDataObj.append('_method', 'PUT');
+                        formDataObj.append('qa_record_id', currentRecordId);
                         console.log('Edit mode: updating material ID:', material.id);
                     } else {
                         // For new mode, create a new material
                         url = '/quality-assurance/materials';
                         method = 'POST';
+                        formDataObj.append('qa_record_id', currentRecordId);
                         console.log('New mode: creating new material');
                     }
 

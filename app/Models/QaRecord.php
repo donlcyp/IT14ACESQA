@@ -13,4 +13,9 @@ class QaRecord extends Model
         'time',
         'color',
     ];
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class);
+    }
 }

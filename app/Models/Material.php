@@ -10,6 +10,7 @@ class Material extends Model
     use HasFactory;
 
     protected $fillable = [
+        'qa_record_id',
         'name',
         'batch',
         'supplier',
@@ -22,4 +23,9 @@ class Material extends Model
         'status',
         'location',
     ];
+
+    public function qaRecord()
+    {
+        return $this->belongsTo(QaRecord::class);
+    }
 }

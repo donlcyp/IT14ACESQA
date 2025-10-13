@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\QaRecord;
 use App\Models\Material;
+use Illuminate\Support\Facades\Schema;
 
 class QualityAssuranceController extends Controller
 {
@@ -28,9 +29,14 @@ class QualityAssuranceController extends Controller
 
     public function show(QaRecord $qa_record)
     {
-        // Fetch materials for this specific QA record
-        // For now, we'll show all materials, but in the future this could be filtered by project/record
-        $materials = Material::orderBy('created_at', 'desc')->get();
+        // Fetch materials for this specific QA record. If column not yet migrated, fall back to all.
+        if (Schema::hasColumn('materials', 'qa_record_id')) {
+            $materials = Material::where('qa_record_id', $qa_record->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $materials = Material::orderBy('created_at', 'desc')->get();
+        }
         
         return view('quality-assurance-show', [
             'record' => $qa_record,
@@ -65,6 +71,7 @@ class QualityAssuranceController extends Controller
     {
         try {
             $validated = $request->validate([
+                'qa_record_id' => 'required|exists:qa_records,id',
                 'name' => 'required|string|max:255',
                 'batch' => 'nullable|string|max:255',
                 'supplier' => 'nullable|string|max:255',
@@ -92,7 +99,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('quality-assurance')->with('success', 'Material added successfully!');
+            return redirect()->route('quality-assurance.show', $validated['qa_record_id'])->with('success', 'Material added successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json([
@@ -119,6 +126,7 @@ class QualityAssuranceController extends Controller
             $material = Material::findOrFail($id);
             
             $validated = $request->validate([
+                'qa_record_id' => 'required|exists:qa_records,id',
                 'name' => 'required|string|max:255',
                 'batch' => 'nullable|string|max:255',
                 'supplier' => 'nullable|string|max:255',
@@ -141,7 +149,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('quality-assurance')->with('success', 'Material updated successfully!');
+            return redirect()->route('quality-assurance.show', $validated['qa_record_id'])->with('success', 'Material updated successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json([

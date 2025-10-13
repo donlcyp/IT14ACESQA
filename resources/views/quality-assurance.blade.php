@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-    <title>AJJ CRISBER Engineering Services - Quality Assurance</title>
+    <title>AJJ CRISBER Engineering Services - Project Material Management</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -1009,7 +1009,7 @@
                     card.removeEventListener('click', onCardDeleteClick);
                     card.classList.remove('delete-hover');
                     // default click goes to details
-                    card.onclick = function () { window.location = `{{ url('/quality-assurance') }}` + '/' + card.dataset.id; };
+                    card.onclick = function () { window.location = showRoute.replace(':id', card.dataset.id); };
                 }
             });
         }
@@ -1041,6 +1041,9 @@
 
         // Initialize default click to show
         updateCardInteractions();
+
+        // Define the show route for navigation
+        const showRoute = '{{ route("quality-assurance.show", ":id") }}';
 
     </script>
 </body>

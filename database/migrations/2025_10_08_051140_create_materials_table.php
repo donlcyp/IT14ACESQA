@@ -9,6 +9,8 @@ return new class extends Migration {
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
+            // Link material to a specific QA record/project
+            $table->foreignId('qa_record_id')->nullable()->constrained('qa_records')->cascadeOnDelete();
             $table->string('name');
             $table->string('batch')->nullable();
             $table->string('supplier')->nullable();

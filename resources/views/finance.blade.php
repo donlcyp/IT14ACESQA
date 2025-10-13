@@ -644,7 +644,7 @@
                 </a>
                 <a href="{{ route('quality-assurance') }}" class="nav-item">
                     <i class="nav-icon fas fa-bolt"></i>
-                    <span>Quality Assurance</span>
+                    <span>Project Material Management</span>
                 </a>
                 <a href="{{ route('audit') }}" class="nav-item">
                     <i class="nav-icon fas fa-gavel"></i>
