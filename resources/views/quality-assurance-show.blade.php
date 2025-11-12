@@ -11,74 +11,97 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --gray-500: #667085;
+            --accent: #dc2626;
             --white: #ffffff;
+
+            --gray-500: #667085;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
-            --blue-1: #1c57b6;
-            --blue-600: #2563eb;
-            --red-600: #dc2626;
-            --black-1: #313131;
-            --sidebar-bg: #c4c4c4;
-            --header-bg: #4a5568;
-            --main-bg: #e2e8f0;
-            --text-lg-medium-font-family: "Inter", sans-serif;
-            --text-lg-medium-font-weight: 500;
-            --text-lg-medium-font-size: 18px;
-            --text-lg-medium-line-height: 28px;
-            --text-md-normal-font-family: "Inter", sans-serif;
-            --text-md-normal-font-weight: 400;
-            --text-md-normal-font-size: 16px;
-            --text-md-normal-line-height: 24px;
-            --text-sm-medium-font-family: "Inter", sans-serif;
-            --text-sm-medium-font-weight: 500;
-            --text-sm-medium-font-size: 14px;
-            --text-sm-medium-line-height: 20px;
-            --text-headline-small-bold-font-family: "Inter", sans-serif;
-            --text-headline-small-bold-font-weight: 700;
-            --text-headline-small-bold-font-size: 18px;
-            --text-headline-small-bold-line-height: 28px;
-            --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
-            --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
+
+            --blue-1: var(--accent);
+            --blue-600: var(--accent);
+            --red-600: var(--accent);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-
-        body { font-family: var(--text-md-normal-font-family); background-color: var(--main-bg); overflow-x: hidden; }
-
-        .dashboard-container { display: flex; min-height: 100vh; }
-
-        .sidebar { width: 280px; background-color: var(--sidebar-bg); padding: 20px; display: flex; flex-direction: column; gap: 30px; position: fixed; height: 100vh; left: 0; top: 0; z-index: 1000; transition: transform 0.3s ease; transform: translateX(-100%); }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-        .logo { width: 50px; height: 50px; border-radius: 50%; background-color: white; border: 2px solid #9ca3af; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display:block; }
-        .logo-fallback { width:100%; height:100%; border-radius:50%; display:none; align-items:center; justify-content:center; background:#e5e7eb; color:#111827; font-weight:700; font-family: "Inter", sans-serif; }
-        .sidebar-title { font-family: var(--text-headline-small-bold-font-family); font-size: var(--text-headline-small-bold-font-size); font-weight: var(--text-headline-small-bold-font-weight); color: black; }
-        .nav-toggle { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .hamburger-menu { background: none; border: none; font-size: 18px; color: var(--gray-700); cursor: pointer; }
-        .chevron { font-size: 14px; color: var(--gray-700); }
-        .nav-menu { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 16px; border-radius: 8px; text-decoration: none; color: var(--gray-700); font-family: var(--text-md-normal-font-family); font-size: var(--text-md-normal-font-size); transition: all 0.2s ease; position: relative; }
-        .nav-item:hover { background-color: rgba(255, 255, 255, 0.3); }
-        .nav-item.active { background-color: white; color: black; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-        .nav-icon { font-size: 18px; width: 20px; text-align: center; }
-        .logout-section { margin-top: auto; padding-top: 20px; }
-        .logout-item { display: flex; align-items: center; gap: 15px; padding: 12px 16px; border-radius: 8px; text-decoration: none; color: var(--gray-700); font-family: var(--text-md-normal-font-family); font-size: var(--text-md-normal-font-size); transition: all 0.2s ease; }
-        .logout-item:hover { background-color: rgba(255, 255, 255, 0.3); }
-
-        .main-content { flex: 1; margin-left: 0; display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
-
-        .header { background: linear-gradient(135deg, var(--header-bg), #2d3748); padding: 20px 30px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden; }
         .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); }
         .header-menu { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background-color 0.2s ease; }
         .header-menu:hover { background-color: rgba(255, 255, 255, 0.1); }
         .header-title { color: white; font-family: "Zen Dots", sans-serif; font-size: 24px; font-weight: 400; flex: 1; }
         .back-btn { color: white; text-decoration: none; margin-right: 15px; padding: 8px 12px; border-radius: 4px; transition: background-color 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
         .back-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: white; text-decoration: none; }
+            .header { 
+                padding: 20px 30px; 
+                display: flex; 
+                align-items: center; 
+                gap: 20px; 
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+                position: relative; 
+                overflow: hidden; 
+            }
+        
+            .header::after { 
+                content: ''; 
+                position: absolute; 
+                bottom: 0; 
+                left: 0; 
+                right: 0; 
+                height: 2px; 
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); 
+            }
+
+            .header-menu { 
+                background: none; 
+                border: none; 
+                color: white; 
+                font-size: 24px; 
+                cursor: pointer; 
+                padding: 8px; 
+                border-radius: 4px; 
+                transition: background-color 0.2s ease; 
+            }
+
+            .header-menu:hover { 
+                background-color: rgba(255, 255, 255, 0.1); 
+            }
+
+            .header-title { 
+                color: white; 
+                font-family: "Zen Dots", sans-serif; 
+                font-size: 24px; 
+                font-weight: 400; 
+                flex: 1; 
+            }
+
+            .back-btn { 
+                color: white; 
+                text-decoration: none; 
+                margin-right: 15px; 
+                padding: 8px 12px; 
+                border-radius: 4px; 
+                transition: background-color 0.2s ease; 
+                display: inline-flex; 
+                align-items: center; 
+                gap: 8px; 
+            }
+
+            .back-btn:hover { 
+                background-color: rgba(255, 255, 255, 0.1); 
+                color: white; 
+                text-decoration: none; 
+            }
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            transition: margin-left 0.3s ease;
+        }
 
         .content-area { flex: 1; padding: 30px; background: linear-gradient(135deg, #f7fafc, #edf2f7); border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
 
@@ -94,7 +117,7 @@
         .qa-actions { display: flex; align-items: center; gap: 16px; }
         .qa-button { background: none; border: none; cursor: pointer; }
         .qa-button-base { display: inline-flex; align-items: center; gap:6px; padding: 8px 12px; border-radius: 8px; background: #fff; box-shadow: var(--shadow-xs); border:1px solid #e5e7eb; font-size: 12px; }
-        .qa-button-base.primary { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+    .qa-button-base.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
         .qa-button-base.success { background:#22c55e; color:#fff; border-color:#22c55e; }
         .qa-button-base.danger { background:#ef4444; color:#fff; border-color:#ef4444; }
 
@@ -103,7 +126,7 @@
         .tab-btn { flex: 1; padding: 16px 24px; background: white; border: none; border-bottom: 3px solid transparent; font-family: 'Inter', sans-serif; font-size: 14px; color: #4b5563; cursor: pointer; transition: all 0.3s; position: relative; }
         .tab-btn:first-child { border-radius: 15px 0 0 0; }
         .tab-btn:last-child { border-radius: 0 15px 0 0; }
-        .tab-btn.active { border-bottom-color: #3b82f6; color: #000; font-weight: 600; background: #f9fafb; }
+    .tab-btn.active { border-bottom-color: var(--accent); color: #000; font-weight: 600; background: #f9fafb; }
         .tab-btn:hover:not(.active) { background: #f9fafb; }
 
         .table-card { background:#ffffff; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow:hidden; border:1px solid #e2e8f0; border-top: none; }
@@ -124,11 +147,11 @@
         .qa-form-field { display:flex; flex-direction:column; gap:6px; }
         .qa-label { font-size:12px; color:#374151; font-weight: 500; }
         .qa-input, .qa-select { border:1px solid #e5e7eb; border-radius:6px; padding:8px 10px; font-size:14px; }
-        .qa-input:focus, .qa-select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .qa-input:focus, .qa-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12); }
         .qa-actions-row { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
         .btn-sm { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .btn-sm:hover { opacity: 0.9; }
-        .btn-sm.primary { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+    .btn-sm.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
         .btn-sm.ghost { background:#fff; color:#111827; }
         .modal-close { position:absolute; top:10px; right:10px; background:#fff; border:1px solid #e5e7eb; border-radius:6px; padding:6px; cursor:pointer; transition: background 0.2s; }
         .modal-close:hover { background: #f3f4f6; }
@@ -232,8 +255,8 @@
         
         .form-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
         }
 
         .form-input:disabled {
@@ -291,11 +314,11 @@
         }
         
         .btn-primary {
-            background: #3b82f6;
+            background: var(--accent);
             color: #ffffff;
         }
         .btn-primary:hover {
-            background: #2563eb; 
+            background: var(--accent);
         }
 
         /* Modal Step 2 Styles - Clean Table Design */
@@ -312,7 +335,7 @@
         }
         
         .add-item-btn { 
-            background: #3b82f6; 
+            background: var(--accent); 
             color: #ffffff; 
             border-radius: 8px; 
             padding: 10px 16px; 
@@ -325,7 +348,7 @@
             font-weight: 500; 
             transition: all 0.2s ease; 
         }
-        .add-item-btn:hover { background: #2563eb; }
+        .add-item-btn:hover { background: var(--accent); }
         .add-item-btn i { font-size: 12px; }
         
         .materials-table {
@@ -377,8 +400,8 @@
         
         .table-input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
         }
         
         .table-input::placeholder {
@@ -403,8 +426,8 @@
         
         .table-select:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
         }
         
         .delete-btn {
@@ -479,26 +502,7 @@
 
 <body>
     <div class="dashboard-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <img src="images/aces-logo.png" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="logo-fallback">ACES</div>
-                </div>
-                <div class="sidebar-title">ACES</div>
-            </div>
-            <nav class="nav-menu">
-                <a href="{{ route('dashboard') }}" class="nav-item"><i class="nav-icon fas fa-smile"></i><span>Dashboard</span></a>
-                <a href="{{ route('quality-assurance') }}" class="nav-item active"><i class="nav-icon fas fa-bolt"></i><span>Project Material Management</span></a>
-                <a href="{{ route('audit') }}" class="nav-item"><i class="nav-icon fas fa-gavel"></i><span>Audit</span></a>
-                <a href="{{ route('finance') }}" class="nav-item"><i class="nav-icon fas fa-chart-bar"></i><span>Finance</span></a>
-                <a href="{{ route('projects') }}" class="nav-item"><i class="nav-icon fas fa-tasks"></i><span>Projects</span></a>
-                <a href="{{ route('employee-attendance') }}" class="nav-item"><i class="nav-icon fas fa-hard-hat"></i><span>Employee Attendance</span></a>
-            </nav>
-            <div class="logout-section">
-                <a href="#" class="logout-item" onclick="logout()"><i class="nav-icon fas fa-sign-out-alt"></i><span>Log Out</span></a>
-            </div>
-        </aside>
+        @include('partials.sidebar')
 
         <main class="main-content" id="mainContent">
             <header class="header">
@@ -507,16 +511,15 @@
                 </a>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
                 <div style="margin-left: auto;">
-                <button class="header-menu" id="headerMenu"><i class="fas fa-bars"></i></button>
                 </div>
             </header>
 
             <section class="content-area">
                 <!-- Breadcrumb -->
                 <nav style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">
-                    <a href="{{ route('dashboard') }}" style="color: #3b82f6; text-decoration: none;">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" style="color: var(--accent); text-decoration: none;">Dashboard</a>
                     <span style="margin: 0 8px;">></span>
-                    <a href="{{ route('quality-assurance') }}" style="color: #3b82f6; text-decoration: none;">Project Material Management</a>
+                    <a href="{{ route('quality-assurance') }}" style="color: var(--accent); text-decoration: none;">Project Material Management</a>
                     <span style="margin: 0 8px;">></span>
                     <span style="color: #374151;">Material Management</span>
                 </nav>
@@ -531,14 +534,14 @@
                         <div class="qa-title-section">
                             <div class="project-card">
                                 <div class="project-line-1">
-                                    <span class="project-badge" style="width: 20px; height: 20px; border-radius: 50%; background: {{ $record->color }};"></span>
-                                    <input class="project-title-input" value="{{ $record->title }}" readonly />
+                                    <span class="project-badge" style="width: 20px; height: 20px; border-radius: 50%;" data-color="{{ $record->color ?? '#2563eb' }}"></span>
+                                    <input class="project-title-input" value="{{ $record->title ?? '' }}" readonly />
                                 </div>
                                 <div class="project-subrow">
-                                    <span>{{ $record->client }}</span>
+                                    <span>{{ $record->client ?? '' }}</span>
                                     <span>•</span>
                                     <span>Inspected by:</span>
-                                    <span class="inspector-chip">{{ $record->inspector }}</span>
+                                    <span class="inspector-chip">{{ $record->inspector ?? '' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -689,10 +692,21 @@
     </div>
 
     <script>
-        // Materials data from database
-        let materials = @json($materials);
-        // Current record id for scoping API requests
-        const currentRecordId = {{ $record->id }};
+    // Set background color for project badge
+    const projectBadge = document.querySelector('.project-badge');
+    if (projectBadge) {
+        const color = projectBadge.getAttribute('data-color');
+        if (color) {
+            projectBadge.style.backgroundColor = color;
+        }
+    }
+    
+    // Materials data from database (processed by Blade on server)
+    const materialsData = '{{ json_encode($materials ?? []) }}';
+    let materials = JSON.parse(materialsData.replace(/&quot;/g, '"'));
+    
+    // Current record id for scoping API requests
+    const currentRecordId = parseInt('{{ isset($record) && $record->id ? $record->id : 0 }}') || null;
         
         // CSRF token for AJAX requests
         const csrfToken = '{{ csrf_token() }}';
@@ -702,27 +716,42 @@
         let selectedRowIndex = -1;
         let editMode = false;
 
-        // Sidebar toggle
+        // Sidebar functionality (guarded for pages that may not include all elements)
         const headerMenu = document.getElementById('headerMenu');
         const sidebar = document.getElementById('sidebar');
-        
-        function toggleSidebar() { 
-            sidebar.classList.toggle('open'); 
-        }
-        
-        headerMenu.addEventListener('click', toggleSidebar);
+        const mainContent = document.getElementById('mainContent');
 
-        // Close sidebar when clicking outside
+        function updateMainContentMargin(isOpen) {
+            if (mainContent) mainContent.style.marginLeft = isOpen ? '280px' : '0';
+        }
+
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('open');
+            updateMainContentMargin(false);
+        }
+
+        function toggleSidebar() {
+            if (!sidebar) return;
+            const willBeOpen = !sidebar.classList.contains('open');
+            sidebar.classList.toggle('open');
+            updateMainContentMargin(willBeOpen);
+        }
+
+        if (headerMenu) headerMenu.addEventListener('click', toggleSidebar);
+
+        // Close sidebar when clicking outside (guard headerMenu presence)
         document.addEventListener('click', function (e) {
-            if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                sidebar.classList.remove('open');
+            const clickedInsideSidebar = sidebar && sidebar.contains(e.target);
+            const clickedHeaderMenu = headerMenu && headerMenu.contains(e.target);
+            if (!clickedInsideSidebar && !clickedHeaderMenu) {
+                closeSidebar();
             }
         });
 
         // Close sidebar when pressing Escape key
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
-                sidebar.classList.remove('open');
+                closeSidebar();
             }
         });
 
@@ -783,67 +812,71 @@
         }
 
         // Row selection
-        document.getElementById('materialsTableBody').addEventListener('click', (e) => {
-            const row = e.target.closest('tr');
-            if (!row || row.querySelector('td[colspan]')) return;
-            
-            document.querySelectorAll('#materialsTableBody tr').forEach(r => r.classList.remove('selected'));
-            row.classList.add('selected');
-            selectedRowIndex = parseInt(row.dataset.index);
-        });
+        const materialsTableBodyEl = document.getElementById('materialsTableBody');
+        if (materialsTableBodyEl) {
+            materialsTableBodyEl.addEventListener('click', (e) => {
+                const row = e.target.closest('tr');
+                if (!row || row.querySelector('td[colspan]')) return;
+                
+                document.querySelectorAll('#materialsTableBody tr').forEach(r => r.classList.remove('selected'));
+                row.classList.add('selected');
+                selectedRowIndex = parseInt(row.dataset.index);
+            });
+        }
 
-        // Delete functionality
+        // Delete functionality (guard presence of delete button)
         const deleteBtn = document.getElementById('deleteBtn');
-        
-        deleteBtn.addEventListener('mouseenter', () => {
-            if (selectedRowIndex >= 0) {
-                const rows = document.querySelectorAll('#materialsTableBody tr');
-                rows[selectedRowIndex]?.classList.add('delete-hover');
-            }
-        });
-
-        deleteBtn.addEventListener('mouseleave', () => {
-            document.querySelectorAll('#materialsTableBody tr').forEach(r => r.classList.remove('delete-hover'));
-        });
-
-        deleteBtn.addEventListener('click', async () => {
-            if (selectedRowIndex < 0) {
-                alert('Please select a material row first by clicking on it.');
-                return;
-            }
-
-            const filtered = materials.filter(m => m.status === currentFilter);
-            const material = filtered[selectedRowIndex];
-            
-            if (confirm(`Are you sure you want to delete ${material.name}?`)) {
-                try {
-                    const response = await fetch(`/quality-assurance/materials/${material.id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            // Reload the page to get updated data from database
-                            window.location.reload();
-                        } else {
-                            showError(result.message || 'An error occurred');
-                        }
-                    } else {
-                        const errorData = await response.json();
-                        showError(errorData.message || 'An error occurred');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showError('Network error occurred');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('mouseenter', () => {
+                if (selectedRowIndex >= 0) {
+                    const rows = document.querySelectorAll('#materialsTableBody tr');
+                    rows[selectedRowIndex]?.classList.add('delete-hover');
                 }
-            }
-        });
+            });
+
+            deleteBtn.addEventListener('mouseleave', () => {
+                document.querySelectorAll('#materialsTableBody tr').forEach(r => r.classList.remove('delete-hover'));
+            });
+
+            deleteBtn.addEventListener('click', async () => {
+                if (selectedRowIndex < 0) {
+                    alert('Please select a material row first by clicking on it.');
+                    return;
+                }
+
+                const filtered = materials.filter(m => m.status === currentFilter);
+                const material = filtered[selectedRowIndex];
+                
+                if (confirm(`Are you sure you want to delete ${material.name}?`)) {
+                    try {
+                        const response = await fetch(`/quality-assurance/materials/${material.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            if (result.success) {
+                                // Reload the page to get updated data from database
+                                window.location.reload();
+                            } else {
+                                showError(result.message || 'An error occurred');
+                            }
+                        } else {
+                            const errorData = await response.json();
+                            showError(errorData.message || 'An error occurred');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showError('Network error occurred');
+                    }
+                }
+            });
+        }
 
         // Modal functions
         const materialModal = document.getElementById('materialModal');
@@ -1123,12 +1156,16 @@
 
         async function saveMaterial() {
             const container = document.getElementById('materialRowsContainer');
-            const rows = container.querySelectorAll('tr');
-            
+            const rows = container ? container.querySelectorAll('tr') : [];
+
+            // Locate save button early so we can restore state on errors
+            const saveBtn = document.querySelector('button[onclick="saveMaterial()"]');
+            const originalText = saveBtn ? saveBtn.innerHTML : null;
+
             console.log('Found rows:', rows.length);
             console.log('Container:', container);
-            
-            if (rows.length === 0) {
+
+            if (!rows || rows.length === 0) {
                 alert('Please add at least one material item.');
                 return;
             }
@@ -1141,7 +1178,7 @@
             console.log('Step 1 inputs:', { supplierInput, locationInput, dateReceivedInput, statusInput });
             console.log('Status input value:', statusInput ? statusInput.value : 'undefined');
             console.log('Status input disabled:', statusInput ? statusInput.disabled : 'undefined');
-            
+
             // Check each field individually
             console.log('Field values:', {
                 supplier: supplierInput ? supplierInput.value : 'MISSING',
@@ -1149,7 +1186,7 @@
                 dateReceived: dateReceivedInput ? dateReceivedInput.value : 'MISSING',
                 status: statusInput ? statusInput.value : 'MISSING'
             });
-            
+
             // If status field is disabled, enable it temporarily for saving
             if (statusInput && statusInput.disabled) {
                 console.log('Status field is disabled, enabling temporarily for save');
@@ -1164,8 +1201,7 @@
                     statusInput: !!statusInput
                 });
                 alert('Error: Some form fields are missing. Please refresh the page and try again.');
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
+                if (saveBtn && originalText !== null) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
                 return;
             }
 
@@ -1173,21 +1209,20 @@
             const location = locationInput.value;
             const dateReceived = dateReceivedInput.value;
             const status = statusInput.value;
-            
+
             console.log('Form values:', { supplier, location, dateReceived, status });
 
             if (!supplier || !location || !dateReceived) {
                 alert('Please fill in all required fields in Step 1.');
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
+                if (saveBtn && originalText !== null) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
                 return;
             }
 
             // Show loading state
-            const saveBtn = document.querySelector('button[onclick="saveMaterial()"]');
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
-            saveBtn.disabled = true;
+            if (saveBtn) {
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
+                saveBtn.disabled = true;
+            }
 
             try {
                 for (const row of rows) {
@@ -1202,8 +1237,7 @@
                     if (!nameInput || !quantityInput || !priceInput || !totalInput) {
                         console.error('Missing required inputs in row:', row);
                         alert('Error: Some form fields are missing. Please refresh the page and try again.');
-                        saveBtn.innerHTML = originalText;
-                        saveBtn.disabled = false;
+                        if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
                         return;
                     }
 
@@ -1218,8 +1252,7 @@
 
                     if (!name || quantity <= 0 || price <= 0) {
                         alert('Please fill in all required fields for each material item.');
-                        saveBtn.innerHTML = originalText;
-                        saveBtn.disabled = false;
+                        if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
                         return;
                     }
 
@@ -1296,8 +1329,7 @@
                             errorMessage = `HTTP ${response.status}: ${response.statusText}`;
                         }
                         showError(errorMessage);
-                        saveBtn.innerHTML = originalText;
-                        saveBtn.disabled = false;
+                        if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
                         return;
                     }
                 }
@@ -1325,8 +1357,7 @@
                 }
                 
                 showError(errorMessage);
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
+                if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
             }
         }
 
@@ -1354,17 +1385,21 @@
         }
 
         // Close modal on outside click
-        materialModal.addEventListener('click', (e) => {
-            if (e.target === materialModal) {
-                closeMaterialModal();
-            }
-        });
+        if (materialModal) {
+            materialModal.addEventListener('click', (e) => {
+                if (e.target === materialModal) {
+                    closeMaterialModal();
+                }
+            });
+        }
 
-        materialModalStep2.addEventListener('click', (e) => {
-            if (e.target === materialModalStep2) {
-                closeMaterialModal();
-            }
-        });
+        if (materialModalStep2) {
+            materialModalStep2.addEventListener('click', (e) => {
+                if (e.target === materialModalStep2) {
+                    closeMaterialModal();
+                }
+            });
+        }
 
         // Logout function
         function logout() {

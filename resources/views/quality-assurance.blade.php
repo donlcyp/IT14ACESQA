@@ -11,168 +11,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --gray-500: #667085;
+            --accent: #dc2626;
             --white: #ffffff;
+
+            --gray-500: #667085;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
-            --blue-1: #1c57b6;
-            --blue-600: #2563eb;
-            --red-600: #dc2626;
-            --black-1: #313131;
-            --sidebar-bg: #c4c4c4;
-            --header-bg: #4a5568;
-            --main-bg: #e2e8f0;
-            --text-lg-medium-font-family: "Inter", sans-serif;
-            --text-lg-medium-font-weight: 500;
-            --text-lg-medium-font-size: 18px;
-            --text-lg-medium-line-height: 28px;
-            --text-md-normal-font-family: "Inter", sans-serif;
-            --text-md-normal-font-weight: 400;
-            --text-md-normal-font-size: 16px;
-            --text-md-normal-line-height: 24px;
-            --text-sm-medium-font-family: "Inter", sans-serif;
-            --text-sm-medium-font-weight: 500;
-            --text-sm-medium-font-size: 14px;
-            --text-sm-medium-line-height: 20px;
-            --text-headline-small-bold-font-family: "Inter", sans-serif;
-            --text-headline-small-bold-font-weight: 700;
-            --text-headline-small-bold-font-size: 18px;
-            --text-headline-small-bold-line-height: 28px;
-            --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
-            --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
+
+            --blue-1: var(--accent);
+            --blue-600: var(--accent);
+            --red-600: var(--accent);
+            --header-bg: var(--accent);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            font-family: var(--text-md-normal-font-family);
-            background-color: var(--main-bg);
-            overflow-x: hidden;
-        }
-
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-            transform: translateX(-100%);
-        }
-
-        .sidebar.open {
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: white;
-            border: 2px solid #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display:block; }
-        .logo-fallback { width:100%; height:100%; border-radius:50%; display:none; align-items:center; justify-content:center; background:#e5e7eb; color:#111827; font-weight:700; font-family: "Inter", sans-serif; }
-
-        .sidebar-title {
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: var(--text-headline-small-bold-font-size);
-            font-weight: var(--text-headline-small-bold-font-weight);
-            color: black;
-        }
-
-
-        .nav-menu {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .nav-item.active {
-            background-color: white;
-            color: black;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .logout-section {
-            margin-top: auto;
-            padding-top: 20px;
-        }
-
-        .logout-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-        }
-
-        .logout-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
+        /* Sidebar has been moved to partials/sidebar.blade.php */
 
         /* Main Content Area */
         .main-content {
@@ -182,11 +37,12 @@
             flex-direction: column;
             min-height: 100vh;
             width: 100%;
+            transition: margin-left 0.3s ease;
         }
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #2d3748);
+            background: linear-gradient(135deg, var(--header-bg), #dc2626);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -374,86 +230,112 @@
             line-height: var(--text-sm-medium-line-height);
         }
 
-        /* Cards Section */
-        .qa-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        /* List Section */
+        .qa-list-container {
             width: 100%;
+            margin-bottom: 30px;
         }
 
-        .qa-card {
+        .qa-list {
             background: #ffffff;
             border-radius: 12px;
-            padding: 20px;
-            width: 100%;
+            overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 180px;
         }
 
-        .qa-card:hover {
-            transform: translateY(-4px);
-        }
-
-        .qa-card-content {
-            display: flex;
-            align-items: flex-start;
+        .qa-list-header {
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+            display: grid;
+            grid-template-columns: 40px 1fr 150px 150px 150px 100px;
             gap: 16px;
-            margin-bottom: 16px;
-            flex: 1;
+            padding: 16px 20px;
+            align-items: center;
+            font-weight: 600;
+            color: #374151;
+            font-family: "Source Code Pro", sans-serif;
+            font-size: 14px;
         }
 
-        .qa-card-picture {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+        .qa-list-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 150px 150px 150px 100px;
+            gap: 16px;
+            padding: 16px 20px;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .qa-list-row:last-child {
+            border-bottom: none;
+        }
+
+        .qa-list-row:hover {
+            background-color: #f9f9f9;
+        }
+
+        .qa-list-row.delete-hover {
+            background-color: #fee2e2;
+        }
+
+        .qa-color-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             flex-shrink: 0;
         }
 
-        .qa-card-info {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .qa-card-title {
-            color: #000000;
-            font-family: "Source Code Pro", sans-serif;
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 1.3;
-            margin: 0;
-            word-wrap: break-word;
-        }
-
-        .qa-card-details {
+        .qa-list-cell {
             color: #3c3c43;
             font-family: "Source Code Pro", sans-serif;
             font-size: 14px;
             font-weight: 400;
             line-height: 1.5;
-            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .qa-card-time {
+        .qa-list-cell.title {
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .qa-list-cell.time {
             color: rgba(102, 102, 102, 0.8);
-            font-family: "Source Code Pro", sans-serif;
             font-size: 12px;
-            text-align: right;
-            margin-top: auto;
-            padding-top: 12px;
-            border-top: 1px solid #f0f0f0;
+        }
+
+        .qa-view-button {
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            font-family: "Source Code Pro", sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .qa-view-button:hover {
+            opacity: 0.85;
+        }
+
+        .qa-view-button i {
+            font-size: 14px;
         }
 
         .qa-delete-button {
-            background: #ff0000;
+            background: var(--accent);
             border: none;
             border-radius: 8px;
             padding: 8px 16px;
@@ -483,7 +365,7 @@
 
         /* New Button */
         .qa-new-button {
-            background: #0084ff;
+            background: var(--accent);
             border: none;
             border-radius: 8px;
             padding: 8px 16px;
@@ -531,6 +413,13 @@
         .qa-card.delete-hover {
             background: #fee2e2;
             border-color: #ef4444;
+        }
+
+        /* Buttons Container */
+        .qa-buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         /* Delete mode banner */
@@ -581,7 +470,7 @@
         .qa-modal-icon {
             width: 40px;
             height: 40px;
-            background: #4a90e2;
+            background: var(--accent);
             border-radius: 8px;
             position: absolute;
             left: 21px;
@@ -689,14 +578,18 @@
 
         /* Responsive Design */
         @media (max-width: 1200px) {
-            .qa-cards {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            .qa-list-header,
+            .qa-list-row {
+                grid-template-columns: 40px 1fr 100px 100px 100px;
+                gap: 12px;
             }
         }
 
         @media (max-width: 992px) {
-            .qa-cards {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            .qa-list-header,
+            .qa-list-row {
+                grid-template-columns: 40px 1fr 80px 80px;
+                gap: 10px;
             }
         }
 
@@ -717,27 +610,23 @@
                 padding: 20px;
             }
 
-            .qa-cards {
-                grid-template-columns: 1fr;
-                gap: 16px;
+            .qa-list-header,
+            .qa-list-row {
+                grid-template-columns: 30px 1fr;
+                gap: 8px;
             }
 
-            .qa-card {
-                min-height: 160px;
-                padding: 16px;
+            .qa-list-header > div:not(:first-child),
+            .qa-list-row > div:nth-child(n+3) {
+                display: none;
             }
 
-            .qa-card-picture {
-                width: 40px;
-                height: 40px;
-            }
-
-            .qa-card-title {
-                font-size: 16px;
-            }
-
-            .qa-card-details {
+            .qa-list-cell {
                 font-size: 13px;
+            }
+
+            .qa-buttons-container {
+                gap: 8px;
             }
         }
     </style>
@@ -746,59 +635,16 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <img src="{{ asset('images/aces-logo.png') }}" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="logo-fallback">ACES</div>
-                </div>
-                <div class="sidebar-title">ACES</div>
-            </div>
-
-
-            <nav class="nav-menu">
-                <a href="{{ route('dashboard') }}" class="nav-item">
-                    <i class="nav-icon fas fa-smile"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ route('quality-assurance') }}" class="nav-item active">
-                    <i class="nav-icon fas fa-bolt"></i>
-                    <span>Project Material Management</span>
-                </a>
-                <a href="{{ route('audit') }}" class="nav-item">
-                    <i class="nav-icon fas fa-gavel"></i>
-                    <span>Audit</span>
-                </a>
-                <a href="{{ route('finance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-chart-bar"></i>
-                    <span>Finance</span>
-                </a>
-                <a href="{{ route('projects') }}" class="nav-item">
-                    <i class="nav-icon fas fa-tasks"></i>
-                    <span>Projects</span>
-                </a>
-                <a href="{{ route('employee-attendance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-hard-hat"></i>
-                    <span>Employee Attendance</span>
-                </a>
-            </nav>
-
-            <div class="logout-section">
-                <a href="#" class="logout-item">
-                    <i class="nav-icon fas fa-sign-out-alt"></i>
-                    <span>Log Out</span>
-                </a>
-            </div>
-        </aside>
+        @include('partials.sidebar')
 
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
             <!-- Header -->
             <header class="header">
-                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
                 <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
                 </button>
+                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
             <!-- Content Area -->
@@ -841,37 +687,8 @@
                     </div>
                 @endif
 
-                <div id="qaDeleteBanner" class="qa-delete-banner">
-                    Delete mode is ON. Click a project card to confirm deletion.
-                </div>
-
-                <!-- QA Cards -->
-                <div class="qa-cards" aria-label="Quality assurance records">
-                    @forelse($records as $index => $record)
-                        <article class="qa-card" data-title="{{ $record->title }}" data-id="{{ $record->id }}" style="cursor: pointer;">
-                            <div class="qa-card-content">
-                                <div class="qa-card-picture" style="background-color: {{ $record->color }}"></div>
-                                <div class="qa-card-info">
-                                    <h3 class="qa-card-title">{{ $record->title }}</h3>
-                                    <p class="qa-card-details">
-                                        Client Name: {{ $record->client }}<br />
-                                        Inspected by: {{ $record->inspector }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="qa-card-time">{{ $record->time }}</div>
-                            <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST" onclick="event.stopPropagation()" style="display: none;">
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                        </article>
-                    @empty
-                        <div style="color:#6b7280; font-family: var(--text-md-normal-font-family);">No projects yet. Click New to add your first project.</div>
-                    @endforelse
-                </div>
-
-                <!-- New & Delete Buttons -->
-                <div style="display:flex; gap:10px;">
+                <!-- New & Delete Buttons at Top -->
+                <div class="qa-buttons-container">
                     <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
                         aria-label="Add new record">
                         <i class="qa-new-icon fas fa-plus"></i>
@@ -883,6 +700,49 @@
                             <span class="qa-new-text">Delete</span>
                         </button>
                     @endif
+                </div>
+
+                <div id="qaDeleteBanner" class="qa-delete-banner">
+                    Delete mode is ON. Click a row to confirm deletion.
+                </div>
+
+                <!-- QA List View -->
+                <div class="qa-list-container" aria-label="Quality assurance records">
+                    @forelse($records as $index => $record)
+                        @if ($index === 0)
+                            <div class="qa-list">
+                                <div class="qa-list-header">
+                                    <div></div>
+                                    <div>Project Name</div>
+                                    <div>Client Name</div>
+                                    <div>Inspector</div>
+                                    <div>Time</div>
+                                    <div></div>
+                                </div>
+                        @endif
+                                <div class="qa-list-row" data-title="{{ $record->title }}" data-id="{{ $record->id }}" style="cursor: pointer;">
+                                    <div class="qa-color-indicator" data-color="{{ $record->color ?? '#520d0d' }}"></div>
+                                    <div class="qa-list-cell title">{{ $record->title }}</div>
+                                    <div class="qa-list-cell">{{ $record->client }}</div>
+                                    <div class="qa-list-cell">{{ $record->inspector }}</div>
+                                    <div class="qa-list-cell time">{{ $record->time }}</div>
+                                    <div style="display: flex; justify-content: center;">
+                                        <button type="button" class="qa-view-button" data-view-id="{{ $record->id }}" aria-label="View project details">
+                                            <i class="fas fa-eye"></i>
+                                            <span>View</span>
+                                        </button>
+                                    </div>
+                                    <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST" style="display: none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </div>
+                        @if ($loop->last)
+                            </div>
+                        @endif
+                    @empty
+                        <div style="color:#6b7280; font-family: var(--text-md-normal-font-family); padding: 20px;">No projects yet. Click New to add your first project.</div>
+                    @endforelse
                 </div>
 
 
@@ -926,7 +786,7 @@
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="time">Time</label>
                                 <div class="qa-modal-field">
-                                    <input type="time" id="time" name="time" required />
+                                    <input type="time" id="time" name="time" readonly />
                                 </div>
                                 @error('time')
                                     <span class="qa-error">{{ $message }}</span>
@@ -935,7 +795,7 @@
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="color">Color</label>
                                 <div class="qa-modal-field">
-                                    <input type="color" id="color" name="color" value="#520d0d" required />
+                                    <input type="color" id="color" name="color" readonly />
                                 </div>
                                 @error('color')
                                     <span class="qa-error">{{ $message }}</span>
@@ -959,27 +819,121 @@
     </div>
 
     <script>
-        // Sidebar toggle functionality
-        const headerMenu = document.getElementById('headerMenu');
-        const sidebar = document.getElementById('sidebar');
+        // Set background colors for qa-color-indicator elements
+        document.querySelectorAll('.qa-color-indicator').forEach(element => {
+            const color = element.getAttribute('data-color');
+            if (color) {
+                element.style.backgroundColor = color;
+            }
+        });
+
+        // Generate random color
+        function generateRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Get current time in HH:MM format
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // Initialize modal with auto-set values
+        const modal = document.querySelector('.qa-modal');
+        const timeInput = document.getElementById('time');
+        const colorInput = document.getElementById('color');
+
+        // Set time and color when modal opens
+        modal.addEventListener('click', function(e) {
+            // Check if modal is being opened (by checking if active class is being added)
+            if (e.target === this && !this.classList.contains('active')) {
+                return; // Modal is closing
+            }
+        });
+
+        // Override the modal open button to set values
+        const newButton = document.querySelector('.qa-new-button');
+        if (newButton) {
+            newButton.addEventListener('click', function() {
+                timeInput.value = getCurrentTime();
+                colorInput.value = generateRandomColor();
+                modal.classList.add('active');
+            });
+        }
+
+        // Also set values when form is reset or modal is shown
+        const form = document.querySelector('.qa-modal-content form');
+        if (form) {
+            form.addEventListener('reset', function() {
+                setTimeout(() => {
+                    timeInput.value = getCurrentTime();
+                    colorInput.value = generateRandomColor();
+                }, 0);
+            });
+        }
+
+        // Set initial values on page load
+        window.addEventListener('load', function() {
+            timeInput.value = getCurrentTime();
+            colorInput.value = generateRandomColor();
+        });
+
+    // Sidebar toggle functionality
+    const headerMenu = document.getElementById('headerMenu');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+        // Sidebar functionality
+        function updateMainContentMargin(isOpen) {
+            mainContent.style.marginLeft = isOpen ? '280px' : '0';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            updateMainContentMargin(false);
+        }
 
         function toggleSidebar() {
+            const willBeOpen = !sidebar.classList.contains('open');
             sidebar.classList.toggle('open');
+            updateMainContentMargin(willBeOpen);
         }
 
         headerMenu.addEventListener('click', toggleSidebar);
 
+        function initializeSidebar() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.add('open');
+                mainContent.style.marginLeft = '280px';
+            } else {
+                sidebar.classList.remove('open');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', initializeSidebar);
+
+        // Initialize sidebar state on page load
+        initializeSidebar();
+
         // Close sidebar when clicking outside
         document.addEventListener('click', function (e) {
             if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                sidebar.classList.remove('open');
+                closeSidebar();
             }
         });
 
         // Close sidebar when pressing Escape key
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
-                sidebar.classList.remove('open');
+                closeSidebar();
             }
         });
 
@@ -990,38 +944,38 @@
             }
         });
 
-        // Delete mode for cards
+        // Delete mode for rows
         let deleteMode = false;
         const deleteToggle = document.getElementById('qaDeleteToggle');
-        const cards = document.querySelectorAll('.qa-card');
+        const rows = document.querySelectorAll('.qa-list-row');
 
-        function updateCardInteractions() {
-            cards.forEach(card => {
+        function updateRowInteractions() {
+            rows.forEach(row => {
                 if (deleteMode) {
                     // disable navigation while in delete mode
-                    card.onclick = function (e) { e.preventDefault(); };
-                    card.addEventListener('mouseenter', onCardEnter);
-                    card.addEventListener('mouseleave', onCardLeave);
-                    card.addEventListener('click', onCardDeleteClick);
+                    row.onclick = function (e) { e.preventDefault(); };
+                    row.addEventListener('mouseenter', onRowEnter);
+                    row.addEventListener('mouseleave', onRowLeave);
+                    row.addEventListener('click', onRowDeleteClick);
                 } else {
-                    card.removeEventListener('mouseenter', onCardEnter);
-                    card.removeEventListener('mouseleave', onCardLeave);
-                    card.removeEventListener('click', onCardDeleteClick);
-                    card.classList.remove('delete-hover');
+                    row.removeEventListener('mouseenter', onRowEnter);
+                    row.removeEventListener('mouseleave', onRowLeave);
+                    row.removeEventListener('click', onRowDeleteClick);
+                    row.classList.remove('delete-hover');
                     // default click goes to details
-                    card.onclick = function () { window.location = showRoute.replace(':id', card.dataset.id); };
+                    row.onclick = function () { window.location = showRoute.replace(':id', row.dataset.id); };
                 }
             });
         }
 
-        function onCardEnter(e) { e.currentTarget.classList.add('delete-hover'); }
-        function onCardLeave(e) { e.currentTarget.classList.remove('delete-hover'); }
-        function onCardDeleteClick(e) {
-            const card = e.currentTarget;
-            const title = card.dataset.title;
+        function onRowEnter(e) { e.currentTarget.classList.add('delete-hover'); }
+        function onRowLeave(e) { e.currentTarget.classList.remove('delete-hover'); }
+        function onRowDeleteClick(e) {
+            const row = e.currentTarget;
+            const title = row.dataset.title;
             const ok = confirm(`Are you sure to delete ${title}?`);
             if (ok) {
-                const form = card.querySelector('form');
+                const form = row.querySelector('form');
                 if (form) {
                     // Submit the form and keep user on the same page
                     form.submit();
@@ -1036,14 +990,23 @@
             this.style.opacity = deleteMode ? '0.9' : '1';
             const banner = document.getElementById('qaDeleteBanner');
             if (banner) banner.classList.toggle('active', deleteMode);
-            updateCardInteractions();
+            updateRowInteractions();
         });
 
         // Initialize default click to show
-        updateCardInteractions();
+        updateRowInteractions();
 
         // Define the show route for navigation
         const showRoute = '{{ route("quality-assurance.show", ":id") }}';
+
+        // Handle view button clicks
+        document.querySelectorAll('.qa-view-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const recordId = this.getAttribute('data-view-id');
+                window.location = showRoute.replace(':id', recordId);
+            });
+        });
 
     </script>
 </body>
