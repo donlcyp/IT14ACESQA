@@ -709,7 +709,7 @@
                         <div class="dashboard-card-header">
                             <div>
                                 <div class="dashboard-card-title">Recent Activity</div>
-                                <div class="dashboard-card-subtitle">Latest updates across quality inspections, finance, and audit trails</div>
+                                <div class="dashboard-card-subtitle">Latest updates across quality inspections, finance, and transaction trails</div>
                             </div>
                         </div>
 
@@ -737,8 +737,8 @@
                                     <i class="fas fa-helmet-safety"></i>
                                 </div>
                                 <div class="activity-content">
-                                    <div class="activity-title">Safety audit checklist for precast installation approved.</div>
-                                    <div class="activity-meta">Audit & Compliance • Eastern Tech Manufacturing Plant • Yesterday</div>
+                                    <div class="activity-title">Safety transaction checklist for precast installation approved.</div>
+                                    <div class="activity-meta">Transaction & Compliance • Eastern Tech Manufacturing Plant • Yesterday</div>
                                 </div>
                             </div>
                         </div>

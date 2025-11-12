@@ -229,9 +229,9 @@
             <i class="nav-icon fas fa-bolt"></i>
             <span>Project Material Management</span>
         </a>
-        <a href="{{ route('audit') }}" class="nav-item {{ request()->routeIs('audit') ? 'active' : '' }}">
+        <a href="{{ route('transaction') }}" class="nav-item {{ request()->routeIs('transaction') ? 'active' : '' }}">
             <i class="nav-icon fas fa-gavel"></i>
-            <span>Audit</span>
+            <span>Transaction</span>
         </a>
         <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
             <i class="nav-icon fas fa-chart-bar"></i>

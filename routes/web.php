@@ -26,7 +26,7 @@ Route::post('/project-material-management/materials', [App\Http\Controllers\Qual
 Route::put('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'updateMaterial'])->name('project-material-management.materials.update');
 Route::delete('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'destroyMaterial'])->name('project-material-management.materials.destroy');
 
-Route::get('/audit', [App\Http\Controllers\AuditController::class, 'index'])->name('audit');
+Route::get('/transaction', [App\Http\Controllers\AuditController::class, 'index'])->name('transaction');
 
 Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
 

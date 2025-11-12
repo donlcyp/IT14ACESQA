@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-    <title>AJJ CRISBER Engineering Services - Audit</title>
+    <title>AJJ CRISBER Engineering Services - Transaction</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -368,9 +368,9 @@
 
             <!-- Content Area -->
             <section class="content-area">
-                <!-- Audit Header -->
+                <!-- Transaction Header -->
                 <div class="audit-header">
-                    <h1 class="audit-title">Audit</h1>
+                    <h1 class="audit-title">Transaction</h1>
                     <div class="audit-actions">
                         <button class="audit-button primary">
                             <i class="fas fa-plus"></i>
@@ -386,7 +386,7 @@
                     </div>
                 </div>
 
-                <!-- Audit Cards -->
+                <!-- Transaction Cards -->
                 <div class="audit-cards">
                     <!-- Approved Invoice Card -->
                     <div class="audit-card">
@@ -479,7 +479,7 @@
                     <!-- Audit Logs Card -->
                     <div class="audit-card">
                         <div class="audit-card-header">
-                            <h2 class="audit-card-title">Audit Logs</h2>
+                            <h2 class="audit-card-title">Transaction Logs</h2>
                             <button class="audit-expand">
                                 <i class="fas fa-expand-arrows-alt"></i>
                             </button>
