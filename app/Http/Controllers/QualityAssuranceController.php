@@ -24,7 +24,7 @@ class QualityAssuranceController extends Controller
         // Fetch materials for the materials section
         $materials = Material::orderBy('created_at', 'desc')->get();
 
-        return view('quality-assurance', compact('records', 'materials'));
+        return view('project-material-management', compact('records', 'materials'));
     }
 
     public function show(QaRecord $qa_record)
@@ -38,7 +38,7 @@ class QualityAssuranceController extends Controller
             $materials = Material::orderBy('created_at', 'desc')->get();
         }
         
-        return view('quality-assurance-show', [
+        return view('project-material-management-show', [
             'record' => $qa_record,
             'materials' => $materials,
         ]);
@@ -48,7 +48,7 @@ class QualityAssuranceController extends Controller
     {
         $qa_record->delete();
 
-        return redirect()->route('quality-assurance')->with('success', 'Record deleted successfully.');
+        return redirect()->route('project-material-management')->with('success', 'Record deleted successfully.');
     }
 
     public function store(Request $request)
@@ -63,7 +63,7 @@ class QualityAssuranceController extends Controller
 
         QaRecord::create($validated);
 
-        return redirect()->route('quality-assurance')->with('success', 'Record created successfully.');
+        return redirect()->route('project-material-management')->with('success', 'Record created successfully.');
     }
 
     // Materials management methods
@@ -99,7 +99,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('quality-assurance.show', $validated['qa_record_id'])->with('success', 'Material added successfully!');
+            return redirect()->route('project-material-management-show', $validated['qa_record_id'])->with('success', 'Material added successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json([
@@ -149,7 +149,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('quality-assurance.show', $validated['qa_record_id'])->with('success', 'Material updated successfully!');
+            return redirect()->route('project-material-management-show', $validated['qa_record_id'])->with('success', 'Material updated successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json([
@@ -183,7 +183,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('quality-assurance')->with('success', 'Material deleted successfully!');
+            return redirect()->route('project-material-management')->with('success', 'Material deleted successfully!');
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return response()->json([

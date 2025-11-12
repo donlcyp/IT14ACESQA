@@ -15,16 +15,16 @@ it('can create a qa record', function () {
         'color' => '#ff0000',
     ];
 
-    $response = $this->post(route('quality-assurance.store'), $data);
+    $response = $this->post(route('project-material-management.store'), $data);
 
-    $response->assertRedirect(route('quality-assurance'));
+    $response->assertRedirect(route('project-material-management'));
     $this->assertDatabaseHas('qa_records', $data);
 });
 
 it('can view qa records list', function () {
     QaRecord::factory()->count(3)->create();
 
-    $response = $this->get(route('quality-assurance'));
+    $response = $this->get(route('project-material-management'));
 
     $response->assertStatus(200);
     $response->assertViewHas('records');
@@ -35,7 +35,7 @@ it('can view qa record details with materials', function () {
     $qaRecord = QaRecord::factory()->create();
     Material::factory()->count(2)->create(['qa_record_id' => $qaRecord->id]);
 
-    $response = $this->get(route('quality-assurance.show', $qaRecord));
+    $response = $this->get(route('project-material-management-show', $qaRecord));
 
     $response->assertStatus(200);
     $response->assertViewHas('record', $qaRecord);
@@ -45,9 +45,9 @@ it('can view qa record details with materials', function () {
 it('can delete a qa record', function () {
     $qaRecord = QaRecord::factory()->create();
 
-    $response = $this->delete(route('quality-assurance.destroy', $qaRecord));
+    $response = $this->delete(route('project-material-management.destroy', $qaRecord));
 
-    $response->assertRedirect(route('quality-assurance'));
+    $response->assertRedirect(route('project-material-management'));
     $this->assertDatabaseMissing('qa_records', ['id' => $qaRecord->id]);
 });
 
@@ -69,9 +69,9 @@ it('can create a material for qa record', function () {
         'location' => 'Warehouse A',
     ];
 
-    $response = $this->post(route('quality-assurance.materials.store'), $data);
+    $response = $this->post(route('project-material-management.materials.store'), $data);
 
-    $response->assertRedirect(route('quality-assurance.show', $qaRecord));
+    $response->assertRedirect(route('project-material-management-show', $qaRecord));
     $this->assertDatabaseHas('materials', $data);
 });
 
@@ -92,30 +92,30 @@ it('can update a material', function () {
         'location' => 'Warehouse B',
     ];
 
-    $response = $this->put(route('quality-assurance.materials.update', $material), $updatedData);
+    $response = $this->put(route('project-material-management.materials.update', $material), $updatedData);
 
-    $response->assertRedirect(route('quality-assurance.show', $material->qa_record_id));
+    $response->assertRedirect(route('project-material-management-show', $material->qa_record_id));
     $this->assertDatabaseHas('materials', $updatedData);
 });
 
 it('can delete a material', function () {
     $material = Material::factory()->create();
 
-    $response = $this->delete(route('quality-assurance.materials.destroy', $material));
+    $response = $this->delete(route('project-material-management.materials.destroy', $material));
 
-    $response->assertRedirect(route('quality-assurance'));
+    $response->assertRedirect(route('project-material-management'));
     $this->assertDatabaseMissing('materials', ['id' => $material->id]);
 });
 
 it('validates qa record creation', function () {
-    $response = $this->post(route('quality-assurance.store'), []);
+    $response = $this->post(route('project-material-management.store'), []);
 
     $response->assertRedirect();
     $response->assertSessionHasErrors(['title', 'client', 'inspector', 'time', 'color']);
 });
 
 it('validates material creation', function () {
-    $response = $this->post(route('quality-assurance.materials.store'), []);
+    $response = $this->post(route('project-material-management.materials.store'), []);
 
     $response->assertRedirect();
     $response->assertSessionHasErrors(['qa_record_id', 'name', 'quantity', 'price', 'total']);
@@ -125,7 +125,7 @@ it('can search qa records', function () {
     QaRecord::factory()->create(['title' => 'Unique Project']);
     QaRecord::factory()->create(['client' => 'Unique Client']);
 
-    $response = $this->get(route('quality-assurance', ['search' => 'Unique']));
+    $response = $this->get(route('project-material-management', ['search' => 'Unique']));
 
     $response->assertStatus(200);
     $response->assertViewHas('records', function ($records) {

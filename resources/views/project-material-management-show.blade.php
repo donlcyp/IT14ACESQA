@@ -11,19 +11,57 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #dc2626;
+            --accent: #16a34a;
             --white: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --header-bg: var(--accent);
+            --main-bg: #ffffff;
 
-            --gray-500: #667085;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
+            --gray-500: #667085;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
+            --black-1: #111827;
 
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: var(--accent);
+            --green-600: #059669;
+
+            --text-lg-medium-font-family: "Inter", sans-serif;
+            --text-lg-medium-font-weight: 500;
+            --text-lg-medium-font-size: 18px;
+            --text-lg-medium-line-height: 28px;
+            --text-md-normal-font-family: "Inter", sans-serif;
+            --text-md-normal-font-weight: 400;
+            --text-md-normal-font-size: 16px;
+            --text-md-normal-line-height: 24px;
+            --text-sm-medium-font-family: "Inter", sans-serif;
+            --text-sm-medium-font-weight: 500;
+            --text-sm-medium-font-size: 14px;
+            --text-sm-medium-line-height: 20px;
+            --text-headline-small-bold-font-family: "Inter", sans-serif;
+            --text-headline-small-bold-font-weight: 700;
+            --text-headline-small-bold-font-size: 18px;
+            --text-headline-small-bold-line-height: 28px;
+
+            --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+            --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--text-md-normal-font-family);
+            background-color: var(--main-bg);
+            color: var(--gray-700);
         }
 
         .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); }
@@ -147,7 +185,7 @@
         .qa-form-field { display:flex; flex-direction:column; gap:6px; }
         .qa-label { font-size:12px; color:#374151; font-weight: 500; }
         .qa-input, .qa-select { border:1px solid #e5e7eb; border-radius:6px; padding:8px 10px; font-size:14px; }
-    .qa-input:focus, .qa-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12); }
+    .qa-input:focus, .qa-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12); }
         .qa-actions-row { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
         .btn-sm { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .btn-sm:hover { opacity: 0.9; }
@@ -256,7 +294,7 @@
         .form-input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
         }
 
         .form-input:disabled {
@@ -401,7 +439,7 @@
         .table-input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.12);
         }
         
         .table-input::placeholder {
@@ -427,7 +465,7 @@
         .table-select:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.12);
         }
         
         .delete-btn {
@@ -449,7 +487,6 @@
 
 
         @media (max-width: 768px) {
-            .sidebar { width: 100%; }
             .content-area { padding: 20px; }
             .qa-form-grid { grid-template-columns: 1fr; }
             .qa-actions { flex-wrap: wrap; }
@@ -506,7 +543,7 @@
 
         <main class="main-content" id="mainContent">
             <header class="header">
-                <a href="{{ route('quality-assurance') }}" class="back-btn">
+                <a href="{{ route('project-material-management') }}" class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back to Project Materials
                 </a>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
@@ -519,7 +556,7 @@
                 <nav style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">
                     <a href="{{ route('dashboard') }}" style="color: var(--accent); text-decoration: none;">Dashboard</a>
                     <span style="margin: 0 8px;">></span>
-                    <a href="{{ route('quality-assurance') }}" style="color: var(--accent); text-decoration: none;">Project Material Management</a>
+                    <a href="{{ route('project-material-management') }}" style="color: var(--accent); text-decoration: none;">Project Material Management</a>
                     <span style="margin: 0 8px;">></span>
                     <span style="color: #374151;">Material Management</span>
                 </nav>
@@ -691,6 +728,7 @@
         </main>
     </div>
 
+    @include('partials.sidebar-js')
     <script>
     // Set background color for project badge
     const projectBadge = document.querySelector('.project-badge');
@@ -715,45 +753,6 @@
         let currentFilter = 'Pending';
         let selectedRowIndex = -1;
         let editMode = false;
-
-        // Sidebar functionality (guarded for pages that may not include all elements)
-        const headerMenu = document.getElementById('headerMenu');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        function updateMainContentMargin(isOpen) {
-            if (mainContent) mainContent.style.marginLeft = isOpen ? '280px' : '0';
-        }
-
-        function closeSidebar() {
-            if (sidebar) sidebar.classList.remove('open');
-            updateMainContentMargin(false);
-        }
-
-        function toggleSidebar() {
-            if (!sidebar) return;
-            const willBeOpen = !sidebar.classList.contains('open');
-            sidebar.classList.toggle('open');
-            updateMainContentMargin(willBeOpen);
-        }
-
-        if (headerMenu) headerMenu.addEventListener('click', toggleSidebar);
-
-        // Close sidebar when clicking outside (guard headerMenu presence)
-        document.addEventListener('click', function (e) {
-            const clickedInsideSidebar = sidebar && sidebar.contains(e.target);
-            const clickedHeaderMenu = headerMenu && headerMenu.contains(e.target);
-            if (!clickedInsideSidebar && !clickedHeaderMenu) {
-                closeSidebar();
-            }
-        });
-
-        // Close sidebar when pressing Escape key
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeSidebar();
-            }
-        });
 
         // Tab filtering
         const tabBtns = document.querySelectorAll('.tab-btn');
@@ -849,7 +848,7 @@
                 
                 if (confirm(`Are you sure you want to delete ${material.name}?`)) {
                     try {
-                        const response = await fetch(`/quality-assurance/materials/${material.id}`, {
+                        const response = await fetch(`/project-material-management/materials/${material.id}`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1285,7 +1284,7 @@
                         // For edit mode, we need to get the material ID
                         const filtered = materials.filter(m => m.status === currentFilter);
                         const material = filtered[selectedRowIndex];
-                        url = `/quality-assurance/materials/${material.id}`;
+                        url = `/project-material-management/materials/${material.id}`;
                         // Use POST with _method override so Laravel parses form-data properly
                         method = 'POST';
                         formDataObj.append('_method', 'PUT');
@@ -1293,7 +1292,7 @@
                         console.log('Edit mode: updating material ID:', material.id);
                     } else {
                         // For new mode, create a new material
-                        url = '/quality-assurance/materials';
+                        url = '/project-material-management/materials';
                         method = 'POST';
                         formDataObj.append('qa_record_id', currentRecordId);
                         console.log('New mode: creating new material');

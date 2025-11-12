@@ -13,18 +13,18 @@ Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->nam
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/quality-assurance', [App\Http\Controllers\QualityAssuranceController::class, 'index'])->name('quality-assurance');
+Route::get('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'index'])->name('project-material-management');
 
-Route::post('/quality-assurance', [App\Http\Controllers\QualityAssuranceController::class, 'store'])->name('quality-assurance.store');
+Route::post('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'store'])->name('project-material-management.store');
 
-Route::delete('/quality-assurance/{qa_record}', [App\Http\Controllers\QualityAssuranceController::class, 'destroy'])->name('quality-assurance.destroy');
+Route::delete('/project-material-management/{qa_record}', [App\Http\Controllers\QualityAssuranceController::class, 'destroy'])->name('project-material-management.destroy');
 
-Route::get('/quality-assurance/{qa_record}', [App\Http\Controllers\QualityAssuranceController::class, 'show'])->name('quality-assurance.show');
+Route::get('/project-material-management/{qa_record}', [App\Http\Controllers\QualityAssuranceController::class, 'show'])->name('project-material-management-show');
 
-// Materials routes within Quality Assurance context
-Route::post('/quality-assurance/materials', [App\Http\Controllers\QualityAssuranceController::class, 'storeMaterial'])->name('quality-assurance.materials.store');
-Route::put('/quality-assurance/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'updateMaterial'])->name('quality-assurance.materials.update');
-Route::delete('/quality-assurance/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'destroyMaterial'])->name('quality-assurance.materials.destroy');
+// Materials routes within Project context
+Route::post('/project-material-management/materials', [App\Http\Controllers\QualityAssuranceController::class, 'storeMaterial'])->name('project-material-management.materials.store');
+Route::put('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'updateMaterial'])->name('project-material-management.materials.update');
+Route::delete('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'destroyMaterial'])->name('project-material-management.materials.destroy');
 
 Route::get('/audit', [App\Http\Controllers\AuditController::class, 'index'])->name('audit');
 

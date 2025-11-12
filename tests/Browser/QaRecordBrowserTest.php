@@ -8,7 +8,7 @@ uses(DatabaseMigrations::class);
 
 it('can create a qa record through browser', function () {
     $this->browse(function (Browser $browser) {
-        $browser->visit('/quality-assurance')
+        $browser->visit('/project-material-management')
                 ->click('.qa-new-button')
                 ->waitFor('.qa-modal')
                 ->type('#project-name', 'Matina IT Park')
@@ -17,7 +17,7 @@ it('can create a qa record through browser', function () {
                 ->type('#time', '10:00')
                 ->type('#color', '#ff0000')
                 ->click('.qa-modal-button.primary')
-                ->assertPathIs('/quality-assurance')
+                ->assertPathIs('/project-material-management')
                 ->assertSee('Record created successfully');
     });
 });
@@ -32,9 +32,9 @@ it('can view qa record details and materials', function () {
     Material::factory()->count(2)->create(['qa_record_id' => $qaRecord->id]);
 
     $this->browse(function (Browser $browser) use ($qaRecord) {
-        $browser->visit('/quality-assurance')
+        $browser->visit('/project-material-management')
                 ->click('.qa-card[data-id="' . $qaRecord->id . '"]')
-                ->assertPathIs('/quality-assurance/' . $qaRecord->id)
+                ->assertPathIs('/project-material-management/' . $qaRecord->id)
                 ->assertSee($qaRecord->title)
                 ->assertSee($qaRecord->client)
                 ->assertSee($qaRecord->inspector);
@@ -49,7 +49,7 @@ it('can add material to qa record', function () {
     ]);
 
     $this->browse(function (Browser $browser) use ($qaRecord) {
-        $browser->visit('/quality-assurance/' . $qaRecord->id)
+        $browser->visit('/project-material-management/' . $qaRecord->id)
                 ->click('.qa-button-base.primary')
                 ->waitFor('#materialModal')
                 ->type('#mat_supplier', 'BuildMart')
@@ -65,7 +65,7 @@ it('can add material to qa record', function () {
                 ->select('.material-unit', 'cubic meters')
                 ->type('.material-price', '150')
                 ->click('button[onclick="saveMaterial()"]')
-                ->assertPathIs('/quality-assurance/' . $qaRecord->id)
+                ->assertPathIs('/project-material-management/' . $qaRecord->id)
                 ->assertSee('Materials added successfully');
     });
 });
@@ -85,7 +85,7 @@ it('can update material in qa record', function () {
     ]);
 
     $this->browse(function (Browser $browser) use ($qaRecord, $material) {
-        $browser->visit('/quality-assurance/' . $qaRecord->id)
+        $browser->visit('/project-material-management/' . $qaRecord->id)
                 ->click('.qa-button-base.success')
                 ->waitFor('#materialModal')
                 ->type('#mat_supplier', 'BuildMart')
@@ -98,7 +98,7 @@ it('can update material in qa record', function () {
                 ->select('.material-unit', 'cubic meters')
                 ->type('.material-price', '150')
                 ->click('button[onclick="saveMaterial()"]')
-                ->assertPathIs('/quality-assurance/' . $qaRecord->id)
+                ->assertPathIs('/project-material-management/' . $qaRecord->id)
                 ->assertSee('Material updated successfully');
     });
 });
@@ -111,11 +111,11 @@ it('can delete qa record', function () {
     ]);
 
     $this->browse(function (Browser $browser) use ($qaRecord) {
-        $browser->visit('/quality-assurance')
+        $browser->visit('/project-material-management')
                 ->click('#qaDeleteToggle')
                 ->click('.qa-card[data-id="' . $qaRecord->id . '"]')
                 ->acceptDialog()
-                ->assertPathIs('/quality-assurance')
+                ->assertPathIs('/project-material-management')
                 ->assertDontSee($qaRecord->title);
     });
 });
@@ -128,7 +128,7 @@ it('validates material creation with invalid data', function () {
     ]);
 
     $this->browse(function (Browser $browser) use ($qaRecord) {
-        $browser->visit('/quality-assurance/' . $qaRecord->id)
+        $browser->visit('/project-material-management/' . $qaRecord->id)
                 ->click('.qa-button-base.primary')
                 ->waitFor('#materialModal')
                 ->type('#mat_supplier', 'SteelCo')

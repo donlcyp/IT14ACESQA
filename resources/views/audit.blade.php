@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #dc2626;
+            --accent: #16a34a;
             --white: #ffffff;
 
             --gray-500: #667085;
@@ -84,7 +84,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #dc2626);
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
             padding: 20px 30px;
             display: flex;
             align-items: center;

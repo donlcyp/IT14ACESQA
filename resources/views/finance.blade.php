@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #dc2626;
+            --accent: #16a34a;
             --white: #ffffff;
 
             --gray-500: #667085;
@@ -88,7 +88,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #dc2626);
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -437,15 +437,6 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
             .main-content {
                 margin-left: 0;
             }
@@ -575,52 +566,8 @@
         </main>
     </div>
 
+    @include('partials.sidebar-js')
     <script>
-        // Sidebar toggle functionality
-        const headerMenu = document.getElementById('headerMenu');
-        const navToggle = document.getElementById('navToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
-            if (window.innerWidth > 768) {
-                if (sidebar.classList.contains('open')) {
-                    mainContent.style.marginLeft = '280px';
-                } else {
-                    mainContent.style.marginLeft = '0';
-                }
-            }
-        }
-
-        function initializeSidebar() {
-            if (window.innerWidth > 768) {
-                sidebar.classList.add('open');
-                mainContent.style.marginLeft = '280px';
-            } else {
-                sidebar.classList.remove('open');
-                mainContent.style.marginLeft = '0';
-            }
-        }
-
-        headerMenu.addEventListener('click', toggleSidebar);
-        navToggle.addEventListener('click', toggleSidebar);
-
-        // Close sidebar on mobile when clicking outside
-        document.addEventListener('click', function (e) {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', initializeSidebar);
-
-        // Initialize sidebar state on page load
-        initializeSidebar();
-
         // Chart button functionality
         document.querySelectorAll('.chart-button').forEach(button => {
             button.addEventListener('click', function () {

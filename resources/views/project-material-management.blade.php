@@ -11,20 +11,57 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #dc2626;
+            --accent: #16a34a;
             --white: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --header-bg: var(--accent);
+            --main-bg: #ffffff;
 
-            --gray-500: #667085;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
+            --gray-500: #667085;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
+            --black-1: #111827;
 
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: var(--accent);
-            --header-bg: var(--accent);
+            --green-600: #059669;
+
+            --text-lg-medium-font-family: "Inter", sans-serif;
+            --text-lg-medium-font-weight: 500;
+            --text-lg-medium-font-size: 18px;
+            --text-lg-medium-line-height: 28px;
+            --text-md-normal-font-family: "Inter", sans-serif;
+            --text-md-normal-font-weight: 400;
+            --text-md-normal-font-size: 16px;
+            --text-md-normal-line-height: 24px;
+            --text-sm-medium-font-family: "Inter", sans-serif;
+            --text-sm-medium-font-weight: 500;
+            --text-sm-medium-font-size: 14px;
+            --text-sm-medium-line-height: 20px;
+            --text-headline-small-bold-font-family: "Inter", sans-serif;
+            --text-headline-small-bold-font-weight: 700;
+            --text-headline-small-bold-font-size: 18px;
+            --text-headline-small-bold-line-height: 28px;
+
+            --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+            --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--text-md-normal-font-family);
+            background-color: var(--main-bg);
+            color: var(--gray-700);
         }
 
         /* Sidebar has been moved to partials/sidebar.blade.php */
@@ -42,7 +79,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #dc2626);
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -594,10 +631,6 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-            }
-
             .header {
                 padding: 15px 20px;
             }
@@ -663,7 +696,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </div>
                         </button>
-                        <form action="{{ route('quality-assurance') }}" method="GET" class="qa-search-form">
+                        <form action="{{ route('project-material-management') }}" method="GET" class="qa-search-form">
                             <div class="qa-search-input">
                                 <div class="qa-search-content">
                                     <i class="qa-search-icon fas fa-search"></i>
@@ -732,7 +765,7 @@
                                             <span>View</span>
                                         </button>
                                     </div>
-                                    <form action="{{ route('quality-assurance.destroy', $record->id) }}" method="POST" style="display: none;">
+                                    <form action="{{ route('project-material-management.destroy', $record->id) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
                                     </form>
@@ -751,7 +784,7 @@
                     <div class="qa-modal-content">
                         <div class="qa-modal-icon"></div>
                         <h2 class="qa-modal-title">Add Project Material Record</h2>
-                        <form action="{{ route('quality-assurance.store') }}" method="POST">
+                        <form action="{{ route('project-material-management.store') }}" method="POST">
                             @csrf
                             <div class="qa-modal-input">
                                 <label class="qa-modal-label" for="project-name">Project Name</label>
@@ -818,6 +851,7 @@
         </main>
     </div>
 
+    @include('partials.sidebar-js')
     <script>
         // Set background colors for qa-color-indicator elements
         document.querySelectorAll('.qa-color-indicator').forEach(element => {
@@ -885,58 +919,6 @@
             colorInput.value = generateRandomColor();
         });
 
-    // Sidebar toggle functionality
-    const headerMenu = document.getElementById('headerMenu');
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-
-        // Sidebar functionality
-        function updateMainContentMargin(isOpen) {
-            mainContent.style.marginLeft = isOpen ? '280px' : '0';
-        }
-
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            updateMainContentMargin(false);
-        }
-
-        function toggleSidebar() {
-            const willBeOpen = !sidebar.classList.contains('open');
-            sidebar.classList.toggle('open');
-            updateMainContentMargin(willBeOpen);
-        }
-
-        headerMenu.addEventListener('click', toggleSidebar);
-
-        function initializeSidebar() {
-            if (window.innerWidth > 768) {
-                sidebar.classList.add('open');
-                mainContent.style.marginLeft = '280px';
-            } else {
-                sidebar.classList.remove('open');
-                mainContent.style.marginLeft = '0';
-            }
-        }
-
-        window.addEventListener('resize', initializeSidebar);
-
-        // Initialize sidebar state on page load
-        initializeSidebar();
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function (e) {
-            if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                closeSidebar();
-            }
-        });
-
-        // Close sidebar when pressing Escape key
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeSidebar();
-            }
-        });
-
         // Modal functionality
         document.querySelector('.qa-modal').addEventListener('click', function (e) {
             if (e.target === this) {
@@ -997,7 +979,7 @@
         updateRowInteractions();
 
         // Define the show route for navigation
-        const showRoute = '{{ route("quality-assurance.show", ":id") }}';
+        const showRoute = '{{ route("project-material-management-show", ":id") }}';
 
         // Handle view button clicks
         document.querySelectorAll('.qa-view-button').forEach(button => {
