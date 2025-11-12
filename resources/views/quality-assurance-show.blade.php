@@ -593,7 +593,7 @@
                         <div class="modal-header">
                             <div class="modal-title">
                                 <div class="modal-icon"><i class="fas fa-bolt"></i></div>
-                                <div class="modal-title-text">Add Material</div>
+                                <div class="modal-title-text">Material Details</div>
                             </div>
                         <button class="modal-close" onclick="closeMaterialModal()">
                             <i class="fas fa-times"></i>
@@ -645,7 +645,7 @@
                         <div class="modal-header">
                             <div class="modal-title">
                                 <div class="modal-icon"><i class="fas fa-bolt"></i></div>
-                                <div class="modal-title-text">Add Material Items</div>
+                                <div class="modal-title-text">Material Items</div>
                             </div>
                             <button class="modal-close" onclick="closeMaterialModal()">
                             <i class="fas fa-times"></i>
