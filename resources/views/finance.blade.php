@@ -342,11 +342,112 @@
             border: 1px solid var(--gray-200);
             border-radius: 8px;
             position: relative;
+            padding: 20px 20px 40px 50px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-end;
             color: var(--gray-500);
             font-family: var(--text-md-normal-font-family);
+        }
+
+        .chart-bars-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: calc(100% - 20px);
+            gap: 8px;
+            padding: 0 10px;
+        }
+
+        .chart-bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            max-width: 60px;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 3px;
+            width: 100%;
+            align-items: flex-end;
+            height: 100%;
+        }
+
+        .chart-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: opacity 0.2s ease;
+            min-height: 4px;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar.revenue {
+            background: linear-gradient(180deg, #9333ea 0%, #7c3aed 100%);
+        }
+
+        .chart-bar.expense {
+            background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .chart-bar-label {
+            font-size: 10px;
+            color: var(--gray-500);
+            text-align: center;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .chart-y-axis {
+            position: absolute;
+            left: 10px;
+            top: 20px;
+            bottom: 40px;
+            width: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+            font-size: 10px;
+            color: var(--gray-500);
+            text-align: right;
+        }
+
+        .chart-x-axis {
+            position: absolute;
+            bottom: 0;
+            left: 40px;
+            right: 0;
+            height: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 10px;
+            color: var(--gray-500);
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+        }
+
+        .chart-tooltip.show {
+            opacity: 1;
         }
 
         /* Finance Sidebar */
@@ -387,7 +488,7 @@
         }
 
         .finance-action-button:nth-child(4) {
-            background: var(--purple-500);
+            background: var(--purple-600);
         }
 
         .finance-graphic {
@@ -469,6 +570,157 @@
                 flex-direction: column;
             }
         }
+
+        /* Financial Data Modal Styles */
+        .financial-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .financial-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .financial-modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .financial-modal.active .financial-modal-content {
+            transform: scale(1);
+        }
+
+        .financial-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .financial-modal-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: var(--text-headline-small-bold-font-size);
+            font-weight: var(--text-headline-small-bold-font-weight);
+            color: var(--gray-800);
+        }
+
+        .financial-modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .financial-modal-close:hover {
+            background: var(--gray-400);
+            color: var(--gray-700);
+        }
+
+        .financial-form-group {
+            margin-bottom: 20px;
+            padding: 0 24px;
+        }
+
+        .financial-form-label {
+            display: block;
+            font-family: var(--text-sm-medium-font-family);
+            font-size: var(--text-sm-medium-font-size);
+            font-weight: var(--text-sm-medium-font-weight);
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .financial-form-input,
+        .financial-form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-family: var(--text-md-normal-font-family);
+            font-size: var(--text-md-normal-font-size);
+            color: var(--gray-800);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .financial-form-input:focus,
+        .financial-form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .financial-form-input::placeholder {
+            color: var(--gray-500);
+        }
+
+        .financial-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 24px;
+            border-top: 1px solid var(--gray-300);
+        }
+
+        .financial-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--text-sm-medium-font-family);
+            font-size: var(--text-sm-medium-font-size);
+            font-weight: var(--text-sm-medium-font-weight);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .financial-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .financial-btn-primary:hover {
+            background: #15803d;
+        }
+
+        .financial-btn-primary:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+        }
+
+        .financial-btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .financial-btn-secondary:hover {
+            background: var(--gray-400);
+        }
     </style>
 </head>
 
@@ -496,13 +748,13 @@
                             <div class="overview-card">
                                 <h2 class="overview-title">Financial Overview</h2>
                                 <div class="overview-content">
-                                    <div class="overview-item">Total Revenue: P5,718,923</div>
-                                    <div class="overview-item">Total Expenses: P2,309,895</div>
+                                    <div class="overview-item">Total Revenue: ₱{{ number_format($totalRevenue, 2) }}</div>
+                                    <div class="overview-item">Total Expenses: ₱{{ number_format($totalExpenses, 2) }}</div>
                                 </div>
                             </div>
                             <div class="overview-card net-profit-card">
-                                <div class="net-profit-value">Net Profit: P999,999</div>
-                                <div class="last-updated">Last Updated: 12:00 AM PST, September 27, 2025</div>
+                                <div class="net-profit-value">Net Profit: ₱{{ number_format($netProfit, 2) }}</div>
+                                <div class="last-updated">Last Updated: {{ date('g:i A T, F d, Y') }}</div>
                             </div>
                         </div>
 
@@ -514,11 +766,11 @@
                             </div>
                             <div class="stat-card blue">
                                 <div class="stat-label">Total Transactions</div>
-                                <div class="stat-value">23</div>
+                                <div class="stat-value">{{ $totalTransactions }}</div>
                             </div>
                             <div class="stat-card yellow">
                                 <div class="stat-label">Avg. Profit Margin</div>
-                                <div class="stat-value">15%</div>
+                                <div class="stat-value">{{ $avgProfitMargin }}%</div>
                             </div>
                         </div>
 
@@ -529,15 +781,20 @@
                                     <div class="chart-title">Statistics</div>
                                     <div class="chart-subtitle">Overall Tracking</div>
                                 </div>
-                                <div class="chart-legend">
-                                    <div class="legend-item">
-                                        <div class="legend-dot purple"></div>
-                                        <span>Revenue</span>
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div class="chart-legend">
+                                        <div class="legend-item">
+                                            <div class="legend-dot purple"></div>
+                                            <span>Revenue</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-dot red"></div>
+                                            <span>Expenses</span>
+                                        </div>
                                     </div>
-                                    <div class="legend-item">
-                                        <div class="legend-dot red"></div>
-                                        <span>Expenses</span>
-                                    </div>
+                                    <button class="finance-action-button" onclick="openFinancialDataModal()" style="padding: 8px 16px; font-size: 12px; background: var(--accent);">
+                                        <i class="fas fa-plus"></i> Add Data
+                                    </button>
                                 </div>
                             </div>
                             <div class="chart-controls">
@@ -546,7 +803,34 @@
                                 <button class="chart-button active">12 months</button>
                             </div>
                             <div class="chart-area">
-                                Financial Chart Area (Revenue vs Expenses over 12 months)
+                                <div class="chart-y-axis">
+                                    <span>₱600K</span>
+                                    <span>₱450K</span>
+                                    <span>₱300K</span>
+                                    <span>₱150K</span>
+                                    <span>₱0</span>
+                                </div>
+                                <div class="chart-bars-container" id="chartBarsContainer">
+                                    @php
+                                        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                        $maxValue = max($financialData->max('revenue'), $financialData->max('expenses'), 600000);
+                                    @endphp
+                                    @foreach($financialData as $data)
+                                        @php
+                                            $monthIndex = $data->month - 1;
+                                            $revenueHeight = ($data->revenue / $maxValue) * 100;
+                                            $expenseHeight = ($data->expenses / $maxValue) * 100;
+                                        @endphp
+                                        <div class="chart-bar-group">
+                                            <div class="chart-bars">
+                                                <div class="chart-bar revenue" style="height: {{ $revenueHeight }}%;" data-value="₱{{ number_format($data->revenue, 0) }}" data-label="Revenue"></div>
+                                                <div class="chart-bar expense" style="height: {{ $expenseHeight }}%;" data-value="₱{{ number_format($data->expenses, 0) }}" data-label="Expenses"></div>
+                                            </div>
+                                            <div class="chart-bar-label">{{ $monthNames[$monthIndex] }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="chart-tooltip" id="chartTooltip"></div>
                             </div>
                         </div>
                     </div>
@@ -559,7 +843,62 @@
                             <button class="finance-action-button">Expense Tracking</button>
                             <button class="finance-action-button">Purchase Order</button>
                         </div>
-                        <div class="finance-graphic"></div>
+                    </div>
+                </div>
+
+                <!-- Add Financial Data Modal -->
+                <div class="financial-modal" id="financialDataModal" aria-hidden="true">
+                    <div class="financial-modal-content" role="dialog" aria-modal="true">
+                        <div class="financial-modal-header">
+                            <div class="financial-modal-title">Add Financial Data</div>
+                            <button class="financial-modal-close" onclick="closeFinancialDataModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="financialDataForm">
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Year</label>
+                                <input type="number" class="financial-form-input" id="financialYear" name="year" value="2025" required min="2020" max="2100" />
+                            </div>
+
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Month</label>
+                                <select class="financial-form-select" id="financialMonth" name="month" required>
+                                    <option value="">Select Month</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11" selected>November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Revenue (₱)</label>
+                                <input type="number" class="financial-form-input" id="financialRevenue" name="revenue" placeholder="Enter revenue amount" step="0.01" min="0" required />
+                            </div>
+
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Expenses (₱)</label>
+                                <input type="number" class="financial-form-input" id="financialExpenses" name="expenses" placeholder="Enter expenses amount" step="0.01" min="0" required />
+                            </div>
+
+                            <div class="financial-modal-footer">
+                                <button type="button" class="financial-btn financial-btn-secondary" onclick="closeFinancialDataModal()">Cancel</button>
+                                <button type="submit" class="financial-btn financial-btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save Data</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </section>
@@ -575,6 +914,104 @@
                 this.classList.add('active');
             });
         });
+
+        // Chart tooltip functionality
+        const chartTooltip = document.getElementById('chartTooltip');
+        const chartBars = document.querySelectorAll('.chart-bar');
+
+        chartBars.forEach(bar => {
+            bar.addEventListener('mouseenter', function(e) {
+                const value = this.getAttribute('data-value');
+                const label = this.getAttribute('data-label');
+                const rect = this.getBoundingClientRect();
+                const chartArea = document.querySelector('.chart-area');
+                const chartRect = chartArea.getBoundingClientRect();
+
+                chartTooltip.textContent = `${label}: ${value}`;
+                chartTooltip.style.left = (rect.left - chartRect.left + rect.width / 2) + 'px';
+                chartTooltip.style.top = (rect.top - chartRect.top - 35) + 'px';
+                chartTooltip.classList.add('show');
+            });
+
+            bar.addEventListener('mouseleave', function() {
+                chartTooltip.classList.remove('show');
+            });
+        });
+
+        // Financial Data Modal functions
+        const financialDataModal = document.getElementById('financialDataModal');
+        const financialDataForm = document.getElementById('financialDataForm');
+
+        function openFinancialDataModal() {
+            financialDataModal.classList.add('active');
+            financialDataModal.setAttribute('aria-hidden', 'false');
+            financialDataForm.reset();
+            document.getElementById('financialYear').value = '2025';
+            document.getElementById('financialMonth').value = '11';
+        }
+
+        function closeFinancialDataModal() {
+            financialDataModal.classList.remove('active');
+            financialDataModal.setAttribute('aria-hidden', 'true');
+            financialDataForm.reset();
+        }
+
+        // Handle form submission
+        financialDataForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                year: document.getElementById('financialYear').value,
+                month: document.getElementById('financialMonth').value,
+                revenue: document.getElementById('financialRevenue').value,
+                expenses: document.getElementById('financialExpenses').value,
+                _token: '{{ csrf_token() }}'
+            };
+
+            // Show loading state
+            const submitBtn = financialDataForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('{{ route("finance.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': formData._token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Financial data added successfully!');
+                    closeFinancialDataModal();
+                    // Reload page to show updated data
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'An error occurred while saving the data.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Close modal on outside click
+        if (financialDataModal) {
+            financialDataModal.addEventListener('click', (e) => {
+                if (e.target === financialDataModal) {
+                    closeFinancialDataModal();
+                }
+            });
+        }
     </script>
 </body>
 

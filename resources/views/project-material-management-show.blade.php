@@ -64,72 +64,68 @@
             color: var(--gray-700);
         }
 
-        .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); }
-        .header-menu { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background-color 0.2s ease; }
-        .header-menu:hover { background-color: rgba(255, 255, 255, 0.1); }
-        .header-title { color: white; font-family: "Zen Dots", sans-serif; font-size: 24px; font-weight: 400; flex: 1; }
-        .back-btn { color: white; text-decoration: none; margin-right: 15px; padding: 8px 12px; border-radius: 4px; transition: background-color 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
-        .back-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: white; text-decoration: none; }
-            .header { 
-                padding: 20px 30px; 
-                display: flex; 
-                align-items: center; 
-                gap: 20px; 
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-                position: relative; 
-                overflow: hidden; 
-            }
-        
-            .header::after { 
-                content: ''; 
-                position: absolute; 
-                bottom: 0; 
-                left: 0; 
-                right: 0; 
-                height: 2px; 
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); 
-            }
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
 
-            .header-menu { 
-                background: none; 
-                border: none; 
-                color: white; 
-                font-size: 24px; 
-                cursor: pointer; 
-                padding: 8px; 
-                border-radius: 4px; 
-                transition: background-color 0.2s ease; 
-            }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
 
-            .header-menu:hover { 
-                background-color: rgba(255, 255, 255, 0.1); 
-            }
+        .header-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
 
-            .header-title { 
-                color: white; 
-                font-family: "Zen Dots", sans-serif; 
-                font-size: 24px; 
-                font-weight: 400; 
-                flex: 1; 
-            }
+        .header-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
-            .back-btn { 
-                color: white; 
-                text-decoration: none; 
-                margin-right: 15px; 
-                padding: 8px 12px; 
-                border-radius: 4px; 
-                transition: background-color 0.2s ease; 
-                display: inline-flex; 
-                align-items: center; 
-                gap: 8px; 
-            }
+        .header-title {
+            color: white;
+            font-family: "Zen Dots", sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            flex: 1;
+        }
 
-            .back-btn:hover { 
-                background-color: rgba(255, 255, 255, 0.1); 
-                color: white; 
-                text-decoration: none; 
-            }
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+        }
         /* Main Content Area */
         .main-content {
             flex: 1;
@@ -539,16 +535,12 @@
 
 <body>
     <div class="dashboard-container">
-        @include('partials.sidebar')
-
         <main class="main-content" id="mainContent">
             <header class="header">
                 <a href="{{ route('project-material-management') }}" class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back to Project Materials
                 </a>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
-                <div style="margin-left: auto;">
-                </div>
             </header>
 
             <section class="content-area">
@@ -728,7 +720,6 @@
         </main>
     </div>
 
-    @include('partials.sidebar-js')
     <script>
     // Set background color for project badge
     const projectBadge = document.querySelector('.project-badge');

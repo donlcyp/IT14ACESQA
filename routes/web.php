@@ -29,6 +29,7 @@ Route::delete('/project-material-management/materials/{id}', [App\Http\Controlle
 Route::get('/transaction', [App\Http\Controllers\AuditController::class, 'index'])->name('transaction');
 
 Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
+Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
 
 Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
 

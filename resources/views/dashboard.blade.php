@@ -294,120 +294,6 @@
             color: #1d4ed8;
         }
 
-        .progress-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 6px;
-            background-color: #e2e8f0;
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .progress-bar span {
-            display: block;
-            height: 100%;
-            background: linear-gradient(135deg, var(--blue-600), #38bdf8);
-        }
-
-        .milestone-list,
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .milestone-item,
-        .activity-item {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-        }
-
-        .milestone-icon,
-        .activity-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            background-color: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--blue-600);
-            font-size: 18px;
-        }
-
-        .milestone-content,
-        .activity-content {
-            flex: 1;
-        }
-
-        .milestone-title,
-        .activity-title {
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 4px;
-        }
-
-        .milestone-meta,
-        .activity-meta {
-            font-size: 13px;
-            color: var(--gray-500);
-        }
-
-        .team-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .team-member {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .team-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .team-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #10b981, #22d3ee);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .team-role {
-            font-size: 13px;
-            color: var(--gray-500);
-        }
-
-        .utilization-rate {
-            font-weight: 600;
-            color: var(--gray-800);
-            text-align: right;
-        }
-
-        .utilization-rate span {
-            display: block;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--gray-500);
-        }
 
         .view-link {
             font-size: 13px;
@@ -535,7 +421,7 @@
                         <div class="dashboard-card-header">
                             <div>
                                 <div class="dashboard-card-title">Active Projects</div>
-                                <div class="dashboard-card-subtitle">Projects currently in execution with status and progress</div>
+                                <div class="dashboard-card-subtitle">Projects currently in execution with status</div>
                             </div>
                             <a class="view-link" href="{{ route('projects') }}">
                                 View all
@@ -549,7 +435,6 @@
                                     <th>Project</th>
                                     <th>Client</th>
                                     <th>Status</th>
-                                    <th>Progress</th>
                                     <th>Lead</th>
                                 </tr>
                             </thead>
@@ -563,14 +448,6 @@
                                             In Review
                                         </span>
                                     </td>
-                                    <td>
-                                        <div class="progress-wrapper">
-                                            <div class="progress-bar">
-                                                <span style="width: 58%;"></span>
-                                            </div>
-                                            <span>58%</span>
-                                        </div>
-                                    </td>
                                     <td>A. Santiago</td>
                                 </tr>
                                 <tr>
@@ -581,14 +458,6 @@
                                             <i class="fas fa-check"></i>
                                             On Track
                                         </span>
-                                    </td>
-                                    <td>
-                                        <div class="progress-wrapper">
-                                            <div class="progress-bar">
-                                                <span style="width: 84%;"></span>
-                                            </div>
-                                            <span>84%</span>
-                                        </div>
                                     </td>
                                     <td>M. Lozada</td>
                                 </tr>
@@ -601,14 +470,6 @@
                                             Mobilizing
                                         </span>
                                     </td>
-                                    <td>
-                                        <div class="progress-wrapper">
-                                            <div class="progress-bar">
-                                                <span style="width: 32%;"></span>
-                                            </div>
-                                            <span>32%</span>
-                                        </div>
-                                    </td>
                                     <td>J. Ramos</td>
                                 </tr>
                             </tbody>
@@ -618,130 +479,201 @@
                     <div class="dashboard-card half">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title">Upcoming Milestones</div>
-                                <div class="dashboard-card-subtitle">Key activities scheduled over the next two weeks</div>
+                                <div class="dashboard-card-title">Project Material Management</div>
+                                <div class="dashboard-card-subtitle">Recent project materials and inspections</div>
                             </div>
+                            <a class="view-link" href="{{ route('project-material-management') }}">
+                                View all
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
 
-                        <div class="milestone-list">
-                            <div class="milestone-item">
-                                <div class="milestone-icon">
-                                    <i class="fas fa-clipboard-check"></i>
-                                </div>
-                                <div class="milestone-content">
-                                    <div class="milestone-title">Final punch list walkthrough</div>
-                                    <div class="milestone-meta">June 14 • Skyline Residences Tower B • Lead: M. Lozada</div>
-                                </div>
-                            </div>
-                            <div class="milestone-item">
-                                <div class="milestone-icon">
-                                    <i class="fas fa-hard-hat"></i>
-                                </div>
-                                <div class="milestone-content">
-                                    <div class="milestone-title">Structural steel installation mobilization</div>
-                                    <div class="milestone-meta">June 18 • North Harbor Logistics Center • Lead: A. Santiago</div>
-                                </div>
-                            </div>
-                            <div class="milestone-item">
-                                <div class="milestone-icon">
-                                    <i class="fas fa-water"></i>
-                                </div>
-                                <div class="milestone-content">
-                                    <div class="milestone-title">Hydro test of fire suppression network</div>
-                                    <div class="milestone-meta">June 22 • Eastern Tech Manufacturing Plant • Lead: J. Ramos</div>
-                                </div>
-                            </div>
-                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Client</th>
+                                    <th>Inspector</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>North Harbor Logistics Center</td>
+                                    <td>TransPhil Industries</td>
+                                    <td>D. Lim</td>
+                                    <td>2 hours ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Skyline Residences Tower B</td>
+                                    <td>Vision City Homes</td>
+                                    <td>R. Santos</td>
+                                    <td>5 hours ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Eastern Tech Manufacturing Plant</td>
+                                    <td>ETM Group</td>
+                                    <td>J. Ramos</td>
+                                    <td>1 day ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="dashboard-card half">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title">Team Utilization</div>
-                                <div class="dashboard-card-subtitle">Resource allocation across active engagements</div>
+                                <div class="dashboard-card-title">Transaction Reminders</div>
+                                <div class="dashboard-card-subtitle">Pending approvals and unpaid invoices</div>
                             </div>
+                            <a class="view-link" href="{{ route('transaction') }}">
+                                View all
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
 
-                        <div class="team-list">
-                            <div class="team-member">
-                                <div class="team-info">
-                                    <div class="team-avatar">RS</div>
-                                    <div>
-                                        <div class="milestone-title">Rowena Santos</div>
-                                        <div class="team-role">Project Manager • Skyline Residences</div>
-                                    </div>
-                                </div>
-                                <div class="utilization-rate">
-                                    92%
-                                    <span>Critical</span>
-                                </div>
-                            </div>
-                            <div class="team-member">
-                                <div class="team-info">
-                                    <div class="team-avatar">DL</div>
-                                    <div>
-                                        <div class="milestone-title">David Lim</div>
-                                        <div class="team-role">QA/QC Supervisor • North Harbor Logistics</div>
-                                    </div>
-                                </div>
-                                <div class="utilization-rate">
-                                    76%
-                                    <span>Healthy</span>
-                                </div>
-                            </div>
-                            <div class="team-member">
-                                <div class="team-info">
-                                    <div class="team-avatar">KM</div>
-                                    <div>
-                                        <div class="milestone-title">Krista Morales</div>
-                                        <div class="team-role">Procurement Lead • Eastern Tech Manufacturing</div>
-                                    </div>
-                                </div>
-                                <div class="utilization-rate">
-                                    63%
-                                    <span>Available</span>
-                                </div>
-                            </div>
-                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice No.</th>
+                                    <th>PO ID</th>
+                                    <th>Amount (₱)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>INV003</td>
+                                    <td>P0003</td>
+                                    <td>₱7,000</td>
+                                    <td>
+                                        <span class="status-badge warning">Unpaid</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>INV002</td>
+                                    <td>P0002</td>
+                                    <td>₱3,200</td>
+                                    <td>
+                                        <span class="status-badge warning">Unpaid</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>INV004</td>
+                                    <td>P0004</td>
+                                    <td>₱12,500</td>
+                                    <td>
+                                        <span class="status-badge info">Pending Approval</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="dashboard-card full">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title">Recent Activity</div>
-                                <div class="dashboard-card-subtitle">Latest updates across quality inspections, finance, and transaction trails</div>
+                                <div class="dashboard-card-title">Finance Summary</div>
+                                <div class="dashboard-card-subtitle">Financial overview and key metrics</div>
                             </div>
+                            <a class="view-link" href="{{ route('finance') }}">
+                                View all
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
 
-                        <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-thermometer-three-quarters"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Concrete core temperature logged at 32°C — within curing specification.</div>
-                                    <div class="activity-meta">QA/QC Team • Skyline Residences Tower B • 42 minutes ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-file-invoice-dollar"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Progress billing #07 for North Harbor Logistics submitted to Finance.</div>
-                                    <div class="activity-meta">Finance Division • Amount: ₱4.8M • 2 hours ago</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-helmet-safety"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Safety transaction checklist for precast installation approved.</div>
-                                    <div class="activity-meta">Transaction & Compliance • Eastern Tech Manufacturing Plant • Yesterday</div>
-                                </div>
-                            </div>
-                        </div>
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th>Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Revenue</td>
+                                    <td>₱5,718,923</td>
+                                    <td>
+                                        <span class="status-badge success">On Track</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Expenses</td>
+                                    <td>₱2,309,895</td>
+                                    <td>
+                                        <span class="status-badge info">Within Budget</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Net Profit</td>
+                                    <td>₱3,409,028</td>
+                                    <td>
+                                        <span class="status-badge success">Positive</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Transactions</td>
+                                    <td>23</td>
+                                    <td>
+                                        <span class="status-badge info">Active</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Average Profit Margin</td>
+                                    <td>15%</td>
+                                    <td>
+                                        <span class="status-badge success">Healthy</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Monthly Revenue</td>
+                                    <td>₱476,577</td>
+                                    <td>
+                                        <span class="status-badge success">On Target</span>
+                                    </td>
+                                    <td>This Month</td>
+                                </tr>
+                                <tr>
+                                    <td>Monthly Expenses</td>
+                                    <td>₱192,491</td>
+                                    <td>
+                                        <span class="status-badge info">Controlled</span>
+                                    </td>
+                                    <td>This Month</td>
+                                </tr>
+                                <tr>
+                                    <td>Outstanding Invoices</td>
+                                    <td>₱22,700</td>
+                                    <td>
+                                        <span class="status-badge warning">Pending</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Pending Payments</td>
+                                    <td>₱15,200</td>
+                                    <td>
+                                        <span class="status-badge warning">Awaiting</span>
+                                    </td>
+                                    <td>Today</td>
+                                </tr>
+                                <tr>
+                                    <td>Budget Utilization</td>
+                                    <td>68%</td>
+                                    <td>
+                                        <span class="status-badge success">Optimal</span>
+                                    </td>
+                                    <td>This Month</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
