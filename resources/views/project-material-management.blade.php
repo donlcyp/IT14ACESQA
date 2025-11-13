@@ -786,11 +786,6 @@
                                 <h2 class="qa-title">Project Material Management</h2>
                             </div>
                         </div>
-                        <button class="qa-button" aria-label="Additional options">
-                            <div class="qa-button-base">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </div>
-                        </button>
                         <form class="qa-search-form">
                             <div class="qa-search-input">
                                 <div class="qa-search-content">

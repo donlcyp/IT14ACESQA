@@ -162,6 +162,26 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         /* Audit Specific Styles */
         .audit-header {
             background: white;
@@ -340,6 +360,11 @@
             color: #991b1b;
         }
 
+        .status-badge.partial {
+            background: transparent;
+            color: #92400e;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
 
@@ -439,6 +464,7 @@
         .input-wrapper { position: relative; }
         .calendar-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; }
         .input-wrapper input { padding-right: 36px; }
+        .form-error { color: #b91c1c; font-size: 12px; margin-top: 6px; }
     </style>
 </head>
 
@@ -458,6 +484,23 @@
 
             <!-- Content Area -->
             <section class="content-area">
+                @if (session('transaction_success'))
+                    <div class="alert alert-success">
+                        {{ session('transaction_success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>There were some issues with your submission:</strong>
+                        <ul style="margin-top: 10px; padding-left: 18px;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Transaction Header -->
                 <div class="audit-header">
                     <h1 class="audit-title">Transaction</h1>
@@ -498,22 +541,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>INV001</td>
-                                    <td>P0001</td>
-                                    <td>5000</td>
-                                    <td><span class="status-badge paid">Paid</span></td>
-                                    <td>2025-01-16</td>
-                                    <td>2025-01-16</td>
-                                </tr>
-                                <tr>
-                                    <td>INV002</td>
-                                    <td>P0002</td>
-                                    <td>3200</td>
-                                    <td><span class="status-badge unpaid">Unpaid</span></td>
-                                    <td>Vendor Y</td>
-                                    <td>-</td>
-                                </tr>
+                                @forelse ($approvedInvoices as $invoice)
+                                    @php
+                                        $statusClass = match ($invoice->payment_status) {
+                                            'paid' => 'paid',
+                                            'partial' => 'partial',
+                                            default => 'unpaid',
+                                        };
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $invoice->invoice_number }}</td>
+                                        <td>{{ $invoice->purchase_order_number ?? '—' }}</td>
+                                        <td>₱{{ number_format($invoice->total_amount, 2) }}</td>
+                                        <td><span class="status-badge {{ $statusClass }}">{{ ucfirst($invoice->payment_status) }}</span></td>
+                                        <td>{{ optional($invoice->invoice_date)->format('Y-m-d') ?? '—' }}</td>
+                                        <td>{{ optional($invoice->verification_date)->format('Y-m-d') ?? '—' }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding:20px; color:#6b7280;">No approved invoices yet.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -538,30 +586,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>INV003</td>
-                                    <td>P0003</td>
-                                    <td>7000</td>
-                                    <td><span class="status-badge unpaid">Unpaid</span></td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+                                @forelse ($pendingInvoices as $invoice)
+                                    @php
+                                        $statusClass = match ($invoice->payment_status) {
+                                            'paid' => 'paid',
+                                            'partial' => 'partial',
+                                            default => 'unpaid',
+                                        };
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $invoice->invoice_number }}</td>
+                                        <td>{{ $invoice->purchase_order_number ?? '—' }}</td>
+                                        <td>₱{{ number_format($invoice->total_amount, 2) }}</td>
+                                        <td><span class="status-badge {{ $statusClass }}">{{ ucfirst($invoice->payment_status) }}</span></td>
+                                        <td>{{ optional($invoice->invoice_date)->format('Y-m-d') ?? '—' }}</td>
+                                        <td>{{ optional($invoice->payment_date)->format('Y-m-d') ?? '—' }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding:20px; color:#6b7280;">No pending invoices right now.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -584,24 +629,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>LOG003</td>
-                                    <td>Added Invoice</td>
-                                    <td>John Doe</td>
-                                    <td>07:00 AM PST, Sep 15, 2025</td>
-                                </tr>
-                                <tr>
-                                    <td>LOG002</td>
-                                    <td>Updated Record</td>
-                                    <td>Jane Smith</td>
-                                    <td>06:45 AM PST, Sep 11, 2025</td>
-                                </tr>
-                                <tr>
-                                    <td>LOG001</td>
-                                    <td>Added Invoice</td>
-                                    <td>John Doe</td>
-                                    <td>12:00 PM PST, Aug 28, 2025</td>
-                                </tr>
+                                @forelse ($invoiceLogs as $log)
+                                    @php
+                                        $timestamp = optional($log->created_at)
+                                            ? $log->created_at
+                                                ->timezone(config('app.timezone'))
+                                                ->format('g:i A T, M d, Y')
+                                            : '—';
+                                    @endphp
+                                    <tr>
+                                        <td>LOG{{ str_pad((string) $log->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                        <td>Created Invoice {{ $log->invoice_number }}</td>
+                                        <td>{{ optional($log->creator)->name ?? 'System' }}</td>
+                                        <td>{{ $timestamp }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="text-align:center; padding:20px; color:#6b7280;">No transaction logs available.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -615,60 +661,104 @@
     <!-- Add Invoice Modal -->
     <div class="modal-overlay" id="addInvoiceModal" aria-hidden="true">
       <div class="modal-content" role="dialog" aria-modal="true">
-        <div class="modal-close" id="invoiceCloseBtn" aria-label="Close">&times;</div>
-        <h2 class="modal-title">
-          <svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
-          Add Invoice
-        </h2>
-        <div class="checkbox-group">
-          <label class="checkbox-item"><input type="checkbox" id="approved" /><span>Approved</span></label>
-          <label class="checkbox-item"><input type="checkbox" id="pending" /><span>Pending</span></label>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="invoiceNo">Invoice No.</label>
-          <input type="text" id="invoiceNo" class="form-input" placeholder="" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="purchaseOrder">Purchase Order ID</label>
-          <input type="text" id="purchaseOrder" class="form-input" placeholder="" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="totalAmount">Total Amount</label>
-          <input type="text" id="totalAmount" class="form-input" placeholder="₱ -" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="status">Status</label>
-          <select id="status" class="form-select">
-            <option value="">Select status</option>
-            <option value="paid">Paid</option>
-            <option value="unpaid">Unpaid</option>
-            <option value="partial">Partially Paid</option>
-          </select>
-        </div>
-        <div class="date-row">
-          <div class="form-group">
-            <label class="form-label" for="invoiceDate">Invoice Date</label>
-            <div class="input-wrapper">
-              <input type="date" id="invoiceDate" class="form-input" />
-              <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
-              </svg>
+        <form id="invoiceForm" action="{{ route('transaction.store') }}" method="POST">
+            @csrf
+            <div class="modal-close" id="invoiceCloseBtn" aria-label="Close">&times;</div>
+            <h2 class="modal-title">
+              <svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+              Add Invoice
+            </h2>
+            <div class="form-group">
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="radio" name="approval_status" value="approved" {{ old('approval_status', 'pending') === 'approved' ? 'checked' : '' }} />
+                  <span>Approved</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="radio" name="approval_status" value="pending" {{ old('approval_status', 'pending') === 'pending' ? 'checked' : '' }} />
+                  <span>Pending</span>
+                </label>
+              </div>
+              @error('approval_status')
+                  <p class="form-error">{{ $message }}</p>
+              @enderror
             </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="verificationDate">Verification Date</label>
-            <div class="input-wrapper">
-              <input type="date" id="verificationDate" class="form-input" />
-              <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
-              </svg>
+            <div class="form-group">
+              <label class="form-label" for="invoiceNo">Invoice No.</label>
+              <input type="text" id="invoiceNo" name="invoice_number" class="form-input" value="{{ old('invoice_number') }}" required />
+              @error('invoice_number')
+                  <p class="form-error">{{ $message }}</p>
+              @enderror
             </div>
-          </div>
-        </div>
-        <div class="button-group">
-          <button class="btn btn-cancel" id="invoiceCancelBtn" type="button">Cancel</button>
-          <button class="btn btn-add" type="button">Add</button>
-        </div>
+            <div class="form-group">
+              <label class="form-label" for="purchaseOrder">Purchase Order ID</label>
+              <input type="text" id="purchaseOrder" name="purchase_order_number" class="form-input" value="{{ old('purchase_order_number') }}" />
+              @error('purchase_order_number')
+                  <p class="form-error">{{ $message }}</p>
+              @enderror
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="totalAmount">Total Amount</label>
+              <input type="number" id="totalAmount" name="total_amount" class="form-input" placeholder="₱ -" value="{{ old('total_amount') }}" min="0" step="0.01" required />
+              @error('total_amount')
+                  <p class="form-error">{{ $message }}</p>
+              @enderror
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="status">Payment Status</label>
+              <select id="status" name="payment_status" class="form-select" required>
+                <option value="" disabled {{ old('payment_status') ? '' : 'selected' }}>Select status</option>
+                <option value="paid" {{ old('payment_status') === 'paid' ? 'selected' : '' }}>Paid</option>
+                <option value="unpaid" {{ old('payment_status', 'unpaid') === 'unpaid' ? 'selected' : '' }}>Unpaid</option>
+                <option value="partial" {{ old('payment_status') === 'partial' ? 'selected' : '' }}>Partially Paid</option>
+              </select>
+              @error('payment_status')
+                  <p class="form-error">{{ $message }}</p>
+              @enderror
+            </div>
+            <div class="date-row">
+              <div class="form-group">
+                <label class="form-label" for="invoiceDate">Invoice Date</label>
+                <div class="input-wrapper">
+                  <input type="date" id="invoiceDate" name="invoice_date" class="form-input" value="{{ old('invoice_date') }}" />
+                  <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
+                  </svg>
+                </div>
+                @error('invoice_date')
+                    <p class="form-error">{{ $message }}</p>
+                @enderror
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="verificationDate">Verification Date</label>
+                <div class="input-wrapper">
+                  <input type="date" id="verificationDate" name="verification_date" class="form-input" value="{{ old('verification_date') }}" />
+                  <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
+                  </svg>
+                </div>
+                @error('verification_date')
+                    <p class="form-error">{{ $message }}</p>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="paymentDate">Payment Date</label>
+              <div class="input-wrapper">
+                <input type="date" id="paymentDate" name="payment_date" class="form-input" value="{{ old('payment_date') }}" />
+                <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
+                </svg>
+              </div>
+              @error('payment_date')
+                  <p class="form-error">{{ $message }}</p>
+              @enderror
+            </div>
+            <div class="button-group">
+              <button class="btn btn-cancel" id="invoiceCancelBtn" type="button">Cancel</button>
+              <button class="btn btn-add" type="submit">Add</button>
+            </div>
+        </form>
       </div>
     </div>
 
@@ -678,16 +768,53 @@
         const modal = document.getElementById('addInvoiceModal');
         const closeBtn = document.getElementById('invoiceCloseBtn');
         const cancelBtn = document.getElementById('invoiceCancelBtn');
-        if (openBtn && modal) {
-          openBtn.addEventListener('click', function(){ modal.classList.add('active'); modal.setAttribute('aria-hidden','false'); });
+        const invoiceForm = document.getElementById('invoiceForm');
+
+        function openModal(shouldReset = true){
+          if (!modal) return;
+          modal.classList.add('active');
+          modal.setAttribute('aria-hidden','false');
+
+          if (invoiceForm) {
+            if (shouldReset) {
+              invoiceForm.reset();
+            }
+
+            const defaultApproval = invoiceForm.querySelector('input[name="approval_status"][value="pending"]');
+            if (shouldReset && defaultApproval && !Array.from(invoiceForm.querySelectorAll('input[name="approval_status"]')).some(radio => radio.checked)) {
+              defaultApproval.checked = true;
+            }
+
+            const firstFocusable = invoiceForm.querySelector('input, select, textarea');
+            if (firstFocusable) {
+              firstFocusable.focus();
+            }
+          }
         }
-        function closeModal(){ if(modal){ modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); } }
+
+        function closeModal(){
+          if (!modal) return;
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden','true');
+          if (invoiceForm) {
+            invoiceForm.reset();
+          }
+        }
+
+        if (openBtn) {
+          openBtn.addEventListener('click', () => openModal(true));
+        }
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
         if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
         if (modal) {
           modal.addEventListener('click', function(e){ if(e.target === modal){ closeModal(); } });
         }
         document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeModal(); } });
+
+        const shouldOpenInvoiceModal = {{ $errors->any() ? 'true' : 'false' }};
+        if (shouldOpenInvoiceModal) {
+          openModal(false);
+        }
       })();
     </script>
 </body>

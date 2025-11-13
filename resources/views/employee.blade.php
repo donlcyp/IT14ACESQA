@@ -180,6 +180,50 @@
             gap: 12px;
         }
 
+        .search-box {
+            position: relative;
+            width: 320px;
+            max-width: 40vw;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
+            box-shadow: var(--shadow-xs);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        .filter-select {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 14px;
+            background: #ffffff;
+            font-size: 14px;
+            min-width: 180px;
+            box-shadow: var(--shadow-xs);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+
+
         .modal {
             position: fixed;
             inset: 0;
@@ -622,6 +666,77 @@
                 overflow-x: auto;
                 white-space: nowrap;
             }
+
+        .pagination-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 0;
+            user-select: none;
+        }
+
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .page-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .page-btn.arrow {
+            font-size: 20px;
+        }
+
+        .page-btn.ellipsis {
+            cursor: default;
+            pointer-events: none;
+        }
         }
     </style>
 </head>
@@ -659,14 +774,29 @@
 
                 <div class="page-header">
                     <h1 class="page-title">Employees</h1>
-                    <div class="page-controls">
+                    <form class="page-controls" method="GET" action="{{ route('employee') }}">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search (coming soon)" disabled />
+                            <input
+                                type="text"
+                                name="search"
+                                placeholder="Search by name or ID"
+                                value="{{ request('search') }}"
+                                aria-label="Search employees"
+                            />
                         </div>
-                        <button class="btn btn-outline" type="button" disabled><i class="fas fa-filter"></i> Filters</button>
+                        <select name="position" class="filter-select" aria-label="Filter by position">
+                            <option value="">All Positions</option>
+                            @foreach ($positions as $position)
+                                <option value="{{ $position }}" @selected(request('position') === $position)>{{ $position }}</option>
+                            @endforeach
+                        </select>
+                        <button class="btn btn-outline" type="submit"><i class="fas fa-filter"></i> Apply</button>
+                        @if (request()->filled('search') || request()->filled('position'))
+                            <a class="btn btn-outline" href="{{ route('employee') }}">Reset</a>
+                        @endif
                         <button class="btn btn-green" type="button" id="openEmployeeModal"><i class="fas fa-user-plus"></i> Add Employee</button>
-                    </div>
+                    </form>
                 </div>
 
                 <div class="table-card">
@@ -700,6 +830,64 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($employees instanceof \Illuminate\Pagination\LengthAwarePaginator && $employees->hasPages())
+                        @php
+                            $currentPage = $employees->currentPage();
+                            $lastPage = $employees->lastPage();
+                            $pageNumbers = [];
+
+                            if ($lastPage <= 7) {
+                                for ($i = 1; $i <= $lastPage; $i++) {
+                                    $pageNumbers[] = $i;
+                                }
+                            } else {
+                                $pageNumbers[] = 1;
+                                if ($currentPage > 3) {
+                                    $pageNumbers[] = '...';
+                                }
+                                $start = max(2, $currentPage - 1);
+                                $end = min($lastPage - 1, $currentPage + 1);
+                                for ($i = $start; $i <= $end; $i++) {
+                                    $pageNumbers[] = $i;
+                                }
+                                if ($currentPage < $lastPage - 2) {
+                                    $pageNumbers[] = '...';
+                                }
+                                $pageNumbers[] = $lastPage;
+                            }
+                        @endphp
+                        <div class="pagination-container">
+                            <div class="pagination-info">
+                                Showing {{ $employees->firstItem() }} to {{ $employees->lastItem() }}
+                                of {{ $employees->total() }} employees
+                            </div>
+                            <div class="pagination-controls">
+                                @if ($employees->onFirstPage())
+                                    <span class="page-btn arrow disabled">‹</span>
+                                @else
+                                    <a class="page-btn arrow" href="{{ $employees->previousPageUrl() }}" rel="prev">‹</a>
+                                @endif
+
+                                <div class="pagination-nav">
+                                    @foreach ($pageNumbers as $page)
+                                        @if ($page === '...')
+                                            <span class="page-btn ellipsis">…</span>
+                                        @elseif ($page == $currentPage)
+                                            <span class="page-btn active">{{ $page }}</span>
+                                        @else
+                                            <a class="page-btn" href="{{ $employees->url($page) }}">{{ $page }}</a>
+                                        @endif
+                                    @endforeach
+                                </div>
+
+                                @if ($employees->hasMorePages())
+                                    <a class="page-btn arrow" href="{{ $employees->nextPageUrl() }}" rel="next">›</a>
+                                @else
+                                    <span class="page-btn arrow disabled">›</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </section>
         </main>

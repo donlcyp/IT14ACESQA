@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\FinancialData;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
 
 class FinanceController extends Controller
@@ -36,8 +37,8 @@ class FinanceController extends Controller
             ? round((($totalRevenue - $totalExpenses) / $totalRevenue) * 100, 1) 
             : 0;
 
-        // Count total transactions (you can adjust this based on your actual transaction table)
-        $totalTransactions = 23; // This can be fetched from your transactions table
+        // Count total transactions from invoices table
+        $totalTransactions = Invoice::count();
 
         return view('finance', compact(
             'financialData',

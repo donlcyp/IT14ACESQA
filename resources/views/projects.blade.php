@@ -599,9 +599,15 @@
                         <thead>
                             <tr>
                                 <th>Project</th>
-                                <th>Client</th>
+                                <th>Client Prefix</th>
+                                <th>Client First Name</th>
+                                <th>Client Last Name</th>
+                                <th>Client Suffix</th>
                                 <th>Status</th>
-                                <th>Lead</th>
+                                <th>Lead Prefix</th>
+                                <th>Lead First Name</th>
+                                <th>Lead Last Name</th>
+                                <th>Lead Suffix</th>
                                 <th>Created</th>
                                 <th>Actions</th>
                             </tr>
@@ -621,19 +627,31 @@
                                 <tr
                                     data-id="{{ $project->id }}"
                                     data-name="{{ $project->project_name }}"
-                                    data-client="{{ $project->client_name }}"
                                     data-status="{{ $project->status }}"
-                                    data-lead="{{ $project->lead }}"
+                                    data-client-prefix="{{ $project->client_prefix }}"
+                                    data-client-first="{{ $project->client_first_name }}"
+                                    data-client-last="{{ $project->client_last_name }}"
+                                    data-client-suffix="{{ $project->client_suffix }}"
+                                    data-lead-prefix="{{ $project->lead_prefix }}"
+                                    data-lead-first="{{ $project->lead_first_name }}"
+                                    data-lead-last="{{ $project->lead_last_name }}"
+                                    data-lead-suffix="{{ $project->lead_suffix }}"
                                 >
                                     <td>{{ $project->project_name }}</td>
-                                    <td>{{ $project->client_name }}</td>
+                                    <td>{{ $project->client_prefix ?: '—' }}</td>
+                                    <td>{{ $project->client_first_name ?: '—' }}</td>
+                                    <td>{{ $project->client_last_name ?: '—' }}</td>
+                                    <td>{{ $project->client_suffix ?: '—' }}</td>
                                     <td>
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>
                                             {{ $project->status }}
                                         </span>
                                     </td>
-                                    <td>{{ $project->lead }}</td>
+                                    <td>{{ $project->lead_prefix ?: '—' }}</td>
+                                    <td>{{ $project->lead_first_name ?: '—' }}</td>
+                                    <td>{{ $project->lead_last_name ?: '—' }}</td>
+                                    <td>{{ $project->lead_suffix ?: '—' }}</td>
                                     <td>{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
                                     <td>
                                         <button
@@ -651,7 +669,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" style="text-align: center; color: #6b7280; padding: 24px;">
+                                    <td colspan="12" style="text-align: center; color: #6b7280; padding: 24px;">
                                         No projects found. Click the <strong>New</strong> button to add one.
                                     </td>
                                 </tr>
@@ -748,17 +766,63 @@
                             </div>
 
                             <div class="projects-form-group">
-                                <label class="projects-form-label">Client Name</label>
+                                <label class="projects-form-label" for="clientPrefix">Client Prefix</label>
                                 <input
                                     type="text"
                                     class="projects-form-input"
-                                    id="clientName"
-                                    name="client_name"
-                                    placeholder="Enter client name"
-                                    value="{{ old('client_name') }}"
+                                    id="clientPrefix"
+                                    name="client_prefix"
+                                    placeholder="Enter client prefix (optional)"
+                                    value="{{ old('client_prefix') }}"
+                                />
+                                @error('client_prefix')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label" for="clientFirstName">Client First Name</label>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="clientFirstName"
+                                    name="client_first_name"
+                                    placeholder="Enter client first name"
+                                    value="{{ old('client_first_name') }}"
                                     required
                                 />
-                                @error('client_name')
+                                @error('client_first_name')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label" for="clientLastName">Client Last Name</label>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="clientLastName"
+                                    name="client_last_name"
+                                    placeholder="Enter client last name"
+                                    value="{{ old('client_last_name') }}"
+                                    required
+                                />
+                                @error('client_last_name')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label" for="clientSuffix">Client Suffix</label>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="clientSuffix"
+                                    name="client_suffix"
+                                    placeholder="Enter client suffix (optional)"
+                                    value="{{ old('client_suffix') }}"
+                                />
+                                @error('client_suffix')
                                     <p class="projects-form-error">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -775,17 +839,63 @@
                             </div>
 
                             <div class="projects-form-group">
-                                <label class="projects-form-label">Lead</label>
+                                <label class="projects-form-label" for="leadPrefix">Lead Engineer Prefix</label>
                                 <input
                                     type="text"
                                     class="projects-form-input"
-                                    id="projectLead"
-                                    name="lead"
-                                    placeholder="Enter project lead"
-                                    value="{{ old('lead') }}"
+                                    id="leadPrefix"
+                                    name="lead_prefix"
+                                    placeholder="Enter lead engineer prefix (optional)"
+                                    value="{{ old('lead_prefix') }}"
+                                />
+                                @error('lead_prefix')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label" for="leadFirstName">Lead Engineer First Name</label>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="leadFirstName"
+                                    name="lead_first_name"
+                                    placeholder="Enter lead engineer first name"
+                                    value="{{ old('lead_first_name') }}"
                                     required
                                 />
-                                @error('lead')
+                                @error('lead_first_name')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label" for="leadLastName">Lead Engineer Last Name</label>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="leadLastName"
+                                    name="lead_last_name"
+                                    placeholder="Enter lead engineer last name"
+                                    value="{{ old('lead_last_name') }}"
+                                    required
+                                />
+                                @error('lead_last_name')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label" for="leadSuffix">Lead Engineer Suffix</label>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="leadSuffix"
+                                    name="lead_suffix"
+                                    placeholder="Enter lead engineer suffix (optional)"
+                                    value="{{ old('lead_suffix') }}"
+                                />
+                                @error('lead_suffix')
                                     <p class="projects-form-error">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -820,13 +930,43 @@
                             </div>
 
                             <div class="projects-form-group">
-                                <label class="projects-form-label">Client Name</label>
-                                <input type="text" class="projects-form-input" id="editClientName" readonly />
+                                <label class="projects-form-label">Client Prefix</label>
+                                <input type="text" class="projects-form-input" id="editClientPrefix" readonly />
                             </div>
 
                             <div class="projects-form-group">
-                                <label class="projects-form-label">Lead</label>
-                                <input type="text" class="projects-form-input" id="editProjectLead" readonly />
+                                <label class="projects-form-label">Client First Name</label>
+                                <input type="text" class="projects-form-input" id="editClientFirstName" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Client Last Name</label>
+                                <input type="text" class="projects-form-input" id="editClientLastName" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Client Suffix</label>
+                                <input type="text" class="projects-form-input" id="editClientSuffix" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Lead Engineer Prefix</label>
+                                <input type="text" class="projects-form-input" id="editLeadPrefix" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Lead Engineer First Name</label>
+                                <input type="text" class="projects-form-input" id="editLeadFirstName" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Lead Engineer Last Name</label>
+                                <input type="text" class="projects-form-input" id="editLeadLastName" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Lead Engineer Suffix</label>
+                                <input type="text" class="projects-form-input" id="editLeadSuffix" readonly />
                             </div>
 
                             <div class="projects-form-group">
@@ -861,8 +1001,14 @@
         const editProjectModal = document.getElementById('editProjectModal');
         const editProjectForm = document.getElementById('editProjectForm');
         const editProjectName = document.getElementById('editProjectName');
-        const editClientName = document.getElementById('editClientName');
-        const editProjectLead = document.getElementById('editProjectLead');
+        const editClientPrefix = document.getElementById('editClientPrefix');
+        const editClientFirstName = document.getElementById('editClientFirstName');
+        const editClientLastName = document.getElementById('editClientLastName');
+        const editClientSuffix = document.getElementById('editClientSuffix');
+        const editLeadPrefix = document.getElementById('editLeadPrefix');
+        const editLeadFirstName = document.getElementById('editLeadFirstName');
+        const editLeadLastName = document.getElementById('editLeadLastName');
+        const editLeadSuffix = document.getElementById('editLeadSuffix');
         const editProjectStatus = document.getElementById('editProjectStatus');
 
         function openProjectModal(shouldReset = false) {
@@ -888,16 +1034,28 @@
             if (!row) return;
             const projectId = row.getAttribute('data-id');
             const name = row.getAttribute('data-name') || '';
-            const client = row.getAttribute('data-client') || '';
+            const clientPrefix = row.getAttribute('data-client-prefix') || '';
+            const clientFirst = row.getAttribute('data-client-first') || '';
+            const clientLast = row.getAttribute('data-client-last') || '';
+            const clientSuffix = row.getAttribute('data-client-suffix') || '';
             const status = row.getAttribute('data-status') || '';
-            const lead = row.getAttribute('data-lead') || '';
+            const leadPrefix = row.getAttribute('data-lead-prefix') || '';
+            const leadFirst = row.getAttribute('data-lead-first') || '';
+            const leadLast = row.getAttribute('data-lead-last') || '';
+            const leadSuffix = row.getAttribute('data-lead-suffix') || '';
 
             if (editProjectForm) {
                 editProjectForm.action = '{{ route('projects.update', ':id') }}'.replace(':id', projectId);
             }
             if (editProjectName) editProjectName.value = name;
-            if (editClientName) editClientName.value = client;
-            if (editProjectLead) editProjectLead.value = lead;
+            if (editClientPrefix) editClientPrefix.value = clientPrefix;
+            if (editClientFirstName) editClientFirstName.value = clientFirst;
+            if (editClientLastName) editClientLastName.value = clientLast;
+            if (editClientSuffix) editClientSuffix.value = clientSuffix;
+            if (editLeadPrefix) editLeadPrefix.value = leadPrefix;
+            if (editLeadFirstName) editLeadFirstName.value = leadFirst;
+            if (editLeadLastName) editLeadLastName.value = leadLast;
+            if (editLeadSuffix) editLeadSuffix.value = leadSuffix;
             if (editProjectStatus) editProjectStatus.value = status;
 
             if (editProjectModal) {

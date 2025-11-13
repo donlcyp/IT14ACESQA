@@ -7,11 +7,40 @@ use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::orderByDesc('created_at')->get();
+        $query = Employee::query();
 
-        return view('employee', compact('employees'));
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($builder) use ($search) {
+                $builder
+                    ->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                    ->orWhere('employee_code', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('position')) {
+            $query->where('position', $request->input('position'));
+        }
+
+        $employees = $query
+            ->orderBy('employee_code')
+            ->paginate(10)
+            ->withQueryString();
+
+        $positions = Employee::query()
+            ->whereNotNull('position')
+            ->where('position', '<>', '')
+            ->distinct()
+            ->orderBy('position')
+            ->pluck('position');
+
+        return view('employee', [
+            'employees' => $employees,
+            'positions' => $positions,
+        ]);
     }
 
     public function store(Request $request)

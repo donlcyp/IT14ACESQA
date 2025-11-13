@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectRecord;
 use App\Models\Material;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -23,6 +24,8 @@ class DatabaseSeeder extends Seeder
         
         // Clear existing data (order matters due to foreign keys)
         DB::table('materials')->truncate();
+        DB::table('invoices')->truncate();
+        DB::table('financial_data')->truncate();
         DB::table('project_records')->truncate();
         DB::table('projects')->truncate();
         DB::table('users')->truncate();
@@ -130,11 +133,22 @@ class DatabaseSeeder extends Seeder
 
         $createdProjectRecords = [];
         foreach ($recordDefinitions as $definition) {
+            $clientParts = $this->splitName($definition['client']);
+            $leadParts = $this->splitName($definition['inspector']);
+
             $project = Project::create([
                 'project_name' => $definition['title'],
-                'client_name' => $definition['client'],
+                'client_prefix' => $clientParts['prefix'],
+                'client_first_name' => $clientParts['first_name'],
+                'client_last_name' => $clientParts['last_name'],
+                'client_suffix' => $clientParts['suffix'],
+                'client_name' => $this->composeName($clientParts, $definition['client']),
                 'status' => 'On Track',
-                'lead' => $definition['inspector'],
+                'lead_prefix' => $leadParts['prefix'],
+                'lead_first_name' => $leadParts['first_name'],
+                'lead_last_name' => $leadParts['last_name'],
+                'lead_suffix' => $leadParts['suffix'],
+                'lead' => $this->composeName($leadParts, $definition['inspector']),
             ]);
 
             $createdProjectRecords[] = ProjectRecord::create([
@@ -146,6 +160,50 @@ class DatabaseSeeder extends Seeder
                 'color' => $definition['color'],
             ]);
         }
+
+        // Seed Invoices
+        $createdBy = User::first()?->id;
+        $invoiceDefinitions = [
+            [
+                'invoice_number' => 'INV-0001',
+                'purchase_order_number' => 'PO-1001',
+                'total_amount' => 50000.00,
+                'payment_status' => 'paid',
+                'approval_status' => 'approved',
+                'invoice_date' => '2025-01-16',
+                'verification_date' => '2025-01-18',
+                'payment_date' => '2025-01-20',
+            ],
+            [
+                'invoice_number' => 'INV-0002',
+                'purchase_order_number' => 'PO-1002',
+                'total_amount' => 32000.00,
+                'payment_status' => 'unpaid',
+                'approval_status' => 'approved',
+                'invoice_date' => '2025-02-05',
+                'verification_date' => null,
+                'payment_date' => null,
+            ],
+            [
+                'invoice_number' => 'INV-0003',
+                'purchase_order_number' => 'PO-1003',
+                'total_amount' => 70000.00,
+                'payment_status' => 'partial',
+                'approval_status' => 'pending',
+                'invoice_date' => '2025-03-12',
+                'verification_date' => null,
+                'payment_date' => '2025-03-21',
+            ],
+        ];
+
+        foreach ($invoiceDefinitions as $definition) {
+            Invoice::create(array_merge(
+                $definition,
+                ['created_by' => $createdBy]
+            ));
+        }
+
+        $this->call(FinancialDataSeeder::class);
 
         // Seed Materials linked to QA Records
         $materials = [
@@ -434,5 +492,103 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Created: ' . count($recordDefinitions) . ' project records');
         $this->command->info('Created: ' . count($materials) . ' materials');
         $this->command->info('Created: ' . count($recordDefinitions) . ' projects');
+        $this->command->info('Created: ' . count($invoiceDefinitions) . ' invoices');
+    }
+
+    /**
+     * @return array{prefix:?string,first_name:?string,last_name:?string,suffix:?string}
+     */
+    private function splitName(string $name): array
+    {
+        $trimmed = trim($name);
+
+        if ($trimmed === '') {
+            return [
+                'prefix' => null,
+                'first_name' => null,
+                'last_name' => null,
+                'suffix' => null,
+            ];
+        }
+
+        $tokens = array_values(array_filter(preg_split('/\s+/', $trimmed) ?: [], fn ($token) => $token !== ''));
+
+        if (empty($tokens)) {
+            return [
+                'prefix' => null,
+                'first_name' => null,
+                'last_name' => null,
+                'suffix' => null,
+            ];
+        }
+
+        $prefixes = [
+            'mr', 'mrs', 'ms', 'miss', 'dr', 'engr', 'eng', 'sir', 'madam', 'rev', 'attorney', 'atty', 'eng\'r', 'prof', 'arch', 'architect',
+        ];
+
+        $suffixes = [
+            'jr', 'sr', 'ii', 'iii', 'iv', 'v', 'phd', 'md', 'dmd', 'pe', 'cpa', 'esq',
+        ];
+
+        $prefixTokens = [];
+        while (!empty($tokens) && $this->matchesTokenList($tokens[0], $prefixes)) {
+            $prefixTokens[] = array_shift($tokens);
+        }
+
+        $suffixTokens = [];
+        while (!empty($tokens) && $this->matchesTokenList(end($tokens), $suffixes)) {
+            array_unshift($suffixTokens, array_pop($tokens));
+        }
+
+        $firstName = $tokens[0] ?? null;
+        $lastName = null;
+
+        if (count($tokens) > 1) {
+            $lastName = implode(' ', array_slice($tokens, 1));
+        } elseif (!$firstName && !empty($tokens)) {
+            $firstName = implode(' ', $tokens);
+        }
+
+        return [
+            'prefix' => $this->nullIfEmpty(implode(' ', $prefixTokens)),
+            'first_name' => $this->nullIfEmpty($firstName),
+            'last_name' => $this->nullIfEmpty($lastName),
+            'suffix' => $this->nullIfEmpty(implode(' ', $suffixTokens)),
+        ];
+    }
+
+    private function matchesTokenList(string $token, array $list): bool
+    {
+        $normalized = strtolower(trim($token, " \t\n\r\0\x0B.,"));
+
+        return in_array($normalized, $list, true);
+    }
+
+    private function nullIfEmpty(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        return $trimmed === '' ? null : $trimmed;
+    }
+
+    /**
+     * @param  array{prefix:?string,first_name:?string,last_name:?string,suffix:?string}  $parts
+     */
+    private function composeName(array $parts, string $fallback): string
+    {
+        $segments = array_filter([
+            $parts['prefix'],
+            $parts['first_name'],
+            $parts['last_name'],
+            $parts['suffix'],
+        ], fn ($segment) => $segment !== null && $segment !== '');
+
+        $assembled = trim(implode(' ', $segments));
+
+        return $assembled !== '' ? $assembled : $fallback;
     }
 }

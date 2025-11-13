@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/materials/{id}', [MaterialController::class, 'destroy'])->name('materials.destroy');
 
     Route::get('/transaction', [App\Http\Controllers\AuditController::class, 'index'])->name('transaction');
+    Route::post('/transaction', [App\Http\Controllers\AuditController::class, 'store'])->name('transaction.store');
 
     Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
     Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
