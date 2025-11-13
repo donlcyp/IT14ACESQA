@@ -24,8 +24,8 @@ class Material extends Model
         'location',
     ];
 
-    public function qaRecord()
+    public function purchaseOrders()
     {
-        return $this->belongsTo(QaRecord::class);
+        return $this->hasMany(PurchaseOrder::class, 'MaterialID', 'id');
     }
 }

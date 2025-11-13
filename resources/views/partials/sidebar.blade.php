@@ -163,9 +163,23 @@
     .main-content {
         flex: 1;
         transition: margin-left 0.3s ease;
+        position: relative;
+        z-index: 1;
     }
     /* When sidebar is hidden on desktop */
     .main-content.sidebar-closed { margin-left: 0; }
+    
+    /* Ensure header and button are always clickable */
+    .header {
+        position: relative;
+        z-index: 1001;
+    }
+    
+    .header-menu {
+        position: relative;
+        z-index: 1002;
+        pointer-events: auto !important;
+    }
 
     /* Responsive Design */
     @media (max-width: 768px) {
@@ -213,6 +227,22 @@
             <i class="nav-icon fas fa-user-check"></i>
             <span>Attendance</span>
         </a>
+        <a href="{{ route('clients.index') }}" class="nav-item {{ request()->routeIs('clients*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-building"></i>
+            <span>Clients</span>
+        </a>
+        <a href="{{ route('purchase-orders.index') }}" class="nav-item {{ request()->routeIs('purchase-orders*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-shopping-cart"></i>
+            <span>Purchase Orders</span>
+        </a>
+        <a href="{{ route('invoices.index') }}" class="nav-item {{ request()->routeIs('invoices*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-file-invoice"></i>
+            <span>Invoices</span>
+        </a>
+        <a href="{{ route('logs.index') }}" class="nav-item {{ request()->routeIs('logs*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-history"></i>
+            <span>System Logs</span>
+        </a>
     </nav>
 
     <div class="logout-section">
@@ -225,39 +255,3 @@
         </form>
     </div>
 </aside>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle') || document.getElementById('headerMenu');
-        const mainContent = document.querySelector('.main-content');
-
-        function applyState(open) {
-            if (open) {
-                sidebar.classList.add('open');
-                if (mainContent) mainContent.classList.remove('sidebar-closed');
-            } else {
-                sidebar.classList.remove('open');
-                if (mainContent) mainContent.classList.add('sidebar-closed');
-            }
-        }
-
-        // Keep sidebar open by default on load (all pages)
-        applyState(true);
-
-        // Toggle sidebar
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                const nextOpen = !sidebar.classList.contains('open');
-                applyState(nextOpen);
-            });
-        }
-
-        // Maintain layout on resize
-        window.addEventListener('resize', function() {
-            // If sidebar is open, re-apply correct classes for current viewport
-            const isOpen = sidebar.classList.contains('open');
-            applyState(isOpen);
-        });
-    });
-</script>

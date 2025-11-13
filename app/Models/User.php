@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'UserName',
+        'UserPosition',
+        'Status',
     ];
 
     /**
@@ -32,6 +35,16 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function logs()
+    {
+        return $this->hasMany(Log::class, 'UserID', 'id');
+    }
+
+    public function employee()
+    {
+        return $this->hasOne(EmployeeList::class, 'UserID', 'id');
+    }
 
     /**
      * Get the attributes that should be cast.

@@ -33,6 +33,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
 
     Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
+    Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('projects.store');
+    Route::get('/projects/create', [App\Http\Controllers\ProjectsController::class, 'create'])->name('projects.create');
+    Route::get('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('projects.show');
+    Route::put('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'destroy'])->name('projects.destroy');
+
+    // Clients
+    Route::resource('clients', App\Http\Controllers\ClientController::class);
+
+    // Purchase Orders
+    Route::resource('purchase-orders', App\Http\Controllers\PurchaseOrderController::class);
+
+    // Invoices
+    Route::resource('invoices', App\Http\Controllers\InvoiceController::class);
+
+    // Logs
+    Route::resource('logs', App\Http\Controllers\LogController::class);
 
     Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
     // New Employee page route (separate from attendance)

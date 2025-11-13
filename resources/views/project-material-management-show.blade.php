@@ -891,6 +891,8 @@
                 const statusField = document.getElementById('mat_status');
                 if (statusField) {
                     statusField.disabled = false;
+                    statusField.style.cursor = 'pointer';
+                    statusField.style.backgroundColor = '';
                     console.log('Status field enabled for edit mode');
                 }
                 
@@ -950,7 +952,13 @@
                 document.getElementById('mat_status').value = 'Pending';
                 
                 // Disable status editing for new materials (only edit can change status)
-                document.getElementById('mat_status').disabled = true;
+                // Status should always be "Pending" for new materials and cannot be edited
+                const statusField = document.getElementById('mat_status');
+                if (statusField) {
+                    statusField.disabled = true;
+                    statusField.style.cursor = 'not-allowed';
+                    statusField.style.backgroundColor = '#f3f4f6';
+                }
                 
                 // Show Add Item button for new materials
                 const addItemBtn = document.getElementById('addItemBtn');
@@ -970,6 +978,12 @@
         }
 
         function closeMaterialModal() {
+            // Reset status field styling when closing modal
+            const statusField = document.getElementById('mat_status');
+            if (statusField) {
+                statusField.style.cursor = '';
+                statusField.style.backgroundColor = '';
+            }
             materialModal.classList.remove('active');
             materialModalStep2.classList.remove('active');
             materialModal.setAttribute('aria-hidden', 'true');
@@ -1174,11 +1188,9 @@
                 status: statusInput ? statusInput.value : 'MISSING'
             });
 
-            // If status field is disabled, enable it temporarily for saving
-            if (statusInput && statusInput.disabled) {
-                console.log('Status field is disabled, enabling temporarily for save');
-                statusInput.disabled = false;
-            }
+            // Status field should remain disabled when adding new materials
+            // We'll read its value directly without enabling it
+            // For new materials, status is always "Pending" and cannot be changed
 
             if (!supplierInput || !locationInput || !dateReceivedInput || !statusInput) {
                 console.error('Missing form fields:', {
@@ -1195,7 +1207,8 @@
             const supplier = supplierInput.value;
             const location = locationInput.value;
             const dateReceived = dateReceivedInput.value;
-            const status = statusInput.value;
+            // Read status value even if disabled (for new materials, it should be "Pending")
+            const status = statusInput.value || 'Pending';
 
             console.log('Form values:', { supplier, location, dateReceived, status });
 
@@ -1243,6 +1256,10 @@
                         return;
                     }
 
+                    // For new materials, always set status to "Pending" (cannot be changed)
+                    // For editing, use the status from the form (which is editable)
+                    const finalStatus = editMode ? status : 'Pending';
+                    
                     const formData = {
                         name: name,
                         batch: batch,
@@ -1253,7 +1270,7 @@
                         total: total,
                         date_received: dateReceived,
                         date_inspected: dateReceived,
-                        status: status,
+                        status: finalStatus,
                         location: location,
                         _token: csrfToken
                     };
