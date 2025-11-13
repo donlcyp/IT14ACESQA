@@ -73,29 +73,17 @@
             width: 100%;
             transition: margin-left 0.3s ease;
         }
-        
-        /* When sidebar is hidden on desktop */
-        .main-content.sidebar-closed { 
-            margin-left: 0; 
+        .main-content.sidebar-closed {
+            margin-left: 0;
         }
-        
-        /* Desktop: Reserve space for sidebar */
         @media (min-width: 769px) {
-            .main-content { 
-                margin-left: 280px; 
-            }
-            .main-content.sidebar-closed { 
-                margin-left: 0; 
+            .main-content {
+                margin-left: 280px;
             }
         }
-        
-        /* Mobile: Sidebar overlays, no margin */
         @media (max-width: 768px) {
-            .main-content { 
-                margin-left: 0 !important; 
-            }
-            .main-content.sidebar-closed { 
-                margin-left: 0 !important; 
+            .main-content {
+                margin-left: 0 !important;
             }
         }
 
@@ -374,6 +362,12 @@
             box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
         }
 
+        .projects-form-error {
+            color: #b91c1c;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
         .projects-modal-footer {
             display: flex;
             justify-content: flex-end;
@@ -435,6 +429,87 @@
             border: 1px solid #f5c6cb;
         }
 
+        /* Modern Pagination Styles */
+        .pagination-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 0;
+            user-select: none;
+        }
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .page-btn:active:not(.disabled):not(.ellipsis) {
+            transform: scale(0.95);
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .page-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .page-btn.arrow {
+            font-size: 20px;
+            font-weight: 400;
+        }
+        .page-btn.ellipsis {
+            cursor: default;
+            pointer-events: none;
+        }
+        .page-btn.ellipsis:hover {
+            background: transparent;
+        }
+        @media (max-width: 640px) {
+            .page-btn {
+                min-width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .page-btn.arrow {
+                font-size: 18px;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header {
@@ -487,19 +562,32 @@
                 </nav>
 
                 <!-- Success/Error Messages -->
-                <div class="alert alert-success" id="successAlert" style="display: none;"></div>
-                <div class="alert alert-danger" id="errorAlert" style="display: none;"></div>
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul style="margin-left: 16px;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <!-- Projects Header -->
                 <div class="projects-header">
                     <div class="projects-content">
                         <div class="projects-title">Projects</div>
                         <div class="projects-actions">
-                            <button class="projects-button" aria-label="New Project">
-                                <div class="projects-button-base primary" onclick="openProjectModal()">
+                            <button type="button" class="projects-button" aria-label="New Project" onclick="openProjectModal(true)">
+                                <span class="projects-button-base primary">
                                     <i class="fas fa-plus"></i>
                                     <span>New</span>
-                                </div>
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -515,48 +603,121 @@
                                 <th>Status</th>
                                 <th>Lead</th>
                                 <th>Created</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="projectsTableBody">
-                            <tr>
-                                <td>North Harbor Logistics Center</td>
-                                <td>TransPhil Industries</td>
-                                <td>
-                                    <span class="status-badge warning">
-                                        <i class="fas fa-hourglass-half"></i>
-                                        In Review
-                                    </span>
-                                </td>
-                                <td>A. Santiago</td>
-                                <td>2 days ago</td>
-                            </tr>
-                            <tr>
-                                <td>Skyline Residences Tower B</td>
-                                <td>Vision City Homes</td>
-                                <td>
-                                    <span class="status-badge success">
-                                        <i class="fas fa-check"></i>
-                                        On Track
-                                    </span>
-                                </td>
-                                <td>M. Lozada</td>
-                                <td>5 days ago</td>
-                            </tr>
-                            <tr>
-                                <td>Eastern Tech Manufacturing Plant</td>
-                                <td>ETM Group</td>
-                                <td>
-                                    <span class="status-badge info">
-                                        <i class="fas fa-bolt"></i>
-                                        Mobilizing
-                                    </span>
-                                </td>
-                                <td>J. Ramos</td>
-                                <td>1 week ago</td>
-                            </tr>
+                            @forelse ($projects as $project)
+                                @php
+                                    $statusMap = [
+                                        'On Track'   => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                        'On Hold'    => ['class' => 'danger', 'icon' => 'fas fa-pause'],
+                                        'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                    ];
+                                    $badge = $statusMap[$project->status] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                @endphp
+                                <tr
+                                    data-id="{{ $project->id }}"
+                                    data-name="{{ $project->project_name }}"
+                                    data-client="{{ $project->client_name }}"
+                                    data-status="{{ $project->status }}"
+                                    data-lead="{{ $project->lead }}"
+                                >
+                                    <td>{{ $project->project_name }}</td>
+                                    <td>{{ $project->client_name }}</td>
+                                    <td>
+                                        <span class="status-badge {{ $badge['class'] }}">
+                                            <i class="{{ $badge['icon'] }}"></i>
+                                            {{ $project->status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $project->lead }}</td>
+                                    <td>{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="projects-button"
+                                            aria-label="Edit Project"
+                                            onclick="openEditProjectModal(this)"
+                                        >
+                                            <span class="projects-button-base">
+                                                <i class="fas fa-edit"></i>
+                                                <span>Edit</span>
+                                            </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #6b7280; padding: 24px;">
+                                        No projects found. Click the <strong>New</strong> button to add one.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+
+                @if($projects instanceof \Illuminate\Pagination\LengthAwarePaginator && $projects->hasPages())
+                    @php
+                        $currentPage = $projects->currentPage();
+                        $lastPage = $projects->lastPage();
+                        $pageNumbers = [];
+
+                        if ($lastPage <= 7) {
+                            for ($i = 1; $i <= $lastPage; $i++) {
+                                $pageNumbers[] = $i;
+                            }
+                        } else {
+                            $pageNumbers[] = 1;
+                            if ($currentPage > 3) {
+                                $pageNumbers[] = '...';
+                            }
+                            $start = max(2, $currentPage - 1);
+                            $end = min($lastPage - 1, $currentPage + 1);
+                            for ($i = $start; $i <= $end; $i++) {
+                                $pageNumbers[] = $i;
+                            }
+                            if ($currentPage < $lastPage - 2) {
+                                $pageNumbers[] = '...';
+                            }
+                            $pageNumbers[] = $lastPage;
+                        }
+                    @endphp
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            Showing {{ $projects->firstItem() }} to {{ $projects->lastItem() }}
+                            of {{ $projects->total() }} results
+                        </div>
+                        <div class="pagination-controls">
+                            @if ($projects->onFirstPage())
+                                <span class="page-btn arrow disabled">‹</span>
+                            @else
+                                <a class="page-btn arrow" href="{{ $projects->previousPageUrl() }}" rel="prev">‹</a>
+                            @endif
+
+                            <div class="pagination-nav">
+                                @foreach ($pageNumbers as $page)
+                                    @if ($page === '...')
+                                        <span class="page-btn ellipsis">…</span>
+                                    @elseif ($page == $currentPage)
+                                        <span class="page-btn active">{{ $page }}</span>
+                                    @else
+                                        <a class="page-btn" href="{{ $projects->url($page) }}">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+                            </div>
+
+                            @if ($projects->hasMorePages())
+                                <a class="page-btn arrow" href="{{ $projects->nextPageUrl() }}" rel="next">›</a>
+                            @else
+                                <span class="page-btn arrow disabled">›</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
 
                 <!-- New Project Modal -->
                 <div class="projects-modal" id="projectModal" aria-hidden="true">
@@ -568,32 +729,65 @@
                             </button>
                         </div>
 
-                        <form id="projectForm">
+                        <form id="projectForm" action="{{ route('projects.store') }}" method="POST">
+                            @csrf
                             <div class="projects-form-group">
                                 <label class="projects-form-label">Project Name</label>
-                                <input type="text" class="projects-form-input" id="projectName" name="project_name" placeholder="Enter project name" required />
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="projectName"
+                                    name="project_name"
+                                    placeholder="Enter project name"
+                                    value="{{ old('project_name') }}"
+                                    required
+                                />
+                                @error('project_name')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="projects-form-group">
                                 <label class="projects-form-label">Client Name</label>
-                                <input type="text" class="projects-form-input" id="clientName" name="client_name" placeholder="Enter client name" required />
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="clientName"
+                                    name="client_name"
+                                    placeholder="Enter client name"
+                                    value="{{ old('client_name') }}"
+                                    required
+                                />
+                                @error('client_name')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="projects-form-group">
                                 <label class="projects-form-label">Status</label>
-                                <select class="projects-form-select" id="projectStatus" name="status" required>
-                                    <option value="">Select status</option>
-                                    <option value="On Track">On Track</option>
-                                    <option value="In Review">In Review</option>
-                                    <option value="Mobilizing">Mobilizing</option>
-                                    <option value="On Hold">On Hold</option>
-                                    <option value="Completed">Completed</option>
-                                </select>
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    value="On Track"
+                                    readonly
+                                />
+                                <input type="hidden" name="status" value="On Track" />
                             </div>
 
                             <div class="projects-form-group">
                                 <label class="projects-form-label">Lead</label>
-                                <input type="text" class="projects-form-input" id="projectLead" name="lead" placeholder="Enter project lead" required />
+                                <input
+                                    type="text"
+                                    class="projects-form-input"
+                                    id="projectLead"
+                                    name="lead"
+                                    placeholder="Enter project lead"
+                                    value="{{ old('lead') }}"
+                                    required
+                                />
+                                @error('lead')
+                                    <p class="projects-form-error">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="projects-modal-footer">
@@ -606,124 +800,140 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Edit Project Modal -->
+                <div class="projects-modal" id="editProjectModal" aria-hidden="true">
+                    <div class="projects-modal-content" role="dialog" aria-modal="true">
+                        <div class="projects-modal-header">
+                            <div class="projects-modal-title">Edit Project Status</div>
+                            <button class="projects-modal-close" onclick="closeEditProjectModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="editProjectForm" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Project Name</label>
+                                <input type="text" class="projects-form-input" id="editProjectName" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Client Name</label>
+                                <input type="text" class="projects-form-input" id="editClientName" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Lead</label>
+                                <input type="text" class="projects-form-input" id="editProjectLead" readonly />
+                            </div>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Status</label>
+                                <select class="projects-form-select" id="editProjectStatus" name="status" required>
+                                    <option value="On Track">On Track</option>
+                                    <option value="In Review">In Review</option>
+                                    <option value="Mobilizing">Mobilizing</option>
+                                    <option value="On Hold">On Hold</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="projects-modal-footer">
+                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeEditProjectModal()">Cancel</button>
+                                <button type="submit" class="projects-btn projects-btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
 
     @include('partials.sidebar-js')
     <script>
-        // Modal functions
         const projectModal = document.getElementById('projectModal');
         const projectForm = document.getElementById('projectForm');
+        const editProjectModal = document.getElementById('editProjectModal');
+        const editProjectForm = document.getElementById('editProjectForm');
+        const editProjectName = document.getElementById('editProjectName');
+        const editClientName = document.getElementById('editClientName');
+        const editProjectLead = document.getElementById('editProjectLead');
+        const editProjectStatus = document.getElementById('editProjectStatus');
 
-        function openProjectModal() {
+        function openProjectModal(shouldReset = false) {
+            if (!projectModal) return;
+            if (shouldReset && projectForm) {
+                projectForm.reset();
+            }
             projectModal.classList.add('active');
             projectModal.setAttribute('aria-hidden', 'false');
-            projectForm.reset();
         }
 
         function closeProjectModal() {
+            if (!projectModal) return;
             projectModal.classList.remove('active');
             projectModal.setAttribute('aria-hidden', 'true');
-            projectForm.reset();
+            if (projectForm) {
+                projectForm.reset();
+            }
         }
 
-        // Handle form submission
-        projectForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+        function openEditProjectModal(buttonEl) {
+            const row = buttonEl.closest('tr');
+            if (!row) return;
+            const projectId = row.getAttribute('data-id');
+            const name = row.getAttribute('data-name') || '';
+            const client = row.getAttribute('data-client') || '';
+            const status = row.getAttribute('data-status') || '';
+            const lead = row.getAttribute('data-lead') || '';
 
-            const formData = {
-                project_name: document.getElementById('projectName').value,
-                client_name: document.getElementById('clientName').value,
-                status: document.getElementById('projectStatus').value,
-                lead: document.getElementById('projectLead').value,
-                _token: '{{ csrf_token() }}'
-            };
+            if (editProjectForm) {
+                editProjectForm.action = '{{ route('projects.update', ':id') }}'.replace(':id', projectId);
+            }
+            if (editProjectName) editProjectName.value = name;
+            if (editClientName) editClientName.value = client;
+            if (editProjectLead) editProjectLead.value = lead;
+            if (editProjectStatus) editProjectStatus.value = status;
 
-            // Show loading state
-            const submitBtn = projectForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
-            submitBtn.disabled = true;
+            if (editProjectModal) {
+                editProjectModal.classList.add('active');
+                editProjectModal.setAttribute('aria-hidden', 'false');
+            }
+        }
 
-            try {
-                // Here you would make an AJAX call to save the project
-                // For now, we'll just show a success message and add to table
-                console.log('Project data:', formData);
+        function closeEditProjectModal() {
+            if (!editProjectModal) return;
+            editProjectModal.classList.remove('active');
+            editProjectModal.setAttribute('aria-hidden', 'true');
+            if (editProjectForm) editProjectForm.reset();
+        }
 
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 500));
+        document.addEventListener('DOMContentLoaded', function () {
+            if (projectModal) {
+                projectModal.addEventListener('click', function (event) {
+                    if (event.target === projectModal) {
+                        closeProjectModal();
+                    }
+                });
+            }
+            if (editProjectModal) {
+                editProjectModal.addEventListener('click', function (event) {
+                    if (event.target === editProjectModal) {
+                        closeEditProjectModal();
+                    }
+                });
+            }
 
-                // Add to table
-                const tbody = document.getElementById('projectsTableBody');
-                const newRow = document.createElement('tr');
-                
-                // Get status badge class
-                let statusClass = 'info';
-                if (formData.status === 'On Track') statusClass = 'success';
-                else if (formData.status === 'In Review') statusClass = 'warning';
-                else if (formData.status === 'On Hold' || formData.status === 'Completed') statusClass = 'danger';
-
-                // Get status icon
-                let statusIcon = 'fas fa-bolt';
-                if (formData.status === 'On Track') statusIcon = 'fas fa-check';
-                else if (formData.status === 'In Review') statusIcon = 'fas fa-hourglass-half';
-                else if (formData.status === 'On Hold') statusIcon = 'fas fa-pause';
-                else if (formData.status === 'Completed') statusIcon = 'fas fa-check-circle';
-
-                newRow.innerHTML = `
-                    <td>${formData.project_name}</td>
-                    <td>${formData.client_name}</td>
-                    <td>
-                        <span class="status-badge ${statusClass}">
-                            <i class="${statusIcon}"></i>
-                            ${formData.status}
-                        </span>
-                    </td>
-                    <td>${formData.lead}</td>
-                    <td>Just now</td>
-                `;
-                tbody.insertBefore(newRow, tbody.firstChild);
-
-                showSuccess('Project added successfully!');
-                closeProjectModal();
-            } catch (error) {
-                console.error('Error:', error);
-                showError('An error occurred while saving the project.');
-            } finally {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+            const shouldShowModal = {{ $errors->any() ? 'true' : 'false' }};
+            if (shouldShowModal) {
+                openProjectModal(false);
             }
         });
-
-        // Close modal on outside click
-        if (projectModal) {
-            projectModal.addEventListener('click', (e) => {
-                if (e.target === projectModal) {
-                    closeProjectModal();
-                }
-            });
-        }
-
-        // Success message
-        function showSuccess(message) {
-            const alert = document.getElementById('successAlert');
-            alert.textContent = message;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
-        }
-
-        // Error message
-        function showError(message) {
-            const alert = document.getElementById('errorAlert');
-            alert.textContent = message;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
     </script>
 </body>
 

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\QaRecord;
+use App\Models\ProjectRecord;
 use App\Models\Material;
+use App\Models\Project;
 use Illuminate\Support\Facades\Schema;
 
 class QualityAssuranceController extends Controller
@@ -14,24 +15,80 @@ class QualityAssuranceController extends Controller
         $search = $request->query('search');
 
         // Fetch records with optional search filtering
-        $records = $search
-            ? QaRecord::where('title', 'like', "%$search%")
-                ->orWhere('client', 'like', "%$search%")
-                ->orWhere('inspector', 'like', "%$search%")
-                ->get()
-            : QaRecord::all();
+        $records = ProjectRecord::when($search, function ($query, $term) {
+                $query->where(function ($subQuery) use ($term) {
+                    $subQuery->where('title', 'like', "%{$term}%")
+                        ->orWhere('client', 'like', "%{$term}%")
+                        ->orWhere('inspector', 'like', "%{$term}%");
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
 
         // Fetch materials for the materials section
         $materials = Material::orderBy('created_at', 'desc')->get();
 
-        return view('project-material-management', compact('records', 'materials'));
+        $usedProjectIds = ProjectRecord::whereNotNull('project_id')->pluck('project_id')->all();
+        $usedProjectNames = ProjectRecord::whereNotNull('title')->pluck('title')->map(fn ($name) => trim($name))->filter()->unique()->values()->all();
+
+        $availableProjectsQuery = Project::query()->orderBy('project_name');
+
+        if (!empty($usedProjectIds)) {
+            $availableProjectsQuery->whereNotIn('id', $usedProjectIds);
+        }
+        if (!empty($usedProjectNames)) {
+            $availableProjectsQuery->whereNotIn('project_name', $usedProjectNames);
+        }
+
+        $availableProjects = $availableProjectsQuery->get();
+
+        $selectedProject = null;
+        if ($request->filled('project_id')) {
+            $selectedProject = Project::find($request->query('project_id'));
+            if ($selectedProject && $availableProjects->where('id', $selectedProject->id)->isEmpty()) {
+                $availableProjects->prepend($selectedProject);
+            }
+        }
+
+        $oldProjectId = old('project_id');
+        if ($oldProjectId && (!$selectedProject || (int) $selectedProject->id !== (int) $oldProjectId)) {
+            $oldProject = Project::find($oldProjectId);
+            if ($oldProject) {
+                $selectedProject = $oldProject;
+                if ($availableProjects->where('id', $oldProject->id)->isEmpty()) {
+                    $availableProjects->prepend($oldProject);
+                }
+            }
+        }
+
+        $selectedRecord = $selectedProject
+            ? ProjectRecord::where('project_id', $selectedProject->id)->first()
+            : null;
+
+        $hasValidationErrors = session()->has('errors') && session('errors')->isNotEmpty();
+        $shouldOpenModal = $request->boolean('open_modal')
+            || $request->filled('project_id')
+            || session('open_modal', false)
+            || $hasValidationErrors;
+
+        return view('project-material-management', [
+            'records' => $records,
+            'materials' => $materials,
+            'availableProjects' => $availableProjects,
+            'selectedProject' => $selectedProject,
+            'shouldOpenModal' => (bool) $shouldOpenModal,
+            'prefilledClientName' => optional($selectedProject)->client_name ?? optional($selectedRecord)->client,
+            'prefilledInspector' => optional($selectedProject)->lead ?? optional($selectedRecord)->inspector,
+            'selectedRecord' => $selectedRecord,
+        ]);
     }
 
-    public function show(QaRecord $qa_record)
+    public function show(ProjectRecord $project_record)
     {
         // Fetch materials for this specific QA record. If column not yet migrated, fall back to all.
-        if (Schema::hasColumn('materials', 'qa_record_id')) {
-            $materials = Material::where('qa_record_id', $qa_record->id)
+        if (Schema::hasColumn('materials', 'project_record_id')) {
+            $materials = Material::where('project_record_id', $project_record->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
@@ -39,14 +96,14 @@ class QualityAssuranceController extends Controller
         }
         
         return view('project-material-management-show', [
-            'record' => $qa_record,
+            'record' => $project_record,
             'materials' => $materials,
         ]);
     }
 
-    public function destroy(QaRecord $qa_record)
+    public function destroy(ProjectRecord $project_record)
     {
-        $qa_record->delete();
+        $project_record->delete();
 
         return redirect()->route('project-material-management')->with('success', 'Record deleted successfully.');
     }
@@ -54,16 +111,25 @@ class QualityAssuranceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'client' => 'required|string|max:255',
-            'inspector' => 'required|string|max:255',
+            'project_id' => 'required|exists:projects,id',
             'time' => 'required|string',
             'color' => 'required|string',
         ]);
 
-        QaRecord::create($validated);
+        $project = Project::findOrFail($validated['project_id']);
 
-        return redirect()->route('project-material-management')->with('success', 'Record created successfully.');
+        ProjectRecord::updateOrCreate(
+            ['project_id' => $project->id],
+            [
+                'title' => $project->project_name,
+                'client' => $project->client_name,
+                'inspector' => $project->lead,
+                'time' => $validated['time'],
+                'color' => $validated['color'],
+            ]
+        );
+
+        return redirect()->route('project-material-management')->with('success', 'Project material record saved successfully.');
     }
 
     // Materials management methods
@@ -71,7 +137,7 @@ class QualityAssuranceController extends Controller
     {
         try {
             $validated = $request->validate([
-                'qa_record_id' => 'required|exists:qa_records,id',
+                'project_record_id' => 'required|exists:project_records,id',
                 'name' => 'required|string|max:255',
                 'batch' => 'nullable|string|max:255',
                 'supplier' => 'nullable|string|max:255',
@@ -99,7 +165,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('project-material-management-show', $validated['qa_record_id'])->with('success', 'Material added successfully!');
+            return redirect()->route('project-material-management-show', $validated['project_record_id'])->with('success', 'Material added successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json([
@@ -126,7 +192,7 @@ class QualityAssuranceController extends Controller
             $material = Material::findOrFail($id);
             
             $validated = $request->validate([
-                'qa_record_id' => 'required|exists:qa_records,id',
+                'project_record_id' => 'required|exists:project_records,id',
                 'name' => 'required|string|max:255',
                 'batch' => 'nullable|string|max:255',
                 'supplier' => 'nullable|string|max:255',
@@ -149,7 +215,7 @@ class QualityAssuranceController extends Controller
                 ]);
             }
 
-            return redirect()->route('project-material-management-show', $validated['qa_record_id'])->with('success', 'Material updated successfully!');
+            return redirect()->route('project-material-management-show', $validated['project_record_id'])->with('success', 'Material updated successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json([

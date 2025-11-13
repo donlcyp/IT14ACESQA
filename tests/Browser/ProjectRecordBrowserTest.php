@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\QaRecord;
+use App\Models\ProjectRecord;
+use App\Models\Project;
 use App\Models\Material;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Material;
-use App\Models\QaRecord;
+use App\Models\ProjectRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MaterialFactory extends Factory
@@ -17,7 +17,7 @@ class MaterialFactory extends Factory
         $total = $quantity * $price;
 
         return [
-            'qa_record_id' => QaRecord::factory(),
+            'project_record_id' => ProjectRecord::factory(),
             'name' => $this->faker->word(),
             'batch' => $this->faker->optional()->word(),
             'supplier' => $this->faker->optional()->company(),

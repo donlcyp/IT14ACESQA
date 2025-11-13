@@ -64,8 +64,6 @@
             color: var(--gray-700);
         }
 
-        /* Sidebar has been moved to partials/sidebar.blade.php */
-
         /* Main Content Area */
         .main-content {
             flex: 1;
@@ -75,29 +73,17 @@
             width: 100%;
             transition: margin-left 0.3s ease;
         }
-        
-        /* When sidebar is hidden on desktop */
-        .main-content.sidebar-closed { 
-            margin-left: 0; 
+        .main-content.sidebar-closed {
+            margin-left: 0;
         }
-        
-        /* Desktop: Reserve space for sidebar */
         @media (min-width: 769px) {
-            .main-content { 
-                margin-left: 280px; 
-            }
-            .main-content.sidebar-closed { 
-                margin-left: 0; 
+            .main-content {
+                margin-left: 280px;
             }
         }
-        
-        /* Mobile: Sidebar overlays, no margin */
         @media (max-width: 768px) {
-            .main-content { 
-                margin-left: 0 !important; 
-            }
-            .main-content.sidebar-closed { 
-                margin-left: 0 !important; 
+            .main-content {
+                margin-left: 0 !important;
             }
         }
 
@@ -489,6 +475,88 @@
         }
         .qa-delete-banner.active { display: block; }
 
+        /* Pagination Bar */
+        /* Modern Pagination Styles */
+        .pagination-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 0;
+            user-select: none;
+        }
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .page-btn:active:not(.disabled):not(.ellipsis) {
+            transform: scale(0.95);
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .page-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .page-btn.arrow {
+            font-size: 20px;
+            font-weight: 400;
+        }
+        .page-btn.ellipsis {
+            cursor: default;
+            pointer-events: none;
+        }
+        .page-btn.ellipsis:hover {
+            background: transparent;
+        }
+        @media (max-width: 640px) {
+            .page-btn {
+                min-width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .page-btn.arrow {
+                font-size: 18px;
+            }
+        }
+
         /* Modal Styles */
         .qa-modal {
             display: none;
@@ -580,6 +648,19 @@
         }
 
         .qa-modal-field input:focus {
+            outline: none;
+        }
+
+        .qa-modal-field select {
+            border: none;
+            background: transparent;
+            flex: 1;
+            font-family: var(--text-md-normal-font-family);
+            font-size: var(--text-sm-medium-font-size);
+            color: #313131;
+        }
+
+        .qa-modal-field select:focus {
             outline: none;
         }
 
@@ -685,7 +766,6 @@
 <body>
     <div class="dashboard-container">
         @include('partials.sidebar')
-
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
             <!-- Header -->
@@ -711,12 +791,12 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </div>
                         </button>
-                        <form action="{{ route('project-material-management') }}" method="GET" class="qa-search-form">
+                        <form class="qa-search-form">
                             <div class="qa-search-input">
                                 <div class="qa-search-content">
                                     <i class="qa-search-icon fas fa-search"></i>
                                     <input class="qa-search-field" name="search" placeholder="Search" type="search"
-                                        aria-label="Search quality assurance records" value="{{ request('search') }}" />
+                                        aria-label="Search quality assurance records" />
                                 </div>
                             </div>
                         </form>
@@ -729,25 +809,12 @@
                     </div>
                 </div>
 
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <!-- New & Delete Buttons at Top -->
+                <!-- Actions -->
                 <div class="qa-buttons-container">
-                    <button class="qa-new-button" onclick="document.querySelector('.qa-modal').classList.add('active')"
-                        aria-label="Add new record">
-                        <i class="qa-new-icon fas fa-plus"></i>
-                        <span class="qa-new-text">New</span>
+                    <button class="qa-danger-button" id="qaDeleteToggle" aria-label="Toggle delete mode">
+                        <i class="fas fa-trash"></i>
+                        <span class="qa-new-text">Delete</span>
                     </button>
-                    @if(($records ?? collect())->count() > 0)
-                        <button class="qa-danger-button" id="qaDeleteToggle" aria-label="Toggle delete mode">
-                            <i class="fas fa-trash"></i>
-                            <span class="qa-new-text">Delete</span>
-                        </button>
-                    @endif
                 </div>
 
                 <div id="qaDeleteBanner" class="qa-delete-banner">
@@ -756,188 +823,112 @@
 
                 <!-- QA List View -->
                 <div class="qa-list-container" aria-label="Quality assurance records">
-                    @forelse($records as $index => $record)
-                        @if ($index === 0)
-                            <div class="qa-list">
-                                <div class="qa-list-header">
-                                    <div></div>
-                                    <div>Project Name</div>
-                                    <div>Client Name</div>
-                                    <div>Inspector</div>
-                                    <div>Time</div>
-                                    <div></div>
-                                </div>
-                        @endif
-                                <div class="qa-list-row" data-title="{{ $record->title }}" data-id="{{ $record->id }}" style="cursor: pointer;">
-                                    <div class="qa-color-indicator" data-color="{{ $record->color ?? '#520d0d' }}"></div>
-                                    <div class="qa-list-cell title">{{ $record->title }}</div>
-                                    <div class="qa-list-cell">{{ $record->client }}</div>
-                                    <div class="qa-list-cell">{{ $record->inspector }}</div>
-                                    <div class="qa-list-cell time">{{ $record->time }}</div>
-                                    <div style="display: flex; justify-content: center;">
-                                        <button type="button" class="qa-view-button" data-view-id="{{ $record->id }}" aria-label="View project details">
-                                            <i class="fas fa-eye"></i>
-                                            <span>View</span>
-                                        </button>
-                                    </div>
-                                    <form action="{{ route('project-material-management.destroy', $record->id) }}" method="POST" style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                </div>
-                        @if ($loop->last)
-                            </div>
-                        @endif
-                    @empty
-                        <div style="color:#6b7280; font-family: var(--text-md-normal-font-family); padding: 20px;">No projects yet. Click New to add your first project.</div>
-                    @endforelse
-                </div>
-
-
-                <!-- QA Modal -->
-                <div class="qa-modal">
-                    <div class="qa-modal-content">
-                        <div class="qa-modal-icon"></div>
-                        <h2 class="qa-modal-title">Add Project Material Record</h2>
-                        <form action="{{ route('project-material-management.store') }}" method="POST">
-                            @csrf
-                            <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="project-name">Project Name</label>
-                                <div class="qa-modal-field">
-                                    <input type="text" id="project-name" name="title" placeholder="Enter Project Name"
-                                        required />
-                                </div>
-                                @error('title')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="client-name">Client Name</label>
-                                <div class="qa-modal-field">
-                                    <input type="text" id="client-name" name="client" placeholder="Enter Client Name"
-                                        required />
-                                </div>
-                                @error('client')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="inspector-name">Inspector Name</label>
-                                <div class="qa-modal-field">
-                                    <input type="text" id="inspector-name" name="inspector"
-                                        placeholder="Enter Inspector Name" required />
-                                </div>
-                                @error('inspector')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="time">Time</label>
-                                <div class="qa-modal-field">
-                                    <input type="time" id="time" name="time" readonly />
-                                </div>
-                                @error('time')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="color">Color</label>
-                                <div class="qa-modal-field">
-                                    <input type="color" id="color" name="color" readonly />
-                                </div>
-                                @error('color')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="qa-modal-buttons">
-                                <button type="button" class="qa-modal-button"
-                                    onclick="document.querySelector('.qa-modal').classList.remove('active')">
-                                    <span class="qa-modal-button-text">Cancel</span>
-                                </button>
-                                <button type="submit" class="qa-modal-button primary">
-                                    <span class="qa-modal-button-text">Add</span>
+                    <div class="qa-list">
+                        <div class="qa-list-header">
+                            <div></div>
+                            <div>Project Name</div>
+                            <div>Client Name</div>
+                            <div>Inspector</div>
+                            <div>Time</div>
+                            <div></div>
+                        </div>
+                        
+                        @forelse($records as $record)
+                        <div class="qa-list-row" data-title="{{ $record->title }}" data-id="{{ $record->id }}">
+                            <div class="qa-color-indicator" data-color="{{ $record->color ?? '#520d0d' }}"></div>
+                            <div class="qa-list-cell title">{{ $record->title }}</div>
+                            <div class="qa-list-cell">{{ $record->client }}</div>
+                            <div class="qa-list-cell">{{ $record->inspector }}</div>
+                            <div class="qa-list-cell time">{{ $record->time }}</div>
+                            <div style="display: flex; justify-content: center;">
+                                <button type="button" class="qa-view-button" data-view-id="{{ $record->id }}" aria-label="View project details">
+                                    <i class="fas fa-eye"></i>
+                                    <span>View</span>
                                 </button>
                             </div>
-                        </form>
+                            <form action="{{ route('project-material-management.destroy', $record->id) }}" method="POST" style="display: none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                        </div>
+                        @empty
+                        <div style="color:#6b7280; font-family: var(--text-md-normal-font-family); padding: 20px;">No project records yet. Create a project from the Projects page to get started.</div>
+                        @endforelse
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                @if($records instanceof \Illuminate\Pagination\LengthAwarePaginator && $records->hasPages())
+                    @php
+                        $currentPage = $records->currentPage();
+                        $lastPage = $records->lastPage();
+                        $pageNumbers = [];
+
+                        if ($lastPage <= 7) {
+                            for ($i = 1; $i <= $lastPage; $i++) {
+                                $pageNumbers[] = $i;
+                            }
+                        } else {
+                            $pageNumbers[] = 1;
+                            if ($currentPage > 3) {
+                                $pageNumbers[] = '...';
+                            }
+                            $start = max(2, $currentPage - 1);
+                            $end = min($lastPage - 1, $currentPage + 1);
+                            for ($i = $start; $i <= $end; $i++) {
+                                $pageNumbers[] = $i;
+                            }
+                            if ($currentPage < $lastPage - 2) {
+                                $pageNumbers[] = '...';
+                            }
+                            $pageNumbers[] = $lastPage;
+                        }
+                    @endphp
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            Showing {{ $records->firstItem() }} to {{ $records->lastItem() }}
+                            of {{ $records->total() }} results
+                        </div>
+                        <div class="pagination-controls">
+                            @if ($records->onFirstPage())
+                                <span class="page-btn arrow disabled">‹</span>
+                            @else
+                                <a class="page-btn arrow" href="{{ $records->previousPageUrl() }}" rel="prev">‹</a>
+                            @endif
+
+                            <div class="pagination-nav">
+                                @foreach ($pageNumbers as $page)
+                                    @if ($page === '...')
+                                        <span class="page-btn ellipsis">…</span>
+                                    @elseif ($page == $currentPage)
+                                        <span class="page-btn active">{{ $page }}</span>
+                                    @else
+                                        <a class="page-btn" href="{{ $records->url($page) }}">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+                            </div>
+
+                            @if ($records->hasMorePages())
+                                <a class="page-btn arrow" href="{{ $records->nextPageUrl() }}" rel="next">›</a>
+                            @else
+                                <span class="page-btn arrow disabled">›</span>
+                            @endif
+                        </div>
+                    </div>
+                @endif
 
             </section>
         </main>
     </div>
 
     @include('partials.sidebar-js')
+
     <script>
         // Set background colors for qa-color-indicator elements
         document.querySelectorAll('.qa-color-indicator').forEach(element => {
             const color = element.getAttribute('data-color');
             if (color) {
                 element.style.backgroundColor = color;
-            }
-        });
-
-        // Generate random color
-        function generateRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-
-        // Get current time in HH:MM format
-        function getCurrentTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${hours}:${minutes}`;
-        }
-
-        // Initialize modal with auto-set values
-        const modal = document.querySelector('.qa-modal');
-        const timeInput = document.getElementById('time');
-        const colorInput = document.getElementById('color');
-
-        // Set time and color when modal opens
-        modal.addEventListener('click', function(e) {
-            // Check if modal is being opened (by checking if active class is being added)
-            if (e.target === this && !this.classList.contains('active')) {
-                return; // Modal is closing
-            }
-        });
-
-        // Override the modal open button to set values
-        const newButton = document.querySelector('.qa-new-button');
-        if (newButton) {
-            newButton.addEventListener('click', function() {
-                timeInput.value = getCurrentTime();
-                colorInput.value = generateRandomColor();
-                modal.classList.add('active');
-            });
-        }
-
-        // Also set values when form is reset or modal is shown
-        const form = document.querySelector('.qa-modal-content form');
-        if (form) {
-            form.addEventListener('reset', function() {
-                setTimeout(() => {
-                    timeInput.value = getCurrentTime();
-                    colorInput.value = generateRandomColor();
-                }, 0);
-            });
-        }
-
-        // Set initial values on page load
-        window.addEventListener('load', function() {
-            timeInput.value = getCurrentTime();
-            colorInput.value = generateRandomColor();
-        });
-
-        // Modal functionality
-        document.querySelector('.qa-modal').addEventListener('click', function (e) {
-            if (e.target === this) {
-                this.classList.remove('active');
             }
         });
 
@@ -960,7 +951,9 @@
                     row.removeEventListener('click', onRowDeleteClick);
                     row.classList.remove('delete-hover');
                     // default click goes to details
-                    row.onclick = function () { window.location = showRoute.replace(':id', row.dataset.id); };
+                    row.onclick = function () { 
+                        window.location = showRoute.replace(':id', row.dataset.id);
+                    };
                 }
             });
         }
@@ -974,7 +967,6 @@
             if (ok) {
                 const form = row.querySelector('form');
                 if (form) {
-                    // Submit the form and keep user on the same page
                     form.submit();
                 }
             }
@@ -1004,7 +996,6 @@
                 window.location = showRoute.replace(':id', recordId);
             });
         });
-
     </script>
 </body>
 

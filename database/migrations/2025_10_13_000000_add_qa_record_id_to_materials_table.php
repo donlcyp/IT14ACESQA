@@ -8,11 +8,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('materials', function (Blueprint $table) {
-            if (!Schema::hasColumn('materials', 'qa_record_id')) {
-                $table->foreignId('qa_record_id')
+            if (!Schema::hasColumn('materials', 'project_record_id')) {
+                $table->foreignId('project_record_id')
                     ->nullable()
                     ->after('id')
-                    ->constrained('qa_records')
+                    ->constrained('project_records')
                     ->cascadeOnDelete();
             }
         });
@@ -21,9 +21,9 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('materials', function (Blueprint $table) {
-            if (Schema::hasColumn('materials', 'qa_record_id')) {
-                $table->dropForeign(['qa_record_id']);
-                $table->dropColumn('qa_record_id');
+            if (Schema::hasColumn('materials', 'project_record_id')) {
+                $table->dropForeign(['project_record_id']);
+                $table->dropColumn('project_record_id');
             }
         });
     }

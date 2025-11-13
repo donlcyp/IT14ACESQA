@@ -1,46 +1,53 @@
 <script>
-// Unified Sidebar toggle
-(function() {
-    const headerMenu = document.getElementById('headerMenu');
+// Unified Sidebar toggle behavior
+document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
-    const STORAGE_KEY = 'sidebarOpen';
+    if (!sidebar) {
+        return;
+    }
 
-    function applyState(open, persist = false) {
-        if (!sidebar) return;
+    const headerMenu = document.getElementById('headerMenu');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const toggleButtons = [headerMenu, sidebarToggle].filter(Boolean);
+    const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
+    const navLinks = sidebar.querySelectorAll('.nav-menu a');
+
+    function applyState(open) {
         if (open) {
             sidebar.classList.add('open');
-            if (mainContent) mainContent.classList.remove('sidebar-closed');
+            if (mainContent) {
+                mainContent.classList.remove('sidebar-closed');
+            }
         } else {
             sidebar.classList.remove('open');
-            if (mainContent) mainContent.classList.add('sidebar-closed');
-        }
-        if (persist) {
-            try { localStorage.setItem(STORAGE_KEY, open ? '1' : '0'); } catch (e) {}
+            if (mainContent) {
+                mainContent.classList.add('sidebar-closed');
+            }
         }
     }
 
-    // Initial state: restore from storage; default to open on desktop-only app
-    let open = true;
-    try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved === '0') open = false;
-        if (saved === '1') open = true;
-    } catch (e) {}
-    applyState(open, false);
+    // Start closed by default (especially after login)
+    applyState(false);
 
-    if (headerMenu) {
-        headerMenu.addEventListener('click', function(){
-            const next = !sidebar.classList.contains('open');
-            applyState(next, true);
+    toggleButtons.forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            if (button.tagName === 'A') {
+                event.preventDefault();
+            }
+            const isOpen = sidebar.classList.contains('open');
+            applyState(!isOpen);
         });
-    }
-
-    window.addEventListener('resize', function(){
-        // Maintain current state when resizing, just re-apply to adjust classes correctly per breakpoint
-        if (!sidebar) return;
-        const isCurrentlyOpen = sidebar.classList.contains('open');
-        applyState(isCurrentlyOpen, false);
     });
-})();
+
+    navLinks.forEach(function (link) {
+        link.addEventListener('click', function () {
+            applyState(false);
+        });
+    });
+
+    window.addEventListener('resize', function () {
+        const isOpen = sidebar.classList.contains('open');
+        applyState(isOpen);
+    });
+});
 </script>

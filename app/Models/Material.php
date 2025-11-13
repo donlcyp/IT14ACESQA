@@ -10,7 +10,7 @@ class Material extends Model
     use HasFactory;
 
     protected $fillable = [
-        'qa_record_id',
+        'project_record_id',
         'name',
         'batch',
         'supplier',
@@ -24,8 +24,8 @@ class Material extends Model
         'location',
     ];
 
-    public function qaRecord()
+    public function projectRecord()
     {
-        return $this->belongsTo(QaRecord::class);
+        return $this->belongsTo(ProjectRecord::class);
     }
 }

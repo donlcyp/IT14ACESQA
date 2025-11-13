@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\QaRecord;
+use App\Models\Project;
+use App\Models\ProjectRecord;
 use App\Models\Material;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
         
         // Clear existing data (order matters due to foreign keys)
         DB::table('materials')->truncate();
-        DB::table('qa_records')->truncate();
+        DB::table('project_records')->truncate();
         DB::table('projects')->truncate();
         DB::table('users')->truncate();
         
@@ -67,8 +68,8 @@ class DatabaseSeeder extends Seeder
             User::create($user);
         }
 
-        // Seed QA Records
-        $qaRecords = [
+        // Seed Project Records and related Projects
+        $recordDefinitions = [
             [
                 'title' => 'Assumption School',
                 'client' => 'Mrs. Maria Lopez',
@@ -127,16 +128,30 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
-        $createdQaRecords = [];
-        foreach ($qaRecords as $qaRecord) {
-            $createdQaRecords[] = QaRecord::create($qaRecord);
+        $createdProjectRecords = [];
+        foreach ($recordDefinitions as $definition) {
+            $project = Project::create([
+                'project_name' => $definition['title'],
+                'client_name' => $definition['client'],
+                'status' => 'On Track',
+                'lead' => $definition['inspector'],
+            ]);
+
+            $createdProjectRecords[] = ProjectRecord::create([
+                'project_id' => $project->id,
+                'title' => $definition['title'],
+                'client' => $definition['client'],
+                'inspector' => $definition['inspector'],
+                'time' => $definition['time'],
+                'color' => $definition['color'],
+            ]);
         }
 
         // Seed Materials linked to QA Records
         $materials = [
             // Materials for Assumption School (QA Record 1)
             [
-                'qa_record_id' => $createdQaRecords[0]->id,
+                'project_record_id' => $createdProjectRecords[0]->id,
                 'name' => 'Steel Beams',
                 'batch' => 'SB-2024-001',
                 'supplier' => 'Metro Steel Corp',
@@ -150,7 +165,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Warehouse A - Section 1',
             ],
             [
-                'qa_record_id' => $createdQaRecords[0]->id,
+                'project_record_id' => $createdProjectRecords[0]->id,
                 'name' => 'Concrete Mix',
                 'batch' => 'CM-2024-002',
                 'supplier' => 'BuildRight Materials',
@@ -164,7 +179,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Storage Yard B',
             ],
             [
-                'qa_record_id' => $createdQaRecords[0]->id,
+                'project_record_id' => $createdProjectRecords[0]->id,
                 'name' => 'Electrical Cables',
                 'batch' => 'EC-2024-003',
                 'supplier' => 'PowerTech Solutions',
@@ -179,7 +194,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for Dr. A.P Medical Center (QA Record 2)
             [
-                'qa_record_id' => $createdQaRecords[1]->id,
+                'project_record_id' => $createdProjectRecords[1]->id,
                 'name' => 'PVC Pipes',
                 'batch' => 'PP-2024-004',
                 'supplier' => 'PlumbMaster Inc',
@@ -193,7 +208,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Plumbing Storage',
             ],
             [
-                'qa_record_id' => $createdQaRecords[1]->id,
+                'project_record_id' => $createdProjectRecords[1]->id,
                 'name' => 'Insulation Material',
                 'batch' => 'IM-2024-005',
                 'supplier' => 'ThermoGuard Ltd',
@@ -207,7 +222,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Construction Site - Building 1',
             ],
             [
-                'qa_record_id' => $createdQaRecords[1]->id,
+                'project_record_id' => $createdProjectRecords[1]->id,
                 'name' => 'Reinforcement Bars',
                 'batch' => 'RB-2024-006',
                 'supplier' => 'SteelWorks Industries',
@@ -222,7 +237,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for First Pacific Inn (QA Record 3)
             [
-                'qa_record_id' => $createdQaRecords[2]->id,
+                'project_record_id' => $createdProjectRecords[2]->id,
                 'name' => 'Roofing Tiles',
                 'batch' => 'RT-2024-007',
                 'supplier' => 'RoofPro Materials',
@@ -236,7 +251,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Roofing Storage Area',
             ],
             [
-                'qa_record_id' => $createdQaRecords[2]->id,
+                'project_record_id' => $createdProjectRecords[2]->id,
                 'name' => 'Floor Tiles',
                 'batch' => 'FT-2024-008',
                 'supplier' => 'TileMaster Corp',
@@ -250,7 +265,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Interior Materials Storage',
             ],
             [
-                'qa_record_id' => $createdQaRecords[2]->id,
+                'project_record_id' => $createdProjectRecords[2]->id,
                 'name' => 'Paint',
                 'batch' => 'PT-2024-009',
                 'supplier' => 'ColorMax Paints',
@@ -265,7 +280,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for Metro Shopping Complex (QA Record 4)
             [
-                'qa_record_id' => $createdQaRecords[3]->id,
+                'project_record_id' => $createdProjectRecords[3]->id,
                 'name' => 'Glass Panels',
                 'batch' => 'GP-2024-010',
                 'supplier' => 'ClearView Glass',
@@ -279,7 +294,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Glass Storage Facility',
             ],
             [
-                'qa_record_id' => $createdQaRecords[3]->id,
+                'project_record_id' => $createdProjectRecords[3]->id,
                 'name' => 'Aluminum Frames',
                 'batch' => 'AF-2024-011',
                 'supplier' => 'MetalFrame Solutions',
@@ -294,7 +309,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for Green Valley Residential (QA Record 5)
             [
-                'qa_record_id' => $createdQaRecords[4]->id,
+                'project_record_id' => $createdProjectRecords[4]->id,
                 'name' => 'Wooden Doors',
                 'batch' => 'WD-2024-012',
                 'supplier' => 'TimberCraft Doors',
@@ -308,7 +323,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Door Storage Warehouse',
             ],
             [
-                'qa_record_id' => $createdQaRecords[4]->id,
+                'project_record_id' => $createdProjectRecords[4]->id,
                 'name' => 'Window Frames',
                 'batch' => 'WF-2024-013',
                 'supplier' => 'WindowPro Inc',
@@ -323,7 +338,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for Tech Park Office Building (QA Record 6)
             [
-                'qa_record_id' => $createdQaRecords[5]->id,
+                'project_record_id' => $createdProjectRecords[5]->id,
                 'name' => 'HVAC Units',
                 'batch' => 'HV-2024-014',
                 'supplier' => 'ClimateControl Systems',
@@ -337,7 +352,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'HVAC Storage Facility',
             ],
             [
-                'qa_record_id' => $createdQaRecords[5]->id,
+                'project_record_id' => $createdProjectRecords[5]->id,
                 'name' => 'Fire Safety Equipment',
                 'batch' => 'FS-2024-015',
                 'supplier' => 'SafeGuard Fire Systems',
@@ -352,7 +367,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for Coastal Bridge Project (QA Record 7)
             [
-                'qa_record_id' => $createdQaRecords[6]->id,
+                'project_record_id' => $createdProjectRecords[6]->id,
                 'name' => 'Pre-stressed Concrete Beams',
                 'batch' => 'PCB-2024-016',
                 'supplier' => 'BridgeWorks Materials',
@@ -366,7 +381,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Bridge Construction Site',
             ],
             [
-                'qa_record_id' => $createdQaRecords[6]->id,
+                'project_record_id' => $createdProjectRecords[6]->id,
                 'name' => 'Steel Cables',
                 'batch' => 'SC-2024-017',
                 'supplier' => 'CableTech Industries',
@@ -381,7 +396,7 @@ class DatabaseSeeder extends Seeder
             ],
             // Materials for University Science Lab (QA Record 8)
             [
-                'qa_record_id' => $createdQaRecords[7]->id,
+                'project_record_id' => $createdProjectRecords[7]->id,
                 'name' => 'Laboratory Equipment',
                 'batch' => 'LE-2024-018',
                 'supplier' => 'LabTech Supplies',
@@ -395,7 +410,7 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Lab Equipment Storage',
             ],
             [
-                'qa_record_id' => $createdQaRecords[7]->id,
+                'project_record_id' => $createdProjectRecords[7]->id,
                 'name' => 'Specialized Ventilation',
                 'batch' => 'SV-2024-019',
                 'supplier' => 'AirFlow Systems',
@@ -414,24 +429,10 @@ class DatabaseSeeder extends Seeder
             Material::create($material);
         }
 
-        // Seed Projects (basic data since table structure is minimal)
-        $projects = [
-            ['created_at' => now()->subDays(10), 'updated_at' => now()->subDays(10)],
-            ['created_at' => now()->subDays(8), 'updated_at' => now()->subDays(8)],
-            ['created_at' => now()->subDays(5), 'updated_at' => now()->subDays(5)],
-            ['created_at' => now()->subDays(3), 'updated_at' => now()->subDays(3)],
-            ['created_at' => now()->subDays(1), 'updated_at' => now()->subDays(1)],
-            ['created_at' => now(), 'updated_at' => now()],
-        ];
-
-        foreach ($projects as $project) {
-            DB::table('projects')->insert($project);
-        }
-
         $this->command->info('Database seeded successfully!');
         $this->command->info('Created: ' . count($users) . ' users');
-        $this->command->info('Created: ' . count($qaRecords) . ' QA records');
+        $this->command->info('Created: ' . count($recordDefinitions) . ' project records');
         $this->command->info('Created: ' . count($materials) . ' materials');
-        $this->command->info('Created: ' . count($projects) . ' projects');
+        $this->command->info('Created: ' . count($recordDefinitions) . ' projects');
     }
 }

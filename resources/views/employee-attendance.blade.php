@@ -501,6 +501,230 @@
                 white-space: nowrap;
             }
         }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--black-1);
+        }
+        .page-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .search-box {
+            position: relative;
+            width: 280px;
+            max-width: 40vw;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
+            box-shadow: var(--shadow-xs);
+            outline: none;
+        }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: var(--shadow-md);
+        }
+        .stat-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #ffffff;
+        }
+        .stat-text p {
+            margin: 0;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--black-1);
+        }
+        .stat-total .stat-icon { background: #3b82f6; }
+        .stat-onsite .stat-icon { background: #16a34a; }
+        .stat-absent .stat-icon { background: #ef4444; }
+        .stat-leave .stat-icon { background: #f97316; }
+
+        /* Actions */
+        .actions-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            background: #ffffff;
+            color: #111827;
+            cursor: pointer;
+            box-shadow: var(--shadow-xs);
+            font-weight: 500;
+        }
+        .btn:hover { filter: brightness(0.97); }
+        .btn-outline {
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+        }
+        .btn-green {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .btn-green:hover { filter: brightness(0.93); }
+        .btn-red {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        /* Table */
+        .table-card {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .attendance-table thead {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .attendance-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .attendance-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--black-1);
+            font-size: 14px;
+        }
+        .attendance-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .attendance-input {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #ffffff;
+            font-size: 14px;
+        }
+        .attendance-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .attendance-actions .btn-save {
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: var(--shadow-xs);
+        }
+        .attendance-actions .btn-save:hover {
+            filter: brightness(0.93);
+        }
+
+        /* Badge Styles */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-on-site {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-on-leave {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status-absent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .page-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .search-box { width: 100%; }
+            .actions-row {
+                flex-wrap: wrap;
+            }
+            .attendance-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
     </style>
 </head>
 
@@ -520,26 +744,62 @@
 
             <!-- Content Area -->
             <section class="content-area">
-                <div class="employee-header">
-                    <h1 class="employee-title">Employee Attendance</h1>
-                    <div class="toolbar">
-                        <button class="btn" title="Options"><i class="fas fa-ellipsis-v"></i></button>
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+
+                <div class="page-header">
+                    <h1 class="page-title">Employee Attendance</h1>
+                    <div class="page-controls">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" placeholder="Search" />
                         </div>
-                        <button class="btn" title="Filters"><i class="fas fa-filter"></i> Filters</button>
+                        <button class="btn btn-outline"><i class="fas fa-filter"></i> Filters</button>
                     </div>
                 </div>
 
-                <div class="action-row">
-                    <button class="btn btn-primary"><i class="fas fa-plus"></i> New</button>
-                    <button class="btn btn-primary"><i class="fas fa-pen"></i> Update</button>
-                    <button class="btn btn-primary"><i class="fas fa-trash"></i> Delete</button>
+                <div class="stats-grid">
+                    <div class="stat-card stat-total">
+                        <div class="stat-left">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-text">
+                                <p>Total Employees</p>
+                            </div>
+                        </div>
+                        <span class="stat-value">{{ $stats['total'] }}</span>
+                    </div>
+                    <div class="stat-card stat-onsite">
+                        <div class="stat-left">
+                            <div class="stat-icon"><i class="fas fa-check"></i></div>
+                            <div class="stat-text">
+                                <p>On Site</p>
+                            </div>
+                        </div>
+                        <span class="stat-value">{{ $stats['on_site'] }}</span>
+                    </div>
+                    <div class="stat-card stat-absent">
+                        <div class="stat-left">
+                            <div class="stat-icon"><i class="fas fa-user-times"></i></div>
+                            <div class="stat-text">
+                                <p>Absent</p>
+                            </div>
+                        </div>
+                        <span class="stat-value">{{ $stats['absent'] }}</span>
+                    </div>
+                    <div class="stat-card stat-leave">
+                        <div class="stat-left">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <div class="stat-text">
+                                <p>On Leave</p>
+                            </div>
+                        </div>
+                        <span class="stat-value">{{ $stats['on_leave'] }}</span>
+                    </div>
                 </div>
 
-                <div class="employee-card">
-                    <table class="employee-table employees">
+                <div class="table-card">
+                    <table class="attendance-table">
                         <thead>
                             <tr>
                                 <th>Employee ID</th>
@@ -550,47 +810,85 @@
                                 <th>Date</th>
                                 <th>Time In</th>
                                 <th>Time Out</th>
+                                <th>Update</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>EMP003</td>
-                                <td>John</td>
-                                <td>Doe</td>
-                                <td>Project Manager</td>
-                                <td><span class="status-badge on-leave">On Leave</span></td>
-                                <td>2025-09-26</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>EMP002</td>
-                                <td>Mari</td>
-                                <td>Lou</td>
-                                <td>Construction Worker</td>
-                                <td><span class="status-badge on-site">On Site</span></td>
-                                <td>2025-09-26</td>
-                                <td>7:26 AM PST</td>
-                                <td>10:30 PM PST</td>
-                            </tr>
-                            <tr>
-                                <td>EMP001</td>
-                                <td>Paul</td>
-                                <td>Tan</td>
-                                <td>Quality Inspector</td>
-                                <td><span class="status-badge absent">Absent</span></td>
-                                <td>2025-09-26</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
+                            @forelse ($employees as $employee)
+                                @php
+                                    $statusClass = match ($employee->status) {
+                                        'On Site' => 'status-on-site',
+                                        'On Leave' => 'status-on-leave',
+                                        'Absent' => 'status-absent',
+                                        default => 'status-on-site',
+                                    };
+                                    $formId = 'attendance-form-' . $employee->id;
+                                @endphp
+                                <tr>
+                                    <td>{{ $employee->employee_code }}</td>
+                                    <td>{{ $employee->first_name }}</td>
+                                    <td>{{ $employee->last_name }}</td>
+                                    <td>{{ $employee->position ?? '—' }}</td>
+                                    <td>
+                                        <select name="status" form="{{ $formId }}" class="attendance-input">
+                                            <option value="On Site" @selected($employee->status === 'On Site')>On Site</option>
+                                            <option value="On Leave" @selected($employee->status === 'On Leave')>On Leave</option>
+                                            <option value="Absent" @selected($employee->status === 'Absent')>Absent</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="date"
+                                            name="attendance_date"
+                                            form="{{ $formId }}"
+                                            class="attendance-input"
+                                            value="{{ optional($employee->attendance_date)->format('Y-m-d') }}"
+                                        >
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="time"
+                                            name="time_in"
+                                            form="{{ $formId }}"
+                                            class="attendance-input"
+                                            value="{{ optional($employee->time_in)->format('H:i') }}"
+                                        >
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="time"
+                                            name="time_out"
+                                            form="{{ $formId }}"
+                                            class="attendance-input"
+                                            value="{{ optional($employee->time_out)->format('H:i') }}"
+                                        >
+                                    </td>
+                                    <td>
+                                        <div class="attendance-actions">
+                                            <button type="submit" form="{{ $formId }}" class="btn-save">
+                                                <i class="fas fa-save"></i> Save
+                                            </button>
+                                            <span class="status-badge {{ $statusClass }}">{{ $employee->status }}</span>
+                                        </div>
+                                        <form id="{{ $formId }}" action="{{ route('employee-attendance.update', $employee) }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" style="text-align:center; padding: 24px; color: #6b7280;">No attendance records yet. Add employees from the Employees page to get started.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                </section>
-            </main>
-        </div>
 
-        @include('partials.sidebar-js')
-    </body>
+            </section>
+        </main>
+    </div>
 
-    </html>
+    @include('partials.sidebar-js')
+</body>
+
+</html>

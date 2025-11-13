@@ -1,28 +1,41 @@
 <?php
 
-use App\Models\QaRecord;
+use App\Models\Project;
+use App\Models\ProjectRecord;
 use App\Models\Material;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('can create a qa record', function () {
+it('can create or update a project record', function () {
+    $project = Project::create([
+        'project_name' => 'Test Project',
+        'client_name' => 'Test Client',
+        'status' => 'On Track',
+        'lead' => 'Test Inspector',
+    ]);
+
     $data = [
-        'title' => 'Test Project',
-        'client' => 'Test Client',
-        'inspector' => 'Test Inspector',
         'time' => '10:00',
         'color' => '#ff0000',
+        'project_id' => $project->id,
     ];
 
     $response = $this->post(route('project-material-management.store'), $data);
 
     $response->assertRedirect(route('project-material-management'));
-    $this->assertDatabaseHas('qa_records', $data);
+    $this->assertDatabaseHas('project_records', [
+        'project_id' => $project->id,
+        'title' => 'Test Project',
+        'client' => 'Test Client',
+        'inspector' => 'Test Inspector',
+        'time' => '10:00',
+        'color' => '#ff0000',
+    ]);
 });
 
-it('can view qa records list', function () {
-    QaRecord::factory()->count(3)->create();
+it('can view project records list', function () {
+    ProjectRecord::factory()->count(3)->create();
 
     $response = $this->get(route('project-material-management'));
 
@@ -31,31 +44,31 @@ it('can view qa records list', function () {
     $response->assertViewHas('materials');
 });
 
-it('can view qa record details with materials', function () {
-    $qaRecord = QaRecord::factory()->create();
-    Material::factory()->count(2)->create(['qa_record_id' => $qaRecord->id]);
+it('can view project record details with materials', function () {
+    $projectRecord = ProjectRecord::factory()->create();
+    Material::factory()->count(2)->create(['project_record_id' => $projectRecord->id]);
 
-    $response = $this->get(route('project-material-management-show', $qaRecord));
+    $response = $this->get(route('project-material-management-show', $projectRecord));
 
     $response->assertStatus(200);
-    $response->assertViewHas('record', $qaRecord);
+    $response->assertViewHas('record', $projectRecord);
     $response->assertViewHas('materials');
 });
 
-it('can delete a qa record', function () {
-    $qaRecord = QaRecord::factory()->create();
+it('can delete a project record', function () {
+    $projectRecord = ProjectRecord::factory()->create();
 
-    $response = $this->delete(route('project-material-management.destroy', $qaRecord));
+    $response = $this->delete(route('project-material-management.destroy', $projectRecord));
 
     $response->assertRedirect(route('project-material-management'));
-    $this->assertDatabaseMissing('qa_records', ['id' => $qaRecord->id]);
+    $this->assertDatabaseMissing('project_records', ['id' => $projectRecord->id]);
 });
 
-it('can create a material for qa record', function () {
-    $qaRecord = QaRecord::factory()->create();
+it('can create a material for a project record', function () {
+    $projectRecord = ProjectRecord::factory()->create();
 
     $data = [
-        'qa_record_id' => $qaRecord->id,
+        'project_record_id' => $projectRecord->id,
         'name' => 'Test Material',
         'batch' => 'BATCH001',
         'supplier' => 'Test Supplier',
@@ -71,14 +84,14 @@ it('can create a material for qa record', function () {
 
     $response = $this->post(route('project-material-management.materials.store'), $data);
 
-    $response->assertRedirect(route('project-material-management-show', $qaRecord));
+    $response->assertRedirect(route('project-material-management-show', $projectRecord));
     $this->assertDatabaseHas('materials', $data);
 });
 
 it('can update a material', function () {
     $material = Material::factory()->create();
     $updatedData = [
-        'qa_record_id' => $material->qa_record_id,
+        'project_record_id' => $material->project_record_id,
         'name' => 'Updated Material',
         'batch' => 'UPDATED001',
         'supplier' => 'Updated Supplier',
@@ -94,7 +107,7 @@ it('can update a material', function () {
 
     $response = $this->put(route('project-material-management.materials.update', $material), $updatedData);
 
-    $response->assertRedirect(route('project-material-management-show', $material->qa_record_id));
+    $response->assertRedirect(route('project-material-management-show', $material->project_record_id));
     $this->assertDatabaseHas('materials', $updatedData);
 });
 
@@ -107,23 +120,23 @@ it('can delete a material', function () {
     $this->assertDatabaseMissing('materials', ['id' => $material->id]);
 });
 
-it('validates qa record creation', function () {
+it('validates project record creation', function () {
     $response = $this->post(route('project-material-management.store'), []);
 
     $response->assertRedirect();
-    $response->assertSessionHasErrors(['title', 'client', 'inspector', 'time', 'color']);
+    $response->assertSessionHasErrors(['project_id', 'time', 'color']);
 });
 
 it('validates material creation', function () {
     $response = $this->post(route('project-material-management.materials.store'), []);
 
     $response->assertRedirect();
-    $response->assertSessionHasErrors(['qa_record_id', 'name', 'quantity', 'price', 'total']);
+    $response->assertSessionHasErrors(['project_record_id', 'name', 'quantity', 'price', 'total']);
 });
 
-it('can search qa records', function () {
-    QaRecord::factory()->create(['title' => 'Unique Project']);
-    QaRecord::factory()->create(['client' => 'Unique Client']);
+it('can search project records', function () {
+    ProjectRecord::factory()->create(['title' => 'Unique Project']);
+    ProjectRecord::factory()->create(['client' => 'Unique Client']);
 
     $response = $this->get(route('project-material-management', ['search' => 'Unique']));
 

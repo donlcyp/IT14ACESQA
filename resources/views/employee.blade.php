@@ -161,6 +161,190 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--black-1);
+        }
+        .page-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 16px;
+            width: min(640px, 92vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--black-1);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: #111827;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .form-card.hidden {
+            display: none;
+        }
+        .form-card,
+        .table-card {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+        }
+        .form-card h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--black-1);
+        }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-field label {
+            font-size: 13px;
+            color: #374151;
+            font-weight: 500;
+        }
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: #ffffff;
+            outline: none;
+            font-size: 14px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            background: #ffffff;
+            color: #111827;
+            cursor: pointer;
+            box-shadow: var(--shadow-xs);
+            font-weight: 500;
+        }
+        .btn-outline {
+            border: 1px solid #d1d5db;
+        }
+        .btn-green {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .btn-green:hover { filter: brightness(0.93); }
+
+        .table-card h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--black-1);
+        }
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .employee-table thead {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .employee-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .employee-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--black-1);
+            font-size: 14px;
+        }
+        .employee-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-on-site { background: #dcfce7; color: #166534; }
+        .status-on-leave { background: #fef3c7; color: #92400e; }
+        .status-absent { background: #fee2e2; color: #991b1b; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
         /* Employees Toolbar */
         .employee-header {
             background: white;
@@ -186,27 +370,6 @@
             align-items: center;
             gap: 12px;
             margin-left: auto;
-        }
-        .search-box {
-            position: relative;
-            width: 320px;
-            max-width: 40vw;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 10px 14px 10px 36px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            outline: none;
-            background-color: #fff;
-        }
-        .search-box .fa-search {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-500);
-            font-size: 14px;
         }
         .btn {
             display: inline-flex;
@@ -479,176 +642,153 @@
 
             <!-- Content Area -->
             <section class="content-area">
-                <!-- Employees Toolbar -->
-                <div class="employee-header">
-                    <h1 class="employee-title">Employees</h1>
-                    <div class="toolbar">
-                        <button class="btn" title="Options"><i class="fas fa-ellipsis-v"></i></button>
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <strong>Please fix the following:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <div class="page-header">
+                    <h1 class="page-title">Employees</h1>
+                    <div class="page-controls">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search" />
+                            <input type="text" placeholder="Search (coming soon)" disabled />
                         </div>
-                        <button class="btn" title="Filters"><i class="fas fa-filter"></i> Filters</button>
-                        <button class="btn btn-primary" title="Add Employee"><i class="fas fa-user-plus"></i> Add Employee</button>
+                        <button class="btn btn-outline" type="button" disabled><i class="fas fa-filter"></i> Filters</button>
+                        <button class="btn btn-green" type="button" id="openEmployeeModal"><i class="fas fa-user-plus"></i> Add Employee</button>
                     </div>
                 </div>
 
-                <div class="employee-cards">
-                        <div class="employee-list-section">
-                            <!-- Employees Table Card -->
-                            <div class="employee-card">
-                                <div class="employee-card-header">
-                                    <h2 class="employee-card-title">List of Employees</h2>
-                                    <button class="employee-expand"><i class="fas fa-expand-arrows-alt"></i></button>
-                                </div>
-                                <table class="employee-table employees">
-                                    <thead>
-                                        <tr>
-                                            <th>Employee ID</th>
-                                            <th>User ID</th>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Position</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>EMP002</td>
-                                            <td>PRM002</td>
-                                            <td>John</td>
-                                            <td>Doe</td>
-                                            <td>Project Manager</td>
-                                            <td>
-                                                <span class="actions">
-                                                    <i class="far fa-eye" title="View"></i>
-                                                    <i class="far fa-edit" title="Edit"></i>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>EMP001</td>
-                                            <td>-</td>
-                                            <td>Mari</td>
-                                            <td>Lou</td>
-                                            <td>Construction Worker</td>
-                                            <td>
-                                                <span class="actions">
-                                                    <i class="far fa-eye" title="View"></i>
-                                                    <i class="far fa-edit" title="Edit"></i>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="form-wrapper employee-form-section" id="employeeFormSection">
-                            <div class="form-header">
-                                <button class="back-btn" id="backToList"><i class="fas fa-arrow-left"></i></button>
-                                <h2 class="employee-card-title" id="formTitle">Add Employee</h2>
-                            </div>
-
-                            <div class="section-card">
-                                <div class="section-title">Employee Information</div>
-                                <div class="section-note">Fields marked (*) are required</div>
-                                <div class="grid cols-5">
-                                    <div class="field"><label>Employee ID *</label><input id="emp_employee_id" type="text"></div>
-                                    <div class="field"><label>User ID (if applicable)</label><input id="emp_user_id" type="text"></div>
-                                    <div class="field"><label>Position *</label><input id="emp_position" type="text"></div>
-                                    <div class="field"><label>Phone No. *</label><input id="emp_phone" type="text"></div>
-                                    <div class="field"><label>Email Address *</label><input id="emp_email" type="email"></div>
-                                </div>
-                                <div class="grid cols-5" style="margin-top:12px;">
-                                    <div class="field"><label>Title</label><input id="emp_title" type="text"></div>
-                                    <div class="field"><label>First Name *</label><input id="emp_first_name" type="text"></div>
-                                    <div class="field"><label>Middle Name</label><input id="emp_middle_name" type="text"></div>
-                                    <div class="field"><label>Last Name *</label><input id="emp_last_name" type="text"></div>
-                                    <div class="field"><label>Suffix</label><input id="emp_suffix" type="text"></div>
-                                </div>
-                                <div class="grid cols-5" style="margin-top:12px;">
-                                    <div class="field"><label>Date of Birth *</label><input id="emp_dob" type="date"></div>
-                                    <div class="field"><label>Gender *</label>
-                                        <select id="emp_gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
-                                    </div>
-                                    <div class="field"><label>Birth Country *</label><input id="emp_birth_country" type="text"></div>
-                                    <div class="field"><label>Birth State</label><input id="emp_birth_state" type="text"></div>
-                                    <div class="field"><label>Birth Location *</label><input id="emp_birth_location" type="text"></div>
-                                </div>
-                            </div>
-
-                            <div class="section-card">
-                                <div class="section-title">Address Details</div>
-                                <div class="section-note">Fields marked (*) are required</div>
-                                <div class="grid cols-4">
-                                    <div class="field"><label>Address Line 1 *</label><input id="emp_addr1" type="text"></div>
-                                    <div class="field"><label>Address Line 2</label><input id="emp_addr2" type="text"></div>
-                                    <div class="field"><label>City / Municipality *</label><input id="emp_city" type="text"></div>
-                                    <div class="field"><label>Province / State *</label><input id="emp_state" type="text"></div>
-                                </div>
-                                <div class="grid cols-4" style="margin-top:12px;">
-                                    <div class="field"><label>ZIP / Postal Code *</label><input id="emp_zip" type="text"></div>
-                                    <div class="field"><label>Country *</label><input id="emp_country" type="text"></div>
-                                </div>
-                            </div>
-
-                            <div class="form-actions">
-                                <button class="btn" id="cancelForm">Cancel</button>
-                                <button class="btn btn-success" id="saveForm">Save</button>
-                            </div>
-                        </div>
+                <div class="table-card">
+                    <h2>Employee Directory</h2>
+                    <table class="employee-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Position</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($employees as $employee)
+                                    <tr>
+                                        <td>{{ $employee->employee_code }}</td>
+                                        <td>{{ $employee->first_name }}</td>
+                                        <td>{{ $employee->last_name }}</td>
+                                        <td>{{ $employee->position ?? '—' }}</td>
+                                        <td>{{ $employee->email ?? '—' }}</td>
+                                        <td>{{ $employee->phone ?? '—' }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding: 24px; color: #6b7280;">No employees yet. Add your first employee using the button above.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
-                </section>
-            </main>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="employeeModal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Employee</h2>
+                <button class="modal-close" id="closeEmployeeModal" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form action="{{ route('employee.store') }}" method="POST" id="employeeForm">
+                @csrf
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="first_name">First Name *</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="last_name">Last Name *</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="position">Position</label>
+                        <input type="text" id="position" name="position" value="{{ old('position') }}">
+                    </div>
+                    <div class="form-field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{ old('email') }}">
+                    </div>
+                    <div class="form-field">
+                        <label for="phone">Phone</label>
+                        <input type="text" id="phone" name="phone" value="{{ old('phone') }}">
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top: 24px;">
+                    <button type="button" class="btn btn-outline" id="cancelEmployeeModal">Cancel</button>
+                    <button type="submit" class="btn btn-green"><i class="fas fa-save"></i> Save Employee</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        @include('partials.sidebar-js')
-        <script>
-            (function(){
-                const addBtn = document.querySelector('.btn.btn-primary');
-                const listSection = document.querySelector('.employee-list-section');
-                const formSection = document.getElementById('employeeFormSection');
-                const backBtn = document.getElementById('backToList');
-                const cancelBtn = document.getElementById('cancelForm');
-                const formTitle = document.getElementById('formTitle');
+    @include('partials.sidebar-js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const openBtn = document.getElementById('openEmployeeModal');
+            const closeBtn = document.getElementById('closeEmployeeModal');
+            const cancelBtn = document.getElementById('cancelEmployeeModal');
+            const modal = document.getElementById('employeeModal');
+            const form = document.getElementById('employeeForm');
 
-                function showForm(mode){
-                    formTitle.textContent = mode === 'edit' ? 'Edit Employee' : 'Add Employee';
-                    listSection.style.display = 'none';
-                    formSection.style.display = 'flex';
-                }
-                function showList(){
-                    formSection.style.display = 'none';
-                    listSection.style.display = 'block';
-                }
-                function clearForm(){
-                    formSection.querySelectorAll('input').forEach(i=> i.value = '');
-                    const g = document.getElementById('emp_gender'); if(g) g.value = '';
-                }
-                function fillFromRow(tr){
-                    const tds = tr.querySelectorAll('td');
-                    document.getElementById('emp_employee_id').value = tds[0]?.textContent.trim() || '';
-                    document.getElementById('emp_user_id').value = tds[1]?.textContent.trim() || '';
-                    document.getElementById('emp_first_name').value = tds[2]?.textContent.trim() || '';
-                    document.getElementById('emp_last_name').value = tds[3]?.textContent.trim() || '';
-                    document.getElementById('emp_position').value = tds[4]?.textContent.trim() || '';
-                }
+            function openModal() {
+                if (!modal) return;
+                modal.classList.add('active');
+                modal.setAttribute('aria-hidden', 'false');
+            }
 
-                if(addBtn){ addBtn.addEventListener('click', ()=>{ clearForm(); showForm('add'); }); }
-                if(backBtn){ backBtn.addEventListener('click', showList); }
-                if(cancelBtn){ cancelBtn.addEventListener('click', (e)=>{ e.preventDefault(); showList(); }); }
+            function closeModal() {
+                if (!modal) return;
+                modal.classList.remove('active');
+                modal.setAttribute('aria-hidden', 'true');
+                if (form) form.reset();
+            }
 
-                document.querySelectorAll('.actions .fa-edit').forEach(icon=>{
-                    icon.addEventListener('click', (e)=>{
-                        const tr = e.target.closest('tr');
-                        clearForm();
-                        fillFromRow(tr);
-                        showForm('edit');
-                    });
+            if (openBtn) openBtn.addEventListener('click', openModal);
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+            if (modal) {
+                modal.addEventListener('click', function (event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
                 });
-            })();
-        </script>
-    </body>
+            }
 
-    </html>
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            if ({!! $errors->any() ? 'true' : 'false' !!}) {
+                openModal();
+            }
+        });
+    </script>
+</body>
+
+</html>

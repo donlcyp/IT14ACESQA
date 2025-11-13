@@ -225,39 +225,3 @@
         </form>
     </div>
 </aside>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle') || document.getElementById('headerMenu');
-        const mainContent = document.querySelector('.main-content');
-
-        function applyState(open) {
-            if (open) {
-                sidebar.classList.add('open');
-                if (mainContent) mainContent.classList.remove('sidebar-closed');
-            } else {
-                sidebar.classList.remove('open');
-                if (mainContent) mainContent.classList.add('sidebar-closed');
-            }
-        }
-
-        // Keep sidebar open by default on load (all pages)
-        applyState(true);
-
-        // Toggle sidebar
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                const nextOpen = !sidebar.classList.contains('open');
-                applyState(nextOpen);
-            });
-        }
-
-        // Maintain layout on resize
-        window.addEventListener('resize', function() {
-            // If sidebar is open, re-apply correct classes for current viewport
-            const isOpen = sidebar.classList.contains('open');
-            applyState(isOpen);
-        });
-    });
-</script>

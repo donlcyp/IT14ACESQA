@@ -873,6 +873,8 @@
         function openMaterialModal(mode) {
             editMode = mode === 'edit';
 
+            const statusField = document.getElementById('mat_status');
+
             if (editMode) {
                 if (selectedRowIndex < 0) {
                     alert('Please select a material row first by clicking on it.');
@@ -885,12 +887,15 @@
                 document.getElementById('mat_supplier').value = material.supplier || '';
                 document.getElementById('mat_location').value = material.location || '';
                 document.getElementById('mat_received').value = material.date_received || '';
-                document.getElementById('mat_status').value = material.status || 'Pending';
+                if (statusField) {
+                    statusField.value = material.status || 'Pending';
+                }
                 
                 // Enable status editing for edit mode
-                const statusField = document.getElementById('mat_status');
                 if (statusField) {
                     statusField.disabled = false;
+                    statusField.style.cursor = 'pointer';
+                    statusField.style.backgroundColor = '';
                     console.log('Status field enabled for edit mode');
                 }
                 
@@ -947,10 +952,16 @@
                 document.getElementById('mat_supplier').value = '';
                 document.getElementById('mat_location').value = '';
                 document.getElementById('mat_received').value = '';
-                document.getElementById('mat_status').value = 'Pending';
+                if (statusField) {
+                    statusField.value = 'Pending';
+                }
                 
                 // Disable status editing for new materials (only edit can change status)
-                document.getElementById('mat_status').disabled = true;
+                if (statusField) {
+                    statusField.disabled = true;
+                    statusField.style.cursor = 'not-allowed';
+                    statusField.style.backgroundColor = '#f3f4f6';
+                }
                 
                 // Show Add Item button for new materials
                 const addItemBtn = document.getElementById('addItemBtn');
@@ -1030,6 +1041,16 @@
             materialModal.classList.add('active');
             materialModal.setAttribute('aria-hidden', 'false');
             materialModalStep2.setAttribute('aria-hidden', 'true');
+
+            if (!editMode) {
+                const statusField = document.getElementById('mat_status');
+                if (statusField) {
+                    statusField.disabled = true;
+                    statusField.style.cursor = 'not-allowed';
+                    statusField.style.backgroundColor = '#f3f4f6';
+                    statusField.value = 'Pending';
+                }
+            }
         }
 
         function addMaterialRow() {
@@ -1162,6 +1183,12 @@
             const dateReceivedInput = document.getElementById('mat_received');
             const statusInput = document.getElementById('mat_status');
 
+            if (!editMode && statusInput) {
+                statusInput.disabled = true;
+                statusInput.style.cursor = 'not-allowed';
+                statusInput.style.backgroundColor = '#f3f4f6';
+            }
+
             console.log('Step 1 inputs:', { supplierInput, locationInput, dateReceivedInput, statusInput });
             console.log('Status input value:', statusInput ? statusInput.value : 'undefined');
             console.log('Status input disabled:', statusInput ? statusInput.disabled : 'undefined');
@@ -1173,12 +1200,6 @@
                 dateReceived: dateReceivedInput ? dateReceivedInput.value : 'MISSING',
                 status: statusInput ? statusInput.value : 'MISSING'
             });
-
-            // If status field is disabled, enable it temporarily for saving
-            if (statusInput && statusInput.disabled) {
-                console.log('Status field is disabled, enabling temporarily for save');
-                statusInput.disabled = false;
-            }
 
             if (!supplierInput || !locationInput || !dateReceivedInput || !statusInput) {
                 console.error('Missing form fields:', {
@@ -1195,7 +1216,7 @@
             const supplier = supplierInput.value;
             const location = locationInput.value;
             const dateReceived = dateReceivedInput.value;
-            const status = statusInput.value;
+            const status = editMode ? statusInput.value : 'Pending';
 
             console.log('Form values:', { supplier, location, dateReceived, status });
 
@@ -1276,13 +1297,13 @@
                         // Use POST with _method override so Laravel parses form-data properly
                         method = 'POST';
                         formDataObj.append('_method', 'PUT');
-                        formDataObj.append('qa_record_id', currentRecordId);
+                        formDataObj.append('project_record_id', currentRecordId);
                         console.log('Edit mode: updating material ID:', material.id);
                     } else {
                         // For new mode, create a new material
                         url = '/project-material-management/materials';
                         method = 'POST';
-                        formDataObj.append('qa_record_id', currentRecordId);
+                        formDataObj.append('project_record_id', currentRecordId);
                         console.log('New mode: creating new material');
                     }
 
