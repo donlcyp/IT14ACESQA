@@ -151,8 +151,8 @@
         .qa-button { background: none; border: none; cursor: pointer; }
         .qa-button-base { display: inline-flex; align-items: center; gap:6px; padding: 8px 12px; border-radius: 8px; background: #fff; box-shadow: var(--shadow-xs); border:1px solid #e5e7eb; font-size: 12px; }
     .qa-button-base.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
-        .qa-button-base.success { background:#22c55e; color:#fff; border-color:#22c55e; }
-        .qa-button-base.danger { background:#ef4444; color:#fff; border-color:#ef4444; }
+        .qa-button-base.success { background: var(--accent); color:#fff; border-color: var(--accent); }
+        .qa-button-base.danger { background: var(--accent); color:#fff; border-color: var(--accent); }
 
         .status-tabs-container { margin-bottom: 20px; }
         .status-tabs { display: flex; border-bottom: 3px solid #e5e7eb; background: white; border-radius: 15px 15px 0 0; overflow: hidden; }
@@ -350,9 +350,7 @@
             background: var(--accent);
             color: #ffffff;
         }
-        .btn-primary:hover {
-            background: var(--accent);
-        }
+        .btn-primary:hover { background: #15803d; }
 
         /* Modal Step 2 Styles - Clean Table Design */
         .modal-add-2, .modal-add-2 * { box-sizing: border-box; }
@@ -708,7 +706,7 @@
                                 <i class="fas fa-plus"></i>
                                 <span>Add Item</span>
                             </button>
-                            <button class="btn btn-primary" onclick="saveMaterial()" style="background: #059669;">
+                            <button class="btn btn-primary" onclick="saveMaterial()">
                                 <i class="fas fa-save"></i>
                                 <span>Save</span>
                             </button>

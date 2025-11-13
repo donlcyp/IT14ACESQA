@@ -222,12 +222,12 @@
             gap: 10px;
             margin-bottom: 16px;
         }
-        .btn-blue  { background:#2563eb; border-color:#2563eb; color:#fff; }
-        .btn-green { background:#16a34a; border-color:#16a34a; color:#fff; }
-        .btn-red   { background:#dc2626; border-color:#dc2626; color:#fff; }
-        .btn-blue:hover  { filter:brightness(0.95); }
-        .btn-green:hover { filter:brightness(0.95); }
-        .btn-red:hover   { filter:brightness(0.95); }
+        .btn-blue  { background: var(--accent); border-color: var(--accent); color:#fff; }
+        .btn-green { background: var(--accent); border-color: var(--accent); color:#fff; }
+        .btn-red   { background: var(--accent); border-color: var(--accent); color:#fff; }
+        .btn-blue:hover  { background: #15803d; }
+        .btn-green:hover { background: #15803d; }
+        .btn-red:hover   { background: #15803d; }
         .search-box {
             position: relative;
             width: 320px;
@@ -263,11 +263,11 @@
         }
         .btn:hover { background: #f9fafb; }
         .btn-primary {
-            background: #2563eb;
-            border-color: #2563eb;
+            background: var(--accent);
+            border-color: var(--accent);
             color: #fff;
         }
-        .btn-primary:hover { background: #1d4ed8; }
+        .btn-primary:hover { background: #15803d; }
 
         /* Employee Cards */
         .employee-cards {
@@ -461,6 +461,11 @@
             color: #065f46;
         }
 
+        .status-badge.absent {
+            background: transparent;
+            color: #ef4444;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
 
@@ -515,11 +520,8 @@
 
             <!-- Content Area -->
             <section class="content-area">
-                <div class="att-toolbar">
-                    <div class="att-left">
-                        <button class="chip-back" title="Back"><i class="fas fa-angle-left"></i></button>
-                        <div class="att-title">Employee Management - Attendance Tracking</div>
-                    </div>
+                <div class="employee-header">
+                    <h1 class="employee-title">Employee Attendance</h1>
                     <div class="toolbar">
                         <button class="btn" title="Options"><i class="fas fa-ellipsis-v"></i></button>
                         <div class="search-box">
@@ -531,13 +533,13 @@
                 </div>
 
                 <div class="action-row">
-                    <button class="btn btn-blue"><i class="fas fa-plus"></i> New</button>
-                    <button class="btn btn-green"><i class="fas fa-pen"></i> Update</button>
-                    <button class="btn btn-red"><i class="fas fa-trash"></i> Delete</button>
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> New</button>
+                    <button class="btn btn-primary"><i class="fas fa-pen"></i> Update</button>
+                    <button class="btn btn-primary"><i class="fas fa-trash"></i> Delete</button>
                 </div>
 
                 <div class="employee-card">
-                    <table class="employee-table attendance">
+                    <table class="employee-table employees">
                         <thead>
                             <tr>
                                 <th>Employee ID</th>
@@ -576,7 +578,7 @@
                                 <td>Paul</td>
                                 <td>Tan</td>
                                 <td>Quality Inspector</td>
-                                <td>Absent</td>
+                                <td><span class="status-badge absent">Absent</span></td>
                                 <td>2025-09-26</td>
                                 <td>-</td>
                                 <td>-</td>

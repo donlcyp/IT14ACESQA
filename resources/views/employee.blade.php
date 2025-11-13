@@ -222,11 +222,18 @@
         }
         .btn:hover { background: #f9fafb; }
         .btn-primary {
-            background: #2563eb;
-            border-color: #2563eb;
+            background: var(--accent);
+            border-color: var(--accent);
             color: #fff;
         }
-        .btn-primary:hover { background: #1d4ed8; }
+        .btn-primary:hover { background: #15803d; }
+
+        .btn-success {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .btn-success:hover { background: #15803d; }
 
         /* Employee Cards */
         .employee-cards {

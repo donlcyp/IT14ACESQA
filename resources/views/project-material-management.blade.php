@@ -449,7 +449,7 @@
 
         /* Danger button (Delete toggle) */
         .qa-danger-button {
-            background: #ff3b30;
+            background: var(--accent);
             border: none;
             border-radius: 8px;
             padding: 8px 16px;
@@ -458,10 +458,10 @@
             gap: 8px;
             color: white;
             cursor: pointer;
-            transition: opacity 0.2s ease;
+            transition: background 0.2s ease;
         }
 
-        .qa-danger-button:hover { opacity: 0.9; }
+        .qa-danger-button:hover { background: #15803d; }
 
         /* Card delete hover while in delete mode */
         .qa-card.delete-hover {

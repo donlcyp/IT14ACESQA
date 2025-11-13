@@ -12,25 +12,6 @@
         background-color: #f8fafc;
     }
 
-    /* Sidebar Overlay */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .sidebar-overlay.active {
-        display: block;
-        opacity: 1;
-    }
-
     /* Sidebar */
     .sidebar {
         position: fixed;
@@ -191,23 +172,7 @@
         .sidebar {
             width: 280px;
         }
-        /* On mobile, content should not be pushed; sidebar overlays */
-        .main-content { margin-left: 0 !important; }
-        .main-content.sidebar-closed { margin-left: 0 !important; }
-    }
-
-    @media (min-width: 769px) {
-        .sidebar-overlay {
-            display: none !important;
-        }
-        /* Reserve desktop space for the sidebar */
-        .main-content { margin-left: 280px !important; }
-        .main-content.sidebar-closed { margin-left: 0 !important; }
-    }
 </style>
-
-<!-- Sidebar Overlay (for mobile) -->
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
@@ -265,23 +230,15 @@
     document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle') || document.getElementById('headerMenu');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
         const mainContent = document.querySelector('.main-content');
 
         function applyState(open) {
-            const isMobile = window.innerWidth <= 768;
             if (open) {
                 sidebar.classList.add('open');
-                if (!isMobile) {
-                    if (mainContent) mainContent.classList.remove('sidebar-closed');
-                    if (sidebarOverlay) sidebarOverlay.classList.remove('active');
-                } else {
-                    if (sidebarOverlay) sidebarOverlay.classList.add('active');
-                }
+                if (mainContent) mainContent.classList.remove('sidebar-closed');
             } else {
                 sidebar.classList.remove('open');
                 if (mainContent) mainContent.classList.add('sidebar-closed');
-                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
             }
         }
 
@@ -293,13 +250,6 @@
             sidebarToggle.addEventListener('click', function() {
                 const nextOpen = !sidebar.classList.contains('open');
                 applyState(nextOpen);
-            });
-        }
-
-        // Close sidebar when clicking overlay (mobile)
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
-                applyState(false);
             });
         }
 

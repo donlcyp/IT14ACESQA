@@ -356,9 +356,9 @@
         }
 
         .chart-button.active {
-            background: var(--blue-600);
+            background: var(--accent);
             color: white;
-            border-color: var(--blue-600);
+            border-color: var(--accent);
         }
 
         .chart-area {
@@ -483,7 +483,7 @@
         }
 
         .finance-action-button {
-            background: var(--purple-600);
+            background: var(--accent);
             color: white;
             border: none;
             border-radius: 8px;
@@ -497,23 +497,14 @@
         }
 
         .finance-action-button:hover {
-            background: var(--purple-700);
+            background: #15803d;
         }
 
-        .finance-action-button:nth-child(1) {
-            background: var(--purple-800);
-        }
-
-        .finance-action-button:nth-child(2) {
-            background: var(--purple-700);
-        }
-
-        .finance-action-button:nth-child(3) {
-            background: var(--purple-600);
-        }
-
+        .finance-action-button:nth-child(1),
+        .finance-action-button:nth-child(2),
+        .finance-action-button:nth-child(3),
         .finance-action-button:nth-child(4) {
-            background: var(--purple-600);
+            background: var(--accent);
         }
 
         .finance-graphic {
