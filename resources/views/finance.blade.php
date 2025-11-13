@@ -83,6 +83,32 @@
             flex-direction: column;
             min-height: 100vh;
             width: 100%;
+            transition: margin-left 0.3s ease;
+        }
+        
+        /* When sidebar is hidden on desktop */
+        .main-content.sidebar-closed { 
+            margin-left: 0; 
+        }
+        
+        /* Desktop: Reserve space for sidebar */
+        @media (min-width: 769px) {
+            .main-content { 
+                margin-left: 280px; 
+            }
+            .main-content.sidebar-closed { 
+                margin-left: 0; 
+            }
+        }
+        
+        /* Mobile: Sidebar overlays, no margin */
+        @media (max-width: 768px) {
+            .main-content { 
+                margin-left: 0 !important; 
+            }
+            .main-content.sidebar-closed { 
+                margin-left: 0 !important; 
+            }
         }
 
         /* Header Styles */
@@ -537,10 +563,6 @@
         }
 
         @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-            }
-
             .header {
                 padding: 15px 20px;
             }

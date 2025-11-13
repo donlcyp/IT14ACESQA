@@ -28,11 +28,14 @@
         }
     }
 
-    // Initial state: use saved value if available; else open on desktop, closed on mobile
-    let saved = null;
-    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { saved = null; }
-    const initialOpen = saved !== null ? saved === '1' : (window.innerWidth > 768);
-    applyState(initialOpen, false);
+    // Initial state: always start closed (hidden) - ignore saved preference on initial load
+    // Sidebar should always start hidden and only show when button is clicked
+    applyState(false, false);
+    
+    // Ensure main content starts with sidebar-closed class
+    if (mainContent) {
+        mainContent.classList.add('sidebar-closed');
+    }
 
     if (headerMenu) {
         headerMenu.addEventListener('click', function(){
@@ -53,12 +56,10 @@
     });
 
     window.addEventListener('resize', function(){
-        // Re-apply to adjust classes correctly per breakpoint, honor saved preference on desktop
-        let saved = null;
-        try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { saved = null; }
-        const preferred = saved !== null ? saved === '1' : (window.innerWidth > 768);
-        const effectiveOpen = window.innerWidth > 768 ? preferred : (sidebar && sidebar.classList.contains('open'));
-        applyState(effectiveOpen, false);
+        // Maintain current state when resizing, just re-apply to adjust classes correctly per breakpoint
+        if (!sidebar) return;
+        const isCurrentlyOpen = sidebar.classList.contains('open');
+        applyState(isCurrentlyOpen, false);
     });
 })();
 </script>

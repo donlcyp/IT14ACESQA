@@ -129,12 +129,11 @@
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             width: 100%;
-            transition: margin-left 0.3s ease;
+            margin-left: 0;
         }
 
         .content-area { flex: 1; padding: 30px; background: linear-gradient(135deg, #f7fafc, #edf2f7); border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
