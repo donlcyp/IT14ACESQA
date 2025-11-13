@@ -79,7 +79,6 @@
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -144,7 +143,7 @@
         /* Finance Layout */
         .finance-layout {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr; /* Full width content */
             gap: 30px;
             height: 100%;
         }

@@ -169,13 +169,6 @@
             line-height: var(--text-lg-medium-line-height);
         }
 
-        .qa-badge {
-            width: 100px;
-            height: 20px;
-            background: linear-gradient(90deg, #e0e0e0, #f0f0f0);
-            border-radius: 10px;
-        }
-
         .qa-actions {
             display: flex;
             align-items: center;
@@ -688,7 +681,6 @@
                         <div class="qa-title-section">
                             <div class="qa-title-badge">
                                 <h2 class="qa-title">Project Material Management</h2>
-                                <div class="qa-badge"></div>
                             </div>
                         </div>
                         <button class="qa-button" aria-label="Additional options">

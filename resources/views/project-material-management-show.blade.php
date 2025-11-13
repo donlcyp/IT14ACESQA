@@ -791,12 +791,12 @@
 
         function getStatusStyle(status) {
             const styles = {
-                'Pending': 'background: #fff3cd; color: #856404;',
-                'Approved': 'background: #d4edda; color: #155724;',
-                'Rejected': 'background: #f8d7da; color: #721c24;',
-                'Fail': 'background: #f8d7da; color: #721c24;', // treat Fail same as Rejected
-                'In Use': 'background: #cfe2ff; color: #084298;',
-                'Depleted': 'background: #e2e3e5; color: #383d41;'
+                'Pending': 'background: transparent; color: #856404;',
+                'Approved': 'background: transparent; color: #155724;',
+                'Rejected': 'background: transparent; color: #721c24;',
+                'Fail': 'background: transparent; color: #721c24;', // treat Fail same as Rejected
+                'In Use': 'background: transparent; color: #084298;',
+                'Depleted': 'background: transparent; color: #383d41;'
             };
             return styles[status] || 'background: #e2e3e5; color: #383d41;';
         }

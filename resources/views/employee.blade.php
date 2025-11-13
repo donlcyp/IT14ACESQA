@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-    <title>AJJ CRISBER Engineering Services - Employees</title>
+    <title>AJJ CRISBER Engineering Services - Employee</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
         rel="stylesheet">
@@ -23,7 +23,7 @@
 
             --blue-1: var(--accent);
             --blue-600: var(--accent);
-            --red-600: #dc2626;
+            --red-600: var(--accent);
             --green-600: #059669;
 
             --black-1: #111827;
@@ -162,47 +162,6 @@
             gap: 12px;
             margin-left: auto;
         }
-        .att-toolbar {
-            background: white;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 14px;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: space-between;
-        }
-        .att-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .chip-back {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
-            background: #fff;
-            box-shadow: var(--shadow-xs);
-            color: #111827;
-        }
-        .att-title { font-weight: 600; color: #111827; }
-        .action-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .btn-blue  { background:#2563eb; border-color:#2563eb; color:#fff; }
-        .btn-green { background:#16a34a; border-color:#16a34a; color:#fff; }
-        .btn-red   { background:#dc2626; border-color:#dc2626; color:#fff; }
-        .btn-blue:hover  { filter:brightness(0.95); }
-        .btn-green:hover { filter:brightness(0.95); }
-        .btn-red:hover   { filter:brightness(0.95); }
         .search-box {
             position: relative;
             width: 320px;
@@ -414,8 +373,6 @@
         .employee-table.attendance thead {
             background: var(--red-600);
         }
-        .employee-table.attendance thead th:first-child { border-top-left-radius: 8px; }
-        .employee-table.attendance thead th:last-child { border-top-right-radius: 8px; }
 
         /* Status badges */
         .status-badge {
@@ -490,11 +447,9 @@
 
             <!-- Content Area -->
             <section class="content-area">
-                <div class="att-toolbar">
-                    <div class="att-left">
-                        <button class="chip-back" title="Back"><i class="fas fa-angle-left"></i></button>
-                        <div class="att-title">Employee Management - Attendance Tracking</div>
-                    </div>
+                <!-- Employees Toolbar -->
+                <div class="employee-header">
+                    <h1 class="employee-title">Employees</h1>
                     <div class="toolbar">
                         <button class="btn" title="Options"><i class="fas fa-ellipsis-v"></i></button>
                         <div class="search-box">
@@ -502,68 +457,166 @@
                             <input type="text" placeholder="Search" />
                         </div>
                         <button class="btn" title="Filters"><i class="fas fa-filter"></i> Filters</button>
+                        <button class="btn btn-primary" title="Add Employee"><i class="fas fa-user-plus"></i> Add Employee</button>
                     </div>
                 </div>
 
-                <div class="action-row">
-                    <button class="btn btn-blue"><i class="fas fa-plus"></i> New</button>
-                    <button class="btn btn-green"><i class="fas fa-pen"></i> Update</button>
-                    <button class="btn btn-red"><i class="fas fa-trash"></i> Delete</button>
-                </div>
+                <div class="employee-cards">
+                        <div class="employee-list-section">
+                            <!-- Employees Table Card -->
+                            <div class="employee-card">
+                                <div class="employee-card-header">
+                                    <h2 class="employee-card-title">List of Employees</h2>
+                                    <button class="employee-expand"><i class="fas fa-expand-arrows-alt"></i></button>
+                                </div>
+                                <table class="employee-table employees">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee ID</th>
+                                            <th>User ID</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Position</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>EMP002</td>
+                                            <td>PRM002</td>
+                                            <td>John</td>
+                                            <td>Doe</td>
+                                            <td>Project Manager</td>
+                                            <td>
+                                                <span class="actions">
+                                                    <i class="far fa-eye" title="View"></i>
+                                                    <i class="far fa-edit" title="Edit"></i>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>EMP001</td>
+                                            <td>-</td>
+                                            <td>Mari</td>
+                                            <td>Lou</td>
+                                            <td>Construction Worker</td>
+                                            <td>
+                                                <span class="actions">
+                                                    <i class="far fa-eye" title="View"></i>
+                                                    <i class="far fa-edit" title="Edit"></i>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
-                <div class="employee-card">
-                    <table class="employee-table attendance">
-                        <thead>
-                            <tr>
-                                <th>Employee ID</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Position</th>
-                                <th>Attendance Status</th>
-                                <th>Date</th>
-                                <th>Time In</th>
-                                <th>Time Out</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>EMP003</td>
-                                <td>John</td>
-                                <td>Doe</td>
-                                <td>Project Manager</td>
-                                <td><span class="status-badge on-leave">On Leave</span></td>
-                                <td>2025-09-26</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>EMP002</td>
-                                <td>Mari</td>
-                                <td>Lou</td>
-                                <td>Construction Worker</td>
-                                <td><span class="status-badge on-site">On Site</span></td>
-                                <td>2025-09-26</td>
-                                <td>7:26 AM PST</td>
-                                <td>10:30 PM PST</td>
-                            </tr>
-                            <tr>
-                                <td>EMP001</td>
-                                <td>Paul</td>
-                                <td>Tan</td>
-                                <td>Quality Inspector</td>
-                                <td>Absent</td>
-                                <td>2025-09-26</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        <div class="form-wrapper employee-form-section" id="employeeFormSection">
+                            <div class="form-header">
+                                <button class="back-btn" id="backToList"><i class="fas fa-arrow-left"></i></button>
+                                <h2 class="employee-card-title" id="formTitle">Add Employee</h2>
+                            </div>
+
+                            <div class="section-card">
+                                <div class="section-title">Employee Information</div>
+                                <div class="section-note">Fields marked (*) are required</div>
+                                <div class="grid cols-5">
+                                    <div class="field"><label>Employee ID *</label><input id="emp_employee_id" type="text"></div>
+                                    <div class="field"><label>User ID (if applicable)</label><input id="emp_user_id" type="text"></div>
+                                    <div class="field"><label>Position *</label><input id="emp_position" type="text"></div>
+                                    <div class="field"><label>Phone No. *</label><input id="emp_phone" type="text"></div>
+                                    <div class="field"><label>Email Address *</label><input id="emp_email" type="email"></div>
+                                </div>
+                                <div class="grid cols-5" style="margin-top:12px;">
+                                    <div class="field"><label>Title</label><input id="emp_title" type="text"></div>
+                                    <div class="field"><label>First Name *</label><input id="emp_first_name" type="text"></div>
+                                    <div class="field"><label>Middle Name</label><input id="emp_middle_name" type="text"></div>
+                                    <div class="field"><label>Last Name *</label><input id="emp_last_name" type="text"></div>
+                                    <div class="field"><label>Suffix</label><input id="emp_suffix" type="text"></div>
+                                </div>
+                                <div class="grid cols-5" style="margin-top:12px;">
+                                    <div class="field"><label>Date of Birth *</label><input id="emp_dob" type="date"></div>
+                                    <div class="field"><label>Gender *</label>
+                                        <select id="emp_gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+                                    </div>
+                                    <div class="field"><label>Birth Country *</label><input id="emp_birth_country" type="text"></div>
+                                    <div class="field"><label>Birth State</label><input id="emp_birth_state" type="text"></div>
+                                    <div class="field"><label>Birth Location *</label><input id="emp_birth_location" type="text"></div>
+                                </div>
+                            </div>
+
+                            <div class="section-card">
+                                <div class="section-title">Address Details</div>
+                                <div class="section-note">Fields marked (*) are required</div>
+                                <div class="grid cols-4">
+                                    <div class="field"><label>Address Line 1 *</label><input id="emp_addr1" type="text"></div>
+                                    <div class="field"><label>Address Line 2</label><input id="emp_addr2" type="text"></div>
+                                    <div class="field"><label>City / Municipality *</label><input id="emp_city" type="text"></div>
+                                    <div class="field"><label>Province / State *</label><input id="emp_state" type="text"></div>
+                                </div>
+                                <div class="grid cols-4" style="margin-top:12px;">
+                                    <div class="field"><label>ZIP / Postal Code *</label><input id="emp_zip" type="text"></div>
+                                    <div class="field"><label>Country *</label><input id="emp_country" type="text"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn" id="cancelForm">Cancel</button>
+                                <button class="btn btn-success" id="saveForm">Save</button>
+                            </div>
+                        </div>
+                    </div>
                 </section>
             </main>
         </div>
 
         @include('partials.sidebar-js')
+        <script>
+            (function(){
+                const addBtn = document.querySelector('.btn.btn-primary');
+                const listSection = document.querySelector('.employee-list-section');
+                const formSection = document.getElementById('employeeFormSection');
+                const backBtn = document.getElementById('backToList');
+                const cancelBtn = document.getElementById('cancelForm');
+                const formTitle = document.getElementById('formTitle');
+
+                function showForm(mode){
+                    formTitle.textContent = mode === 'edit' ? 'Edit Employee' : 'Add Employee';
+                    listSection.style.display = 'none';
+                    formSection.style.display = 'flex';
+                }
+                function showList(){
+                    formSection.style.display = 'none';
+                    listSection.style.display = 'block';
+                }
+                function clearForm(){
+                    formSection.querySelectorAll('input').forEach(i=> i.value = '');
+                    const g = document.getElementById('emp_gender'); if(g) g.value = '';
+                }
+                function fillFromRow(tr){
+                    const tds = tr.querySelectorAll('td');
+                    document.getElementById('emp_employee_id').value = tds[0]?.textContent.trim() || '';
+                    document.getElementById('emp_user_id').value = tds[1]?.textContent.trim() || '';
+                    document.getElementById('emp_first_name').value = tds[2]?.textContent.trim() || '';
+                    document.getElementById('emp_last_name').value = tds[3]?.textContent.trim() || '';
+                    document.getElementById('emp_position').value = tds[4]?.textContent.trim() || '';
+                }
+
+                if(addBtn){ addBtn.addEventListener('click', ()=>{ clearForm(); showForm('add'); }); }
+                if(backBtn){ backBtn.addEventListener('click', showList); }
+                if(cancelBtn){ cancelBtn.addEventListener('click', (e)=>{ e.preventDefault(); showList(); }); }
+
+                document.querySelectorAll('.actions .fa-edit').forEach(icon=>{
+                    icon.addEventListener('click', (e)=>{
+                        const tr = e.target.closest('tr');
+                        clearForm();
+                        fillFromRow(tr);
+                        showForm('edit');
+                    });
+                });
+            })();
+        </script>
     </body>
 
     </html>

@@ -1,74 +1,64 @@
 <script>
-// Sidebar toggle functionality (guard DOM elements)
-const headerMenu = document.getElementById('headerMenu');
-const navToggle = document.getElementById('navToggle');
-const sidebar = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-
-function toggleSidebar() {
-    if (!sidebar) return;
+// Unified Sidebar toggle
+(function() {
+    const headerMenu = document.getElementById('headerMenu');
+    const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
-    sidebar.classList.toggle('open');
-    
-    // Handle overlay for mobile
-    if (sidebarOverlay) {
-        if (sidebar.classList.contains('open')) {
-            sidebarOverlay.classList.add('active');
+    const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
+    const STORAGE_KEY = 'sidebarOpen';
+
+    function applyState(open, persist = false) {
+        const isMobile = window.innerWidth <= 768;
+        if (!sidebar) return;
+        if (open) {
+            sidebar.classList.add('open');
+            if (!isMobile) {
+                if (mainContent) mainContent.classList.remove('sidebar-closed');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            } else {
+                if (sidebarOverlay) sidebarOverlay.classList.add('active');
+            }
         } else {
-            sidebarOverlay.classList.remove('active');
-        }
-    }
-    
-    // Handle main content margin for desktop
-    if (window.innerWidth > 768 && mainContent) {
-        if (sidebar.classList.contains('open')) {
-            mainContent.style.marginLeft = '280px';
-        } else {
-            mainContent.style.marginLeft = '0';
-        }
-    }
-}
-
-function initializeSidebar() {
-    if (!sidebar) return;
-    // Always start with sidebar closed
-    sidebar.classList.remove('open');
-    if (mainContent) {
-        mainContent.style.marginLeft = '0';
-    }
-}
-
-if (headerMenu) headerMenu.addEventListener('click', toggleSidebar);
-if (navToggle) navToggle.addEventListener('click', toggleSidebar);
-
-// Close sidebar on mobile when clicking outside
-document.addEventListener('click', function (e) {
-    if (!sidebar) return;
-    if (window.innerWidth <= 768) {
-        const clickedHeader = headerMenu && headerMenu.contains(e.target);
-        if (!sidebar.contains(e.target) && !clickedHeader) {
             sidebar.classList.remove('open');
+            if (mainContent) mainContent.classList.add('sidebar-closed');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
+        if (persist) {
+            try { localStorage.setItem(STORAGE_KEY, open ? '1' : '0'); } catch (e) {}
         }
     }
-});
 
-// Handle window resize - keep sidebar closed on resize
-window.addEventListener('resize', function() {
-    if (!sidebar) return;
-    // On resize, close sidebar if it was open and adjust main content
-    if (window.innerWidth <= 768) {
-        sidebar.classList.remove('open');
-        if (mainContent) mainContent.style.marginLeft = '0';
-    } else {
-        // On desktop, only adjust margin if sidebar is open
-        if (sidebar.classList.contains('open') && mainContent) {
-            mainContent.style.marginLeft = '280px';
-        } else if (mainContent) {
-            mainContent.style.marginLeft = '0';
-        }
+    // Initial state: use saved value if available; else open on desktop, closed on mobile
+    let saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { saved = null; }
+    const initialOpen = saved !== null ? saved === '1' : (window.innerWidth > 768);
+    applyState(initialOpen, false);
+
+    if (headerMenu) {
+        headerMenu.addEventListener('click', function(){
+            const next = !sidebar.classList.contains('open');
+            applyState(next, true);
+        });
     }
-});
 
-// Initialize sidebar state on page load
-initializeSidebar();
+    // Close overlay on mobile when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!sidebar) return;
+        if (window.innerWidth <= 768) {
+            const clickedHeader = headerMenu && headerMenu.contains(e.target);
+            if (!sidebar.contains(e.target) && !clickedHeader) {
+                applyState(false, true);
+            }
+        }
+    });
+
+    window.addEventListener('resize', function(){
+        // Re-apply to adjust classes correctly per breakpoint, honor saved preference on desktop
+        let saved = null;
+        try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { saved = null; }
+        const preferred = saved !== null ? saved === '1' : (window.innerWidth > 768);
+        const effectiveOpen = window.innerWidth > 768 ? preferred : (sidebar && sidebar.classList.contains('open'));
+        applyState(effectiveOpen, false);
+    });
+})();
 </script>

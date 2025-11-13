@@ -181,29 +181,28 @@
     /* Main Content */
     .main-content {
         flex: 1;
-        margin-left: 0;
         transition: margin-left 0.3s ease;
     }
-
-    .main-content.sidebar-open {
-        margin-left: 280px;
-    }
+    /* When sidebar is hidden on desktop */
+    .main-content.sidebar-closed { margin-left: 0; }
 
     /* Responsive Design */
     @media (max-width: 768px) {
         .sidebar {
             width: 280px;
         }
-
-        .main-content.sidebar-open {
-            margin-left: 0;
-        }
+        /* On mobile, content should not be pushed; sidebar overlays */
+        .main-content { margin-left: 0 !important; }
+        .main-content.sidebar-closed { margin-left: 0 !important; }
     }
 
     @media (min-width: 769px) {
         .sidebar-overlay {
             display: none !important;
         }
+        /* Reserve desktop space for the sidebar */
+        .main-content { margin-left: 280px !important; }
+        .main-content.sidebar-closed { margin-left: 0 !important; }
     }
 </style>
 
@@ -241,58 +240,74 @@
             <i class="nav-icon fas fa-tasks"></i>
             <span>Projects</span>
         </a>
-        <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
+        <a href="{{ route('employee') }}" class="nav-item {{ request()->routeIs('employee') ? 'active' : '' }}">
             <i class="nav-icon fas fa-hard-hat"></i>
-            <span>Employee Attendance</span>
+            <span>Employee</span>
+        </a>
+        <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-user-check"></i>
+            <span>Attendance</span>
         </a>
     </nav>
 
     <div class="logout-section">
-        <a href="#" class="logout-item">
-            <i class="nav-icon fas fa-sign-out-alt"></i>
-            <span>Log Out</span>
-        </a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="logout-item" style="width:100%; background:none; border:none;">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <span>Log Out</span>
+            </button>
+        </form>
     </div>
 </aside>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarToggle = document.getElementById('sidebarToggle') || document.getElementById('headerMenu');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const mainContent = document.querySelector('.main-content');
+
+        function applyState(open) {
+            const isMobile = window.innerWidth <= 768;
+            if (open) {
+                sidebar.classList.add('open');
+                if (!isMobile) {
+                    if (mainContent) mainContent.classList.remove('sidebar-closed');
+                    if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+                } else {
+                    if (sidebarOverlay) sidebarOverlay.classList.add('active');
+                }
+            } else {
+                sidebar.classList.remove('open');
+                if (mainContent) mainContent.classList.add('sidebar-closed');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            }
+        }
+
+        // Keep sidebar open by default on load (all pages)
+        applyState(true);
 
         // Toggle sidebar
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                sidebarOverlay.classList.toggle('active');
-                if (mainContent) {
-                    mainContent.classList.toggle('sidebar-open');
-                }
+                const nextOpen = !sidebar.classList.contains('open');
+                applyState(nextOpen);
             });
         }
 
         // Close sidebar when clicking overlay (mobile)
         if (sidebarOverlay) {
             sidebarOverlay.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                sidebarOverlay.classList.remove('active');
-                if (mainContent) {
-                    mainContent.classList.remove('sidebar-open');
-                }
+                applyState(false);
             });
         }
 
-        // Close sidebar on mobile after navigation
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('active');
-                }
-            });
+        // Maintain layout on resize
+        window.addEventListener('resize', function() {
+            // If sidebar is open, re-apply correct classes for current viewport
+            const isOpen = sidebar.classList.contains('open');
+            applyState(isOpen);
         });
     });
 </script>

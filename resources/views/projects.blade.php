@@ -239,22 +239,22 @@
         }
 
         .status-badge.success {
-            background-color: rgba(34, 197, 94, 0.15);
+            background-color: transparent;
             color: #047857;
         }
 
         .status-badge.warning {
-            background-color: rgba(251, 191, 36, 0.18);
+            background-color: transparent;
             color: #a16207;
         }
 
         .status-badge.info {
-            background-color: rgba(59, 130, 246, 0.15);
+            background-color: transparent;
             color: #1d4ed8;
         }
 
         .status-badge.danger {
-            background-color: rgba(239, 68, 68, 0.15);
+            background-color: transparent;
             color: #991b1b;
         }
 
