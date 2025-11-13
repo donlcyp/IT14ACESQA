@@ -189,6 +189,10 @@
             <i class="nav-icon fas fa-home"></i>
             <span>Dashboard</span>
         </a>
+        <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-tasks"></i>
+            <span>Projects</span>
+        </a>
         <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-bolt"></i>
             <span>Project Material Management</span>
@@ -200,10 +204,6 @@
         <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
             <i class="nav-icon fas fa-chart-bar"></i>
             <span>Finance</span>
-        </a>
-        <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-tasks"></i>
-            <span>Projects</span>
         </a>
         <a href="{{ route('employee') }}" class="nav-item {{ request()->routeIs('employee') ? 'active' : '' }}">
             <i class="nav-icon fas fa-hard-hat"></i>
