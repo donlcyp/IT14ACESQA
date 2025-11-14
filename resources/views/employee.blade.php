@@ -667,75 +667,102 @@
                 white-space: nowrap;
             }
 
+        /* Modern Pagination Styles */
         .pagination-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
-            padding: 24px 0;
+            padding: 20px 0;
             user-select: none;
         }
-
         .pagination-info {
             color: #6b7280;
             font-size: 14px;
             text-align: center;
         }
-
         .pagination-controls {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
         }
-
         .pagination-nav {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            gap: 4px;
         }
-
         .page-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             min-width: 36px;
             height: 36px;
-            padding: 0 10px;
+            padding: 0 8px;
             border: none;
             border-radius: 8px;
             background: transparent;
-            color: #374151;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
-            background: #f3f4f6;
+        /* Links - always underlined */
+        a.page-btn {
+            color: #374151;
+            text-decoration: underline !important;
+        }
+        a.page-btn:hover {
             color: #111827;
+            text-decoration: underline !important;
+            background: transparent !important;
         }
-
-        .page-btn.active {
-            background: var(--accent);
-            color: #ffffff;
+        /* Spans - no underline */
+        span.page-btn {
+            text-decoration: none;
+            color: #374151;
+        }
+        /* Active page - green background */
+        span.page-btn.active {
+            background: var(--accent) !important;
+            color: white !important;
             font-weight: 600;
+            text-decoration: none !important;
+            border-radius: 8px;
+            padding: 0 12px;
         }
-
-        .page-btn.disabled {
-            opacity: 0.4;
+        /* Disabled - light grey */
+        span.page-btn.disabled {
+            opacity: 0.5;
+            color: #9ca3af !important;
             cursor: not-allowed;
             pointer-events: none;
+            text-decoration: none !important;
         }
-
+        /* Arrow styling */
         .page-btn.arrow {
             font-size: 20px;
+            font-weight: 400;
         }
-
         .page-btn.ellipsis {
             cursor: default;
             pointer-events: none;
+        }
+        .page-btn.ellipsis:hover {
+            background: transparent;
+        }
+        @media (max-width: 640px) {
+            .page-btn {
+                min-width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .page-btn.arrow {
+                font-size: 18px;
+            }
         }
         }
     </style>
@@ -856,34 +883,32 @@
                                 $pageNumbers[] = $lastPage;
                             }
                         @endphp
-                        <div class="pagination-container">
-                            <div class="pagination-info">
+                        <div class="pagination-container" style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px 0;">
+                            <div class="pagination-info" style="color: #6b7280; font-size: 14px; text-align: center;">
                                 Showing {{ $employees->firstItem() }} to {{ $employees->lastItem() }}
                                 of {{ $employees->total() }} employees
                             </div>
-                            <div class="pagination-controls">
+                            <div class="pagination-controls" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
                                 @if ($employees->onFirstPage())
-                                    <span class="page-btn arrow disabled">‹</span>
+                                    <span class="page-btn arrow disabled" style="opacity: 0.5; color: #9ca3af; cursor: not-allowed; pointer-events: none; text-decoration: none; font-size: 20px;">‹</span>
                                 @else
-                                    <a class="page-btn arrow" href="{{ $employees->previousPageUrl() }}" rel="prev">‹</a>
+                                    <a class="page-btn arrow" href="{{ $employees->previousPageUrl() }}" rel="prev" style="color: #374151; text-decoration: underline; font-size: 20px;">‹</a>
                                 @endif
 
-                                <div class="pagination-nav">
-                                    @foreach ($pageNumbers as $page)
-                                        @if ($page === '...')
-                                            <span class="page-btn ellipsis">…</span>
-                                        @elseif ($page == $currentPage)
-                                            <span class="page-btn active">{{ $page }}</span>
-                                        @else
-                                            <a class="page-btn" href="{{ $employees->url($page) }}">{{ $page }}</a>
-                                        @endif
-                                    @endforeach
+                                <div class="pagination-nav" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    <span class="page-btn active" style="background: var(--accent); color: white; font-weight: 600; text-decoration: none; border-radius: 8px; padding: 0 12px; min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;">{{ $currentPage }}</span>
+                                    @if ($currentPage < $lastPage)
+                                        <a class="page-btn" href="{{ $employees->url($currentPage + 1) }}" style="color: #374151; text-decoration: underline; min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;">{{ $currentPage + 1 }}</a>
+                                    @endif
                                 </div>
 
                                 @if ($employees->hasMorePages())
-                                    <a class="page-btn arrow" href="{{ $employees->nextPageUrl() }}" rel="next">›</a>
+                                    <a class="page-btn arrow" href="{{ $employees->nextPageUrl() }}" rel="next" style="color: #374151; text-decoration: underline; font-size: 20px;">›</a>
+                                    @if ($currentPage < $lastPage - 1)
+                                        <a class="page-btn arrow" href="{{ $employees->url($lastPage) }}" rel="last" style="color: #374151; text-decoration: underline; font-size: 20px;">››</a>
+                                    @endif
                                 @else
-                                    <span class="page-btn arrow disabled">›</span>
+                                    <span class="page-btn arrow disabled" style="opacity: 0.5; color: #9ca3af; cursor: not-allowed; pointer-events: none; text-decoration: none; font-size: 20px;">›</span>
                                 @endif
                             </div>
                         </div>

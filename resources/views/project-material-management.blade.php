@@ -482,7 +482,7 @@
             flex-direction: column;
             align-items: center;
             gap: 16px;
-            padding: 24px 0;
+            padding: 20px 0;
             user-select: none;
         }
         .pagination-info {
@@ -498,7 +498,7 @@
         .pagination-nav {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .page-btn {
             display: inline-flex;
@@ -506,7 +506,7 @@
             justify-content: center;
             min-width: 36px;
             height: 36px;
-            padding: 0 10px;
+            padding: 0 8px;
             border: none;
             border-radius: 8px;
             background: transparent;
@@ -912,6 +912,108 @@
                     </div>
                 @endif
 
+                <!-- QA Modal -->
+                <div class="qa-modal" id="qaModal">
+                    <div class="qa-modal-content">
+                        <div class="qa-modal-icon"></div>
+                        <h2 class="qa-modal-title">Add Project Material Record</h2>
+                        <form action="{{ route('project-material-management.store') }}" method="POST">
+                            @csrf
+                            @if ($selectedProject)
+                                <input
+                                    type="hidden"
+                                    id="project-id"
+                                    name="project_id"
+                                    value="{{ $selectedProject->id }}"
+                                    data-client="{{ $selectedProject->client_name }}"
+                                    data-lead="{{ $selectedProject->lead }}"
+                                >
+                                <div class="qa-modal-input">
+                                    <label class="qa-modal-label">Project Name</label>
+                                    <div class="qa-modal-field">
+                                        <input type="text" value="{{ $selectedProject->project_name }}" readonly>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="qa-modal-input">
+                                    <label class="qa-modal-label" for="project-id">Project Name</label>
+                                    <div class="qa-modal-field">
+                                        <select id="project-id" name="project_id" required>
+                                            <option value="">Select Project</option>
+                                            @foreach ($availableProjects as $project)
+                                                <option
+                                                    value="{{ $project->id }}"
+                                                    data-client="{{ $project->client_name }}"
+                                                    data-lead="{{ $project->lead }}"
+                                                    @selected(old('project_id') == $project->id)
+                                                >
+                                                    {{ $project->project_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @error('project_id')
+                                        <span class="qa-error">{{ $message }}</span>
+                                    @enderror
+                                    @if ($availableProjects->count() === 0)
+                                        <span class="qa-error">All projects already have material records assigned.</span>
+                                    @endif
+                                </div>
+                            @endif
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="client-name">Client Name</label>
+                                <div class="qa-modal-field">
+                                    <input
+                                        type="text"
+                                        id="client-name"
+                                        placeholder="Client will be filled automatically"
+                                        value="{{ $prefilledClientName ?? '' }}"
+                                        readonly
+                                    />
+                                </div>
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="inspector-name">Inspector (Project Lead)</label>
+                                <div class="qa-modal-field">
+                                    <input
+                                        type="text"
+                                        id="inspector-name"
+                                        placeholder="Inspector follows the project lead"
+                                        value="{{ $prefilledInspector ?? '' }}"
+                                        readonly
+                                    />
+                                </div>
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="time">Time</label>
+                                <div class="qa-modal-field">
+                                    <input type="time" id="time" name="time" value="{{ old('time', date('H:i')) }}" required />
+                                </div>
+                                @error('time')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-input">
+                                <label class="qa-modal-label" for="color">Color</label>
+                                <div class="qa-modal-field">
+                                    <input type="color" id="color" name="color" value="{{ old('color', '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT)) }}" required />
+                                </div>
+                                @error('color')
+                                    <span class="qa-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="qa-modal-buttons">
+                                <button type="button" class="qa-modal-button" onclick="closeQaModal()">
+                                    <span class="qa-modal-button-text">Cancel</span>
+                                </button>
+                                <button type="submit" class="qa-modal-button primary">
+                                    <span class="qa-modal-button-text">Save</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
             </section>
         </main>
     </div>
@@ -919,6 +1021,61 @@
     @include('partials.sidebar-js')
 
     <script>
+        // Modal functions
+        const qaModal = document.getElementById('qaModal');
+        const projectSelect = document.getElementById('project-id');
+        const clientInput = document.getElementById('client-name');
+        const inspectorInput = document.getElementById('inspector-name');
+
+        function openQaModal() {
+            if (qaModal) {
+                qaModal.classList.add('active');
+            }
+        }
+
+        function closeQaModal() {
+            if (qaModal) {
+                qaModal.classList.remove('active');
+            }
+        }
+
+        // Auto-fill client and inspector when project is selected
+        if (projectSelect && projectSelect.tagName === 'SELECT') {
+            projectSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption && selectedOption.value) {
+                    const client = selectedOption.getAttribute('data-client') || '';
+                    const lead = selectedOption.getAttribute('data-lead') || '';
+                    if (clientInput) clientInput.value = client;
+                    if (inspectorInput) inspectorInput.value = lead;
+                }
+            });
+        }
+
+        // Auto-fill if project is pre-selected
+        if (projectSelect && projectSelect.tagName === 'INPUT') {
+            const client = projectSelect.getAttribute('data-client') || '';
+            const lead = projectSelect.getAttribute('data-lead') || '';
+            if (clientInput) clientInput.value = client;
+            if (inspectorInput) inspectorInput.value = lead;
+        }
+
+        // Close modal when clicking outside
+        if (qaModal) {
+            qaModal.addEventListener('click', function(e) {
+                if (e.target === qaModal) {
+                    closeQaModal();
+                }
+            });
+        }
+
+        // Open modal automatically if shouldOpenModal is true
+        @if(isset($shouldOpenModal) && $shouldOpenModal)
+            document.addEventListener('DOMContentLoaded', function() {
+                openQaModal();
+            });
+        @endif
+
         // Set background colors for qa-color-indicator elements
         document.querySelectorAll('.qa-color-indicator').forEach(element => {
             const color = element.getAttribute('data-color');

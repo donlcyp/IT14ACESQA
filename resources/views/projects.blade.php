@@ -435,7 +435,7 @@
             flex-direction: column;
             align-items: center;
             gap: 16px;
-            padding: 24px 0;
+            padding: 20px 0;
             user-select: none;
         }
         .pagination-info {
@@ -451,7 +451,7 @@
         .pagination-nav {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .page-btn {
             display: inline-flex;
@@ -459,7 +459,7 @@
             justify-content: center;
             min-width: 36px;
             height: 36px;
-            padding: 0 10px;
+            padding: 0 8px;
             border: none;
             border-radius: 8px;
             background: transparent;

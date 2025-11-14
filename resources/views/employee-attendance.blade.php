@@ -702,22 +702,92 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 12px;
-            border-radius: 999px;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
             font-size: 12px;
             font-weight: 600;
         }
         .status-on-site {
-            background: #dcfce7;
             color: #166534;
         }
         .status-on-leave {
-            background: #fef3c7;
             color: #92400e;
         }
         .status-absent {
-            background: #fee2e2;
             color: #991b1b;
+        }
+
+        /* Modern Pagination Styles */
+        .pagination-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 0;
+            user-select: none;
+        }
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 8px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .page-btn:active:not(.disabled):not(.ellipsis) {
+            transform: scale(0.95);
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .page-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .page-btn.arrow {
+            font-size: 20px;
+            font-weight: 400;
+        }
+        .page-btn.ellipsis {
+            cursor: default;
+            pointer-events: none;
+        }
+        .page-btn.ellipsis:hover {
+            background: transparent;
         }
 
         /* Responsive */
@@ -739,77 +809,16 @@
                 overflow-x: auto;
                 white-space: nowrap;
             }
-
-        .pagination-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            padding: 24px 0;
-            user-select: none;
         }
-
-        .pagination-info {
-            color: #6b7280;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .pagination-nav {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .page-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 36px;
-            height: 36px;
-            padding: 0 10px;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: #374151;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
-            background: #f3f4f6;
-            color: #111827;
-        }
-
-        .page-btn.active {
-            background: var(--accent);
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .page-btn.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .page-btn.arrow {
-            font-size: 20px;
-        }
-
-        .page-btn.ellipsis {
-            cursor: default;
-            pointer-events: none;
-        }
+        @media (max-width: 640px) {
+            .page-btn {
+                min-width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .page-btn.arrow {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -993,24 +1002,33 @@
                 $lastPage = $employees->lastPage();
                 $pageNumbers = [];
 
+                // Show all pages if 7 or fewer pages
                 if ($lastPage <= 7) {
                     for ($i = 1; $i <= $lastPage; $i++) {
                         $pageNumbers[] = $i;
                     }
                 } else {
+                    // For more than 7 pages, show smart pagination
                     $pageNumbers[] = 1;
-                    if ($currentPage > 3) {
+                    
+                    if ($currentPage > 4) {
                         $pageNumbers[] = '...';
                     }
+                    
                     $start = max(2, $currentPage - 1);
                     $end = min($lastPage - 1, $currentPage + 1);
+                    
                     for ($i = $start; $i <= $end; $i++) {
                         $pageNumbers[] = $i;
                     }
-                    if ($currentPage < $lastPage - 2) {
+                    
+                    if ($currentPage < $lastPage - 3) {
                         $pageNumbers[] = '...';
                     }
-                    $pageNumbers[] = $lastPage;
+                    
+                    if ($lastPage > 1) {
+                        $pageNumbers[] = $lastPage;
+                    }
                 }
             @endphp
             <div class="pagination-container">
