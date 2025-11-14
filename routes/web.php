@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FinanceSectionsController;
 
 // Public authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -32,6 +33,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
     Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
+
+    // Finance subsections
+    Route::get('/finance/revenue', [FinanceSectionsController::class, 'revenue'])->name('finance.revenue');
+    Route::get('/finance/expenses', [FinanceSectionsController::class, 'expenses'])->name('finance.expenses');
+    Route::get('/finance/budget', [FinanceSectionsController::class, 'budgetIndex'])->name('finance.budget');
+    Route::post('/finance/budget', [FinanceSectionsController::class, 'budgetStore'])->name('finance.budget.store');
+    Route::get('/finance/purchase-orders', [FinanceSectionsController::class, 'purchaseOrdersIndex'])->name('finance.purchase-orders');
+    Route::post('/finance/purchase-orders', [FinanceSectionsController::class, 'purchaseOrdersStore'])->name('finance.purchase-orders.store');
+    Route::post('/finance/purchase-orders/{id}/status', [FinanceSectionsController::class, 'purchaseOrdersUpdateStatus'])->name('finance.purchase-orders.status');
 
     Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
     Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('projects.store');

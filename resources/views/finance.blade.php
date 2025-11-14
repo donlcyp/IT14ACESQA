@@ -377,7 +377,7 @@
 
         .chart-bars-container {
             display: flex;
-            align-items: flex-end;
+            align-items: stretch;
             justify-content: space-around;
             height: calc(100% - 20px);
             gap: 8px;
@@ -390,6 +390,7 @@
             align-items: center;
             gap: 4px;
             flex: 1;
+            height: 100%;
             max-width: 60px;
         }
 
@@ -398,7 +399,7 @@
             gap: 3px;
             width: 100%;
             align-items: flex-end;
-            height: 100%;
+            flex: 1;
         }
 
         .chart-bar {
@@ -406,7 +407,7 @@
             border-radius: 4px 4px 0 0;
             position: relative;
             transition: opacity 0.2s ease;
-            min-height: 4px;
+            min-height: 0;
         }
 
         .chart-bar:hover {
@@ -477,8 +478,8 @@
 
         /* Finance Sidebar */
         .finance-actions {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
@@ -486,25 +487,45 @@
             background: var(--accent);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 16px 20px;
+            border-radius: 10px;
+            padding: 14px 16px;
             font-family: var(--text-sm-medium-font-family);
-            font-size: var(--text-sm-medium-font-size);
-            font-weight: var(--text-sm-medium-font-weight);
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
             text-align: left;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-xs);
         }
 
         .finance-action-button:hover {
             background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-        .finance-action-button:nth-child(1),
-        .finance-action-button:nth-child(2),
-        .finance-action-button:nth-child(3),
-        .finance-action-button:nth-child(4) {
-            background: var(--accent);
+        .finance-action-button i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .finance-actions-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .finance-actions-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: var(--text-headline-small-bold-font-size);
+            font-weight: var(--text-headline-small-bold-font-weight);
+            color: var(--black-1);
+            margin-bottom: 12px;
         }
 
         .finance-graphic {
@@ -534,18 +555,16 @@
             }
 
             .finance-sidebar {
-                flex-direction: row;
+                flex-direction: column;
                 gap: 20px;
             }
 
             .finance-actions {
-                flex: 1;
-                flex-direction: row;
+                grid-template-columns: 1fr;
             }
 
             .finance-action-button {
-                flex: 1;
-                text-align: center;
+                text-align: left;
             }
 
             .finance-graphic {
@@ -816,31 +835,71 @@
                             </div>
                             <div class="chart-area">
                                 <div class="chart-y-axis">
-                                    <span>₱600K</span>
-                                    <span>₱450K</span>
-                                    <span>₱300K</span>
-                                    <span>₱150K</span>
+                                    @php
+                                        $maxRevenue = (float) ($financialData->max('revenue') ?? 0);
+                                        $maxExpenses = (float) ($financialData->max('expenses') ?? 0);
+                                        $rawMax = max($maxRevenue, $maxExpenses);
+                                        $rawMax = $rawMax > 0 ? $rawMax : 1; // avoid zero scale
+                                        $range = $rawMax * 1.1; // add 10% headroom
+                                        $base = pow(10, floor(log10($range)));
+                                        $fraction = $range / $base;
+                                        if ($fraction <= 1) { $nice = 1; }
+                                        elseif ($fraction <= 2) { $nice = 2; }
+                                        elseif ($fraction <= 5) { $nice = 5; }
+                                        else { $nice = 10; }
+                                        $step = $nice * $base / 4; // step for 4 ticks
+                                        // Recompute to ensure 4 steps cover the range
+                                        $scaleMax = ceil($range / $step) * $step;
+                                    @endphp
+                                    <span>₱{{ number_format($scaleMax, 0) }}</span>
+                                    <span>₱{{ number_format($scaleMax * 0.75, 0) }}</span>
+                                    <span>₱{{ number_format($scaleMax * 0.5, 0) }}</span>
+                                    <span>₱{{ number_format($scaleMax * 0.25, 0) }}</span>
                                     <span>₱0</span>
                                 </div>
                                 <div class="chart-bars-container" id="chartBarsContainer">
                                     @php
                                         $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                                        $maxValue = max($financialData->max('revenue'), $financialData->max('expenses'), 600000);
+                                        // Use the same scale as Y-axis
+                                        if (!isset($scaleMax)) {
+                                            $mxRev = (float) ($financialData->max('revenue') ?? 0);
+                                            $mxExp = (float) ($financialData->max('expenses') ?? 0);
+                                            $raw = max($mxRev, $mxExp);
+                                            $raw = $raw > 0 ? $raw : 1;
+                                            $range2 = $raw * 1.1;
+                                            $base2 = pow(10, floor(log10($range2)));
+                                            $frac2 = $range2 / $base2;
+                                            if ($frac2 <= 1) { $nice2 = 1; }
+                                            elseif ($frac2 <= 2) { $nice2 = 2; }
+                                            elseif ($frac2 <= 5) { $nice2 = 5; }
+                                            else { $nice2 = 10; }
+                                            $step2 = $nice2 * $base2 / 4;
+                                            $scaleMax = ceil($range2 / $step2) * $step2;
+                                        }
+                                        $maxValue = $scaleMax;
                                     @endphp
-                                    @foreach($financialData as $data)
+                                    @php
+                                        $dataByMonth = $financialData->keyBy('month');
+                                    @endphp
+                                    @for ($m = 1; $m <= 12; $m++)
                                         @php
-                                            $monthIndex = $data->month - 1;
-                                            $revenueHeight = ($data->revenue / $maxValue) * 100;
-                                            $expenseHeight = ($data->expenses / $maxValue) * 100;
+                                            $record = $dataByMonth->get($m);
+                                            $rev = (float) ($record->revenue ?? 0);
+                                            $exp = (float) ($record->expenses ?? 0);
+                                            $revenueHeight = $maxValue > 0 ? ($rev / $maxValue) * 100 : 0;
+                                            $expenseHeight = $maxValue > 0 ? ($exp / $maxValue) * 100 : 0;
+                                            $minPct = 2; // ensure visibility for small non-zero values
+                                            $revenueDisplay = ($rev > 0 && $revenueHeight > 0 && $revenueHeight < $minPct) ? $minPct : $revenueHeight;
+                                            $expenseDisplay = ($exp > 0 && $expenseHeight > 0 && $expenseHeight < $minPct) ? $minPct : $expenseHeight;
                                         @endphp
                                         <div class="chart-bar-group">
                                             <div class="chart-bars">
-                                                <div class="chart-bar revenue" style="height: {{ $revenueHeight }}%;" data-value="₱{{ number_format($data->revenue, 0) }}" data-label="Revenue"></div>
-                                                <div class="chart-bar expense" style="height: {{ $expenseHeight }}%;" data-value="₱{{ number_format($data->expenses, 0) }}" data-label="Expenses"></div>
+                                                <div class="chart-bar revenue" style="height: {{ $revenueDisplay }}%;" data-value="₱{{ number_format($rev, 0) }}" data-label="Revenue"></div>
+                                                <div class="chart-bar expense" style="height: {{ $expenseDisplay }}%;" data-value="₱{{ number_format($exp, 0) }}" data-label="Expenses"></div>
                                             </div>
-                                            <div class="chart-bar-label">{{ $monthNames[$monthIndex] }}</div>
+                                            <div class="chart-bar-label">{{ $monthNames[$m - 1] }}</div>
                                         </div>
-                                    @endforeach
+                                    @endfor
                                 </div>
                                 <div class="chart-tooltip" id="chartTooltip"></div>
                             </div>
@@ -849,11 +908,26 @@
 
                     <!-- Finance Sidebar -->
                     <div class="finance-sidebar">
-                        <div class="finance-actions">
-                            <button class="finance-action-button">Project Budget Management</button>
-                            <button class="finance-action-button">Revenue Recording</button>
-                            <button class="finance-action-button">Expense Tracking</button>
-                            <button class="finance-action-button">Purchase Order</button>
+                        <div class="finance-actions-card">
+                            <div class="finance-actions-title">Finance Actions</div>
+                            <div class="finance-actions">
+                                <a class="finance-action-button" href="{{ route('finance.budget') }}">
+                                    <i class="fas fa-wallet"></i>
+                                    <span>Project Budget Management</span>
+                                </a>
+                                <a class="finance-action-button" href="{{ route('finance.revenue') }}">
+                                    <i class="fas fa-arrow-trend-up"></i>
+                                    <span>Revenue Recording</span>
+                                </a>
+                                <a class="finance-action-button" href="{{ route('finance.expenses') }}">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>Expense Tracking</span>
+                                </a>
+                                <a class="finance-action-button" href="{{ route('finance.purchase-orders') }}">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                    <span>Purchase Order</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
