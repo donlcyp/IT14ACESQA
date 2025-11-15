@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
     Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'update'])->name('employee-attendance.update');
+    Route::get('/employee-attendance-history', [App\Http\Controllers\EmployeeAttendanceController::class, 'history'])->name('employee-attendance.history');
     // New Employee page route (separate from attendance)
     Route::get('/employee', [App\Http\Controllers\EmployeeController::class, 'index'])->name('employee');
     Route::post('/employee', [App\Http\Controllers\EmployeeController::class, 'store'])->name('employee.store');

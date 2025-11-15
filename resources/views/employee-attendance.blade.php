@@ -601,6 +601,7 @@
             color: var(--black-1);
         }
         .stat-total .stat-icon { background: #3b82f6; }
+        .stat-idle .stat-icon { background: #9ca3af; }
         .stat-onsite .stat-icon { background: #16a34a; }
         .stat-absent .stat-icon { background: #ef4444; }
         .stat-leave .stat-icon { background: #f97316; }
@@ -697,26 +698,80 @@
             filter: brightness(0.93);
         }
 
-        /* Badge Styles */
+        /* Badge Styles - Enhanced with backgrounds */
         .status-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
-            border: none;
-            border-radius: 0;
-            background: transparent;
+            padding: 4px 12px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
+            text-transform: uppercase;
+            gap: 6px;
+        }
+        .status-idle {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
         }
         .status-on-site {
+            background: #dcfce7;
             color: #166534;
+            border: 1px solid #86efac;
         }
         .status-on-leave {
+            background: #fed7aa;
             color: #92400e;
+            border: 1px solid #fdba74;
         }
         .status-absent {
+            background: #fee2e2;
             color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #93c5fd;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .info-banner-icon {
+            color: #2563eb;
+            font-size: 20px;
+            margin-top: 2px;
+        }
+        .info-banner-content h4 {
+            color: #1e40af;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+        }
+        .info-banner-content p {
+            color: #1e40af;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .info-banner-content ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+            color: #1e40af;
+            font-size: 13px;
+        }
+        .info-banner-content ul li {
+            margin: 4px 0;
+        }
+        .status-legend {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         /* Modern Pagination Styles */
@@ -845,30 +900,35 @@
 
                 <div class="page-header">
                     <h1 class="page-title">Employee Attendance</h1>
-                    <form class="page-controls" method="GET" action="{{ route('employee-attendance') }}">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input
-                                type="text"
-                                name="search"
-                                placeholder="Search by name or ID"
-                                value="{{ $filters['search'] ?? '' }}"
-                                aria-label="Search attendance records"
-                            />
-                        </div>
-                        <select name="status" class="filter-select" aria-label="Filter by status">
-                            <option value="">All Statuses</option>
-                            @foreach ($statusOptions as $statusOption)
-                                <option value="{{ $statusOption }}" @selected(($filters['status'] ?? '') === $statusOption)>
-                                    {{ $statusOption }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <button class="btn btn-outline" type="submit"><i class="fas fa-filter"></i> Apply</button>
-                        @if (!empty($filters['search']) || !empty($filters['status']))
-                            <a class="btn btn-outline" href="{{ route('employee-attendance') }}">Reset</a>
-                        @endif
-                    </form>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <a href="{{ route('employee-attendance.history') }}" class="btn btn-primary">
+                            <i class="fas fa-history"></i> View Past Days
+                        </a>
+                        <form class="page-controls" method="GET" action="{{ route('employee-attendance') }}" style="margin: 0;">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Search by name or ID"
+                                    value="{{ $filters['search'] ?? '' }}"
+                                    aria-label="Search attendance records"
+                                />
+                            </div>
+                            <select name="status" class="filter-select" aria-label="Filter by status">
+                                <option value="">All Statuses</option>
+                                @foreach ($statusOptions as $statusOption)
+                                    <option value="{{ $statusOption }}" @selected(($filters['status'] ?? '') === $statusOption)>
+                                        {{ $statusOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button class="btn btn-outline" type="submit"><i class="fas fa-filter"></i> Apply</button>
+                            @if (!empty($filters['search']) || !empty($filters['status']))
+                                <a class="btn btn-outline" href="{{ route('employee-attendance') }}">Reset</a>
+                            @endif
+                        </form>
+                    </div>
                 </div>
 
                 <div class="stats-grid">
@@ -880,6 +940,15 @@
                             </div>
                         </div>
                         <span class="stat-value">{{ $stats['total'] }}</span>
+                    </div>
+                    <div class="stat-card stat-idle">
+                        <div class="stat-left">
+                            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="stat-text">
+                                <p>Idle (No Status)</p>
+                            </div>
+                        </div>
+                        <span class="stat-value">{{ $stats['idle'] }}</span>
                     </div>
                     <div class="stat-card stat-onsite">
                         <div class="stat-left">
@@ -910,6 +979,43 @@
                     </div>
                 </div>
 
+                <!-- Status Information Banner -->
+                <div class="info-banner">
+                    <div class="info-banner-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="info-banner-content">
+                        <h4>How Attendance Status Works</h4>
+                        <ul>
+                            <li>
+                                <span class="status-legend">
+                                    <span class="status-badge status-idle">Idle</span>
+                                    - Default status at the start of the day. No action taken yet for this employee.
+                                </span>
+                            </li>
+                            <li>
+                                <span class="status-legend">
+                                    <span class="status-badge status-on-site">On Site</span>
+                                    - Automatically set when Time In is recorded. Employee is present at work.
+                                </span>
+                            </li>
+                            <li>
+                                <span class="status-legend">
+                                    <span class="status-badge status-on-leave">On Leave</span>
+                                    - Must be manually selected. Employee has an approved leave for the day.
+                                </span>
+                            </li>
+                            <li>
+                                <span class="status-legend">
+                                    <span class="status-badge status-absent">Absent</span>
+                                    - Manually mark as absent if employee doesn't show up for work.
+                                </span>
+                            </li>
+                        </ul>
+                        <p style="margin-top: 10px; font-style: italic;">💡 Tip: Enter Time In to automatically change status from Idle to On Site. Status cannot be On Site without a clock-in time.</p>
+                    </div>
+                </div>
+
                 <div class="table-card">
                     <table class="attendance-table">
                         <thead>
@@ -929,10 +1035,11 @@
                             @forelse ($employees as $employee)
                                 @php
                                     $statusClass = match ($employee->status) {
+                                        'Idle' => 'status-idle',
                                         'On Site' => 'status-on-site',
                                         'On Leave' => 'status-on-leave',
                                         'Absent' => 'status-absent',
-                                        default => 'status-on-site',
+                                        default => 'status-idle',
                                     };
                                     $formId = 'attendance-form-' . $employee->id;
                                 @endphp
@@ -943,6 +1050,7 @@
                                     <td>{{ $employee->position ?? '—' }}</td>
                                     <td>
                                         <select name="status" form="{{ $formId }}" class="attendance-input">
+                                            <option value="Idle" @selected($employee->status === 'Idle')>Idle</option>
                                             <option value="On Site" @selected($employee->status === 'On Site')>On Site</option>
                                             <option value="On Leave" @selected($employee->status === 'On Leave')>On Leave</option>
                                             <option value="Absent" @selected($employee->status === 'Absent')>Absent</option>
@@ -980,7 +1088,6 @@
                                             <button type="submit" form="{{ $formId }}" class="btn-save">
                                                 <i class="fas fa-save"></i> Save
                                             </button>
-                                            <span class="status-badge {{ $statusClass }}">{{ $employee->status }}</span>
                                         </div>
                                         <form id="{{ $formId }}" action="{{ route('employee-attendance.update', $employee) }}" method="POST" style="display: none;">
                                             @csrf
