@@ -9,11 +9,48 @@ class ProjectsController extends Controller
 {
     public function index()
     {
-        $projects = Project::orderByDesc('created_at')
+        $projects = Project::where('archived', false)
+            ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
 
         return view('projects', compact('projects'));
+    }
+
+    public function archives()
+    {
+        $projects = Project::where('archived', true)
+            ->orderByDesc('archived_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('archives', compact('projects'));
+    }
+
+    public function archive(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'archive_reason' => ['required', 'string', 'in:Finished,Cancelled'],
+        ]);
+
+        $project->update([
+            'archived' => true,
+            'archive_reason' => $validated['archive_reason'],
+            'archived_at' => now(),
+        ]);
+
+        return redirect()->route('projects')->with('success', 'Project archived successfully.');
+    }
+
+    public function unarchive(Project $project)
+    {
+        $project->update([
+            'archived' => false,
+            'archive_reason' => null,
+            'archived_at' => null,
+        ]);
+
+        return redirect()->route('archives')->with('success', 'Project restored successfully.');
     }
 
     public function store(Request $request)

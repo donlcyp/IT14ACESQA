@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FinanceSectionsController;
+use App\Http\Controllers\TransactionController;
 
 // Public authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -31,6 +32,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/transaction', [App\Http\Controllers\AuditController::class, 'index'])->name('transaction');
     Route::post('/transaction', [App\Http\Controllers\AuditController::class, 'store'])->name('transaction.store');
 
+    // New Transaction System Routes (Project Materials & Invoices)
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::get('/transactions/{projectId}/invoice/{supplier}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
+    Route::get('/transactions-history', [TransactionController::class, 'history'])->name('transactions.history');
+
     Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
     Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
 
@@ -46,6 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
     Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('projects.store');
     Route::put('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'update'])->name('projects.update');
+    
+    // Archives routes
+    Route::get('/archives', [App\Http\Controllers\ProjectsController::class, 'archives'])->name('archives');
+    Route::post('/projects/{project}/archive', [App\Http\Controllers\ProjectsController::class, 'archive'])->name('projects.archive');
+    Route::put('/projects/{project}/unarchive', [App\Http\Controllers\ProjectsController::class, 'unarchive'])->name('projects.unarchive');
 
     Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
     Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'update'])->name('employee-attendance.update');

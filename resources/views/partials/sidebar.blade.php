@@ -193,13 +193,17 @@
             <i class="nav-icon fas fa-tasks"></i>
             <span>Projects</span>
         </a>
+        <a href="{{ route('archives') }}" class="nav-item {{ request()->routeIs('archives') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-archive"></i>
+            <span>Archives</span>
+        </a>
         <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
             <i class="nav-icon fas fa-bolt"></i>
             <span>Project Material Management</span>
         </a>
-        <a href="{{ route('transaction') }}" class="nav-item {{ request()->routeIs('transaction') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-gavel"></i>
-            <span>Transaction</span>
+        <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-exchange-alt"></i>
+            <span>Transactions & Invoice</span>
         </a>
         <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
             <i class="nav-icon fas fa-chart-bar"></i>

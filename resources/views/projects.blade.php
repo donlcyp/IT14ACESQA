@@ -583,6 +583,12 @@
                     <div class="projects-content">
                         <div class="projects-title">Projects</div>
                         <div class="projects-actions">
+                            <a href="{{ route('archives') }}" class="projects-button" aria-label="View Archives" style="text-decoration: none;">
+                                <span class="projects-button-base" style="background: #f3f4f6; color: #374151;">
+                                    <i class="fas fa-archive"></i>
+                                    <span>Archives</span>
+                                </span>
+                            </a>
                             <button type="button" class="projects-button" aria-label="New Project" onclick="openProjectModal(true)">
                                 <span class="projects-button-base primary">
                                     <i class="fas fa-plus"></i>
@@ -663,6 +669,18 @@
                                             <span class="projects-button-base">
                                                 <i class="fas fa-edit"></i>
                                                 <span>Edit</span>
+                                            </span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="projects-button"
+                                            aria-label="Archive Project"
+                                            onclick="openArchiveModal({{ $project->id }}, '{{ $project->project_name }}')"
+                                            style="margin-left: 8px;"
+                                        >
+                                            <span class="projects-button-base" style="background: #fee2e2; color: #991b1b;">
+                                                <i class="fas fa-archive"></i>
+                                                <span>Archive</span>
                                             </span>
                                         </button>
                                     </td>
@@ -990,6 +1008,42 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Archive Project Modal -->
+                <div class="projects-modal" id="archiveModal" aria-hidden="true">
+                    <div class="projects-modal-content" role="dialog" aria-modal="true">
+                        <div class="projects-modal-header">
+                            <div class="projects-modal-title">Archive Project</div>
+                            <button class="projects-modal-close" onclick="closeArchiveModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="archiveForm" method="POST">
+                            @csrf
+                            <p style="margin-bottom: 20px; color: #374151; font-size: 14px;">
+                                Are you sure you want to archive <strong id="archiveProjectName"></strong>?
+                            </p>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Archive Reason</label>
+                                <select class="projects-form-select" name="archive_reason" required>
+                                    <option value="">Select reason</option>
+                                    <option value="Finished">Finished</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+
+                            <div class="projects-modal-footer">
+                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeArchiveModal()">Cancel</button>
+                                <button type="submit" class="projects-btn" style="background: #dc2626; color: white;">
+                                    <i class="fas fa-archive"></i>
+                                    <span>Archive</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
@@ -1000,6 +1054,9 @@
         const projectForm = document.getElementById('projectForm');
         const editProjectModal = document.getElementById('editProjectModal');
         const editProjectForm = document.getElementById('editProjectForm');
+        const archiveModal = document.getElementById('archiveModal');
+        const archiveForm = document.getElementById('archiveForm');
+        const archiveProjectName = document.getElementById('archiveProjectName');
         const editProjectName = document.getElementById('editProjectName');
         const editClientPrefix = document.getElementById('editClientPrefix');
         const editClientFirstName = document.getElementById('editClientFirstName');
@@ -1071,6 +1128,25 @@
             if (editProjectForm) editProjectForm.reset();
         }
 
+        function openArchiveModal(projectId, projectName) {
+            if (!archiveModal || !archiveForm) return;
+            
+            archiveForm.action = '{{ route('projects.archive', ':id') }}'.replace(':id', projectId);
+            if (archiveProjectName) {
+                archiveProjectName.textContent = projectName;
+            }
+            
+            archiveModal.classList.add('active');
+            archiveModal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeArchiveModal() {
+            if (!archiveModal) return;
+            archiveModal.classList.remove('active');
+            archiveModal.setAttribute('aria-hidden', 'true');
+            if (archiveForm) archiveForm.reset();
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             if (projectModal) {
                 projectModal.addEventListener('click', function (event) {
@@ -1083,6 +1159,13 @@
                 editProjectModal.addEventListener('click', function (event) {
                     if (event.target === editProjectModal) {
                         closeEditProjectModal();
+                    }
+                });
+            }
+            if (archiveModal) {
+                archiveModal.addEventListener('click', function (event) {
+                    if (event.target === archiveModal) {
+                        closeArchiveModal();
                     }
                 });
             }

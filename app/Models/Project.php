@@ -22,6 +22,9 @@ class Project extends Model
         'lead_first_name',
         'lead_last_name',
         'lead_suffix',
+        'archived',
+        'archive_reason',
+        'archived_at',
     ];
 
     protected $appends = [
