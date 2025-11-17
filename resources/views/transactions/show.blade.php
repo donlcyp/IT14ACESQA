@@ -442,9 +442,6 @@
                 <a href="{{ route('transactions.index') }}" class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back to Projects
                 </a>
-                <button class="header-menu" id="headerMenu">
-                    <i class="fas fa-bars"></i>
-                </button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
