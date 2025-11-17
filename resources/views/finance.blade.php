@@ -419,7 +419,7 @@
         }
 
         .chart-bar.expense {
-            background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+            background: linear-gradient(180deg, #20b255ff 0%, #16a34a 100%);
         }
 
         .chart-bar-label {
@@ -764,9 +764,6 @@
         <main class="main-content" id="mainContent">
             <!-- Header -->
             <header class="header">
-                <button class="header-menu" id="headerMenu">
-                    <i class="fas fa-bars"></i>
-                </button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
