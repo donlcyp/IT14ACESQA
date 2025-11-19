@@ -588,9 +588,8 @@
                 <!-- Status Tabs -->
                 <div class="status-tabs-container">
                     <div class="status-tabs">
-                        <button class="tab-btn active" data-status="Pending">Pending</button>
-                        <button class="tab-btn" data-status="Approved">Approved</button>
-                        <button class="tab-btn" data-status="Fail">Fail</button>
+                        <button class="tab-btn active" data-status="Ongoing">Ongoing</button>
+                        <button class="tab-btn" data-status="Completed">Completed</button>
                     </div>
                 </div>
 
@@ -648,9 +647,8 @@
                                 <div class="form-group">
                                     <label class="form-label">Status</label>
                                     <select class="form-input" id="mat_status" name="status">
-                                        <option value="Pending">Pending</option>
-                                        <option value="Approved">Approved</option>
-                                        <option value="Fail">Fail</option>
+                                        <option value="Ongoing">Ongoing</option>
+                                        <option value="Completed">Completed</option>
                                     </select>
                                 </div>
                                 </div>
@@ -738,7 +736,7 @@
         const csrfToken = '{{ csrf_token() }}';
         console.log('CSRF Token:', csrfToken);
 
-        let currentFilter = 'Pending';
+        let currentFilter = 'Ongoing';
         let selectedRowIndex = -1;
         let editMode = false;
 
@@ -788,10 +786,8 @@
 
         function getStatusStyle(status) {
             const styles = {
-                'Pending': 'background: transparent; color: #856404;',
-                'Approved': 'background: transparent; color: #155724;',
-                'Rejected': 'background: transparent; color: #721c24;',
-                'Fail': 'background: transparent; color: #721c24;', // treat Fail same as Rejected
+                'Ongoing': 'background: transparent; color: #0284c7;',
+                'Completed': 'background: transparent; color: #16a34a;',
                 'In Use': 'background: transparent; color: #084298;',
                 'Depleted': 'background: transparent; color: #383d41;'
             };
@@ -888,7 +884,7 @@
                 document.getElementById('mat_location').value = material.location || '';
                 document.getElementById('mat_received').value = material.date_received || '';
                 if (statusField) {
-                    statusField.value = material.status || 'Pending';
+                    statusField.value = material.status || 'Ongoing';
                 }
                 
                 // Enable status editing for edit mode
@@ -953,7 +949,7 @@
                 document.getElementById('mat_location').value = '';
                 document.getElementById('mat_received').value = '';
                 if (statusField) {
-                    statusField.value = 'Pending';
+                    statusField.value = 'Ongoing';
                 }
                 
                 // Disable status editing for new materials (only edit can change status)

@@ -185,38 +185,75 @@
     </div>
 
     <nav class="nav-menu">
+        <!-- Dashboard - Available to all roles -->
         <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <i class="nav-icon fas fa-home"></i>
             <span>Dashboard</span>
         </a>
-        <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-tasks"></i>
-            <span>Projects</span>
-        </a>
-        <a href="{{ route('archives') }}" class="nav-item {{ request()->routeIs('archives') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-archive"></i>
-            <span>Archives</span>
-        </a>
-        <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-bolt"></i>
-            <span>Project Material Management</span>
-        </a>
-        <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-exchange-alt"></i>
-            <span>Transactions & Invoice</span>
-        </a>
-        <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-chart-bar"></i>
-            <span>Finance</span>
-        </a>
-        <a href="{{ route('employee') }}" class="nav-item {{ request()->routeIs('employee') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-hard-hat"></i>
-            <span>Employee</span>
-        </a>
-        <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-user-check"></i>
-            <span>Attendance</span>
-        </a>
+
+        <!-- OWNER: All menu items visible -->
+        @if(auth()->check() && auth()->user()->role === 'OWNER')
+            <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-tasks"></i>
+                <span>Projects</span>
+            </a>
+            <a href="{{ route('archives') }}" class="nav-item {{ request()->routeIs('archives') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-archive"></i>
+                <span>Archives</span>
+            </a>
+            <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-bolt"></i>
+                <span>Project Material Management</span>
+            </a>
+            <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-exchange-alt"></i>
+                <span>Transactions & Invoice</span>
+            </a>
+            <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-chart-bar"></i>
+                <span>Finance</span>
+            </a>
+            <a href="{{ route('employee') }}" class="nav-item {{ request()->routeIs('employee') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-hard-hat"></i>
+                <span>Employee</span>
+            </a>
+            <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-user-check"></i>
+                <span>Attendance</span>
+            </a>
+        @endif
+
+        <!-- PROJECT MANAGER: Projects and Attendance -->
+        @if(auth()->check() && auth()->user()->role === 'PM')
+            <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-tasks"></i>
+                <span>Projects</span>
+            </a>
+            <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-user-check"></i>
+                <span>Attendance</span>
+            </a>
+        @endif
+
+        <!-- QUALITY ASSURANCE: Project Material Management only -->
+        @if(auth()->check() && auth()->user()->role === 'QA')
+            <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-bolt"></i>
+                <span>Project Material Management</span>
+            </a>
+        @endif
+
+        <!-- FINANCIAL MANAGER: Transactions & Invoice and Finance -->
+        @if(auth()->check() && auth()->user()->role === 'FM')
+            <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-exchange-alt"></i>
+                <span>Transactions & Invoice</span>
+            </a>
+            <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-chart-bar"></i>
+                <span>Finance</span>
+            </a>
+        @endif
     </nav>
 
     <div class="logout-section">

@@ -41,30 +41,35 @@ class DatabaseSeeder extends Seeder
                 'email' => 'admin@ajjcrisber.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => 'OWNER',
             ],
             [
                 'name' => 'Engr. Dela Cruz',
                 'email' => 'delacruz@ajjcrisber.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => 'PM',
             ],
             [
                 'name' => 'Engr. Ramirez',
                 'email' => 'ramirez@ajjcrisber.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => 'QA',
             ],
             [
                 'name' => 'Engr. Flores',
                 'email' => 'flores@ajjcrisber.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => 'FM',
             ],
             [
                 'name' => 'Engr. Santos',
                 'email' => 'santos@ajjcrisber.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
+                'role' => 'PM',
             ],
         ];
 

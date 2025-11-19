@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\AttendanceHistory;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -11,6 +12,64 @@ class EmployeeAttendanceController extends Controller
 {
     public function index(Request $request)
     {
+        // Get all projects with their employees
+        $projects = Project::with('employees')->orderBy('project_name')->get();
+        
+        // Get all employees with their current project assignments
+        $allEmployees = Employee::all()->map(function ($employee) {
+            $assignedProject = $employee->projects()->first();
+            $employee->assigned_to_other_project = $assignedProject && $assignedProject->status !== 'Completed';
+            
+            // Get attendance records - both current and historical
+            $attendanceRecords = [];
+            
+            // Add current attendance if it exists
+            if ($employee->status && $employee->status !== 'Idle') {
+                $attendanceRecords[] = [
+                    'employee_id' => $employee->id,
+                    'employee_code' => $employee->employee_code,
+                    'first_name' => $employee->first_name,
+                    'last_name' => $employee->last_name,
+                    'position' => $employee->position,
+                    'status' => $employee->status,
+                    'attendance_date' => $employee->attendance_date ? $employee->attendance_date->format('Y-m-d') : now()->format('Y-m-d'),
+                    'time_in' => $employee->time_in ? $employee->time_in->format('H:i') : null,
+                    'time_out' => $employee->time_out ? $employee->time_out->format('H:i') : null,
+                ];
+            }
+            
+            // Add historical attendance records
+            $historicalRecords = AttendanceHistory::where('employee_id', $employee->id)
+                ->orderBy('attendance_date', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($record) {
+                    return [
+                        'employee_id' => $record->employee_id,
+                        'employee_code' => $record->employee_code,
+                        'first_name' => $record->first_name,
+                        'last_name' => $record->last_name,
+                        'position' => $record->position,
+                        'status' => $record->status,
+                        'attendance_date' => $record->attendance_date ? $record->attendance_date->format('Y-m-d') : null,
+                        'time_in' => $record->time_in ? (is_string($record->time_in) ? $record->time_in : $record->time_in->format('H:i')) : null,
+                        'time_out' => $record->time_out ? (is_string($record->time_out) ? $record->time_out : $record->time_out->format('H:i')) : null,
+                    ];
+                })
+                ->toArray();
+            
+            $employee->attendance_records = array_merge($attendanceRecords, $historicalRecords);
+            
+            return $employee;
+        })->toArray();
+        
+        // Build project-employees mapping
+        $projectEmployees = [];
+        foreach ($projects as $project) {
+            $projectEmployees[$project->id] = $project->employees->pluck('id')->toArray();
+        }
+
+        // For daily attendance tracking
         $today = Carbon::today();
 
         // Save yesterday's attendance to history before resetting
@@ -79,7 +138,15 @@ class EmployeeAttendanceController extends Controller
         $filters = $request->only(['search', 'status']);
         $statusOptions = ['Idle', 'On Site', 'On Leave', 'Absent'];
 
-        return view('employee-attendance', compact('employees', 'stats', 'filters', 'statusOptions'));
+        return view('employee-attendance', compact(
+            'employees',
+            'projects',
+            'allEmployees',
+            'projectEmployees',
+            'stats',
+            'filters',
+            'statusOptions'
+        ));
     }
 
     public function update(Request $request, Employee $employee)
@@ -110,6 +177,11 @@ class EmployeeAttendanceController extends Controller
         }
 
         $employee->update($data);
+
+        // Return JSON response
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Attendance updated successfully.']);
+        }
 
         return redirect()->route('employee-attendance')->with('success', 'Attendance updated successfully.');
     }
@@ -169,5 +241,55 @@ class EmployeeAttendanceController extends Controller
         ];
 
         return view('attendance-history', compact('records', 'stats', 'filters', 'statusOptions'));
+    }
+
+    /**
+     * Assign employees to a project
+     */
+    public function assignEmployeesToProject(Request $request, Project $project)
+    {
+        try {
+            // Validate that user has permission (PM or OWNER)
+            $user = auth()->guard('web')->user();
+            if (!$user || !$user->canManageProjectEmployees()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            $validated = $request->validate([
+                'employee_ids' => ['required', 'array', 'min:1'],
+                'employee_ids.*' => ['integer', 'exists:employees,id']
+            ]);
+
+            $employeeIds = $validated['employee_ids'];
+
+            // Check if employees are already assigned to other active projects
+            $assignedToOtherProjects = Employee::whereHas('projects', function ($query) use ($employeeIds, $project) {
+                $query->where('status', '!=', 'Completed')
+                      ->where('project_id', '!=', $project->id);
+            })
+            ->whereIn('id', $employeeIds)
+            ->pluck('id')
+            ->toArray();
+
+            if (!empty($assignedToOtherProjects)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Some employees are already assigned to other active projects and cannot be reassigned until those projects are completed.'
+                ], 422);
+            }
+
+            // Sync employees (this will add new ones and remove old ones)
+            $project->employees()->sync($employeeIds);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employees assigned successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

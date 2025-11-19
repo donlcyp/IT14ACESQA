@@ -4,6 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AJJ CRISBER Engineering Services - Employees</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
@@ -516,6 +517,212 @@
             font-weight: 700;
             color: var(--black-1);
         }
+
+        /* Tab Navigation */
+        .tab-btn {
+            display: none;
+        }
+
+        /* Projects Table */
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .projects-table thead {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .projects-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .projects-table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--black-1);
+            font-size: 14px;
+        }
+        .projects-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .projects-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* Project Status Badge */
+        .project-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .project-status.ongoing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .project-status.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Employees Badge */
+        .employees-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: #ffffff;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .project-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+        .action-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        #editAttendanceModal.active {
+            z-index: 3000;
+        }
+        #allProjectsAttendanceModal.active {
+            z-index: 2500;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: inherit;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--black-1);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            color: #111827;
+        }
+
+        /* Employee List in Modal */
+        .employee-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .employee-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+        }
+        .employee-item:hover {
+            background: #f3f4f6;
+        }
+        .employee-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+        .employee-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .employee-name {
+            font-weight: 500;
+            color: #111827;
+        }
+        .employee-code {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .employee-position {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
         .page-controls {
             display: flex;
             align-items: center;
@@ -898,38 +1105,12 @@
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                <div class="page-header">
-                    <h1 class="page-title">Employee Attendance</h1>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <a href="{{ route('employee-attendance.history') }}" class="btn btn-primary">
-                            <i class="fas fa-history"></i> View Past Days
-                        </a>
-                        <form class="page-controls" method="GET" action="{{ route('employee-attendance') }}" style="margin: 0;">
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input
-                                    type="text"
-                                    name="search"
-                                    placeholder="Search by name or ID"
-                                    value="{{ $filters['search'] ?? '' }}"
-                                    aria-label="Search attendance records"
-                                />
-                            </div>
-                            <select name="status" class="filter-select" aria-label="Filter by status">
-                                <option value="">All Statuses</option>
-                                @foreach ($statusOptions as $statusOption)
-                                    <option value="{{ $statusOption }}" @selected(($filters['status'] ?? '') === $statusOption)>
-                                        {{ $statusOption }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <button class="btn btn-outline" type="submit"><i class="fas fa-filter"></i> Apply</button>
-                            @if (!empty($filters['search']) || !empty($filters['status']))
-                                <a class="btn btn-outline" href="{{ route('employee-attendance') }}">Reset</a>
-                            @endif
-                        </form>
-                    </div>
+                <!-- Page Title -->
+                <div class="page-header" style="margin-bottom: 24px;">
+                    <h1 class="page-title">Project Employee Assignments</h1>
                 </div>
+
+                <!-- Projects Tab -->
 
                 <div class="stats-grid">
                     <div class="stat-card stat-total">
@@ -979,203 +1160,757 @@
                     </div>
                 </div>
 
+
                 <!-- Status Information Banner -->
-                <div class="info-banner">
+                <div class="info-banner" id="projects-info">
                     <div class="info-banner-icon">
                         <i class="fas fa-info-circle"></i>
                     </div>
                     <div class="info-banner-content">
-                        <h4>How Attendance Status Works</h4>
+                        <h4>Project Employee Assignment</h4>
                         <ul>
-                            <li>
-                                <span class="status-legend">
-                                    <span class="status-badge status-idle">Idle</span>
-                                    - Default status at the start of the day. No action taken yet for this employee.
-                                </span>
-                            </li>
-                            <li>
-                                <span class="status-legend">
-                                    <span class="status-badge status-on-site">On Site</span>
-                                    - Automatically set when Time In is recorded. Employee is present at work.
-                                </span>
-                            </li>
-                            <li>
-                                <span class="status-legend">
-                                    <span class="status-badge status-on-leave">On Leave</span>
-                                    - Must be manually selected. Employee has an approved leave for the day.
-                                </span>
-                            </li>
-                            <li>
-                                <span class="status-legend">
-                                    <span class="status-badge status-absent">Absent</span>
-                                    - Manually mark as absent if employee doesn't show up for work.
-                                </span>
-                            </li>
+                            <li>View all projects and their assigned employees in the table below.</li>
+                            <li>Only <strong>OWNER</strong> and <strong>PM</strong> can add employees to projects.</li>
+                            <li>Employees can only be assigned to <strong>one active project</strong> at a time.</li>
+                            <li>Once a project is marked as <strong>Completed</strong>, employees can be reassigned to other projects.</li>
+                            <li>Click <strong>Manage Employees</strong> to add or remove employees from a project.</li>
                         </ul>
-                        <p style="margin-top: 10px; font-style: italic;">💡 Tip: Enter Time In to automatically change status from Idle to On Site. Status cannot be On Site without a clock-in time.</p>
                     </div>
                 </div>
 
+                <!-- Projects Table -->
                 <div class="table-card">
-                    <table class="attendance-table">
+                    <table class="projects-table">
                         <thead>
                             <tr>
-                                <th>Employee ID</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Position</th>
-                                <th>Attendance Status</th>
-                                <th>Date</th>
-                                <th>Time In</th>
-                                <th>Time Out</th>
-                                <th>Update</th>
+                                <th>Project Name</th>
+                                <th>Client</th>
+                                <th>Project Lead</th>
+                                <th>Status</th>
+                                <th>Employees Assigned</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($employees as $employee)
-                                @php
-                                    $statusClass = match ($employee->status) {
-                                        'Idle' => 'status-idle',
-                                        'On Site' => 'status-on-site',
-                                        'On Leave' => 'status-on-leave',
-                                        'Absent' => 'status-absent',
-                                        default => 'status-idle',
-                                    };
-                                    $formId = 'attendance-form-' . $employee->id;
-                                @endphp
+                            @forelse ($projects as $project)
                                 <tr>
-                                    <td>{{ $employee->employee_code }}</td>
-                                    <td>{{ $employee->first_name }}</td>
-                                    <td>{{ $employee->last_name }}</td>
-                                    <td>{{ $employee->position ?? '—' }}</td>
+                                    <td><strong>{{ $project->project_name }}</strong></td>
+                                    <td>{{ $project->client_full_name }}</td>
+                                    <td>{{ $project->lead_full_name }}</td>
                                     <td>
-                                        <select name="status" form="{{ $formId }}" class="attendance-input">
-                                            <option value="Idle" @selected($employee->status === 'Idle')>Idle</option>
-                                            <option value="On Site" @selected($employee->status === 'On Site')>On Site</option>
-                                            <option value="On Leave" @selected($employee->status === 'On Leave')>On Leave</option>
-                                            <option value="Absent" @selected($employee->status === 'Absent')>Absent</option>
-                                        </select>
+                                        <span class="project-status {{ strtolower($project->status) }}">
+                                            {{ $project->status }}
+                                        </span>
                                     </td>
                                     <td>
-                                        <input
-                                            type="date"
-                                            name="attendance_date"
-                                            form="{{ $formId }}"
-                                            class="attendance-input"
-                                            value="{{ optional($employee->attendance_date)->format('Y-m-d') }}"
-                                        >
+                                        <span class="employees-badge">{{ $project->employees->count() }}</span>
                                     </td>
                                     <td>
-                                        <input
-                                            type="time"
-                                            name="time_in"
-                                            form="{{ $formId }}"
-                                            class="attendance-input"
-                                            value="{{ optional($employee->time_in)->format('H:i') }}"
-                                        >
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="time"
-                                            name="time_out"
-                                            form="{{ $formId }}"
-                                            class="attendance-input"
-                                            value="{{ optional($employee->time_out)->format('H:i') }}"
-                                        >
-                                    </td>
-                                    <td>
-                                        <div class="attendance-actions">
-                                            <button type="submit" form="{{ $formId }}" class="btn-save">
-                                                <i class="fas fa-save"></i> Save
+                                        <div class="project-actions">
+                                            <button 
+                                                class="action-btn {{ !auth()->user()->canManageProjectEmployees() ? 'disabled' : '' }}"
+                                                onclick="openEmployeeModal({{ $project->id }}, '{{ $project->project_name }}', '{{ $project->status }}')"
+                                                {{ !auth()->user()->canManageProjectEmployees() ? 'disabled' : '' }}
+                                            >
+                                                <i class="fas fa-users"></i> Manage
+                                            </button>
+                                            <button class="action-btn" onclick="viewProjectEmployees({{ $project->id }})">
+                                                <i class="fas fa-eye"></i> View
                                             </button>
                                         </div>
-                                        <form id="{{ $formId }}" action="{{ route('employee-attendance.update', $employee) }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" style="text-align:center; padding: 24px; color: #6b7280;">No attendance records yet. Add employees from the Employees page to get started.</td>
+                                    <td colspan="6" style="text-align:center; padding: 24px; color: #6b7280;">
+                                        No projects available. Create a project from the Projects page to get started.
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-
-        @if($employees instanceof \Illuminate\Pagination\LengthAwarePaginator && $employees->hasPages())
-            @php
-                $currentPage = $employees->currentPage();
-                $lastPage = $employees->lastPage();
-                $pageNumbers = [];
-
-                // Show all pages if 7 or fewer pages
-                if ($lastPage <= 7) {
-                    for ($i = 1; $i <= $lastPage; $i++) {
-                        $pageNumbers[] = $i;
-                    }
-                } else {
-                    // For more than 7 pages, show smart pagination
-                    $pageNumbers[] = 1;
-                    
-                    if ($currentPage > 4) {
-                        $pageNumbers[] = '...';
-                    }
-                    
-                    $start = max(2, $currentPage - 1);
-                    $end = min($lastPage - 1, $currentPage + 1);
-                    
-                    for ($i = $start; $i <= $end; $i++) {
-                        $pageNumbers[] = $i;
-                    }
-                    
-                    if ($currentPage < $lastPage - 3) {
-                        $pageNumbers[] = '...';
-                    }
-                    
-                    if ($lastPage > 1) {
-                        $pageNumbers[] = $lastPage;
-                    }
-                }
-            @endphp
-            <div class="pagination-container">
-                <div class="pagination-info">
-                    Showing {{ $employees->firstItem() }} to {{ $employees->lastItem() }}
-                    of {{ $employees->total() }} attendance records
                 </div>
-                <div class="pagination-controls">
-                    @if ($employees->onFirstPage())
-                        <span class="page-btn arrow disabled">‹</span>
-                    @else
-                        <a class="page-btn arrow" href="{{ $employees->previousPageUrl() }}" rel="prev">‹</a>
-                    @endif
-
-                    <div class="pagination-nav">
-                        @foreach ($pageNumbers as $page)
-                            @if ($page === '...')
-                                <span class="page-btn ellipsis">…</span>
-                            @elseif ($page == $currentPage)
-                                <span class="page-btn active">{{ $page }}</span>
-                            @else
-                                <a class="page-btn" href="{{ $employees->url($page) }}">{{ $page }}</a>
-                            @endif
-                        @endforeach
-                    </div>
-
-                    @if ($employees->hasMorePages())
-                        <a class="page-btn arrow" href="{{ $employees->nextPageUrl() }}" rel="next">›</a>
-                    @else
-                        <span class="page-btn arrow disabled">›</span>
-                    @endif
-                </div>
-            </div>
-        @endif
 
             </section>
         </main>
     </div>
 
-    @include('partials.sidebar-js')
-</body>
+    <!-- Employee Assignment Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Manage Employees - <span id="modalProjectName"></span></h2>
+                <button class="modal-close" onclick="closeEmployeeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
 
-</html>
+            <div id="modalWarning" class="info-banner" style="display: none; margin-bottom: 20px;">
+                <div class="info-banner-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="info-banner-content">
+                    <h4 style="margin: 0;">Project Completed</h4>
+                    <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
+                </div>
+            </div>
+
+            <p style="color: #6b7280; margin-bottom: 16px;">
+                Select employees to assign to this project. Only employees not assigned to other active projects are available.
+            </p>
+
+            <div class="employee-list" id="employeeList">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
+                <button class="btn btn-green" onclick="saveEmployeeAssignments()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Attendance Modal -->
+    <div id="editAttendanceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Attendance - <span id="editEmployeeName"></span></h2>
+                <button class="modal-close" onclick="closeEditAttendanceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="field" style="margin-bottom: 16px;">
+                <label>Status</label>
+                <select id="editStatus" style="padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; width: 100%; height: 40px;">
+                    <option value="Idle">Idle</option>
+                    <option value="On Site">On Site</option>
+                    <option value="On Leave">On Leave</option>
+                    <option value="Absent">Absent</option>
+                </select>
+            </div>
+
+            <div class="field" style="margin-bottom: 16px;">
+                <label>Time In</label>
+                <input type="time" id="editTimeIn" style="padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; width: 100%; height: 40px;" placeholder="">
+            </div>
+
+            <div class="field" style="margin-bottom: 16px;">
+                <label>Time Out</label>
+                <input type="time" id="editTimeOut" style="padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; width: 100%; height: 40px;" placeholder="">
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-outline" onclick="closeEditAttendanceModal()">Cancel</button>
+                <button class="btn btn-green" onclick="saveAttendanceEdit()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Employees Modal -->
+    <div id="viewEmployeesModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 class="modal-title">Project Employees - <span id="viewModalProjectName"></span></h2>
+                <button class="modal-close" onclick="closeViewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb;">
+                <button onclick="switchViewTab('assigned')" id="tab-assigned" style="padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--accent); border-bottom: 3px solid var(--accent); transition: all 0.2s;">
+                    <i class="fas fa-users"></i> Assigned Employees
+                </button>
+                <button onclick="switchViewTab('attendance')" id="tab-attendance" style="padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    <i class="fas fa-calendar-check"></i> Daily Attendance
+                </button>
+            </div>
+
+            <!-- Assigned Employees Tab -->
+            <div id="assigned-content" style="display: block;">
+                <div id="employeesView" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Daily Attendance Tab -->
+            <div id="attendance-content" style="display: none; overflow-x: auto;">
+                <table class="attendance-table" style="min-width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
+                            <th style="min-width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-outline" onclick="closeViewModal()">Close</button>
+                <button class="btn btn-primary" onclick="viewAllProjectsAttendance()">
+                    <i class="fas fa-history"></i> View All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View All Projects Attendance Modal -->
+    <div id="allProjectsAttendanceModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px; max-height: 85vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 class="modal-title">All Projects - Daily Attendance History</h2>
+                <button class="modal-close" onclick="closeAllProjectsAttendanceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Date Filter -->
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                <label style="font-weight: 500; color: #111827;">Filter by Date:</label>
+                <input type="date" id="attendanceDateFilter" style="padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; height: 40px;">
+                <button class="action-btn" onclick="clearDateFilter()" style="background: #f3f4f6; color: #374151;">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+
+            <!-- Status Filter -->
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="action-btn" onclick="filterAttendanceStatus('All')" id="filter-All" style="background: var(--accent); color: #fff; border-color: var(--accent);">
+                    <i class="fas fa-list"></i> All
+                </button>
+                <button class="action-btn" onclick="filterAttendanceStatus('On Site')" id="filter-On Site">
+                    <i class="fas fa-check"></i> On Site
+                </button>
+                <button class="action-btn" onclick="filterAttendanceStatus('On Leave')" id="filter-On Leave">
+                    <i class="fas fa-clock"></i> On Leave
+                </button>
+                <button class="action-btn" onclick="filterAttendanceStatus('Absent')" id="filter-Absent">
+                    <i class="fas fa-user-times"></i> Absent
+                </button>
+                <button class="action-btn" onclick="filterAttendanceStatus('Idle')" id="filter-Idle">
+                    <i class="fas fa-hourglass-half"></i> Idle
+                </button>
+            </div>
+
+            <!-- Attendance Table -->
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Employee</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                    </tr>
+                </thead>
+                <tbody id="allAttendanceTableBody">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-outline" onclick="closeAllProjectsAttendanceModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    @include('partials.sidebar-js')
+
+    <script>
+        let currentProjectId = null;
+        let currentProjectStatus = null;
+        let allEmployees = {!! json_encode($allEmployees ?? []) !!};
+        let projectEmployees = {!! json_encode($projectEmployees ?? []) !!};
+        let canManage = {{ auth()->user()->canManageProjectEmployees() ? 'true' : 'false' }};
+
+        function openEmployeeModal(projectId, projectName, projectStatus) {
+            if (!canManage) {
+                alert('You do not have permission to manage project employees.');
+                return;
+            }
+
+            currentProjectId = projectId;
+            currentProjectStatus = projectStatus;
+            document.getElementById('modalProjectName').textContent = projectName;
+
+            // Show warning if project is completed
+            if (projectStatus.toLowerCase() === 'completed') {
+                document.getElementById('modalWarning').style.display = 'flex';
+            } else {
+                document.getElementById('modalWarning').style.display = 'none';
+            }
+
+            // Load and display employees
+            loadEmployeesForModal(projectId);
+            document.getElementById('employeeModal').classList.add('active');
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeModal').classList.remove('active');
+            currentProjectId = null;
+        }
+
+        function loadEmployeesForModal(projectId) {
+            const employeeList = document.getElementById('employeeList');
+            const assignedEmployeeIds = projectEmployees[projectId] || [];
+
+            employeeList.innerHTML = '';
+
+            allEmployees.forEach(employee => {
+                const isAssigned = assignedEmployeeIds.includes(employee.id);
+                const isAssignedToOtherProject = employee.assigned_to_other_project && !isAssigned;
+
+                const employeeItem = document.createElement('div');
+                employeeItem.className = 'employee-item';
+                employeeItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <input 
+                            type="checkbox" 
+                            value="${employee.id}"
+                            ${isAssigned ? 'checked' : ''}
+                            ${isAssignedToOtherProject ? 'disabled' : ''}
+                            class="employee-checkbox"
+                        >
+                        <div class="employee-info">
+                            <div class="employee-name">${employee.first_name} ${employee.last_name}</div>
+                            <div class="employee-code">${employee.employee_code}</div>
+                            <div class="employee-position">${employee.position || 'No Position'}</div>
+                            ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600;">Assigned to other active project</div>' : ''}
+                        </div>
+                    </div>
+                `;
+                employeeList.appendChild(employeeItem);
+            });
+        }
+
+        function saveEmployeeAssignments() {
+            const checkboxes = document.querySelectorAll('.employee-checkbox:not(:disabled)');
+            const selectedEmployeeIds = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => parseInt(cb.value));
+
+            if (selectedEmployeeIds.length === 0) {
+                alert('Please select at least one employee to assign.');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            if (!csrfToken) {
+                alert('CSRF token not found. Please refresh the page and try again.');
+                console.error('CSRF token missing');
+                return;
+            }
+
+            console.log('Sending request to:', `/api/projects/${currentProjectId}/employees`);
+            console.log('Employee IDs:', selectedEmployeeIds);
+            console.log('CSRF Token:', csrfToken);
+
+            fetch(`/api/projects/${currentProjectId}/employees`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    employee_ids: selectedEmployeeIds
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Check if response is actually JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.error('Non-JSON response received:', text);
+                        throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                    });
+                }
+                
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    alert('Employees assigned successfully!');
+                    closeEmployeeModal();
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to assign employees'));
+                }
+            })
+            .catch(error => {
+                console.error('Full error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+        }
+
+        function viewProjectEmployees(projectId) {
+            const assignedEmployeeIds = projectEmployees[projectId] || [];
+            const projectName = event.target.closest('tr').querySelector('td strong').textContent;
+            
+            document.getElementById('viewModalProjectName').textContent = projectName;
+
+            // Load assigned employees
+            const employeesView = document.getElementById('employeesView');
+            employeesView.innerHTML = '';
+
+            if (assignedEmployeeIds.length === 0) {
+                employeesView.innerHTML = '<p style="color: #6b7280; text-align: center;">No employees assigned to this project.</p>';
+            } else {
+                assignedEmployeeIds.forEach(employeeId => {
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    if (employee) {
+                        const employeeView = document.createElement('div');
+                        employeeView.style.cssText = 'padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 3px solid var(--accent);';
+                        employeeView.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <div style="font-weight: 500; color: #111827;">${employee.first_name} ${employee.last_name}</div>
+                                    <div style="font-size: 13px; color: #6b7280;">${employee.employee_code} • ${employee.position || 'No Position'}</div>
+                                </div>
+                            </div>
+                        `;
+                        employeesView.appendChild(employeeView);
+                    }
+                });
+            }
+
+            // Load attendance for assigned employees
+            loadAttendanceForEmployees(assignedEmployeeIds);
+
+            // Reset tab to assigned employees
+            switchViewTab('assigned');
+
+            document.getElementById('viewEmployeesModal').classList.add('active');
+        }
+
+        function switchViewTab(tabName) {
+            // Hide all tabs
+            document.getElementById('assigned-content').style.display = tabName === 'assigned' ? 'block' : 'none';
+            document.getElementById('attendance-content').style.display = tabName === 'attendance' ? 'block' : 'none';
+
+            // Update tab buttons
+            const assignedBtn = document.getElementById('tab-assigned');
+            const attendanceBtn = document.getElementById('tab-attendance');
+
+            if (tabName === 'assigned') {
+                assignedBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--accent); border-bottom: 3px solid var(--accent); transition: all 0.2s;';
+                attendanceBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.2s;';
+            } else {
+                assignedBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.2s;';
+                attendanceBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--accent); border-bottom: 3px solid var(--accent); transition: all 0.2s;';
+            }
+        }
+
+        function loadAttendanceForEmployees(employeeIds) {
+            const tableBody = document.getElementById('attendanceTableBody');
+            tableBody.innerHTML = '';
+
+            if (employeeIds.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #6b7280;">No employees assigned to view attendance.</td></tr>';
+                return;
+            }
+
+            let hasRecords = false;
+            const attendanceRows = [];
+
+            // Collect all attendance records for assigned employees
+            employeeIds.forEach(employeeId => {
+                const employee = allEmployees.find(e => e.id === employeeId);
+                
+                if (employee) {
+                    console.log(`Employee: ${employee.first_name} ${employee.last_name}`, employee.attendance_records);
+                    
+                    if (employee.attendance_records && employee.attendance_records.length > 0) {
+                        employee.attendance_records.forEach(record => {
+                            hasRecords = true;
+                            const statusClass = getStatusClass(record.status);
+                            
+                            attendanceRows.push({
+                                employeeId: record.employee_id,
+                                name: `${record.first_name} ${record.last_name}`,
+                                status: record.status,
+                                statusClass: statusClass,
+                                date: record.attendance_date || '—',
+                                timeIn: record.time_in || '—',
+                                timeOut: record.time_out || '—'
+                            });
+                        });
+                    }
+                }
+            });
+
+            // Sort by date (newest first)
+            attendanceRows.sort((a, b) => {
+                if (a.date === '—' || b.date === '—') return 0;
+                return new Date(b.date) - new Date(a.date);
+            });
+
+            // Render rows
+            attendanceRows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.name}</td>
+                    <td><span class="status-badge ${row.statusClass}">${row.status}</span></td>
+                    <td>${row.date}</td>
+                    <td>${row.timeIn}</td>
+                    <td>${row.timeOut}</td>
+                    <td>
+                        <button class="action-btn" onclick="openEditAttendanceModal(${row.employeeId}, '${row.name}', '${row.status}', '${row.timeIn}', '${row.timeOut}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            if (!hasRecords) {
+                console.warn('No attendance records found for employees:', employeeIds);
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #6b7280;">No attendance records for assigned employees.</td></tr>';
+            }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Idle': return 'status-idle';
+                case 'On Site': return 'status-on-site';
+                case 'On Leave': return 'status-on-leave';
+                case 'Absent': return 'status-absent';
+                default: return 'status-idle';
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Edit Attendance Functions
+        let currentEditEmployeeId = null;
+
+        function openEditAttendanceModal(employeeId, employeeName, status, timeIn, timeOut) {
+            currentEditEmployeeId = employeeId;
+            document.getElementById('editEmployeeName').textContent = employeeName;
+            document.getElementById('editStatus').value = 'Idle'; // Always default to Idle
+            document.getElementById('editTimeIn').value = ''; // Keep empty
+            document.getElementById('editTimeOut').value = ''; // Keep empty
+            
+            document.getElementById('editAttendanceModal').classList.add('active');
+        }
+
+        function closeEditAttendanceModal() {
+            document.getElementById('editAttendanceModal').classList.remove('active');
+            currentEditEmployeeId = null;
+        }
+
+        function saveAttendanceEdit() {
+            const status = document.getElementById('editStatus').value;
+            const timeIn = document.getElementById('editTimeIn').value;
+            const timeOut = document.getElementById('editTimeOut').value;
+
+            if (!currentEditEmployeeId) {
+                alert('Error: Employee ID not found');
+                return;
+            }
+
+            // Send update to server
+            fetch(`/employee-attendance/${currentEditEmployeeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: status,
+                    time_in: timeIn || null,
+                    time_out: timeOut || null,
+                    attendance_date: new Date().toISOString().split('T')[0]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.message) {
+                    alert('Attendance updated successfully!');
+                    closeEditAttendanceModal();
+                    location.reload();
+                } else {
+                    alert('Error updating attendance');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating attendance');
+            });
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewEmployeesModal').classList.remove('active');
+        }
+
+        // View All Projects Attendance
+        let currentAttendanceFilter = 'All';
+        let currentDateFilter = '';
+
+        function viewAllProjectsAttendance() {
+            currentAttendanceFilter = 'All';
+            currentDateFilter = '';
+            document.getElementById('attendanceDateFilter').value = '';
+            loadAllProjectsAttendance();
+            document.getElementById('allProjectsAttendanceModal').classList.add('active');
+        }
+
+        function closeAllProjectsAttendanceModal() {
+            document.getElementById('allProjectsAttendanceModal').classList.remove('active');
+        }
+
+        function loadAllProjectsAttendance() {
+            const tableBody = document.getElementById('allAttendanceTableBody');
+            tableBody.innerHTML = '';
+
+            const rows = [];
+
+            // Collect attendance from all projects
+            Object.keys(projectEmployees).forEach(projectId => {
+                const project = Object.values(arguments[0] || {}).find(p => p && p.id == projectId) || 
+                               Array.from(document.querySelectorAll('.projects-table tbody tr')).find(row => {
+                                   const cells = row.querySelectorAll('td');
+                                   return cells[0]?.textContent.trim() === projectId;
+                               });
+
+                const employeeIds = projectEmployees[projectId] || [];
+                
+                employeeIds.forEach(employeeId => {
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    
+                    if (employee && employee.attendance_records && employee.attendance_records.length > 0) {
+                        employee.attendance_records.forEach(record => {
+                            const projectRow = document.querySelector(`.projects-table tbody tr td strong`);
+                            const projectName = projectRow?.textContent || `Project ${projectId}`;
+                            
+                            rows.push({
+                                projectName: projectName,
+                                employeeName: `${record.first_name} ${record.last_name}`,
+                                status: record.status,
+                                statusClass: getStatusClass(record.status),
+                                date: record.attendance_date || '—',
+                                timeIn: record.time_in || '—',
+                                timeOut: record.time_out || '—'
+                            });
+                        });
+                    }
+                });
+            });
+
+            // Apply status filter
+            let filtered = currentAttendanceFilter === 'All' 
+                ? rows 
+                : rows.filter(row => row.status === currentAttendanceFilter);
+
+            // Apply date filter
+            if (currentDateFilter) {
+                filtered = filtered.filter(row => row.date === currentDateFilter);
+            }
+
+            if (filtered.length === 0) {
+                const filterText = currentDateFilter ? ` on ${currentDateFilter}` : '';
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #6b7280;">No ${currentAttendanceFilter} records found${filterText}.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.projectName}</td>
+                    <td>${row.employeeName}</td>
+                    <td><span class="status-badge ${row.statusClass}">${row.status}</span></td>
+                    <td>${row.date}</td>
+                    <td>${row.timeIn}</td>
+                    <td>${row.timeOut}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function filterAttendanceStatus(status) {
+            currentAttendanceFilter = status;
+            
+            // Update active button
+            document.querySelectorAll('#allProjectsAttendanceModal .action-btn').forEach(btn => {
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+            });
+            document.getElementById(`filter-${status}`).style.background = 'var(--accent)';
+            document.getElementById(`filter-${status}`).style.color = '#fff';
+            document.getElementById(`filter-${status}`).style.borderColor = 'var(--accent)';
+            
+            loadAllProjectsAttendance();
+        }
+
+        // Date filter event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateFilter = document.getElementById('attendanceDateFilter');
+            if (dateFilter) {
+                dateFilter.addEventListener('change', function(e) {
+                    currentDateFilter = e.target.value;
+                    loadAllProjectsAttendance();
+                });
+            }
+        });
+
+        function clearDateFilter() {
+            currentDateFilter = '';
+            document.getElementById('attendanceDateFilter').value = '';
+            loadAllProjectsAttendance();
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('employeeModal');
+            const viewModal = document.getElementById('viewEmployeesModal');
+            const editModal = document.getElementById('editAttendanceModal');
+            const allProjectsModal = document.getElementById('allProjectsAttendanceModal');
+            
+            if (event.target === modal) {
+                closeEmployeeModal();
+            }
+            if (event.target === viewModal) {
+                closeViewModal();
+            }
+            if (event.target === editModal) {
+                closeEditAttendanceModal();
+            }
+            if (event.target === allProjectsModal) {
+                closeAllProjectsAttendanceModal();
+            }
+        });
+    </script>

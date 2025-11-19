@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Employee extends Model
 {
@@ -30,5 +31,15 @@ class Employee extends Model
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
+    }
+
+    /**
+     * Get the projects this employee is assigned to.
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_employees', 'employee_id', 'project_id')
+            ->withPivot('role_title', 'salary', 'justification', 'assigned_from', 'assigned_to')
+            ->withTimestamps();
     }
 }

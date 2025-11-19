@@ -390,7 +390,7 @@
                         </table>
 
                         <div class="pagination-wrapper">
-                            {{ $history->links() }}
+                            @include('custom.pagination', ['paginator' => $history])
                         </div>
                     @else
                         <div class="empty-state">

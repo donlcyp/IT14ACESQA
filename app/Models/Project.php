@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Project extends Model
 {
@@ -44,5 +45,15 @@ class Project extends Model
         return trim(collect([$this->lead_prefix, $this->lead_first_name, $this->lead_last_name, $this->lead_suffix])
             ->filter(fn ($segment) => $segment !== null && $segment !== '')
             ->implode(' '));
+    }
+
+    /**
+     * Get the employees assigned to this project.
+     */
+    public function employees(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class, 'project_employees', 'project_id', 'employee_id')
+            ->withPivot('role_title', 'salary', 'justification', 'assigned_from', 'assigned_to')
+            ->withTimestamps();
     }
 }

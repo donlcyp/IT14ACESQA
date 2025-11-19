@@ -176,6 +176,13 @@
             cursor: pointer;
         }
 
+        /* Action button container */
+        .projects-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .projects-button-base {
             display: inline-flex;
             align-items: center;
@@ -236,11 +243,19 @@
             letter-spacing: 0.06em;
         }
 
+        .projects-table thead th:last-child {
+            text-align: center;
+        }
+
         .projects-table tbody td {
             padding: 14px 12px;
             border-bottom: 1px solid #e5e7eb;
             font-size: 14px;
             color: #111827;
+        }
+
+        .projects-table tbody td:last-child {
+            text-align: center;
         }
 
         .projects-table tbody tr:hover {
@@ -691,29 +706,30 @@
                                     <td>{{ $project->lead_suffix ?: '—' }}</td>
                                     <td>{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
                                     <td>
-                                        <button
-                                            type="button"
-                                            class="projects-button"
-                                            aria-label="Edit Project"
-                                            onclick="openEditProjectModal(this)"
-                                        >
-                                            <span class="projects-button-base">
-                                                <i class="fas fa-edit"></i>
-                                                <span>Edit</span>
-                                            </span>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="projects-button"
-                                            aria-label="Archive Project"
-                                            onclick="openArchiveModal({{ $project->id }}, '{{ $project->project_name }}')"
-                                            style="margin-left: 8px;"
-                                        >
-                                            <span class="projects-button-base" style="background: #fee2e2; color: #991b1b;">
-                                                <i class="fas fa-archive"></i>
-                                                <span>Archive</span>
-                                            </span>
-                                        </button>
+                                        <div class="projects-actions">
+                                            <button
+                                                type="button"
+                                                class="projects-button"
+                                                aria-label="Edit Project"
+                                                onclick="openEditProjectModal(this)"
+                                            >
+                                                <span class="projects-button-base">
+                                                    <i class="fas fa-edit"></i>
+                                                    <span>Edit</span>
+                                                </span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="projects-button"
+                                                aria-label="Archive Project"
+                                                onclick="openArchiveModal({{ $project->id }}, '{{ $project->project_name }}')"
+                                            >
+                                                <span class="projects-button-base" style="background: #fee2e2; color: #991b1b;">
+                                                    <i class="fas fa-archive"></i>
+                                                    <span>Archive</span>
+                                                </span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -1021,10 +1037,7 @@
                             <div class="projects-form-group">
                                 <label class="projects-form-label">Status</label>
                                 <select class="projects-form-select" id="editProjectStatus" name="status" required>
-                                    <option value="On Track">On Track</option>
-                                    <option value="In Review">In Review</option>
-                                    <option value="Mobilizing">Mobilizing</option>
-                                    <option value="On Hold">On Hold</option>
+                                    <option value="Ongoing">Ongoing</option>
                                     <option value="Completed">Completed</option>
                                 </select>
                             </div>

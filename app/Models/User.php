@@ -46,4 +46,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Check if user can manage project employees.
+     * Only OWNER and PM roles can manage project employees.
+     */
+    public function canManageProjectEmployees(): bool
+    {
+        return in_array($this->role, ['OWNER', 'PM']);
+    }
 }
