@@ -6,14 +6,116 @@
   <title>Purchase Orders</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    body { font-family: Inter, system-ui, Arial; padding: 24px; }
+    :root {
+      --accent: #16a34a;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --white: #ffffff;
+    }
+    
+    body { 
+      font-family: "Inter", sans-serif; 
+      padding: 24px; 
+      background-color: #f9fafb;
+    }
+    
     .container { max-width: 1100px; margin: 0 auto; }
-    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
     .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    input, select, button { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
-    button { background: #16a34a; color: #fff; border: none; cursor: pointer; }
+    
+    input, select { 
+      padding: 10px 12px; 
+      border: 1px solid var(--gray-300); 
+      border-radius: 8px; 
+      font-family: "Inter", sans-serif;
+      font-size: 14px;
+    }
+    
+    /* Standardized Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-family: "Inter", sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    
+    .btn-success, .btn-add, .btn-new, .btn-edit {
+      background: var(--success);
+      color: var(--white);
+    }
+    
+    .btn-success:hover, .btn-add:hover, .btn-new:hover, .btn-edit:hover {
+      background: #15803d;
+      transform: translateY(-1px);
+    }
+    
+    .btn-danger, .btn-delete {
+      background: var(--danger);
+      color: var(--white);
+    }
+    
+    .btn-danger:hover, .btn-delete:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+    }
+    
+    .btn-warning {
+      background: var(--warning);
+      color: var(--white);
+    }
+    
+    .btn-warning:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--gray-200);
+    }
+    
+    /* Legacy button support */
+    button { 
+      background: var(--success); 
+      color: var(--white); 
+      border: none; 
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: "Inter", sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    button:hover {
+      background: #15803d;
+      transform: translateY(-1px);
+    }
+    
     table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+    th, td { padding: 12px; border-bottom: 1px solid var(--gray-200); text-align: left; font-family: "Inter", sans-serif; }
+    th { background: var(--gray-100); font-weight: 600; color: var(--gray-700); }
     form.inline { display: inline-block; }
   </style>
 </head>

@@ -416,7 +416,7 @@
                         </div>
                         <div class="summary-content">
                             <span class="summary-label">Total Projects</span>
-                            <span class="summary-number">27</span>
+                            <span class="summary-number">{{ number_format($summary['total_projects'] ?? 0) }}</span>
                         </div>
                     </div>
                     <div class="summary-item">
@@ -425,7 +425,7 @@
                         </div>
                         <div class="summary-content">
                             <span class="summary-label">Complete Projects</span>
-                            <span class="summary-number">21</span>
+                            <span class="summary-number">{{ number_format($summary['complete_projects'] ?? 0) }}</span>
                         </div>
                     </div>
                     <div class="summary-item">
@@ -434,7 +434,7 @@
                         </div>
                         <div class="summary-content">
                             <span class="summary-label">Ongoing Projects</span>
-                            <span class="summary-number">6</span>
+                            <span class="summary-number">{{ number_format($summary['ongoing_projects'] ?? 0) }}</span>
                         </div>
                     </div>
                 </div>
@@ -463,39 +463,40 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>North Harbor Logistics Center</td>
-                                    <td>TransPhil Industries</td>
-                                    <td>
-                                        <span class="status-badge warning">
-                                            <i class="fas fa-hourglass-half"></i>
-                                            In Review
-                                        </span>
-                                    </td>
-                                    <td>A. Santiago</td>
-                                </tr>
-                                <tr>
-                                    <td>Skyline Residences Tower B</td>
-                                    <td>Vision City Homes</td>
-                                    <td>
-                                        <span class="status-badge success">
-                                            <i class="fas fa-check"></i>
-                                            On Track
-                                        </span>
-                                    </td>
-                                    <td>M. Lozada</td>
-                                </tr>
-                                <tr>
-                                    <td>Eastern Tech Manufacturing Plant</td>
-                                    <td>ETM Group</td>
-                                    <td>
-                                        <span class="status-badge info">
-                                            <i class="fas fa-bolt"></i>
-                                            Mobilizing
-                                        </span>
-                                    </td>
-                                    <td>J. Ramos</td>
-                                </tr>
+                                @php
+                                    $statusMap = [
+                                        'On Track'   => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                        'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
+                                        'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                    ];
+                                @endphp
+
+                                @forelse ($activeProjects as $project)
+                                    @php
+                                        $badge = $statusMap[$project->status] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                        $clientName = $project->client_name ?? ($project->client_full_name ?? '—');
+                                        $leadName = $project->lead ?? ($project->lead_full_name ?? '—');
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $project->project_name }}</td>
+                                        <td>{{ $clientName }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $badge['class'] }}">
+                                                <i class="{{ $badge['icon'] }}"></i>
+                                                {{ $project->status ?? '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $leadName }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No active projects yet.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -522,24 +523,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>North Harbor Logistics Center</td>
-                                    <td>TransPhil Industries</td>
-                                    <td>D. Lim</td>
-                                    <td>2 hours ago</td>
-                                </tr>
-                                <tr>
-                                    <td>Skyline Residences Tower B</td>
-                                    <td>Vision City Homes</td>
-                                    <td>R. Santos</td>
-                                    <td>5 hours ago</td>
-                                </tr>
-                                <tr>
-                                    <td>Eastern Tech Manufacturing Plant</td>
-                                    <td>ETM Group</td>
-                                    <td>J. Ramos</td>
-                                    <td>1 day ago</td>
-                                </tr>
+                                @forelse ($recentProjectRecords as $record)
+                                    <tr>
+                                        <td>{{ $record->title }}</td>
+                                        <td>{{ $record->client ?? '—' }}</td>
+                                        <td>{{ $record->inspector ?? '—' }}</td>
+                                        <td>{{ $record->time ?? optional($record->created_at)->diffForHumans() }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No recent material inspections.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -566,30 +561,36 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>INV003</td>
-                                    <td>P0003</td>
-                                    <td>₱7,000</td>
-                                    <td>
-                                        <span class="status-badge warning">Unpaid</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>INV002</td>
-                                    <td>P0002</td>
-                                    <td>₱3,200</td>
-                                    <td>
-                                        <span class="status-badge warning">Unpaid</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>INV004</td>
-                                    <td>P0004</td>
-                                    <td>₱12,500</td>
-                                    <td>
-                                        <span class="status-badge info">Pending Approval</span>
-                                    </td>
-                                </tr>
+                                @forelse ($transactionReminders as $invoice)
+                                    @php
+                                        $displayStatus = $invoice->approval_status === 'pending'
+                                            ? 'Pending Approval'
+                                            : match ($invoice->payment_status) {
+                                                'paid' => 'Paid',
+                                                'partial' => 'Partially Paid',
+                                                default => 'Unpaid',
+                                            };
+
+                                        $statusClass = match ($displayStatus) {
+                                            'Paid' => 'success',
+                                            'Partially Paid' => 'info',
+                                            'Pending Approval' => 'info',
+                                            default => 'warning',
+                                        };
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $invoice->invoice_number }}</td>
+                                        <td>{{ $invoice->purchase_order_number ?? '—' }}</td>
+                                        <td>₱{{ number_format($invoice->total_amount ?? 0, 2) }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $statusClass }}">{{ $displayStatus }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No pending invoices or payments.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -616,83 +617,105 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    $lastUpdated = $financeSummary['last_updated'] ?? null;
+                                    $lastUpdatedText = $lastUpdated ? $lastUpdated->format('M d, Y g:i A') : '—';
+
+                                    $netProfit = $financeSummary['net_profit'] ?? 0;
+                                    $netStatus = $netProfit > 0 ? 'Positive' : ($netProfit < 0 ? 'Negative' : 'Break-even');
+
+                                    $avgMargin = $financeSummary['avg_profit_margin'] ?? 0;
+                                    $avgMarginStatus = $avgMargin >= 15 ? 'Healthy' : ($avgMargin >= 5 ? 'Moderate' : 'Low');
+
+                                    $budgetUtil = $financeSummary['budget_utilization'] ?? null;
+                                    $budgetStatus = $budgetUtil === null
+                                        ? 'No Budget'
+                                        : ($budgetUtil <= 100 ? 'Optimal' : 'Over Budget');
+                                @endphp
+
                                 <tr>
                                     <td>Total Revenue</td>
-                                    <td>₱5,718,923</td>
+                                    <td>₱{{ number_format($financeSummary['total_revenue'] ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="status-badge success">On Track</span>
+                                        <span class="status-badge success">{{ ($financeSummary['total_revenue'] ?? 0) > 0 ? 'On Track' : 'No Data' }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Total Expenses</td>
-                                    <td>₱2,309,895</td>
+                                    <td>₱{{ number_format($financeSummary['total_expenses'] ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="status-badge info">Within Budget</span>
+                                        <span class="status-badge info">{{ ($financeSummary['total_expenses'] ?? 0) > 0 ? 'Recorded' : 'No Data' }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Net Profit</td>
-                                    <td>₱3,409,028</td>
+                                    <td>₱{{ number_format($netProfit, 2) }}</td>
                                     <td>
-                                        <span class="status-badge success">Positive</span>
+                                        <span class="status-badge {{ $netProfit > 0 ? 'success' : ($netProfit < 0 ? 'warning' : 'info') }}">{{ $netStatus }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Total Transactions</td>
-                                    <td>23</td>
+                                    <td>{{ number_format($financeSummary['total_transactions'] ?? 0) }}</td>
                                     <td>
-                                        <span class="status-badge info">Active</span>
+                                        <span class="status-badge info">{{ ($financeSummary['total_transactions'] ?? 0) > 0 ? 'Active' : 'None' }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Average Profit Margin</td>
-                                    <td>15%</td>
+                                    <td>{{ number_format($avgMargin, 1) }}%</td>
                                     <td>
-                                        <span class="status-badge success">Healthy</span>
+                                        <span class="status-badge {{ $avgMargin >= 15 ? 'success' : ($avgMargin >= 5 ? 'info' : 'warning') }}">{{ $avgMarginStatus }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Monthly Revenue</td>
-                                    <td>₱476,577</td>
+                                    <td>₱{{ number_format($financeSummary['monthly_revenue'] ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="status-badge success">On Target</span>
+                                        <span class="status-badge success">{{ ($financeSummary['monthly_revenue'] ?? 0) > 0 ? 'Recorded' : 'No Data' }}</span>
                                     </td>
                                     <td>This Month</td>
                                 </tr>
                                 <tr>
                                     <td>Monthly Expenses</td>
-                                    <td>₱192,491</td>
+                                    <td>₱{{ number_format($financeSummary['monthly_expenses'] ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="status-badge info">Controlled</span>
+                                        <span class="status-badge info">{{ ($financeSummary['monthly_expenses'] ?? 0) > 0 ? 'Recorded' : 'No Data' }}</span>
                                     </td>
                                     <td>This Month</td>
                                 </tr>
                                 <tr>
                                     <td>Outstanding Invoices</td>
-                                    <td>₱22,700</td>
+                                    <td>₱{{ number_format($financeSummary['outstanding_invoices'] ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="status-badge warning">Pending</span>
+                                        <span class="status-badge warning">{{ ($financeSummary['outstanding_invoices'] ?? 0) > 0 ? 'Pending' : 'None' }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Pending Payments</td>
-                                    <td>₱15,200</td>
+                                    <td>₱{{ number_format($financeSummary['pending_payments'] ?? 0, 2) }}</td>
                                     <td>
-                                        <span class="status-badge warning">Awaiting</span>
+                                        <span class="status-badge warning">{{ ($financeSummary['pending_payments'] ?? 0) > 0 ? 'Awaiting' : 'None' }}</span>
                                     </td>
-                                    <td>Today</td>
+                                    <td>{{ $lastUpdatedText }}</td>
                                 </tr>
                                 <tr>
                                     <td>Budget Utilization</td>
-                                    <td>68%</td>
                                     <td>
-                                        <span class="status-badge success">Optimal</span>
+                                        @if ($budgetUtil === null)
+                                            —
+                                        @else
+                                            {{ $budgetUtil }}%
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ $budgetUtil === null ? 'info' : ($budgetUtil <= 100 ? 'success' : 'warning') }}">{{ $budgetStatus }}</span>
                                     </td>
                                     <td>This Month</td>
                                 </tr>
