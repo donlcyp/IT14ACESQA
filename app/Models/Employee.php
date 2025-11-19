@@ -11,6 +11,8 @@ class Employee extends Model
         'first_name',
         'last_name',
         'position',
+        'education_level',
+        'document_path',
         'email',
         'phone',
         'status',

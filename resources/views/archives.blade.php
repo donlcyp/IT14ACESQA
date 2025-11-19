@@ -549,7 +549,7 @@
                                             @else background: #fee2e2; color: #991b1b; @endif
                                         ">{{ $project->archive_reason }}</span>
                                     </td>
-                                    <td>{{ $project->archived_at ? $project->archived_at->format('M d, Y') : '—' }}</td>
+                                    <td>{{ $project->archived_at ? \Carbon\Carbon::parse($project->archived_at)->format('M d, Y') : '—' }}</td>
                                     <td>
                                         <form action="{{ route('projects.unarchive', $project) }}" method="POST" style="display:inline;">
                                             @csrf

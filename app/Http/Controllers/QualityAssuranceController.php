@@ -147,13 +147,21 @@ class QualityAssuranceController extends Controller
                 'total' => 'required|numeric|min:0',
                 'date_received' => 'nullable|date',
                 'date_inspected' => 'nullable|date',
-                'status' => 'nullable|string|max:50',
+                'status' => 'nullable|string|in:Pending,Delivered,Inspected,Approved,Failed',
+                'remarks' => 'nullable|string',
                 'location' => 'nullable|string|max:255',
             ]);
 
             // Set default status to 'Pending' if not provided
             if (empty($validated['status'])) {
                 $validated['status'] = 'Pending';
+            }
+
+            // Require remarks when status is Failed
+            if (($validated['status'] ?? null) === 'Failed' && empty($validated['remarks'])) {
+                return back()
+                    ->withErrors(['remarks' => 'Remarks are required when marking material as Failed.'])
+                    ->withInput();
             }
 
             Material::create($validated);
@@ -202,9 +210,16 @@ class QualityAssuranceController extends Controller
                 'total' => 'required|numeric|min:0',
                 'date_received' => 'nullable|date',
                 'date_inspected' => 'nullable|date',
-                'status' => 'required|string|max:50',
+                'status' => 'required|string|in:Pending,Delivered,Inspected,Approved,Failed',
+                'remarks' => 'nullable|string',
                 'location' => 'nullable|string|max:255',
             ]);
+
+            if (($validated['status'] ?? null) === 'Failed' && empty($validated['remarks'])) {
+                return back()
+                    ->withErrors(['remarks' => 'Remarks are required when marking material as Failed.'])
+                    ->withInput();
+            }
 
             $material->update($validated);
 

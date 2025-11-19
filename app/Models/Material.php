@@ -21,6 +21,7 @@ class Material extends Model
         'date_received',
         'date_inspected',
         'status',
+        'remarks',
         'location',
     ];
 

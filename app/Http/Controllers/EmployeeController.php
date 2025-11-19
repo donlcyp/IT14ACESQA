@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -46,19 +47,28 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name'  => ['required', 'string', 'max:255'],
-            'position'   => ['nullable', 'string', 'max:255'],
-            'email'      => ['nullable', 'email', 'max:255', 'unique:employees,email'],
-            'phone'      => ['nullable', 'string', 'max:50'],
+            'first_name'      => ['required', 'string', 'max:255'],
+            'last_name'       => ['required', 'string', 'max:255'],
+            'position'        => ['nullable', 'string', 'max:255'],
+            'education_level' => ['nullable', 'in:Elementary,High School,Senior High,Vocational/TESDA,Tertiary/College,Graduate Studies'],
+            'document'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'email'           => ['nullable', 'email', 'max:255', 'unique:employees,email'],
+            'phone'           => ['nullable', 'string', 'max:50'],
         ]);
 
         $data['employee_code'] = $this->generateEmployeeCode();
 
-        foreach (['position', 'email', 'phone'] as $key) {
+        // Handle optional fields normalization
+        foreach (['position', 'email', 'phone', 'education_level'] as $key) {
             if (empty($data[$key])) {
                 $data[$key] = null;
             }
+        }
+
+        // Handle optional document upload
+        if ($request->hasFile('document')) {
+            $path = $request->file('document')->store('employee_docs', 'public');
+            $data['document_path'] = $path;
         }
 
         Employee::create($data);

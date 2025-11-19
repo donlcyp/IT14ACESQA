@@ -763,10 +763,11 @@
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
             <!-- Header -->
-             <button class="header-menu" id="headerMenu">
+
+            <header class="header">
+                <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
                 </button>
-            <header class="header">
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 

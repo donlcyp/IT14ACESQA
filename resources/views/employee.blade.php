@@ -925,7 +925,7 @@
                 <button class="modal-close" id="closeEmployeeModal" aria-label="Close"><i class="fas fa-times"></i></button>
             </div>
 
-            <form action="{{ route('employee.store') }}" method="POST" id="employeeForm">
+            <form action="{{ route('employee.store') }}" method="POST" id="employeeForm" enctype="multipart/form-data">
                 @csrf
                 <div class="form-grid">
                     <div class="form-field">
@@ -941,12 +941,28 @@
                         <input type="text" id="position" name="position" value="{{ old('position') }}">
                     </div>
                     <div class="form-field">
+                        <label for="education_level">Education Level</label>
+                        <select id="education_level" name="education_level">
+                            <option value="" {{ old('education_level') === null ? 'selected' : '' }}>Select education level</option>
+                            <option value="Elementary" {{ old('education_level') === 'Elementary' ? 'selected' : '' }}>Elementary</option>
+                            <option value="High School" {{ old('education_level') === 'High School' ? 'selected' : '' }}>High School</option>
+                            <option value="Senior High" {{ old('education_level') === 'Senior High' ? 'selected' : '' }}>Senior High</option>
+                            <option value="Vocational/TESDA" {{ old('education_level') === 'Vocational/TESDA' ? 'selected' : '' }}>Vocational/TESDA</option>
+                            <option value="Tertiary/College" {{ old('education_level') === 'Tertiary/College' ? 'selected' : '' }}>Tertiary/College</option>
+                            <option value="Graduate Studies" {{ old('education_level') === 'Graduate Studies' ? 'selected' : '' }}>Graduate Studies</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" value="{{ old('email') }}">
                     </div>
                     <div class="form-field">
                         <label for="phone">Phone</label>
                         <input type="text" id="phone" name="phone" value="{{ old('phone') }}">
+                    </div>
+                    <div class="form-field">
+                        <label for="document">Document/Photo (JPG, PNG, or PDF, max 5MB)</label>
+                        <input type="file" id="document" name="document" accept=".jpg,.jpeg,.png,.pdf">
                     </div>
                 </div>
                 <div class="form-actions" style="margin-top: 24px;">

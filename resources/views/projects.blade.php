@@ -189,6 +189,17 @@
             transition: all 0.2s ease;
         }
 
+        /* Make action buttons inside table more compact */
+        .projects-table .projects-button-base {
+            padding: 6px 10px;
+            font-size: 11px;
+            gap: 4px;
+        }
+        .projects-table .projects-button-base i {
+            font-size: 12px;
+            line-height: 1;
+        }
+
         .projects-button-base.primary {
             background: var(--accent);
             color: #fff;
@@ -297,6 +308,26 @@
             padding: 24px;
             position: relative;
             box-shadow: var(--shadow-md);
+        }
+
+        /* Ensure modals fit within the viewport */
+        .projects-modal {
+            padding: 16px;
+        }
+
+        .projects-modal-content {
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+        }
+
+        @media (max-width: 640px) {
+            .projects-modal-content {
+                max-width: 95vw;
+                padding: 16px;
+            }
+            .projects-modal-title {
+                font-size: 18px;
+            }
         }
 
         .projects-modal-header {
@@ -850,10 +881,10 @@
                                 <input
                                     type="text"
                                     class="projects-form-input"
-                                    value="On Track"
+                                    value="In Review"
                                     readonly
                                 />
-                                <input type="hidden" name="status" value="On Track" />
+                                <input type="hidden" name="status" value="In Review" />
                             </div>
 
                             <div class="projects-form-group">
