@@ -147,18 +147,18 @@ class QualityAssuranceController extends Controller
                 'total' => 'required|numeric|min:0',
                 'date_received' => 'nullable|date',
                 'date_inspected' => 'nullable|date',
-                'status' => 'nullable|string|in:Pending,Delivered,Inspected,Approved,Failed',
+                'status' => 'nullable|string|in:Pending,Approved,Fail',
                 'remarks' => 'nullable|string',
                 'location' => 'nullable|string|max:255',
             ]);
 
-            // Set default status to 'Pending' if not provided
+            // Set default status to 'Pending' (idle) if not provided
             if (empty($validated['status'])) {
                 $validated['status'] = 'Pending';
             }
 
-            // Require remarks when status is Failed
-            if (($validated['status'] ?? null) === 'Failed' && empty($validated['remarks'])) {
+            // Require remarks when status is Fail
+            if (($validated['status'] ?? null) === 'Fail' && empty($validated['remarks'])) {
                 return back()
                     ->withErrors(['remarks' => 'Remarks are required when marking material as Failed.'])
                     ->withInput();
@@ -210,12 +210,12 @@ class QualityAssuranceController extends Controller
                 'total' => 'required|numeric|min:0',
                 'date_received' => 'nullable|date',
                 'date_inspected' => 'nullable|date',
-                'status' => 'required|string|in:Pending,Delivered,Inspected,Approved,Failed',
+                'status' => 'required|string|in:Pending,Approved,Fail',
                 'remarks' => 'nullable|string',
                 'location' => 'nullable|string|max:255',
             ]);
 
-            if (($validated['status'] ?? null) === 'Failed' && empty($validated['remarks'])) {
+            if (($validated['status'] ?? null) === 'Fail' && empty($validated['remarks'])) {
                 return back()
                     ->withErrors(['remarks' => 'Remarks are required when marking material as Failed.'])
                     ->withInput();

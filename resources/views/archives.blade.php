@@ -536,12 +536,15 @@
                                     <td>{{ $project->client_name }}</td>
                                     <td>{{ $project->lead }}</td>
                                     <td>
+                                        @php
+                                            $archiveDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                        @endphp
                                         <span class="status-badge" style="
-                                            @if($project->status === 'On Track') background: #d1fae5; color: #065f46;
-                                            @elseif($project->status === 'At Risk') background: #fef3c7; color: #92400e;
-                                            @elseif($project->status === 'Off Track') background: #fee2e2; color: #991b1b;
+                                            @if($archiveDisplayStatus === 'Ongoing') background: #d1fae5; color: #065f46;
+                                            @elseif($archiveDisplayStatus === 'At Risk') background: #fef3c7; color: #92400e;
+                                            @elseif($archiveDisplayStatus === 'Off Track') background: #fee2e2; color: #991b1b;
                                             @else background: #dbeafe; color: #1e40af; @endif
-                                        ">{{ $project->status }}</span>
+                                        ">{{ $archiveDisplayStatus }}</span>
                                     </td>
                                     <td>
                                         <span class="status-badge" style="

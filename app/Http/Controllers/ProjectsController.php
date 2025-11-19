@@ -77,7 +77,7 @@ class ProjectsController extends Controller
         $record = ProjectRecord::where('project_id', $project->id)->first();
         if ($record) {
             $blockers = Material::where('project_record_id', $record->id)
-                ->whereNotIn('status', ['Approved', 'Failed'])
+                ->whereNotIn('status', ['Approved', 'Fail'])
                 ->count();
             if ($blockers > 0) {
                 return redirect()->back()->with('error', 'Not all materials are cleared (Approved/Failed).');

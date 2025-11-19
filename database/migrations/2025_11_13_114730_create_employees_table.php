@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('position')->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('phone')->nullable();
-            $table->enum('status', ['On Site', 'On Leave', 'Absent'])->default('On Site');
+            $table->enum('status', ['Idle', 'On Site', 'On Leave', 'Absent'])->default('Idle');
             $table->date('attendance_date')->nullable();
             $table->time('time_in')->nullable();
             $table->time('time_out')->nullable();

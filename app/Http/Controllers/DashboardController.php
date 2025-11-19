@@ -33,7 +33,7 @@ class DashboardController extends Controller
             'ongoing_projects' => $ongoingProjects,
         ];
 
-        // Active projects (latest 5)
+        // Active projects (latest 5) - all non-archived
         $activeProjects = Project::where('archived', false)
             ->orderByDesc('created_at')
             ->take(5)
@@ -44,78 +44,25 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Transaction reminders: unpaid or pending approval invoices
-        $transactionReminders = Invoice::where(function ($query) {
-                $query->where('payment_status', '!=', 'paid')
-                      ->orWhere('approval_status', 'pending');
+        // Projects that have materials to be returned (materials with status "Fail")
+        $projectsToReturn = ProjectRecord::whereHas('materials', function ($query) {
+                $query->where('status', 'Fail');
             })
-            ->orderByDesc('invoice_date')
-            ->orderByDesc('created_at')
+            ->with(['materials' => function ($query) {
+                $query->where('status', 'Fail');
+            }])
+            ->withCount(['materials as failed_count' => function ($query) {
+                $query->where('status', 'Fail');
+            }])
+            ->orderByDesc('failed_count')
             ->take(5)
             ->get();
-
-        // Finance summary (year-to-date and current month)
-        $currentYear = (int) date('Y');
-        $currentMonth = (int) date('n');
-
-        $totalRevenue = FinancialData::where('year', $currentYear)->sum('revenue');
-        $totalExpenses = FinancialData::where('year', $currentYear)->sum('expenses');
-        $netProfit = $totalRevenue - $totalExpenses;
-
-        $monthlyRevenue = FinancialData::where('year', $currentYear)
-            ->where('month', $currentMonth)
-            ->value('revenue') ?? 0;
-
-        $monthlyExpenses = FinancialData::where('year', $currentYear)
-            ->where('month', $currentMonth)
-            ->value('expenses') ?? 0;
-
-        $avgProfitMargin = $totalRevenue > 0
-            ? round((($totalRevenue - $totalExpenses) / $totalRevenue) * 100, 1)
-            : 0;
-
-        $totalTransactions = Invoice::count();
-
-        $outstandingInvoicesAmount = Invoice::where('payment_status', '!=', 'paid')
-            ->sum('total_amount');
-
-        $pendingPaymentsAmount = Invoice::where('payment_status', '!=', 'paid')
-            ->where('approval_status', 'approved')
-            ->sum('total_amount');
-
-        // Budget utilization based on saved yearly budget targets
-        $budgetUtilization = null;
-        $budgetPath = "budgets_{$currentYear}.json";
-
-        if (Storage::disk('local')->exists($budgetPath)) {
-            $budgetData = json_decode(Storage::disk('local')->get($budgetPath), true) ?: [];
-            $budgetTotal = array_sum($budgetData);
-
-            if ($budgetTotal > 0) {
-                $budgetUtilization = round(($totalExpenses / $budgetTotal) * 100);
-            }
-        }
-
-        $financeSummary = [
-            'total_revenue' => $totalRevenue,
-            'total_expenses' => $totalExpenses,
-            'net_profit' => $netProfit,
-            'total_transactions' => $totalTransactions,
-            'avg_profit_margin' => $avgProfitMargin,
-            'monthly_revenue' => $monthlyRevenue,
-            'monthly_expenses' => $monthlyExpenses,
-            'outstanding_invoices' => $outstandingInvoicesAmount,
-            'pending_payments' => $pendingPaymentsAmount,
-            'budget_utilization' => $budgetUtilization,
-            'last_updated' => now(),
-        ];
 
         return view('dashboard', compact(
             'summary',
             'activeProjects',
             'recentProjectRecords',
-            'transactionReminders',
-            'financeSummary'
+            'projectsToReturn'
         ));
     }
 }

@@ -28,7 +28,7 @@ class ProjectFactory extends Factory
             'client_last_name' => $clientLast,
             'client_suffix' => $clientSuffix,
             'client_name' => trim(implode(' ', array_filter([$clientPrefix, $clientFirst, $clientLast, $clientSuffix]))),
-            'status' => $this->faker->randomElement(['On Track', 'In Review', 'Mobilizing', 'On Hold', 'Completed']),
+            'status' => $this->faker->randomElement(['Ongoing', 'In Review', 'Mobilizing', 'On Hold', 'Completed']),
             'lead_prefix' => $leadPrefix,
             'lead_first_name' => $leadFirst,
             'lead_last_name' => $leadLast,

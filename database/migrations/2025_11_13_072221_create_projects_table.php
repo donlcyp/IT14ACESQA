@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
                 $table->string('project_name');
                 $table->string('client_name');
-                $table->string('status')->default('On Track');
+                $table->string('status')->default('Ongoing');
                 $table->string('lead');
             $table->timestamps();
             });
@@ -33,7 +33,7 @@ return new class extends Migration
             }
 
             if (!Schema::hasColumn('projects', 'status')) {
-                $table->string('status')->default('On Track')->after('client_name');
+                $table->string('status')->default('Ongoing')->after('client_name');
             }
 
             if (!Schema::hasColumn('projects', 'lead')) {

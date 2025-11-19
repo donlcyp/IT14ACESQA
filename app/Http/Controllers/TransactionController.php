@@ -60,20 +60,62 @@ class TransactionController extends Controller
     {
         $project = ProjectRecord::findOrFail($projectId);
         
-        // Get all materials from this supplier for this project
+        // Get APPROVED materials only for the main invoice
         $materials = Material::where('project_record_id', $projectId)
             ->where('supplier', $supplier)
+            ->where('status', 'Approved')
             ->get();
 
-        // Calculate totals
+        // Get FAILED materials separately for return invoice section
+        $failedMaterials = Material::where('project_record_id', $projectId)
+            ->where('supplier', $supplier)
+            ->where('status', 'Fail')
+            ->get();
+
+        // Calculate totals for approved materials only
         $subtotal = $materials->sum('total');
         $tax = $subtotal * 0.12; // 12% VAT
         $total = $subtotal + $tax;
 
+        // Total value of failed materials (for reference/return invoice)
+        $failedSubtotal = $failedMaterials->sum('total');
+
         // Get purchase history for this project
         $purchaseHistory = $this->getPurchaseHistory($projectId, $supplier);
 
-        return view('transactions.invoice', compact('project', 'supplier', 'materials', 'subtotal', 'tax', 'total', 'purchaseHistory'));
+        return view('transactions.invoice', compact(
+            'project',
+            'supplier',
+            'materials',
+            'failedMaterials',
+            'subtotal',
+            'tax',
+            'total',
+            'failedSubtotal',
+            'purchaseHistory'
+        ));
+    }
+
+    /**
+     * Update reason for returning a failed material (remarks field)
+     */
+    public function updateReturnReason(Request $request, Material $material)
+    {
+        $validated = $request->validate([
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        $material->remarks = $validated['remarks'] ?? null;
+        $material->save();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Return reason updated successfully.',
+            ]);
+        }
+
+        return back()->with('success', 'Return reason updated successfully.');
     }
 
     /**

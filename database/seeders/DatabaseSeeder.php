@@ -149,7 +149,7 @@ class DatabaseSeeder extends Seeder
                 'client_last_name' => $clientParts['last_name'],
                 'client_suffix' => $clientParts['suffix'],
                 'client_name' => $this->composeName($clientParts, $definition['client']),
-                'status' => 'On Track',
+                'status' => 'Ongoing',
                 'lead_prefix' => $leadParts['prefix'],
                 'lead_first_name' => $leadParts['first_name'],
                 'lead_last_name' => $leadParts['last_name'],

@@ -556,6 +556,60 @@
                         </div>
                     </div>
 
+                    @if(isset($failedMaterials) && $failedMaterials->count() > 0)
+                        <div class="invoice-card" style="margin-top: 24px;">
+                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--black-1);">
+                                <i class="fas fa-undo" style="color: var(--red-600); margin-right: 8px;"></i>
+                                Return Invoice - Failed Items
+                            </h3>
+                            <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px;">
+                                These materials are marked as <strong>Fail</strong> and are <strong>not included</strong> in the main invoice. Use this section to record the reason for returning each item.
+                            </p>
+
+                            <table class="invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item Description</th>
+                                        <th>Batch/Serial</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                        <th>Reason for Returning</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($failedMaterials as $failed)
+                                        <tr>
+                                            <td>{{ $failed->name }}</td>
+                                            <td>{{ $failed->batch ?? 'N/A' }}</td>
+                                            <td>{{ $failed->quantity }} {{ $failed->unit }}</td>
+                                            <td>₱{{ number_format($failed->total, 2) }}</td>
+                                            <td>
+                                                <form method="POST" action="{{ route('transactions.return-reason.update', $failed->id) }}" style="display: flex; flex-direction: column; gap: 8px;">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <textarea name="remarks" rows="2" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #e5e7eb; font-size: 13px; resize: vertical;" placeholder="Enter reason for returning this item">{{ old('remarks', $failed->remarks) }}</textarea>
+                                                    <button type="submit" class="action-btn primary" style="padding: 6px 12px; font-size: 12px; align-self: flex-start;">
+                                                        <i class="fas fa-save"></i>
+                                                        Save Reason
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                            <div class="invoice-totals">
+                                <div class="totals-box">
+                                    <div class="total-row subtotal">
+                                        <span class="label">Total Failed Items Value:</span>
+                                        <span class="amount">₱{{ number_format($failedSubtotal, 2) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Purchase History for this supplier -->
                     @if($purchaseHistory->count() > 0)
                         <div class="invoice-card" style="margin-top: 24px;">

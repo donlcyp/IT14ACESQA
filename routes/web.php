@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
         Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
         Route::get('/transactions/{projectId}/invoice/{supplier}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
+        Route::put('/transactions/materials/{material}/return-reason', [TransactionController::class, 'updateReturnReason'])->name('transactions.return-reason.update');
         Route::get('/transactions-history', [TransactionController::class, 'history'])->name('transactions.history');
 
         Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');

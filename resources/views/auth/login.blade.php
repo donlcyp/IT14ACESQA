@@ -92,10 +92,6 @@
                 <strong>There were problems with your input.</strong>
             </div>
         @endif
-        <div class="row">
-            <label class="remember"><input type="checkbox" name="remember" /> Remember me</label>
-            <a class="link" href="mailto:admin@ajjcrisber.com?subject=Forgot%20password&body=Please%20assist%20with%20resetting%20my%20password." title="Forgot password support">Forgot password?</a>
-        </div>
         <button class="btn" type="submit">Sign In</button>
         @error('email')
             <div class="error">{{ $message }}</div>

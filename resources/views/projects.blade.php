@@ -668,13 +668,15 @@
                             @forelse ($projects as $project)
                                 @php
                                     $statusMap = [
-                                        'On Track'   => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'Ongoing'   => ['class' => 'success', 'icon' => 'fas fa-check'],
                                         'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
                                         'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
                                         'On Hold'    => ['class' => 'danger', 'icon' => 'fas fa-pause'],
                                         'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
                                     ];
-                                    $badge = $statusMap[$project->status] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+
+                                    $displayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                    $badge = $statusMap[$displayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
                                 @endphp
                                 <tr
                                     data-id="{{ $project->id }}"
@@ -697,7 +699,7 @@
                                     <td>
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>
-                                            {{ $project->status }}
+                                            {{ $displayStatus }}
                                         </span>
                                     </td>
                                     <td>{{ $project->lead_prefix ?: '—' }}</td>
