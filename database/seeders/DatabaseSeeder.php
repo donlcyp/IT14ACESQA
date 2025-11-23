@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder
 
         $project = Project::create([
             'project_code' => 'PROJ-001',
+            'project_name' => 'Website Development',
             'description' => 'Website Development',
             'location' => 'New York',
             'industry' => 'Technology',
