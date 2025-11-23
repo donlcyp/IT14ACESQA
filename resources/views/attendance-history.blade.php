@@ -571,13 +571,13 @@
                                     };
                                 @endphp
                                 <tr>
-                                    <td>{{ $record->attendance_date->format('M d, Y') }}</td>
-                                    <td>{{ $record->employee_code }}</td>
-                                    <td>{{ $record->first_name }}</td>
-                                    <td>{{ $record->last_name }}</td>
+                                    <td>{{ $record->date->format('M d, Y') }}</td>
+                                    <td>{{ 'EMP' . str_pad($record->employee_id, 3, '0', STR_PAD_LEFT) }}</td>
+                                    <td>{{ $record->f_name }}</td>
+                                    <td>{{ $record->l_name }}</td>
                                     <td>{{ $record->position ?? '—' }}</td>
                                     <td>
-                                        <span class="status-badge {{ $statusClass }}">{{ $record->status }}</span>
+                                        <span class="status-badge {{ $statusClass }}">{{ $record->attendance_status }}</span>
                                     </td>
                                     <td>{{ optional($record->time_in)->format('h:i A') ?? '—' }}</td>
                                     <td>{{ optional($record->time_out)->format('h:i A') ?? '—' }}</td>

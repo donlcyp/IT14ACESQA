@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('projects', function (Blueprint $table) {
-            $table->boolean('archived')->default(false)->after('lead');
-            $table->string('archive_reason')->nullable()->after('archived');
-            $table->timestamp('archived_at')->nullable()->after('archive_reason');
+            $table->string('project_name')->nullable()->after('project_code');
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('projects', function (Blueprint $table) {
-            $table->dropColumn(['archived', 'archive_reason', 'archived_at']);
+            $table->dropColumn('project_name');
         });
     }
 };

@@ -842,12 +842,12 @@
                             <tbody>
                                 @forelse ($employees as $employee)
                                     <tr>
-                                        <td>{{ $employee->employee_code }}</td>
-                                        <td>{{ $employee->first_name }}</td>
-                                        <td>{{ $employee->last_name }}</td>
+                                        <td>{{ 'EMP' . str_pad($employee->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                        <td>{{ $employee->f_name }}</td>
+                                        <td>{{ $employee->l_name }}</td>
                                         <td>{{ $employee->position ?? '—' }}</td>
-                                        <td>{{ $employee->email ?? '—' }}</td>
-                                        <td>{{ $employee->phone ?? '—' }}</td>
+                                        <td>{{ $employee->user->email ?? '—' }}</td>
+                                        <td>{{ $employee->user->phone ?? '—' }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -938,7 +938,14 @@
                     </div>
                     <div class="form-field">
                         <label for="position">Position</label>
-                        <input type="text" id="position" name="position" value="{{ old('position') }}">
+                        <select id="position" name="position">
+                            <option value="" {{ old('position') === null ? 'selected' : '' }}>Select position</option>
+                            <option value="Project Manager" {{ old('position') === 'Project Manager' ? 'selected' : '' }}>Project Manager</option>
+                            <option value="Finance Manager" {{ old('position') === 'Finance Manager' ? 'selected' : '' }}>Finance Manager</option>
+                            <option value="HR/Timekeeper" {{ old('position') === 'HR/Timekeeper' ? 'selected' : '' }}>HR/Timekeeper</option>
+                            <option value="Quality Assurance Officer" {{ old('position') === 'Quality Assurance Officer' ? 'selected' : '' }}>Quality Assurance Officer</option>
+                            <option value="Construction Worker" {{ old('position') === 'Construction Worker' ? 'selected' : '' }}>Construction Worker</option>
+                        </select>
                     </div>
                     <div class="form-field">
                         <label for="education_level">Education Level</label>

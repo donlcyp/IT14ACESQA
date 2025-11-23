@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
-use App\Models\ProjectRecord;
-use App\Models\FinancialData;
+use App\Models\Material;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,22 +38,14 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Recent project material records (latest 5)
-        $recentProjectRecords = ProjectRecord::orderByDesc('created_at')
+        // Recent materials (latest 5)
+        $recentProjectRecords = Material::orderByDesc('created_at')
             ->take(5)
             ->get();
 
-        // Projects that have materials to be returned (materials with status "Fail")
-        $projectsToReturn = ProjectRecord::whereHas('materials', function ($query) {
-                $query->where('status', 'Fail');
-            })
-            ->with(['materials' => function ($query) {
-                $query->where('status', 'Fail');
-            }])
-            ->withCount(['materials as failed_count' => function ($query) {
-                $query->where('status', 'Fail');
-            }])
-            ->orderByDesc('failed_count')
+        // Materials that have failed status (need to be returned)
+        $projectsToReturn = Material::where('status', 'Fail')
+            ->orderByDesc('created_at')
             ->take(5)
             ->get();
 

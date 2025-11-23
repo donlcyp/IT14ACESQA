@@ -585,8 +585,32 @@
             padding: 24px;
             width: 100%;
             max-width: 442px;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: var(--shadow-md);
             position: relative;
+        }
+
+        /* Landscape scrolling support */
+        @media (max-height: 600px) or (orientation: landscape) {
+            .qa-modal-content {
+                max-width: 95vw;
+                max-height: 95vh;
+                overflow-y: auto;
+                overflow-x: auto;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Tablet landscape */
+        @media (max-width: 1024px) and (orientation: landscape) {
+            .qa-modal-content {
+                max-width: 90vw;
+                max-height: 90vh;
+            }
         }
 
         .qa-modal-icon {
@@ -614,6 +638,23 @@
             gap: 2px;
             width: 100%;
             margin-bottom: 16px;
+        }
+
+        /* Landscape form wrapping */
+        @media (max-height: 600px) or (orientation: landscape) {
+            .qa-modal form {
+                display: contents;
+            }
+
+            .qa-modal-title {
+                grid-column: 1 / -1;
+                margin: 0 0 20px 0;
+            }
+
+            .qa-modal-buttons {
+                grid-column: 1 / -1;
+                margin-top: 20px;
+            }
         }
 
         .qa-modal-label {
@@ -967,7 +1008,7 @@
                                         type="text"
                                         id="client-name"
                                         placeholder="Client will be filled automatically"
-                                        value="{{ $prefilledClientName ?? '' }}"
+                                        value="{{ $selectedProject?->client_name ?? '' }}"
                                         readonly
                                     />
                                 </div>
@@ -979,28 +1020,16 @@
                                         type="text"
                                         id="inspector-name"
                                         placeholder="Inspector follows the project lead"
-                                        value="{{ $prefilledInspector ?? '' }}"
+                                        value="{{ $selectedProject?->lead ?? '' }}"
                                         readonly
                                     />
                                 </div>
                             </div>
                             <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="time">Time</label>
+                                <label class="qa-modal-label" for="color-picker">Color</label>
                                 <div class="qa-modal-field">
-                                    <input type="time" id="time" name="time" value="{{ old('time', date('H:i')) }}" required />
+                                    <input type="color" id="color-picker" name="color" value="#16a34a" />
                                 </div>
-                                @error('time')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="qa-modal-input">
-                                <label class="qa-modal-label" for="color">Color</label>
-                                <div class="qa-modal-field">
-                                    <input type="color" id="color" name="color" value="{{ old('color', '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT)) }}" required />
-                                </div>
-                                @error('color')
-                                    <span class="qa-error">{{ $message }}</span>
-                                @enderror
                             </div>
                             <div class="qa-modal-buttons">
                                 <button type="button" class="qa-modal-button" onclick="closeQaModal()">

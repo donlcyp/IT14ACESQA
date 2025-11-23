@@ -6,19 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('project_records', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('client');
-            $table->string('inspector');
-            $table->string('time'); // Using string for "30 mins ago"; could use timestamp
-            $table->string('color'); // For picture background color
+            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
+            $table->string('title')->nullable();
+            $table->string('client')->nullable();
+            $table->string('inspector')->nullable();
+            $table->string('time')->nullable();
+            $table->string('color')->nullable()->default('#520d0d');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('project_records');

@@ -607,19 +607,13 @@
                                                     <div>{{ $project->client_name }}</div>
                                                     <div class="muted" style="margin-top:8px;">Lead</div>
                                                     <div>{{ $project->lead }}</div>
-                                                    @php
-                                                        $inspector = optional($project->projectRecords->first())->inspector;
-                                                    @endphp
                                                     <div class="muted" style="margin-top:8px;">Inspector</div>
-                                                    <div>{{ $inspector ?? 'N/A' }}</div>
+                                                    <div>{{ $project->lead ?? 'N/A' }}</div>
                                                 </div>
                                                 <div>
                                                     @php
-                                                        $materials = collect();
-                                                        foreach(($project->projectRecords ?? []) as $rec){
-                                                            $materials = $materials->merge($rec->materials);
-                                                        }
-                                                        $materialsTotal = $materials->sum('total');
+                                                        $materials = $project->purchaseOrders->pluck('material')->filter();
+                                                        $materialsTotal = $materials->sum('total_cost');
                                                     @endphp
                                                     <div class="report-section-title">Materials Used</div>
                                                     <table class="report-table">
@@ -633,9 +627,9 @@
                                                         <tbody>
                                                             @forelse($materials as $m)
                                                                 <tr>
-                                                                    <td>{{ $m->name }}</td>
-                                                                    <td>{{ $m->quantity }} {{ $m->unit }}</td>
-                                                                    <td>₱{{ number_format($m->total, 2) }}</td>
+                                                                    <td>{{ $m->material_name }}</td>
+                                                                    <td>{{ $m->quantity_received }} {{ $m->unit_of_measure }}</td>
+                                                                    <td>₱{{ number_format($m->total_cost, 2) }}</td>
                                                                 </tr>
                                                             @empty
                                                                 <tr><td colspan="3" class="muted">No materials recorded.</td></tr>

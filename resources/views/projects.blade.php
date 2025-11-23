@@ -323,16 +323,39 @@
             padding: 24px;
             position: relative;
             box-shadow: var(--shadow-md);
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .projects-form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .projects-form-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Landscape orientation support */
+        @media (min-width: 800px) and (min-height: 600px) {
+            .projects-modal-content {
+                max-width: 900px;
+            }
+
+            .projects-form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .projects-form-full {
+                grid-column: 1 / -1;
+            }
         }
 
         /* Ensure modals fit within the viewport */
         .projects-modal {
             padding: 16px;
-        }
-
-        .projects-modal-content {
-            max-height: calc(100vh - 32px);
-            overflow-y: auto;
         }
 
         @media (max-width: 640px) {
@@ -342,6 +365,24 @@
             }
             .projects-modal-title {
                 font-size: 18px;
+            }
+        }
+
+        /* Landscape orientation support for mobile */
+        @media (max-height: 600px) or (orientation: landscape) {
+            .projects-modal-content {
+                max-height: 95vh;
+                overflow-y: auto;
+                overflow-x: auto;
+            }
+            
+            .projects-form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            .projects-form-full {
+                grid-column: 1 / -1;
             }
         }
 
@@ -650,16 +691,13 @@
                     <table class="projects-table">
                         <thead>
                             <tr>
-                                <th>Project</th>
+                                <th>Project Name</th>
                                 <th>Client Prefix</th>
                                 <th>Client First Name</th>
                                 <th>Client Last Name</th>
                                 <th>Client Suffix</th>
                                 <th>Status</th>
-                                <th>Lead Prefix</th>
-                                <th>Lead First Name</th>
-                                <th>Lead Last Name</th>
-                                <th>Lead Suffix</th>
+                                <th>Assigned Project Manager</th>
                                 <th>Created</th>
                                 <th>Actions</th>
                             </tr>
@@ -680,35 +718,35 @@
                                 @endphp
                                 <tr
                                     data-id="{{ $project->id }}"
-                                    data-name="{{ $project->project_name }}"
+                                    data-name="{{ $project->project_code }}"
                                     data-status="{{ $project->status }}"
-                                    data-client-prefix="{{ $project->client_prefix }}"
-                                    data-client-first="{{ $project->client_first_name }}"
-                                    data-client-last="{{ $project->client_last_name }}"
-                                    data-client-suffix="{{ $project->client_suffix }}"
-                                    data-lead-prefix="{{ $project->lead_prefix }}"
-                                    data-lead-first="{{ $project->lead_first_name }}"
-                                    data-lead-last="{{ $project->lead_last_name }}"
-                                    data-lead-suffix="{{ $project->lead_suffix }}"
                                 >
                                     <td>{{ $project->project_name }}</td>
-                                    <td>{{ $project->client_prefix ?: '—' }}</td>
-                                    <td>{{ $project->client_first_name ?: '—' }}</td>
-                                    <td>{{ $project->client_last_name ?: '—' }}</td>
-                                    <td>{{ $project->client_suffix ?: '—' }}</td>
+                                    <td>—</td>
+                                    <td>{{ $project->client?->company_name ?: '—' }}</td>
+                                    <td>{{ $project->client?->contact_person ?: '—' }}</td>
+                                    <td>—</td>
                                     <td>
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>
                                             {{ $displayStatus }}
                                         </span>
                                     </td>
-                                    <td>{{ $project->lead_prefix ?: '—' }}</td>
-                                    <td>{{ $project->lead_first_name ?: '—' }}</td>
-                                    <td>{{ $project->lead_last_name ?: '—' }}</td>
-                                    <td>{{ $project->lead_suffix ?: '—' }}</td>
+                                    <td>{{ $project->assignedPM?->name ?: '—' }}</td>
                                     <td>{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
                                     <td>
                                         <div class="projects-actions">
+                                            <button
+                                                type="button"
+                                                class="projects-button"
+                                                aria-label="View Project"
+                                                onclick="window.location.href='{{ route('projects.show', $project->id) }}'"
+                                            >
+                                                <span class="projects-button-base" style="background: #dbeafe; color: #0369a1;">
+                                                    <i class="fas fa-eye"></i>
+                                                    <span>View</span>
+                                                </span>
+                                            </button>
                                             <button
                                                 type="button"
                                                 class="projects-button"
@@ -816,155 +854,190 @@
 
                         <form id="projectForm" action="{{ route('projects.store') }}" method="POST">
                             @csrf
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Project Name</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="projectName"
-                                    name="project_name"
-                                    placeholder="Enter project name"
-                                    value="{{ old('project_name') }}"
-                                    required
-                                />
-                                @error('project_name')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            <div class="projects-form-grid">
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Project Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="projectName"
+                                        name="project_name"
+                                        placeholder="Enter project name"
+                                        value="{{ old('project_name') }}"
+                                        required
+                                    />
+                                    @error('project_name')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="clientPrefix">Client Prefix</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="clientPrefix"
-                                    name="client_prefix"
-                                    placeholder="Enter client prefix (optional)"
-                                    value="{{ old('client_prefix') }}"
-                                />
-                                @error('client_prefix')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group projects-form-full">
+                                    <label class="projects-form-label">Description</label>
+                                    <textarea
+                                        class="projects-form-input"
+                                        id="description"
+                                        name="description"
+                                        placeholder="Enter project description"
+                                        rows="3"
+                                    >{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="clientFirstName">Client First Name</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="clientFirstName"
-                                    name="client_first_name"
-                                    placeholder="Enter client first name"
-                                    value="{{ old('client_first_name') }}"
-                                    required
-                                />
-                                @error('client_first_name')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientPrefix">Client Prefix</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientPrefix"
+                                        name="client_prefix"
+                                        placeholder="Enter client prefix (optional)"
+                                        value="{{ old('client_prefix') }}"
+                                    />
+                                    @error('client_prefix')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="clientLastName">Client Last Name</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="clientLastName"
-                                    name="client_last_name"
-                                    placeholder="Enter client last name"
-                                    value="{{ old('client_last_name') }}"
-                                    required
-                                />
-                                @error('client_last_name')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientFirstName">Client First Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientFirstName"
+                                        name="client_first_name"
+                                        placeholder="Enter client first name"
+                                        value="{{ old('client_first_name') }}"
+                                        required
+                                    />
+                                    @error('client_first_name')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="clientSuffix">Client Suffix</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="clientSuffix"
-                                    name="client_suffix"
-                                    placeholder="Enter client suffix (optional)"
-                                    value="{{ old('client_suffix') }}"
-                                />
-                                @error('client_suffix')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientLastName">Client Last Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientLastName"
+                                        name="client_last_name"
+                                        placeholder="Enter client last name"
+                                        value="{{ old('client_last_name') }}"
+                                        required
+                                    />
+                                    @error('client_last_name')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Status</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    value="In Review"
-                                    readonly
-                                />
-                                <input type="hidden" name="status" value="In Review" />
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientSuffix">Client Suffix</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientSuffix"
+                                        name="client_suffix"
+                                        placeholder="Enter client suffix (optional)"
+                                        value="{{ old('client_suffix') }}"
+                                    />
+                                    @error('client_suffix')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="leadPrefix">Lead Engineer Prefix</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="leadPrefix"
-                                    name="lead_prefix"
-                                    placeholder="Enter lead engineer prefix (optional)"
-                                    value="{{ old('lead_prefix') }}"
-                                />
-                                @error('lead_prefix')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Location</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="location"
+                                        name="location"
+                                        placeholder="Enter project location"
+                                        value="{{ old('location') }}"
+                                    />
+                                    @error('location')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="leadFirstName">Lead Engineer First Name</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="leadFirstName"
-                                    name="lead_first_name"
-                                    placeholder="Enter lead engineer first name"
-                                    value="{{ old('lead_first_name') }}"
-                                    required
-                                />
-                                @error('lead_first_name')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Industry</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="industry"
+                                        name="industry"
+                                        placeholder="Enter industry"
+                                        value="{{ old('industry') }}"
+                                    />
+                                    @error('industry')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="leadLastName">Lead Engineer Last Name</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="leadLastName"
-                                    name="lead_last_name"
-                                    placeholder="Enter lead engineer last name"
-                                    value="{{ old('lead_last_name') }}"
-                                    required
-                                />
-                                @error('lead_last_name')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Target Timeline</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="targetTimeline"
+                                        name="target_timeline"
+                                        value="{{ old('target_timeline') }}"
+                                    />
+                                    @error('target_timeline')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label" for="leadSuffix">Lead Engineer Suffix</label>
-                                <input
-                                    type="text"
-                                    class="projects-form-input"
-                                    id="leadSuffix"
-                                    name="lead_suffix"
-                                    placeholder="Enter lead engineer suffix (optional)"
-                                    value="{{ old('lead_suffix') }}"
-                                />
-                                @error('lead_suffix')
-                                    <p class="projects-form-error">{{ $message }}</p>
-                                @enderror
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Allocated Amount</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="projects-form-input"
+                                        id="allocatedAmount"
+                                        name="allocated_amount"
+                                        placeholder="Enter allocated budget"
+                                        value="{{ old('allocated_amount') }}"
+                                    />
+                                    @error('allocated_amount')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Status</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="status"
+                                        name="status"
+                                        value="Ongoing"
+                                        readonly
+                                    />
+                                    <input type="hidden" name="status" value="Ongoing" />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Assigned PM</label>
+                                    <select
+                                        class="projects-form-input"
+                                        id="assignedPmId"
+                                        name="assigned_pm_id"
+                                    >
+                                        <option value="">-- Select a Project Manager --</option>
+                                        @foreach($projectManagers as $pm)
+                                            <option value="{{ $pm->id }}" {{ old('assigned_pm_id') == $pm->id ? 'selected' : '' }}>
+                                                {{ $pm->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('assigned_pm_id')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
 
                             <div class="projects-modal-footer">
@@ -982,7 +1055,7 @@
                 <div class="projects-modal" id="editProjectModal" aria-hidden="true">
                     <div class="projects-modal-content" role="dialog" aria-modal="true">
                         <div class="projects-modal-header">
-                            <div class="projects-modal-title">Edit Project Status</div>
+                            <div class="projects-modal-title">Edit Project</div>
                             <button class="projects-modal-close" onclick="closeEditProjectModal()">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -991,64 +1064,104 @@
                         <form id="editProjectForm" method="POST">
                             @csrf
                             @method('PUT')
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Project Name</label>
-                                <input type="text" class="projects-form-input" id="editProjectName" readonly />
-                            </div>
+                            <div class="projects-form-grid">
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Project Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="editProjectName"
+                                        name="project_name"
+                                        placeholder="Enter project name"
+                                        required
+                                    />
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Client Prefix</label>
-                                <input type="text" class="projects-form-input" id="editClientPrefix" readonly />
-                            </div>
+                                <div class="projects-form-group projects-form-full">
+                                    <label class="projects-form-label">Description</label>
+                                    <textarea
+                                        class="projects-form-input"
+                                        id="editDescription"
+                                        name="description"
+                                        placeholder="Enter project description"
+                                        rows="3"
+                                    ></textarea>
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Client First Name</label>
-                                <input type="text" class="projects-form-input" id="editClientFirstName" readonly />
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Location</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="editLocation"
+                                        name="location"
+                                        placeholder="Enter project location"
+                                    />
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Client Last Name</label>
-                                <input type="text" class="projects-form-input" id="editClientLastName" readonly />
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Industry</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="editIndustry"
+                                        name="industry"
+                                        placeholder="Enter industry"
+                                    />
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Client Suffix</label>
-                                <input type="text" class="projects-form-input" id="editClientSuffix" readonly />
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Target Timeline</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editTargetTimeline"
+                                        name="target_timeline"
+                                    />
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Lead Engineer Prefix</label>
-                                <input type="text" class="projects-form-input" id="editLeadPrefix" readonly />
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Allocated Amount</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="projects-form-input"
+                                        id="editAllocatedAmount"
+                                        name="allocated_amount"
+                                        placeholder="Enter allocated budget"
+                                    />
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Lead Engineer First Name</label>
-                                <input type="text" class="projects-form-input" id="editLeadFirstName" readonly />
-                            </div>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Status</label>
+                                    <select class="projects-form-select" id="editProjectStatus" name="status" required>
+                                        <option value="Ongoing">Ongoing</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
 
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Lead Engineer Last Name</label>
-                                <input type="text" class="projects-form-input" id="editLeadLastName" readonly />
-                            </div>
-
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Lead Engineer Suffix</label>
-                                <input type="text" class="projects-form-input" id="editLeadSuffix" readonly />
-                            </div>
-
-                            <div class="projects-form-group">
-                                <label class="projects-form-label">Status</label>
-                                <select class="projects-form-select" id="editProjectStatus" name="status" required>
-                                    <option value="Ongoing">Ongoing</option>
-                                    <option value="Completed">Completed</option>
-                                </select>
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Assigned PM</label>
+                                    <select
+                                        class="projects-form-input"
+                                        id="editAssignedPmId"
+                                        name="assigned_pm_id"
+                                    >
+                                        <option value="">-- Select a Project Manager --</option>
+                                        @foreach($projectManagers as $pm)
+                                            <option value="{{ $pm->id }}">
+                                                {{ $pm->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="projects-modal-footer">
                                 <button type="button" class="projects-btn projects-btn-secondary" onclick="closeEditProjectModal()">Cancel</button>
                                 <button type="submit" class="projects-btn projects-btn-primary">
                                     <i class="fas fa-save"></i>
-                                    <span>Save</span>
+                                    <span>Save Changes</span>
                                 </button>
                             </div>
                         </form>
@@ -1104,15 +1217,13 @@
         const archiveForm = document.getElementById('archiveForm');
         const archiveProjectName = document.getElementById('archiveProjectName');
         const editProjectName = document.getElementById('editProjectName');
-        const editClientPrefix = document.getElementById('editClientPrefix');
-        const editClientFirstName = document.getElementById('editClientFirstName');
-        const editClientLastName = document.getElementById('editClientLastName');
-        const editClientSuffix = document.getElementById('editClientSuffix');
-        const editLeadPrefix = document.getElementById('editLeadPrefix');
-        const editLeadFirstName = document.getElementById('editLeadFirstName');
-        const editLeadLastName = document.getElementById('editLeadLastName');
-        const editLeadSuffix = document.getElementById('editLeadSuffix');
+        const editDescription = document.getElementById('editDescription');
+        const editLocation = document.getElementById('editLocation');
+        const editIndustry = document.getElementById('editIndustry');
+        const editTargetTimeline = document.getElementById('editTargetTimeline');
+        const editAllocatedAmount = document.getElementById('editAllocatedAmount');
         const editProjectStatus = document.getElementById('editProjectStatus');
+        const editAssignedPmId = document.getElementById('editAssignedPmId');
 
         function openProjectModal(shouldReset = false) {
             if (!projectModal) return;
@@ -1136,35 +1247,32 @@
             const row = buttonEl.closest('tr');
             if (!row) return;
             const projectId = row.getAttribute('data-id');
-            const name = row.getAttribute('data-name') || '';
-            const clientPrefix = row.getAttribute('data-client-prefix') || '';
-            const clientFirst = row.getAttribute('data-client-first') || '';
-            const clientLast = row.getAttribute('data-client-last') || '';
-            const clientSuffix = row.getAttribute('data-client-suffix') || '';
-            const status = row.getAttribute('data-status') || '';
-            const leadPrefix = row.getAttribute('data-lead-prefix') || '';
-            const leadFirst = row.getAttribute('data-lead-first') || '';
-            const leadLast = row.getAttribute('data-lead-last') || '';
-            const leadSuffix = row.getAttribute('data-lead-suffix') || '';
+            
+            // Fetch project data via API or use data attributes
+            fetch(`/api/projects/${projectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (editProjectForm) {
+                        editProjectForm.action = `/projects/${projectId}`;
+                    }
+                    if (editProjectName) editProjectName.value = data.project_name || '';
+                    if (editDescription) editDescription.value = data.description || '';
+                    if (editLocation) editLocation.value = data.location || '';
+                    if (editIndustry) editIndustry.value = data.industry || '';
+                    if (editTargetTimeline) editTargetTimeline.value = data.target_timeline ? data.target_timeline.split(' ')[0] : '';
+                    if (editAllocatedAmount) editAllocatedAmount.value = data.allocated_amount || '';
+                    if (editProjectStatus) editProjectStatus.value = data.status || 'Ongoing';
+                    if (editAssignedPmId) editAssignedPmId.value = data.assigned_pm_id || '';
 
-            if (editProjectForm) {
-                editProjectForm.action = '{{ route('projects.update', ':id') }}'.replace(':id', projectId);
-            }
-            if (editProjectName) editProjectName.value = name;
-            if (editClientPrefix) editClientPrefix.value = clientPrefix;
-            if (editClientFirstName) editClientFirstName.value = clientFirst;
-            if (editClientLastName) editClientLastName.value = clientLast;
-            if (editClientSuffix) editClientSuffix.value = clientSuffix;
-            if (editLeadPrefix) editLeadPrefix.value = leadPrefix;
-            if (editLeadFirstName) editLeadFirstName.value = leadFirst;
-            if (editLeadLastName) editLeadLastName.value = leadLast;
-            if (editLeadSuffix) editLeadSuffix.value = leadSuffix;
-            if (editProjectStatus) editProjectStatus.value = status;
-
-            if (editProjectModal) {
-                editProjectModal.classList.add('active');
-                editProjectModal.setAttribute('aria-hidden', 'false');
-            }
+                    if (editProjectModal) {
+                        editProjectModal.classList.add('active');
+                        editProjectModal.setAttribute('aria-hidden', 'false');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching project data:', error);
+                    alert('Error loading project data');
+                });
         }
 
         function closeEditProjectModal() {
@@ -1177,7 +1285,7 @@
         function openArchiveModal(projectId, projectName) {
             if (!archiveModal || !archiveForm) return;
             
-            archiveForm.action = '{{ route('projects.archive', ':id') }}'.replace(':id', projectId);
+            archiveForm.action = `/projects/${projectId}/archive`;
             if (archiveProjectName) {
                 archiveProjectName.textContent = projectName;
             }

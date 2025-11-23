@@ -53,7 +53,7 @@ class PDFController extends Controller
      */
     public function downloadProjectReport($projectId)
     {
-        $project = Project::with(['employees', 'projectRecords'])->findOrFail($projectId);
+        $project = Project::with(['employees', 'documents', 'updates', 'client'])->findOrFail($projectId);
 
         $pdf = Pdf::loadView('pdfs.project-report', ['project' => $project])
             ->setPaper('a4')
@@ -70,7 +70,7 @@ class PDFController extends Controller
      */
     public function downloadProjectCsv($projectId)
     {
-        $project = Project::with(['employees', 'projectRecords.materials'])->findOrFail($projectId);
+        $project = Project::with(['employees', 'documents', 'updates'])->findOrFail($projectId);
 
         $filename = 'project_' . preg_replace('/[^A-Za-z0-9_-]+/', '_', $project->project_name) . '_report_' . now()->format('Ymd_His') . '.csv';
 
@@ -87,8 +87,7 @@ class PDFController extends Controller
             fputcsv($output, ['Project Details', 'Project Name', $project->project_name]);
             fputcsv($output, ['Project Details', 'Client', $project->client_name]);
             fputcsv($output, ['Project Details', 'Lead', $project->lead]);
-            $inspector = optional($project->projectRecords->first())->inspector;
-            fputcsv($output, ['Project Details', 'Inspector', $inspector]);
+            fputcsv($output, ['Project Details', 'Inspector', 'N/A']);
             fputcsv($output, ['Project Details', 'Status', $project->status]);
             fputcsv($output, ['Project Details', 'Archived At', optional($project->archived_at)->toDateTimeString()]);
 
@@ -99,9 +98,6 @@ class PDFController extends Controller
             fputcsv($output, ['Materials']);
             fputcsv($output, ['Name', 'Quantity', 'Unit', 'Unit Price', 'Total', 'Supplier', 'Date Received', 'Status']);
             $materials = collect();
-            foreach (($project->projectRecords ?? []) as $rec) {
-                $materials = $materials->merge($rec->materials);
-            }
             foreach ($materials as $m) {
                 fputcsv($output, [
                     $m->name,
@@ -126,9 +122,43 @@ class PDFController extends Controller
             fputcsv($output, ['Full Name', 'Position']);
             foreach ($project->employees as $emp) {
                 fputcsv($output, [
-                    $emp->full_name,
+                    $emp->f_name . ' ' . $emp->l_name,
                     $emp->position,
                 ]);
+            }
+
+            // Blank line
+            fputcsv($output, ['']);
+
+            // Section: Project Updates
+            if ($project->updates && $project->updates->count() > 0) {
+                fputcsv($output, ['Project Updates']);
+                fputcsv($output, ['Title', 'Description', 'Status', 'Updated Date', 'Updated By']);
+                foreach ($project->updates as $update) {
+                    fputcsv($output, [
+                        $update->title,
+                        $update->description,
+                        $update->status,
+                        $update->created_at->format('M d, Y H:i'),
+                        $update->updatedBy?->name ?? 'Unknown',
+                    ]);
+                }
+                fputcsv($output, ['']);
+            }
+
+            // Section: Documentation Images
+            if ($project->documents && $project->documents->count() > 0) {
+                fputcsv($output, ['Documentation Images']);
+                fputcsv($output, ['Title', 'Uploaded Date', 'Uploaded By', 'File Size (KB)', 'Mime Type']);
+                foreach ($project->documents as $doc) {
+                    fputcsv($output, [
+                        $doc->title,
+                        $doc->created_at->format('M d, Y H:i'),
+                        $doc->uploader?->name ?? 'Unknown',
+                        number_format($doc->file_size / 1024, 2),
+                        $doc->mime_type,
+                    ]);
+                }
             }
 
             fclose($output);

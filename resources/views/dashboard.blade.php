@@ -517,22 +517,27 @@
                             <thead>
                                 <tr>
                                     <th>Project</th>
-                                    <th>Client</th>
-                                    <th>Inspector</th>
-                                    <th>Time</th>
+                                    <th>Material</th>
+                                    <th>Supplier</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($recentProjectRecords as $record)
                                     <tr>
-                                        <td>{{ $record->title }}</td>
-                                        <td>{{ $record->client ?? '—' }}</td>
-                                        <td>{{ $record->inspector ?? '—' }}</td>
-                                        <td>{{ $record->time ?? optional($record->created_at)->diffForHumans() }}</td>
+                                        <td>{{ $record->material_name }}</td>
+                                        <td>{{ $record->supplier ?? '—' }}</td>
+                                        <td>
+                                            <span class="status-badge {{ strtolower($record->status) }}">
+                                                {{ $record->status ?? '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ optional($record->created_at)->diffForHumans() }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No recent material inspections.</td>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No recent materials.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -543,7 +548,7 @@
                         <div class="dashboard-card-header">
                             <div>
                                 <div class="dashboard-card-title">Transaction Reminders</div>
-                                <div class="dashboard-card-subtitle">Projects with materials to be returned</div>
+                                <div class="dashboard-card-subtitle">Materials with failed status to be returned</div>
                             </div>
                             <a class="view-link" href="{{ route('transactions.index') }}">
                                 View all
@@ -554,28 +559,27 @@
                         <table class="dashboard-table">
                             <thead>
                                 <tr>
-                                    <th>Project</th>
-                                    <th>Client</th>
-                                    <th>Failed Items</th>
+                                    <th>Material Name</th>
+                                    <th>Supplier</th>
+                                    <th>Status</th>
                                     <th>Last Updated</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($projectsToReturn as $record)
-                                    @php
-                                        $project = $record->project ?? null;
-                                        $projectName = $record->title ?? ($project->project_name ?? '—');
-                                        $clientName = $record->client ?? ($project->client_name ?? '—');
-                                    @endphp
                                     <tr>
-                                        <td>{{ $projectName }}</td>
-                                        <td>{{ $clientName }}</td>
-                                        <td>{{ $record->failed_count ?? $record->materials->count() }}</td>
+                                        <td>{{ $record->material_name }}</td>
+                                        <td>{{ $record->supplier ?? '—' }}</td>
+                                        <td>
+                                            <span class="status-badge fail">
+                                                {{ $record->status }}
+                                            </span>
+                                        </td>
                                         <td>{{ optional($record->updated_at)->diffForHumans() ?? '—' }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No projects currently have materials to be returned.</td>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No materials currently with failed status to be returned.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

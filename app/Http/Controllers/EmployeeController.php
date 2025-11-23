@@ -16,9 +16,8 @@ class EmployeeController extends Controller
             $search = $request->input('search');
             $query->where(function ($builder) use ($search) {
                 $builder
-                    ->where('first_name', 'like', '%' . $search . '%')
-                    ->orWhere('last_name', 'like', '%' . $search . '%')
-                    ->orWhere('employee_code', 'like', '%' . $search . '%');
+                    ->where('f_name', 'like', '%' . $search . '%')
+                    ->orWhere('l_name', 'like', '%' . $search . '%');
             });
         }
 
@@ -27,7 +26,8 @@ class EmployeeController extends Controller
         }
 
         $employees = $query
-            ->orderBy('employee_code')
+            ->orderBy('f_name')
+            ->orderBy('l_name')
             ->paginate(10)
             ->withQueryString();
 
@@ -52,26 +52,41 @@ class EmployeeController extends Controller
             'position'        => ['nullable', 'string', 'max:255'],
             'education_level' => ['nullable', 'in:Elementary,High School,Senior High,Vocational/TESDA,Tertiary/College,Graduate Studies'],
             'document'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
-            'email'           => ['nullable', 'email', 'max:255', 'unique:employees,email'],
+            'email'           => ['nullable', 'email', 'max:255'],
             'phone'           => ['nullable', 'string', 'max:50'],
         ]);
 
-        $data['employee_code'] = $this->generateEmployeeCode();
+        // Create or find user first
+        $fullName = $data['first_name'] . ' ' . $data['last_name'];
+        $user = \App\Models\User::firstOrCreate(
+            ['email' => $data['email'] ?? ('emp.' . time() . '@system.local')],
+            [
+                'name' => $fullName,
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role' => 'USER',
+                'user_position' => $data['position'],
+                'status' => 'Active',
+            ]
+        );
 
-        // Handle optional fields normalization
-        foreach (['position', 'email', 'phone', 'education_level'] as $key) {
-            if (empty($data[$key])) {
-                $data[$key] = null;
-            }
-        }
+        // Create employee linked to user (update if exists)
+        $employeeData = [
+            'user_id' => $user->id,
+            'f_name' => $data['first_name'],
+            'l_name' => $data['last_name'],
+            'position' => $data['position'] ?? null,
+        ];
 
-        // Handle optional document upload
+        // Handle optional document upload (store separately if needed)
         if ($request->hasFile('document')) {
             $path = $request->file('document')->store('employee_docs', 'public');
-            $data['document_path'] = $path;
+            // Store document path in a separate way if needed (not in employee_list table)
         }
 
-        Employee::create($data);
+        Employee::updateOrCreate(
+            ['user_id' => $user->id],
+            $employeeData
+        );
 
         return redirect()->route('employee')->with('success', 'Employee added successfully.');
     }
