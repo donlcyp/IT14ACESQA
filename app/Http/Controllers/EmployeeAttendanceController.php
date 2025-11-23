@@ -24,7 +24,7 @@ class EmployeeAttendanceController extends Controller
             $attendanceRecords = [];
             
             // Add current attendance if it exists
-            if ($employee->status && $employee->status !== 'Idle') {
+            if ($employee->status) {
                 $attendanceRecords[] = [
                     'employee_id' => $employee->id,
                     'employee_code' => $employee->employee_code,
@@ -105,6 +105,17 @@ class EmployeeAttendanceController extends Controller
             'time_in' => null,
             'time_out' => null,
         ]);
+
+        // Ensure Idle employees assigned to any active (non-completed) project get a current attendance_date (today)
+        $activeAssignedIds = Employee::whereHas('projects', function ($q) {
+                $q->where('status', '!=', 'Completed');
+            })
+            ->pluck('id');
+        if ($activeAssignedIds->isNotEmpty()) {
+            Employee::whereIn('id', $activeAssignedIds)->where('status', 'Idle')->update([
+                'attendance_date' => $today->toDateString(),
+            ]);
+        }
 
         $stats = [
             'total'   => Employee::count(),
@@ -280,6 +291,14 @@ class EmployeeAttendanceController extends Controller
 
             // Sync employees (this will add new ones and remove old ones)
             $project->employees()->sync($employeeIds);
+
+            // Ensure assigned employees default to Idle status on assignment
+            Employee::whereIn('id', $employeeIds)->update([
+                'status' => 'Idle',
+                'attendance_date' => null,
+                'time_in' => null,
+                'time_out' => null,
+            ]);
 
             return response()->json([
                 'success' => true,

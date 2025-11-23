@@ -250,18 +250,27 @@
         }
 
         .badge.danger {
-            background: #fee2e2;
+            background: transparent;
             color: #991b1b;
+            border: none;
+            padding: 0;
+            border-radius: 0;
         }
 
         .badge.success {
-            background: #d1fae5;
+            background: transparent;
             color: #065f46;
+            border: none;
+            padding: 0;
+            border-radius: 0;
         }
 
         .badge.info {
-            background: #dbeafe;
+            background: transparent;
             color: #1e40af;
+            border: none;
+            padding: 0;
+            border-radius: 0;
         }
 
         .empty-state {

@@ -123,6 +123,7 @@ Route::middleware('auth')->group(function () {
     // OWNER & PM can download project reports
     Route::middleware('role:OWNER,PM')->group(function () {
         Route::get('/pdf/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectReport'])->name('pdf.project.download');
+        Route::get('/csv/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectCsv'])->name('csv.project.download');
         Route::get('/pdf/attendance-report', [App\Http\Controllers\PDFController::class, 'downloadAttendanceReport'])->name('pdf.attendance-report.download');
     });
 });

@@ -48,6 +48,14 @@ class Project extends Model
     }
 
     /**
+     * Get the project records associated with this project.
+     */
+    public function projectRecords()
+    {
+        return $this->hasMany(ProjectRecord::class);
+    }
+
+    /**
      * Get the employees assigned to this project.
      */
     public function employees(): BelongsToMany

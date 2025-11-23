@@ -1435,6 +1435,7 @@
         let currentProjectStatus = null;
         let allEmployees = {!! json_encode($allEmployees ?? []) !!};
         let projectEmployees = {!! json_encode($projectEmployees ?? []) !!};
+        let projectNames = {!! json_encode(($projects ?? collect())->pluck('project_name','id')) !!};
         let canManage = {{ auth()->user()->canManageProjectEmployees() ? 'true' : 'false' }};
 
         function openEmployeeModal(projectId, projectName, projectStatus) {
@@ -1800,12 +1801,6 @@
 
             // Collect attendance from all projects
             Object.keys(projectEmployees).forEach(projectId => {
-                const project = Object.values(arguments[0] || {}).find(p => p && p.id == projectId) || 
-                               Array.from(document.querySelectorAll('.projects-table tbody tr')).find(row => {
-                                   const cells = row.querySelectorAll('td');
-                                   return cells[0]?.textContent.trim() === projectId;
-                               });
-
                 const employeeIds = projectEmployees[projectId] || [];
                 
                 employeeIds.forEach(employeeId => {
@@ -1813,8 +1808,7 @@
                     
                     if (employee && employee.attendance_records && employee.attendance_records.length > 0) {
                         employee.attendance_records.forEach(record => {
-                            const projectRow = document.querySelector(`.projects-table tbody tr td strong`);
-                            const projectName = projectRow?.textContent || `Project ${projectId}`;
+                            const projectName = projectNames[String(projectId)] || projectNames[Number(projectId)] || `Project ${projectId}`;
                             
                             rows.push({
                                 projectName: projectName,

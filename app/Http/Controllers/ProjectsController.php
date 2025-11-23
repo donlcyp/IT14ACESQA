@@ -96,6 +96,7 @@ class ProjectsController extends Controller
     public function archives()
     {
         $projects = Project::where('archived', true)
+            ->with(['employees', 'projectRecords.materials'])
             ->orderByDesc('archived_at')
             ->paginate(10)
             ->withQueryString();
@@ -126,7 +127,7 @@ class ProjectsController extends Controller
             'archived_at' => null,
         ]);
 
-        return redirect()->route('archives')->with('success', 'Project restored successfully.');
+        return redirect()->route('projects')->with('success', 'Project restored successfully.');
     }
 
     public function store(Request $request)

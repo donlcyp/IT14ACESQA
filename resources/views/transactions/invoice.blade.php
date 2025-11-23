@@ -636,10 +636,10 @@
                                             <td>{{ $item->quantity }}</td>
                                             <td>₱{{ number_format($item->price, 2) }}</td>
                                             <td>
-                                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; 
-                                                    @if($item->status == 'Approved') background: #d1fae5; color: #065f46;
-                                                    @elseif($item->status == 'Fail') background: #fee2e2; color: #991b1b;
-                                                    @else background: #fef3c7; color: #92400e; @endif">
+                                                <span style="padding: 0; border-radius: 0; font-size: 11px; font-weight: 600; background: transparent;
+                                                    @if($item->status == 'Approved') color: #065f46;
+                                                    @elseif($item->status == 'Fail') color: #991b1b;
+                                                    @else color: #92400e; @endif">
                                                     {{ $item->status }}
                                                 </span>
                                             </td>

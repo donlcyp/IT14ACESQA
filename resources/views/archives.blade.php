@@ -294,6 +294,25 @@
             background-color: var(--gray-100);
         }
 
+        /* Report details */
+        .report-details {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .report-section-title { font-weight: 600; margin-bottom: 8px; color: #111827; }
+        .muted { color: #6b7280; font-size: 14px; }
+        .report-table { width: 100%; border-collapse: collapse; }
+        .report-table th, .report-table td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 14px; }
+        .toggle-btn { background: white; border: 1px solid #e5e7eb; color: #111827; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
         /* Tables */
         .audit-table {
             width: 100%;
@@ -489,6 +508,11 @@
                         {{ session('transaction_success') }}
                     </div>
                 @endif
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -562,6 +586,90 @@
                                                 Restore
                                             </button>
                                         </form>
+                                        <button class="toggle-btn" onclick="toggleReport('report-{{ $project->id }}')" style="margin-left:8px;">
+                                            <i class="fas fa-file-alt"></i> Report
+                                        </button>
+                                        <a href="{{ route('pdf.project.download', $project->id) }}" class="toggle-btn" style="margin-left:8px; text-decoration:none; display:inline-block;">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="{{ route('csv.project.download', $project->id) }}" class="toggle-btn" style="margin-left:8px; text-decoration:none; display:inline-block;">
+                                            <i class="fas fa-file-csv"></i> CSV
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr id="report-{{ $project->id }}" style="display:none;">
+                                    <td colspan="7">
+                                        <div class="report-details">
+                                            <div class="report-grid">
+                                                <div>
+                                                    <div class="report-section-title">Project Details</div>
+                                                    <div class="muted">Client</div>
+                                                    <div>{{ $project->client_name }}</div>
+                                                    <div class="muted" style="margin-top:8px;">Lead</div>
+                                                    <div>{{ $project->lead }}</div>
+                                                    @php
+                                                        $inspector = optional($project->projectRecords->first())->inspector;
+                                                    @endphp
+                                                    <div class="muted" style="margin-top:8px;">Inspector</div>
+                                                    <div>{{ $inspector ?? 'N/A' }}</div>
+                                                </div>
+                                                <div>
+                                                    @php
+                                                        $materials = collect();
+                                                        foreach(($project->projectRecords ?? []) as $rec){
+                                                            $materials = $materials->merge($rec->materials);
+                                                        }
+                                                        $materialsTotal = $materials->sum('total');
+                                                    @endphp
+                                                    <div class="report-section-title">Materials Used</div>
+                                                    <table class="report-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>Qty</th>
+                                                                <th>Total</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @forelse($materials as $m)
+                                                                <tr>
+                                                                    <td>{{ $m->name }}</td>
+                                                                    <td>{{ $m->quantity }} {{ $m->unit }}</td>
+                                                                    <td>₱{{ number_format($m->total, 2) }}</td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr><td colspan="3" class="muted">No materials recorded.</td></tr>
+                                                            @endforelse
+                                                            <tr>
+                                                                <td colspan="2" style="text-align:right; font-weight:600;">Total Cost</td>
+                                                                <td style="font-weight:700;">₱{{ number_format($materialsTotal, 2) }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top:16px;">
+                                                <div class="report-section-title">Employees Involved</div>
+                                                <table class="report-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Position</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @forelse($project->employees as $emp)
+                                                            <tr>
+                                                                <td>{{ $emp->full_name }}</td>
+                                                                <td>{{ $emp->position }}</td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr><td colspan="2" class="muted">No employees assigned.</td></tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -583,6 +691,13 @@
     </div>
 
     @include('partials.sidebar-js')
+    <script>
+        function toggleReport(id){
+            const row = document.getElementById(id);
+            if(!row) return;
+            row.style.display = row.style.display === 'none' ? '' : 'none';
+        }
+    </script>
 </body>
 
 </html>
