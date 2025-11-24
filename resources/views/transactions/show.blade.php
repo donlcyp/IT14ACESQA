@@ -489,7 +489,11 @@
                         </button>
                     </div>
 
-                    @if($project->materials->count() > 0)
+                    @php
+                        $materials = $project->purchaseOrders->pluck('material')->filter();
+                    @endphp
+
+                    @if($materials && $materials->count() > 0)
                         <table class="data-table">
                             <thead>
                                 <tr>
@@ -503,14 +507,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($project->materials as $material)
+                                @foreach($materials as $material)
                                     <tr>
-                                        <td>{{ $material->name }}</td>
-                                        <td>{{ $material->batch ?? 'N/A' }}</td>
+                                        <td>{{ $material->material_name }}</td>
+                                        <td>{{ $material->batch_serial_no ?? 'N/A' }}</td>
                                         <td>{{ $material->supplier ?? 'N/A' }}</td>
-                                        <td>{{ $material->quantity }} {{ $material->unit }}</td>
-                                        <td>₱{{ number_format($material->price, 2) }}</td>
-                                        <td>₱{{ number_format($material->total, 2) }}</td>
+                                        <td>{{ $material->quantity_received }} {{ $material->unit_of_measure }}</td>
+                                        <td>₱{{ number_format($material->unit_price, 2) }}</td>
+                                        <td>₱{{ number_format($material->total_cost, 2) }}</td>
                                         <td>{{ $material->date_received ? date('M d, Y', strtotime($material->date_received)) : 'N/A' }}</td>
                                     </tr>
                                 @endforeach

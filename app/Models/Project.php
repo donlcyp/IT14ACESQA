@@ -5,54 +5,72 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'project_code',
         'project_name',
-        'client_name',
-        'client_prefix',
-        'client_first_name',
-        'client_last_name',
-        'client_suffix',
+        'description',
+        'location',
+        'industry',
+        'date_started',
+        'date_ended',
+        'target_timeline',
+        'assigned_pm_id',
+        'client_id',
+        'allocated_amount',
+        'used_amount',
         'status',
-        'lead',
-        'lead_prefix',
-        'lead_first_name',
-        'lead_last_name',
-        'lead_suffix',
+        'note_remarks',
+        'pm_status',
         'archived',
-        'archive_reason',
         'archived_at',
     ];
 
-    protected $appends = [
-        'client_full_name',
-        'lead_full_name',
+    protected $casts = [
+        'date_started' => 'date',
+        'date_ended' => 'date',
+        'target_timeline' => 'date',
+        'allocated_amount' => 'decimal:2',
+        'used_amount' => 'decimal:2',
+        'archived' => 'boolean',
     ];
 
-    public function getClientFullNameAttribute(): string
+    /**
+     * Get the project manager assigned to this project.
+     */
+    public function assignedPM(): BelongsTo
     {
-        return trim(collect([$this->client_prefix, $this->client_first_name, $this->client_last_name, $this->client_suffix])
-            ->filter(fn ($segment) => $segment !== null && $segment !== '')
-            ->implode(' '));
-    }
-
-    public function getLeadFullNameAttribute(): string
-    {
-        return trim(collect([$this->lead_prefix, $this->lead_first_name, $this->lead_last_name, $this->lead_suffix])
-            ->filter(fn ($segment) => $segment !== null && $segment !== '')
-            ->implode(' '));
+        return $this->belongsTo(User::class, 'assigned_pm_id', 'id');
     }
 
     /**
-     * Get the project records associated with this project.
+     * Get the client for this project.
      */
-    public function projectRecords()
+    public function client(): BelongsTo
     {
-        return $this->hasMany(ProjectRecord::class);
+        return $this->belongsTo(Client::class, 'client_id', 'id');
+    }
+
+    /**
+     * Get the purchase orders for this project.
+     */
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class, 'project_id', 'id');
+    }
+
+    /**
+     * Get the project material managers for this project.
+     */
+    public function projMatManagers(): HasMany
+    {
+        return $this->hasMany(ProjMatManage::class, 'project_id', 'id');
     }
 
     /**
@@ -63,5 +81,39 @@ class Project extends Model
         return $this->belongsToMany(Employee::class, 'project_employees', 'project_id', 'employee_id')
             ->withPivot('role_title', 'salary', 'justification', 'assigned_from', 'assigned_to')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the project documents for this project.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class, 'project_id', 'id');
+    }
+
+    /**
+     * Get the project updates for this project.
+     */
+    public function updates(): HasMany
+    {
+        return $this->hasMany(ProjectUpdate::class, 'project_id', 'id')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Backward compatibility accessors for old schema field names
+     */
+    public function getProjectNameAttribute()
+    {
+        return $this->attributes['project_name'] ?? $this->project_code;
+    }
+
+    public function getClientNameAttribute()
+    {
+        return $this->client?->company_name ?? 'N/A';
+    }
+
+    public function getLeadAttribute()
+    {
+        return $this->assignedPM?->name ?? 'N/A';
     }
 }

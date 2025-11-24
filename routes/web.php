@@ -21,12 +21,24 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:OWNER,PM')->group(function () {
         // Projects
         Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
+<<<<<<< HEAD
         Route::get('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('projects.show');
+=======
+        Route::get('/api/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'getProject'])->name('api.projects.get');
+        Route::match(['get', 'post'], '/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('projects.show');
+>>>>>>> 819c5549f14ea69c7a038fd8920601111c1f40e9
         Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('projects.store');
         Route::put('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'update'])->name('projects.update');
         Route::post('/projects/{project}/recommend', [App\Http\Controllers\ProjectsController::class, 'recommendCompletion'])->name('projects.recommend');
         Route::post('/projects/{project}/approve', [App\Http\Controllers\ProjectsController::class, 'approve'])->name('projects.approve');
         Route::post('/projects/{project}/complete', [App\Http\Controllers\ProjectsController::class, 'complete'])->name('projects.complete');
+
+        // Project Documents
+        Route::post('/projects/{project}/documents', [App\Http\Controllers\ProjectsController::class, 'storeDocument'])->name('projects.documents.store');
+        Route::delete('/projects/{project}/documents/{document}', [App\Http\Controllers\ProjectsController::class, 'deleteDocument'])->name('projects.documents.delete');
+
+        // Project Updates
+        Route::post('/projects/{project}/updates', [App\Http\Controllers\ProjectsController::class, 'storeUpdate'])->name('projects.updates.store');
 
         // Archives
         Route::get('/archives', [App\Http\Controllers\ProjectsController::class, 'archives'])->name('archives');
@@ -35,7 +47,7 @@ Route::middleware('auth')->group(function () {
 
         // Employee & Attendance
         Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
-        Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'update'])->name('employee-attendance.update');
+        Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'storeAttendance'])->name('employee-attendance.store');
         Route::get('/employee-attendance-history', [App\Http\Controllers\EmployeeAttendanceController::class, 'history'])->name('employee-attendance.history');
     });
 

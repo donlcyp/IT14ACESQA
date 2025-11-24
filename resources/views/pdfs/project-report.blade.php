@@ -73,6 +73,40 @@
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 8px;
         }
+        .image-container {
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        .image-wrapper {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .image-content {
+            max-height: 300px;
+            overflow: hidden;
+            background-color: #f9fafb;
+        }
+        .image-content img {
+            width: 100%;
+            height: auto;
+        }
+        .image-info {
+            padding: 10px 12px;
+            background-color: #f3f4f6;
+            border-top: 1px solid #d1d5db;
+            font-size: 12px;
+        }
+        .image-title {
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .image-meta {
+            color: #6b7280;
+            font-size: 11px;
+        }
         .footer {
             margin-top: 40px;
             text-align: center;
@@ -125,10 +159,10 @@
         <tbody>
             @forelse($project->employees as $employee)
             <tr>
-                <td>{{ $employee->employee_code }}</td>
-                <td>{{ $employee->first_name }} {{ $employee->last_name }}</td>
+                <td>{{ 'EMP' . str_pad($employee->id, 3, '0', STR_PAD_LEFT) }}</td>
+                <td>{{ $employee->f_name }} {{ $employee->l_name }}</td>
                 <td>{{ $employee->position ?? 'N/A' }}</td>
-                <td>{{ $employee->status ?? 'Idle' }}</td>
+                <td>{{ $employee->user->role ?? 'Idle' }}</td>
             </tr>
             @empty
             <tr>
@@ -137,6 +171,62 @@
             @endforelse
         </tbody>
     </table>
+
+    @if($project->documents && $project->documents->count() > 0)
+    <div class="section-title">Documentation Images</div>
+    <div class="image-container">
+        @foreach($project->documents as $doc)
+        <div class="image-wrapper">
+            <div class="image-content">
+                <img src="{{ storage_path('app/public/' . $doc->file_path) }}" alt="{{ $doc->title }}">
+            </div>
+            <div class="image-info">
+                <div class="image-title">{{ $doc->title }}</div>
+                <div class="image-meta">
+                    Uploaded: {{ $doc->created_at->format('M d, Y H:i') }} | By: {{ $doc->uploader?->name ?? 'Unknown' }} | Size: {{ number_format($doc->file_size / 1024, 2) }} KB
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
+
+    @if($project->updates && $project->updates->count() > 0)
+    <div class="section-title">Project Updates</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Updated By</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($project->updates as $update)
+            <tr>
+                <td style="font-weight: bold;">{{ $update->title }}</td>
+                <td>{{ Str::limit($update->description, 100) }}</td>
+                <td>
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;
+                        @if($update->status === 'Completed') background-color: #dcfce7; color: #166534;
+                        @elseif($update->status === 'In Progress') background-color: #bfdbfe; color: #1e40af;
+                        @elseif($update->status === 'On Hold') background-color: #fef3c7; color: #92400e;
+                        @elseif($update->status === 'Cancelled') background-color: #fee2e2; color: #991b1b;
+                        @else background-color: #f3f4f6; color: #1f2937;
+                        @endif
+                    ">
+                        {{ $update->status }}
+                    </span>
+                </td>
+                <td>{{ $update->updatedBy?->name ?? 'Unknown' }}</td>
+                <td>{{ $update->created_at->format('M d, Y H:i') }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
 
     <div class="footer">
         <p>This is an automatically generated report. Generated on {{ now()->format('M d, Y H:i') }}</p>

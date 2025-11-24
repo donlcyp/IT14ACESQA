@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ProjectRecord;
+use App\Models\Project;
 use App\Models\Material;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
@@ -15,19 +15,17 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        // Get all projects with materials
-        $projects = ProjectRecord::with(['materials' => function($query) {
-            $query->select('project_record_id', 'status', 'supplier', 'price', 'total')
-                  ->whereNotNull('supplier');
-        }])
-        ->orderBy('created_at', 'desc')
-        ->get();
+        // Get all projects with related materials through purchase orders
+        $projects = Project::with(['purchaseOrders.material'])
+            ->orderByDesc('created_at')
+            ->get();
 
         // Calculate statistics for each project
         $projects = $projects->map(function($project) {
-            $failedMaterials = $project->materials->where('status', 'Fail');
-            $project->failed_count = $failedMaterials->count();
-            $project->suppliers = $project->materials->pluck('supplier')->unique()->filter()->values();
+            $materials = $project->purchaseOrders->pluck('material')->filter();
+            $failedMaterials = $materials->where('status', 'Fail');
+            $project->failed_count = $failedMaterials ? $failedMaterials->count() : 0;
+            $project->suppliers = $materials->pluck('supplier')->unique()->filter()->values();
             return $project;
         });
 
@@ -39,12 +37,16 @@ class TransactionController extends Controller
      */
     public function show($id)
     {
-        $project = ProjectRecord::with(['materials' => function($query) {
-            $query->where('status', 'Fail');
+        $project = Project::with(['purchaseOrders' => function($query) {
+            $query->whereHas('material', function($q) {
+                $q->where('status', 'Fail');
+            })->with('material');
         }])->findOrFail($id);
 
         // Get unique suppliers from this project's materials
-        $suppliers = Material::where('project_record_id', $id)
+        $suppliers = Material::whereHas('purchaseOrders', function($q) use ($id) {
+            $q->where('project_id', $id);
+        })
             ->whereNotNull('supplier')
             ->where('supplier', '!=', '')
             ->distinct()
@@ -58,27 +60,31 @@ class TransactionController extends Controller
      */
     public function invoice($projectId, $supplier)
     {
-        $project = ProjectRecord::findOrFail($projectId);
+        $project = Project::findOrFail($projectId);
         
         // Get APPROVED materials only for the main invoice
-        $materials = Material::where('project_record_id', $projectId)
+        $materials = Material::whereHas('purchaseOrders', function($q) use ($projectId) {
+            $q->where('project_id', $projectId);
+        })
             ->where('supplier', $supplier)
             ->where('status', 'Approved')
             ->get();
 
         // Get FAILED materials separately for return invoice section
-        $failedMaterials = Material::where('project_record_id', $projectId)
+        $failedMaterials = Material::whereHas('purchaseOrders', function($q) use ($projectId) {
+            $q->where('project_id', $projectId);
+        })
             ->where('supplier', $supplier)
             ->where('status', 'Fail')
             ->get();
 
         // Calculate totals for approved materials only
-        $subtotal = $materials->sum('total');
+        $subtotal = $materials->sum('total_cost');
         $tax = $subtotal * 0.12; // 12% VAT
         $total = $subtotal + $tax;
 
         // Total value of failed materials (for reference/return invoice)
-        $failedSubtotal = $failedMaterials->sum('total');
+        $failedSubtotal = $failedMaterials->sum('total_cost');
 
         // Get purchase history for this project
         $purchaseHistory = $this->getPurchaseHistory($projectId, $supplier);
@@ -123,9 +129,11 @@ class TransactionController extends Controller
      */
     private function getPurchaseHistory($projectId, $supplier = null)
     {
-        $query = Material::where('project_record_id', $projectId)
-            ->select('id', 'name', 'supplier', 'quantity', 'price', 'total', 'status', 'date_received', 'created_at')
-            ->orderBy('created_at', 'desc');
+        $query = Material::whereHas('purchaseOrders', function($q) use ($projectId) {
+            $q->where('project_id', $projectId);
+        })
+            ->select('id', 'material_name', 'supplier', 'quantity_received', 'unit_of_measure', 'unit_price', 'total_cost', 'status', 'date_received', 'created_at')
+            ->orderByDesc('created_at');
 
         if ($supplier) {
             $query->where('supplier', $supplier);
@@ -139,9 +147,9 @@ class TransactionController extends Controller
      */
     public function history()
     {
-        $history = Material::with('projectRecord')
-            ->select('id', 'project_record_id', 'name', 'supplier', 'quantity', 'unit', 'price', 'total', 'status', 'date_received', 'created_at')
-            ->orderBy('created_at', 'desc')
+        $history = Material::with('purchaseOrders')
+            ->select('id', 'material_name', 'supplier', 'quantity_received', 'unit_of_measure', 'unit_price', 'total_cost', 'status', 'date_received', 'created_at')
+            ->orderByDesc('created_at')
             ->paginate(20);
 
         return view('transactions.history', compact('history'));

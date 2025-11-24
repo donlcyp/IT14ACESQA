@@ -372,12 +372,12 @@
                                 @foreach($history as $item)
                                     <tr>
                                         <td><strong>#{{ $item->id }}</strong></td>
-                                        <td>{{ $item->projectRecord->title ?? 'N/A' }}</td>
-                                        <td>{{ $item->name }}</td>
+                                        <td>{{ $item->purchaseOrders->first()?->project?->project_code ?? 'N/A' }}</td>
+                                        <td>{{ $item->material_name }}</td>
                                         <td>{{ $item->supplier ?? 'N/A' }}</td>
-                                        <td>{{ $item->quantity }} {{ $item->unit }}</td>
-                                        <td>₱{{ number_format($item->price, 2) }}</td>
-                                        <td><strong>₱{{ number_format($item->total, 2) }}</strong></td>
+                                        <td>{{ $item->quantity_received }} {{ $item->unit_of_measure }}</td>
+                                        <td>₱{{ number_format($item->unit_price, 2) }}</td>
+                                        <td><strong>₱{{ number_format($item->total_cost, 2) }}</strong></td>
                                         <td>
                                             <span class="status-badge {{ strtolower($item->status) }}">
                                                 {{ $item->status }}

@@ -1487,8 +1487,8 @@
                             class="employee-checkbox"
                         >
                         <div class="employee-info">
-                            <div class="employee-name">${employee.first_name} ${employee.last_name}</div>
-                            <div class="employee-code">${employee.employee_code}</div>
+                            <div class="employee-name">${employee.f_name} ${employee.l_name}</div>
+                            <div class="employee-code">EMP${String(employee.id).padStart(3, '0')}</div>
                             <div class="employee-position">${employee.position || 'No Position'}</div>
                             ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600;">Assigned to other active project</div>' : ''}
                         </div>
@@ -1589,8 +1589,8 @@
                         employeeView.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: start;">
                                 <div>
-                                    <div style="font-weight: 500; color: #111827;">${employee.first_name} ${employee.last_name}</div>
-                                    <div style="font-size: 13px; color: #6b7280;">${employee.employee_code} • ${employee.position || 'No Position'}</div>
+                                    <div style="font-weight: 500; color: #111827;">${employee.f_name} ${employee.l_name}</div>
+                                    <div style="font-size: 13px; color: #6b7280;">EMP${String(employee.id).padStart(3, '0')} • ${employee.position || 'No Position'}</div>
                                 </div>
                             </div>
                         `;
@@ -1643,7 +1643,7 @@
                 const employee = allEmployees.find(e => e.id === employeeId);
                 
                 if (employee) {
-                    console.log(`Employee: ${employee.first_name} ${employee.last_name}`, employee.attendance_records);
+                    console.log(`Employee: ${employee.f_name} ${employee.l_name}`, employee.attendance_records);
                     
                     if (employee.attendance_records && employee.attendance_records.length > 0) {
                         employee.attendance_records.forEach(record => {
@@ -1812,7 +1812,7 @@
                             
                             rows.push({
                                 projectName: projectName,
-                                employeeName: `${record.first_name} ${record.last_name}`,
+                                employeeName: `${record.f_name} ${record.l_name}`,
                                 status: record.status,
                                 statusClass: getStatusClass(record.status),
                                 date: record.attendance_date || '—',

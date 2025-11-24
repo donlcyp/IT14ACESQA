@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeSeeder extends Seeder
 {
@@ -15,190 +16,135 @@ class EmployeeSeeder extends Seeder
     {
         $employees = [
             [
-                'employee_code' => 'EMP001',
                 'first_name' => 'Juan',
                 'last_name' => 'Dela Cruz',
                 'position' => 'Project Manager',
                 'email' => 'juan.delacruz@ajjcrisber.com',
                 'phone' => '+63 912 345 6789',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP002',
                 'first_name' => 'Maria',
                 'last_name' => 'Santos',
                 'position' => 'Senior Engineer',
                 'email' => 'maria.santos@ajjcrisber.com',
                 'phone' => '+63 912 345 6790',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP003',
                 'first_name' => 'Carlos',
                 'last_name' => 'Ramos',
                 'position' => 'Civil Engineer',
                 'email' => 'carlos.ramos@ajjcrisber.com',
                 'phone' => '+63 912 345 6791',
-                'status' => 'On Leave',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP004',
                 'first_name' => 'Ana',
                 'last_name' => 'Lozada',
                 'position' => 'Structural Engineer',
                 'email' => 'ana.lozada@ajjcrisber.com',
                 'phone' => '+63 912 345 6792',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP005',
                 'first_name' => 'Roberto',
                 'last_name' => 'Garcia',
                 'position' => 'Electrical Engineer',
                 'email' => 'roberto.garcia@ajjcrisber.com',
                 'phone' => '+63 912 345 6793',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP006',
                 'first_name' => 'Patricia',
                 'last_name' => 'Lim',
                 'position' => 'Quality Assurance Inspector',
                 'email' => 'patricia.lim@ajjcrisber.com',
                 'phone' => '+63 912 345 6794',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP007',
                 'first_name' => 'Michael',
                 'last_name' => 'Tan',
                 'position' => 'Site Supervisor',
                 'email' => 'michael.tan@ajjcrisber.com',
                 'phone' => '+63 912 345 6795',
-                'status' => 'Absent',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP008',
                 'first_name' => 'Jennifer',
                 'last_name' => 'Cruz',
                 'position' => 'Architect',
                 'email' => 'jennifer.cruz@ajjcrisber.com',
                 'phone' => '+63 912 345 6796',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP009',
                 'first_name' => 'Daniel',
                 'last_name' => 'Villanueva',
                 'position' => 'Mechanical Engineer',
                 'email' => 'daniel.villanueva@ajjcrisber.com',
                 'phone' => '+63 912 345 6797',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP010',
                 'first_name' => 'Lisa',
                 'last_name' => 'Mendoza',
                 'position' => 'Safety Officer',
                 'email' => 'lisa.mendoza@ajjcrisber.com',
                 'phone' => '+63 912 345 6798',
-                'status' => 'On Leave',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP011',
                 'first_name' => 'James',
                 'last_name' => 'Torres',
                 'position' => 'Surveyor',
                 'email' => 'james.torres@ajjcrisber.com',
                 'phone' => '+63 912 345 6799',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP012',
                 'first_name' => 'Sarah',
                 'last_name' => 'Fernandez',
                 'position' => 'Draftsman',
                 'email' => 'sarah.fernandez@ajjcrisber.com',
                 'phone' => '+63 912 345 6800',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP013',
                 'first_name' => 'Mark',
                 'last_name' => 'Alvarez',
                 'position' => 'Construction Manager',
                 'email' => 'mark.alvarez@ajjcrisber.com',
                 'phone' => '+63 912 345 6801',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP014',
                 'first_name' => 'Grace',
                 'last_name' => 'Reyes',
                 'position' => 'Environmental Engineer',
                 'email' => 'grace.reyes@ajjcrisber.com',
                 'phone' => '+63 912 345 6802',
-                'status' => 'Absent',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
             [
-                'employee_code' => 'EMP015',
                 'first_name' => 'Paul',
                 'last_name' => 'Morales',
                 'position' => 'Project Coordinator',
                 'email' => 'paul.morales@ajjcrisber.com',
                 'phone' => '+63 912 345 6803',
-                'status' => 'Idle',
-                'attendance_date' => null,
-                'time_in' => null,
-                'time_out' => null,
             ],
         ];
 
-        foreach ($employees as $employee) {
-            Employee::create($employee);
+        foreach ($employees as $empData) {
+            // Create or find user
+            $user = User::firstOrCreate(
+                ['email' => $empData['email']],
+                [
+                    'name' => $empData['first_name'] . ' ' . $empData['last_name'],
+                    'password' => Hash::make('password'),
+                    'role' => 'USER',
+                    'user_position' => $empData['position'],
+                    'status' => 'Active',
+                ]
+            );
+
+            // Create or find employee linked to user
+            Employee::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'user_id' => $user->id,
+                    'f_name' => $empData['first_name'],
+                    'l_name' => $empData['last_name'],
+                    'position' => $empData['position'],
+                ]
+            );
         }
     }
 }
-
