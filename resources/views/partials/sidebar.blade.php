@@ -221,6 +221,11 @@
                 <i class="nav-icon fas fa-user-check"></i>
                 <span>Attendance</span>
             </a>
+
+            <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-user-gear"></i>
+                <span>User Management</span>
+            </a>
         @endif
 
         <!-- PROJECT MANAGER: Projects and Attendance -->

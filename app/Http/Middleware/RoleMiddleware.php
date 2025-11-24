@@ -12,15 +12,17 @@ class RoleMiddleware
      * Handle an incoming request.
      * Allowed roles can be provided as a comma-separated string in the middleware parameter.
      */
-    public function handle(Request $request, Closure $next, string $roles): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
         if (!$user) {
             abort(401);
         }
 
-        $allowed = collect(explode(',', $roles))
-            ->map(fn($r) => trim($r))
+        // Support both multiple params (role:OWNER,QA becomes ["OWNER","QA"]) and embedded commas
+        $allowed = collect($roles)
+            ->flatMap(fn ($r) => explode(',', $r))
+            ->map(fn ($r) => strtoupper(trim($r)))
             ->filter()
             ->values()
             ->all();
@@ -29,7 +31,9 @@ class RoleMiddleware
             return $next($request);
         }
 
-        if (!in_array($user->role, $allowed, true)) {
+        $userRole = strtoupper(trim((string) $user->role));
+
+        if (!in_array($userRole, $allowed, true)) {
             abort(403);
         }
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FinanceSectionsController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserManagementController;
 
 // Public authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:OWNER,PM')->group(function () {
         // Projects
         Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
+        Route::get('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('projects.show');
         Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('projects.store');
         Route::put('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'update'])->name('projects.update');
         Route::post('/projects/{project}/recommend', [App\Http\Controllers\ProjectsController::class, 'recommendCompletion'])->name('projects.recommend');
@@ -39,35 +41,18 @@ Route::middleware('auth')->group(function () {
 
     // ===== OWNER ONLY: Additional exclusive access =====
     Route::middleware('role:OWNER')->group(function () {
-        // Project Material Management
-        Route::get('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'index'])->name('project-material-management');
-        Route::post('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'store'])->name('project-material-management.store');
-        Route::delete('/project-material-management/{project_record}', [App\Http\Controllers\QualityAssuranceController::class, 'destroy'])->name('project-material-management.destroy');
-        Route::get('/project-material-management/{project_record}', [App\Http\Controllers\QualityAssuranceController::class, 'show'])->name('project-material-management-show');
-        Route::post('/project-material-management/materials', [App\Http\Controllers\QualityAssuranceController::class, 'storeMaterial'])->name('project-material-management.materials.store');
-        Route::put('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'updateMaterial'])->name('project-material-management.materials.update');
-        Route::delete('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'destroyMaterial'])->name('project-material-management.materials.destroy');
-
-        // Transactions & Finance
-        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-        Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
-        Route::get('/transactions/{projectId}/invoice/{supplier}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
-        Route::put('/transactions/materials/{material}/return-reason', [TransactionController::class, 'updateReturnReason'])->name('transactions.return-reason.update');
-        Route::get('/transactions-history', [TransactionController::class, 'history'])->name('transactions.history');
-
-        Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
-        Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
-        Route::get('/finance/revenue', [FinanceSectionsController::class, 'revenue'])->name('finance.revenue');
-        Route::get('/finance/expenses', [FinanceSectionsController::class, 'expenses'])->name('finance.expenses');
-        Route::get('/finance/budget', [FinanceSectionsController::class, 'budgetIndex'])->name('finance.budget');
-        Route::post('/finance/budget', [FinanceSectionsController::class, 'budgetStore'])->name('finance.budget.store');
-        Route::get('/finance/purchase-orders', [FinanceSectionsController::class, 'purchaseOrdersIndex'])->name('finance.purchase-orders');
-        Route::post('/finance/purchase-orders', [FinanceSectionsController::class, 'purchaseOrdersStore'])->name('finance.purchase-orders.store');
-        Route::post('/finance/purchase-orders/{id}/status', [FinanceSectionsController::class, 'purchaseOrdersUpdateStatus'])->name('finance.purchase-orders.status');
-
         // Employee Management
         Route::get('/employee', [App\Http\Controllers\EmployeeController::class, 'index'])->name('employee');
         Route::post('/employee', [App\Http\Controllers\EmployeeController::class, 'store'])->name('employee.store');
+
+        // Admin User Management
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::prefix('users')->name('users.')->group(function () {
+                Route::get('/', [UserManagementController::class, 'index'])->name('index');
+                Route::get('/create', [UserManagementController::class, 'create'])->name('create');
+                Route::post('/', [UserManagementController::class, 'store'])->name('store');
+            });
+        });
     });
 
     // ===== QUALITY ASSURANCE (QA): Project Material Management Only =====

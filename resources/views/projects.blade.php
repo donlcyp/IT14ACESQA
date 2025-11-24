@@ -691,7 +691,11 @@
                                     data-lead-last="{{ $project->lead_last_name }}"
                                     data-lead-suffix="{{ $project->lead_suffix }}"
                                 >
-                                    <td>{{ $project->project_name }}</td>
+                                    <td>
+                                        <a href="{{ route('projects.show', $project) }}" style="color: var(--accent); text-decoration: none;">
+                                            {{ $project->project_name }}
+                                        </a>
+                                    </td>
                                     <td>{{ $project->client_prefix ?: '—' }}</td>
                                     <td>{{ $project->client_first_name ?: '—' }}</td>
                                     <td>{{ $project->client_last_name ?: '—' }}</td>

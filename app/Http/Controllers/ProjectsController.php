@@ -19,6 +19,13 @@ class ProjectsController extends Controller
         return view('projects', compact('projects'));
     }
 
+    public function show(Project $project)
+    {
+        $project->load(['projectRecords.materials', 'employees']);
+
+        return view('project-show', compact('project'));
+    }
+
     // PM recommends completion (records timestamp). Only role PM can trigger.
     public function recommendCompletion(Project $project)
     {
