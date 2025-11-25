@@ -31,16 +31,13 @@ class ProjectsController extends Controller
         return view('projects', compact('projects', 'clients', 'projectManagers'));
     }
 
-<<<<<<< HEAD
     public function show(Project $project)
     {
         $project->load(['projectRecords.materials', 'employees']);
 
-        return view('project-show', compact('project'));
+        return view('projects-view', compact('project'));
     }
 
-    // PM recommends completion (records timestamp). Only role PM can trigger.
-=======
     /**
      * Get project data for API/AJAX requests
      */
@@ -48,7 +45,8 @@ class ProjectsController extends Controller
     {
         return response()->json($project);
     }
->>>>>>> 819c5549f14ea69c7a038fd8920601111c1f40e9
+
+    // PM recommends completion (records timestamp). Only role PM can trigger.
     public function recommendCompletion(Project $project)
     {
         $user = auth()->user();
@@ -278,12 +276,6 @@ class ProjectsController extends Controller
         ]);
 
         return redirect()->route('projects')->with('success', 'Project updated successfully.');
-    }
-
-    public function show(Project $project)
-    {
-        $project->load('client', 'assignedPM', 'employees', 'documents', 'updates');
-        return view('projects-view', compact('project'));
     }
 
     /**

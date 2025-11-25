@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-    <title>AJJ CRISBER Engineering Services - {{ $project->title }} - Transactions</title>
+    <title>AJJ CRISBER Engineering Services - {{ $projectRecord->title ?? $project->title ?? $project->project_name }} - Transactions</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -449,29 +449,29 @@
                 <!-- Project Info -->
                 <div class="project-info-card">
                     <div class="project-header">
-                        <div class="project-icon" style="background-color: {{ $project->color ?? '#16a34a' }};">
+                        <div class="project-icon" style="background-color: {{ $projectRecord->color ?? $project->color ?? '#16a34a' }};">
                             <i class="fas fa-folder"></i>
                         </div>
                         <div class="project-details">
-                            <h2>{{ $project->title }}</h2>
-                            <p>{{ $project->client }}</p>
+                            <h2>{{ $projectRecord->title ?? $project->title ?? $project->project_name }}</h2>
+                            <p>{{ $projectRecord->client ?? $project->client?->company_name ?? '' }}</p>
                         </div>
                     </div>
                     <div class="project-meta">
                         <div class="meta-item">
                             <i class="fas fa-user"></i>
                             <span class="meta-label">Inspector:</span>
-                            <span class="meta-value">{{ $project->inspector }}</span>
+                            <span class="meta-value">{{ $projectRecord->inspector ?? $project->assignedPM?->name ?? '' }}</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-clock"></i>
                             <span class="meta-label">Time:</span>
-                            <span class="meta-value">{{ $project->time }}</span>
+                            <span class="meta-value">{{ $projectRecord->time ?? 'N/A' }}</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-calendar"></i>
                             <span class="meta-label">Created:</span>
-                            <span class="meta-value">{{ $project->created_at->format('M d, Y') }}</span>
+                            <span class="meta-value">{{ ($projectRecord->created_at ?? $project->created_at)->format('M d, Y') }}</span>
                         </div>
                     </div>
                 </div>

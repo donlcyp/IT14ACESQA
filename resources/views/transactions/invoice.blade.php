@@ -479,7 +479,7 @@
                                 <h2>INVOICE</h2>
                                 <p><strong>Invoice #:</strong> INV-{{ str_pad($project->id, 5, '0', STR_PAD_LEFT) }}</p>
                                 <p><strong>Date:</strong> {{ date('F d, Y') }}</p>
-                                <p><strong>Project:</strong> {{ $project->title }}</p>
+                                <p><strong>Project:</strong> {{ $projectRecord->title ?? $project->title ?? $project->project_name }}</p>
                             </div>
                         </div>
 
@@ -488,8 +488,8 @@
                             <div class="party-info">
                                 <h3>Bill To</h3>
                                 <div class="party-details">
-                                    <p>{{ $project->client }}</p>
-                                    <p>Project: {{ $project->title }}</p>
+                                    <p>{{ $projectRecord->client ?? $project->client?->company_name ?? '' }}</p>
+                                    <p>Project: {{ $projectRecord->title ?? $project->title ?? $project->project_name }}</p>
                                 </div>
                             </div>
                             <div class="party-info">

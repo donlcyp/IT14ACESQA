@@ -365,20 +365,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($projects as $project)
-                                    <tr onclick="window.location.href='{{ route('transactions.show', $project->id) }}'">
+                                @forelse($projects as $project)
+                                    <tr onclick="window.location.href='{{ route('transactions.show', $project->id) }}'" style="cursor: pointer;">
                                         <td>
                                             <div class="project-name">
                                                 <span class="project-color-badge" style="background-color: {{ $project->color ?? '#16a34a' }};"></span>
-                                                {{ $project->title }}
+                                                <span title="{{ $project->title ?? 'No Title' }}">{{ $project->title ?? 'Untitled Project' }}</span>
                                             </div>
                                         </td>
-                                        <td>{{ $project->client }}</td>
+                                        <td>
+                                            <span title="{{ $project->client ?? 'No Client' }}">{{ $project->client ?? '—' }}</span>
+                                        </td>
                                         <td>
                                             <i class="fas fa-user" style="color: var(--accent); margin-right: 6px;"></i>
-                                            {{ $project->inspector }}
+                                            <span title="{{ $project->inspector ?? 'No Inspector' }}">{{ $project->inspector ?? '—' }}</span>
                                         </td>
-                                        <td>{{ $project->time }}</td>
+                                        <td>
+                                            <span title="{{ $project->time ?? 'No Time' }}">{{ $project->time ?? '—' }}</span>
+                                        </td>
                                         <td>
                                             @if($project->failed_count > 0)
                                                 <span class="badge danger">
@@ -393,10 +397,10 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($project->suppliers->count() > 0)
-                                                <span class="badge info">
+                                            @if($project->suppliers && $project->suppliers->count() > 0)
+                                                <span class="badge info" title="{{ $project->suppliers->implode(', ') }}">
                                                     <i class="fas fa-truck"></i>
-                                                    {{ $project->suppliers->count() }}
+                                                    {{ implode(', ', $project->suppliers->slice(0, 2)->toArray()) }}{{ $project->suppliers->count() > 2 ? '...' : '' }}
                                                 </span>
                                             @else
                                                 <span style="color: var(--gray-500); font-size: 12px;">—</span>
@@ -409,7 +413,14 @@
                                             </a>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">
+                                            <i class="fas fa-inbox" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                                            No project records found. Create a project with materials to see transactions here.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

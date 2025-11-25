@@ -1409,7 +1409,7 @@
             <table class="attendance-table">
                 <thead>
                     <tr>
-                        <th>Project</th>
+                        <th>Project Name</th>
                         <th>Employee</th>
                         <th>Status</th>
                         <th>Date</th>

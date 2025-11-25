@@ -20,7 +20,6 @@ class EmployeeAttendanceController extends Controller
                 // Add convenience attributes for the view
                 $project->client_full_name = $project->client?->company_name ?? 'N/A';
                 $project->lead_full_name = $project->assignedPM?->name ?? 'N/A';
-                $project->project_name = $project->project_code;
                 return $project;
             });
         

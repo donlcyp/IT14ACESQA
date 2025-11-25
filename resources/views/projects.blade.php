@@ -721,23 +721,15 @@
                                     data-name="{{ $project->project_code }}"
                                     data-status="{{ $project->status }}"
                                 >
-<<<<<<< HEAD
                                     <td>
                                         <a href="{{ route('projects.show', $project) }}" style="color: var(--accent); text-decoration: none;">
                                             {{ $project->project_name }}
                                         </a>
                                     </td>
                                     <td>{{ $project->client_prefix ?: '—' }}</td>
-                                    <td>{{ $project->client_first_name ?: '—' }}</td>
-                                    <td>{{ $project->client_last_name ?: '—' }}</td>
+                                    <td>{{ $project->client?->company_name ?: $project->client_first_name ?: '—' }}</td>
+                                    <td>{{ $project->client?->contact_person ?: $project->client_last_name ?: '—' }}</td>
                                     <td>{{ $project->client_suffix ?: '—' }}</td>
-=======
-                                    <td>{{ $project->project_name }}</td>
-                                    <td>—</td>
-                                    <td>{{ $project->client?->company_name ?: '—' }}</td>
-                                    <td>{{ $project->client?->contact_person ?: '—' }}</td>
-                                    <td>—</td>
->>>>>>> 819c5549f14ea69c7a038fd8920601111c1f40e9
                                     <td>
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>

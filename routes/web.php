@@ -21,12 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:OWNER,PM')->group(function () {
         // Projects
         Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
-<<<<<<< HEAD
-        Route::get('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('projects.show');
-=======
         Route::get('/api/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'getProject'])->name('api.projects.get');
         Route::match(['get', 'post'], '/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'show'])->name('projects.show');
->>>>>>> 819c5549f14ea69c7a038fd8920601111c1f40e9
         Route::post('/projects', [App\Http\Controllers\ProjectsController::class, 'store'])->name('projects.store');
         Route::put('/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'update'])->name('projects.update');
         Route::post('/projects/{project}/recommend', [App\Http\Controllers\ProjectsController::class, 'recommendCompletion'])->name('projects.recommend');

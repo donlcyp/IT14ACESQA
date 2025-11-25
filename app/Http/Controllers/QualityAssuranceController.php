@@ -122,22 +122,18 @@ class QualityAssuranceController extends Controller
     public function storeMaterial(Request $request)
     {
         try {
+            // Validate and normalize input - accept either material_name or name
+            $materialName = $request->input('material_name') ?? $request->input('name');
+            $batchNo = $request->input('batch_serial_no') ?? $request->input('batch');
+            $qty = $request->input('quantity_received') ?? $request->input('quantity');
+            $unitMeasure = $request->input('unit_of_measure') ?? $request->input('unit');
+            $unitPrc = $request->input('unit_price') ?? $request->input('price');
+            $totalCst = $request->input('total_cost') ?? $request->input('total');
+
             $validated = $request->validate([
                 'project_record_id' => 'nullable|exists:project_records,id',
                 'project_id' => 'nullable|exists:projects,id',
-                'material_name' => 'required|string|max:255',
-                'name' => 'nullable|string|max:255',
-                'batch_serial_no' => 'nullable|string|max:255',
-                'batch' => 'nullable|string|max:255',
                 'supplier' => 'nullable|string|max:255',
-                'quantity_received' => 'nullable|integer|min:0',
-                'quantity' => 'nullable|numeric|min:0',
-                'unit_of_measure' => 'nullable|string|max:50',
-                'unit' => 'nullable|string|max:50',
-                'unit_price' => 'nullable|numeric|min:0',
-                'price' => 'nullable|numeric|min:0',
-                'total_cost' => 'nullable|numeric|min:0',
-                'total' => 'nullable|numeric|min:0',
                 'date_received' => 'nullable|date',
                 'date_inspected' => 'nullable|date',
                 'status' => 'nullable|string|in:Pending,Approved,Fail',
@@ -145,24 +141,19 @@ class QualityAssuranceController extends Controller
                 'location' => 'nullable|string|max:255',
             ]);
 
-            // Normalize field names (support both old and new naming conventions)
-            if (empty($validated['material_name']) && !empty($validated['name'])) {
-                $validated['material_name'] = $validated['name'];
-            }
-            if (empty($validated['batch_serial_no']) && !empty($validated['batch'])) {
-                $validated['batch_serial_no'] = $validated['batch'];
-            }
-            if (empty($validated['quantity_received']) && !empty($validated['quantity'])) {
-                $validated['quantity_received'] = $validated['quantity'];
-            }
-            if (empty($validated['unit_of_measure']) && !empty($validated['unit'])) {
-                $validated['unit_of_measure'] = $validated['unit'];
-            }
-            if (empty($validated['unit_price']) && !empty($validated['price'])) {
-                $validated['unit_price'] = $validated['price'];
-            }
-            if (empty($validated['total_cost']) && !empty($validated['total'])) {
-                $validated['total_cost'] = $validated['total'];
+            // Add manually validated fields
+            $validated['material_name'] = $materialName;
+            $validated['batch_serial_no'] = $batchNo;
+            $validated['quantity_received'] = $qty ? intval($qty) : 0;
+            $validated['unit_of_measure'] = $unitMeasure;
+            $validated['unit_price'] = $unitPrc ? floatval($unitPrc) : 0;
+            $validated['total_cost'] = $totalCst ? floatval($totalCst) : 0;
+
+            // Validate required material_name
+            if (empty($validated['material_name'])) {
+                return back()
+                    ->withErrors(['material_name' => 'The material name field is required.'])
+                    ->withInput();
             }
 
             // Set default status to 'Pending' (idle) if not provided
@@ -212,20 +203,47 @@ class QualityAssuranceController extends Controller
         try {
             $material = Material::findOrFail($id);
             
+            // Extract with fallback to alternative field names
+            $materialName = $request->input('material_name') ?? $request->input('name');
+            $batchNo = $request->input('batch_serial_no') ?? $request->input('batch');
+            $qty = $request->input('quantity_received') ?? $request->input('quantity');
+            $unitMeasure = $request->input('unit_of_measure') ?? $request->input('unit');
+            $unitPrc = $request->input('unit_price') ?? $request->input('price');
+            $totalCst = $request->input('total_cost') ?? $request->input('total');
+            
             $validated = $request->validate([
-                'material_name' => 'required|string|max:255',
-                'batch_serial_no' => 'nullable|string|max:255',
                 'supplier' => 'nullable|string|max:255',
-                'quantity_received' => 'required|integer|min:0',
-                'unit_of_measure' => 'nullable|string|max:50',
-                'unit_price' => 'required|numeric|min:0',
-                'total_cost' => 'required|numeric|min:0',
                 'date_received' => 'nullable|date',
                 'date_inspected' => 'nullable|date',
                 'status' => 'required|string|in:Pending,Approved,Fail',
                 'remarks' => 'nullable|string',
                 'location' => 'nullable|string|max:255',
             ]);
+
+            // Manually validate and assign the normalized fields
+            $validated['material_name'] = $materialName;
+            if (empty($validated['material_name'])) {
+                return back()->withErrors(['material_name' => 'The material name field is required.'])->withInput();
+            }
+
+            $validated['quantity_received'] = $qty;
+            if (empty($validated['quantity_received'])) {
+                return back()->withErrors(['quantity_received' => 'The quantity received field is required.'])->withInput();
+            }
+
+            $validated['unit_price'] = $unitPrc;
+            if (empty($validated['unit_price'])) {
+                return back()->withErrors(['unit_price' => 'The unit price field is required.'])->withInput();
+            }
+
+            $validated['total_cost'] = $totalCst;
+            if (empty($validated['total_cost'])) {
+                return back()->withErrors(['total_cost' => 'The total cost field is required.'])->withInput();
+            }
+
+            // Optional fields
+            $validated['batch_serial_no'] = $batchNo;
+            $validated['unit_of_measure'] = $unitMeasure;
 
             if (($validated['status'] ?? null) === 'Fail' && empty($validated['remarks'])) {
                 return back()
