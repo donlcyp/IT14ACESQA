@@ -11,21 +11,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --gray-500: #667085;
+            --accent: #16a34a;
             --white: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --header-bg: var(--accent);
+            --main-bg: #ffffff;
+
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
+            --gray-500: #667085;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
-            --blue-1: #1c57b6;
-            --blue-600: #2563eb;
-            --red-600: #dc2626;
+            --black-1: #111827;
+
+            --blue-1: var(--accent);
+            --blue-600: var(--accent);
+            --red-600: var(--accent);
             --green-600: #059669;
-            --black-1: #313131;
-            --sidebar-bg: #c4c4c4;
-            --header-bg: #4a5568;
-            --main-bg: #e2e8f0;
+
             --text-lg-medium-font-family: "Inter", sans-serif;
             --text-lg-medium-font-weight: 500;
             --text-lg-medium-font-size: 18px;
@@ -42,6 +46,7 @@
             --text-headline-small-bold-font-weight: 700;
             --text-headline-small-bold-font-size: 18px;
             --text-headline-small-bold-line-height: 28px;
+
             --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
             --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
         }
@@ -56,168 +61,35 @@
         body {
             font-family: var(--text-md-normal-font-family);
             background-color: var(--main-bg);
-            overflow-x: hidden;
-        }
-
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: white;
-            border: 2px solid #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #dc2626;
-            position: relative;
-        }
-
-        .logo .aces-text {
-            color: #dc2626;
-        }
-
-        .logo .aces-text:nth-child(2),
-        .logo .aces-text:nth-child(4) {
-            color: #2563eb;
-        }
-
-        .sidebar-title {
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: var(--text-headline-small-bold-font-size);
-            font-weight: var(--text-headline-small-bold-font-weight);
-            color: black;
-        }
-
-        .nav-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .hamburger-menu {
-            background: none;
-            border: none;
-            font-size: 18px;
             color: var(--gray-700);
-            cursor: pointer;
-        }
-
-        .chevron {
-            font-size: 14px;
-            color: var(--gray-700);
-        }
-
-        .nav-menu {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .nav-item.active {
-            background-color: white;
-            color: black;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .logout-section {
-            margin-top: auto;
-            padding-top: 20px;
-        }
-
-        .logout-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-        }
-
-        .logout-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
         }
 
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 280px;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            width: 100%;
+            transition: margin-left 0.3s ease;
         }
-
-        .main-content.expanded {
+        .main-content.sidebar-closed {
             margin-left: 0;
+        }
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+            }
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0 !important;
+            }
         }
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #2d3748);
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -265,255 +137,468 @@
             flex: 1;
             padding: 30px;
             background: linear-gradient(135deg, #f7fafc, #edf2f7);
-            border-left: 1px solid #e2e8f0;
-            border-right: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
         }
 
         /* Projects Header */
         .projects-header {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
             margin-bottom: 30px;
-            box-shadow: var(--shadow-md);
+            padding: 20px;
         }
 
-        .projects-header-top {
+        .projects-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .projects-title {
+            color: #101828;
+            font-family: var(--text-lg-medium-font-family);
+            font-size: var(--text-lg-medium-font-size);
+            font-weight: var(--text-lg-medium-font-weight);
+            line-height: var(--text-lg-medium-line-height);
+        }
+
+        .projects-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .projects-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Action button container */
+        .projects-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .projects-button-base {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: var(--shadow-xs);
+            border: 1px solid #e5e7eb;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        /* Make action buttons inside table more compact */
+        .projects-table .projects-button-base {
+            padding: 6px 10px;
+            font-size: 11px;
+            gap: 4px;
+        }
+        .projects-table .projects-button-base i {
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .projects-button-base.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .projects-button-base.primary:hover {
+            background: #15803d;
+        }
+
+        /* Projects Table */
+        .projects-table-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .projects-table thead th {
+            background: #f8fafc;
+            color: #111827;
+            font-weight: 600;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 12px;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .projects-table thead th:last-child {
+            text-align: center;
+        }
+
+        .projects-table tbody td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #111827;
+        }
+
+        .projects-table tbody td:last-child {
+            text-align: center;
+        }
+
+        .projects-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .projects-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background-color: transparent;
+            color: #047857;
+        }
+
+        .status-badge.warning {
+            background-color: transparent;
+            color: #a16207;
+        }
+
+        .status-badge.info {
+            background-color: transparent;
+            color: #1d4ed8;
+        }
+
+        .status-badge.danger {
+            background-color: transparent;
+            color: #991b1b;
+        }
+
+        /* Modal Styles */
+        .projects-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .projects-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .projects-modal-content {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            padding: 24px;
+            position: relative;
+            box-shadow: var(--shadow-md);
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .projects-form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .projects-form-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Landscape orientation support */
+        @media (min-width: 800px) and (min-height: 600px) {
+            .projects-modal-content {
+                max-width: 900px;
+            }
+
+            .projects-form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .projects-form-full {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Ensure modals fit within the viewport */
+        .projects-modal {
+            padding: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .projects-modal-content {
+                max-width: 95vw;
+                padding: 16px;
+            }
+            .projects-modal-title {
+                font-size: 18px;
+            }
+        }
+
+        /* Landscape orientation support for mobile */
+        @media (max-height: 600px) or (orientation: landscape) {
+            .projects-modal-content {
+                max-height: 95vh;
+                overflow-y: auto;
+                overflow-x: auto;
+            }
+            
+            .projects-form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            .projects-form-full {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .projects-modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        .projects-title {
-            color: var(--black-1);
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: 24px;
-            font-weight: var(--text-headline-small-bold-font-weight);
+        .projects-modal-title {
+            font-weight: 700;
+            font-size: 20px;
+            color: #111827;
         }
 
-        .projects-view-options {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .view-toggle {
-            background: none;
-            border: none;
-            color: var(--gray-600);
-            font-size: 18px;
+        .projects-modal-close {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px;
             cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-        }
-
-        .view-toggle:hover {
-            background-color: var(--gray-100);
-        }
-
-        .projects-header-bottom {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .projects-search {
-            flex: 1;
-            max-width: 400px;
-        }
-
-        .search-container {
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 10px 16px 10px 40px;
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            background: white;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--blue-600);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-500);
-            font-size: 16px;
-        }
-
-        .projects-filters {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .filter-button {
-            background: white;
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: var(--text-sm-medium-font-family);
-            font-size: var(--text-sm-medium-font-size);
-            font-weight: var(--text-sm-medium-font-weight);
-            color: var(--gray-700);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .filter-button:hover {
-            background: var(--gray-50);
-        }
-
-        .projects-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .action-button {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-family: var(--text-sm-medium-font-family);
-            font-size: var(--text-sm-medium-font-size);
-            font-weight: var(--text-sm-medium-font-weight);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: opacity 0.2s ease;
-        }
-
-        .action-button:hover {
-            opacity: 0.9;
-        }
-
-        .action-button.primary {
-            background: var(--blue-600);
-            color: white;
-        }
-
-        .action-button.danger {
-            background: var(--red-600);
-            color: white;
-        }
-
-        /* Project Cards */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .project-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow-md);
-            transition: transform 0.2s ease;
-            position: relative;
-        }
-
-        .project-card:hover {
-            transform: translateY(-4px);
-        }
-
-        .project-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .project-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+            transition: background 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
+            width: 32px;
+            height: 32px;
         }
 
-        .project-icon.red {
-            background: #8b0000;
+        .projects-modal-close:hover {
+            background: #f3f4f6;
         }
 
-        .project-icon.blue {
-            background: var(--blue-600);
+        .projects-form-group {
+            margin-bottom: 20px;
         }
 
-        .project-icon.pink {
-            background: #ff69b4;
+        .projects-form-label {
+            display: block;
+            color: #374151;
+            font-family: "Inter", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
         }
 
-        .project-info {
-            flex: 1;
+        .projects-form-input,
+        .projects-form-select {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #111827;
+            transition: all 0.2s ease;
         }
 
-        .project-title {
-            color: var(--black-1);
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: 18px;
-            font-weight: var(--text-headline-small-bold-font-weight);
-            margin-bottom: 4px;
+        .projects-form-input:focus,
+        .projects-form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
         }
 
-        .project-client {
-            color: var(--gray-600);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            margin-bottom: 4px;
-        }
-
-        .project-location {
-            color: var(--gray-600);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-        }
-
-        .project-time {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: var(--gray-500);
-            font-family: var(--text-sm-medium-font-family);
+        .projects-form-error {
+            color: #b91c1c;
             font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .projects-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .projects-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .projects-btn-secondary {
+            background: #ffffff;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .projects-btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        .projects-btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .projects-btn-primary:hover {
+            background: #15803d;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Modern Pagination Styles */
+        .pagination-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 0;
+            user-select: none;
+        }
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 8px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .page-btn:active:not(.disabled):not(.ellipsis) {
+            transform: scale(0.95);
+        }
+        .page-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .page-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .page-btn.arrow {
+            font-size: 20px;
+            font-weight: 400;
+        }
+        .page-btn.ellipsis {
+            cursor: default;
+            pointer-events: none;
+        }
+        .page-btn.ellipsis:hover {
+            background: transparent;
+        }
+        @media (max-width: 640px) {
+            .page-btn {
+                min-width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .page-btn.arrow {
+                font-size: 18px;
+            }
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
             .header {
                 padding: 15px 20px;
             }
@@ -526,22 +611,18 @@
                 padding: 20px;
             }
 
-            .projects-header-bottom {
+            .projects-content {
                 flex-direction: column;
-                align-items: stretch;
-                gap: 16px;
+                align-items: flex-start;
             }
 
-            .projects-search {
-                max-width: none;
+            .projects-table {
+                font-size: 12px;
             }
 
-            .projects-filters {
-                justify-content: space-between;
-            }
-
-            .projects-grid {
-                grid-template-columns: 1fr;
+            .projects-table thead th,
+            .projects-table tbody td {
+                padding: 8px 6px;
             }
         }
     </style>
@@ -549,63 +630,9 @@
 
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <span class="aces-text">A</span><span class="aces-text">C</span><span
-                        class="aces-text">E</span><span class="aces-text">S</span>
-                </div>
-                <div class="sidebar-title">ACES</div>
-            </div>
+        @include('partials.sidebar')
 
-            <div class="nav-toggle">
-                <button class="hamburger-menu" id="navToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <span class="chevron">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-            </div>
-
-            <nav class="nav-menu">
-                <a href="{{ route('dashboard') }}" class="nav-item">
-                    <i class="nav-icon fas fa-smile"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ route('quality-assurance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-bolt"></i>
-                    <span>Quality Assurance</span>
-                </a>
-                <a href="{{ route('audit') }}" class="nav-item">
-                    <i class="nav-icon fas fa-gavel"></i>
-                    <span>Audit</span>
-                </a>
-                <a href="{{ route('finance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-chart-bar"></i>
-                    <span>Finance</span>
-                </a>
-                <a href="{{ route('projects') }}" class="nav-item active">
-                    <i class="nav-icon fas fa-tasks"></i>
-                    <span>Projects</span>
-                </a>
-                <a href="{{ route('employee-attendance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-hard-hat"></i>
-                    <span>Employee Attendance</span>
-                </a>
-            </nav>
-
-            <div class="logout-section">
-                <a href="#" class="logout-item">
-                    <i class="nav-icon fas fa-sign-out-alt"></i>
-                    <span>Log Out</span>
-                </a>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
         <main class="main-content" id="mainContent">
-            <!-- Header -->
             <header class="header">
                 <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
@@ -613,121 +640,709 @@
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
-            <!-- Content Area -->
             <section class="content-area">
+                <!-- Breadcrumb -->
+                <nav style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">
+                    <a href="{{ route('dashboard') }}" style="color: var(--accent); text-decoration: none;">Dashboard</a>
+                    <span style="margin: 0 8px;">></span>
+                    <span style="color: #374151;">Projects</span>
+                </nav>
+
+                <!-- Success/Error Messages -->
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul style="margin-left: 16px;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Projects Header -->
                 <div class="projects-header">
-                    <div class="projects-header-top">
-                        <h1 class="projects-title">Projects</h1>
-                        <div class="projects-view-options">
-                            <button class="view-toggle">
-                                <i class="fas fa-th-large"></i>
-                            </button>
-                            <button class="view-toggle">
-                                <i class="fas fa-list"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="projects-header-bottom">
-                        <div class="projects-search">
-                            <div class="search-container">
-                                <i class="search-icon fas fa-search"></i>
-                                <input type="text" class="search-input" placeholder="Search">
-                            </div>
-                        </div>
-                        <div class="projects-filters">
-                            <button class="filter-button">
-                                <i class="fas fa-filter"></i>
-                                <span>Filters</span>
-                            </button>
-                        </div>
+                    <div class="projects-content">
+                        <div class="projects-title">Projects</div>
                         <div class="projects-actions">
-                            <button class="action-button primary">
-                                <i class="fas fa-plus"></i>
-                                <span>New</span>
-                            </button>
-                            <button class="action-button danger">
-                                <i class="fas fa-trash"></i>
-                                <span>Delete</span>
+                            <a href="{{ route('archives') }}" class="projects-button" aria-label="View Archives" style="text-decoration: none;">
+                                <span class="projects-button-base" style="background: #f3f4f6; color: #374151;">
+                                    <i class="fas fa-archive"></i>
+                                    <span>Archives</span>
+                                </span>
+                            </a>
+                            <button type="button" class="projects-button" aria-label="New Project" onclick="openProjectModal(true)">
+                                <span class="projects-button-base primary">
+                                    <i class="fas fa-plus"></i>
+                                    <span>New</span>
+                                </span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Project Cards -->
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <div class="project-time">30 mins ago</div>
-                        <div class="project-header">
-                            <div class="project-icon red">AS</div>
-                            <div class="project-info">
-                                <h3 class="project-title">Assumption School</h3>
-                                <div class="project-client">Client Name: Mrs. Maria Lopez</div>
-                                <div class="project-location">Tagum</div>
+                <!-- Projects Table -->
+                <div class="projects-table-card">
+                    <table class="projects-table">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Client Prefix</th>
+                                <th>Client First Name</th>
+                                <th>Client Last Name</th>
+                                <th>Client Suffix</th>
+                                <th>Status</th>
+                                <th>Assigned Project Manager</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody">
+                            @forelse ($projects as $project)
+                                @php
+                                    $statusMap = [
+                                        'Ongoing'   => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                        'On Hold'    => ['class' => 'danger', 'icon' => 'fas fa-pause'],
+                                        'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                    ];
+
+                                    $displayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                    $badge = $statusMap[$displayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                @endphp
+                                <tr
+                                    data-id="{{ $project->id }}"
+                                    data-name="{{ $project->project_code }}"
+                                    data-status="{{ $project->status }}"
+                                >
+<<<<<<< HEAD
+                                    <td>
+                                        <a href="{{ route('projects.show', $project) }}" style="color: var(--accent); text-decoration: none;">
+                                            {{ $project->project_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $project->client_prefix ?: '—' }}</td>
+                                    <td>{{ $project->client_first_name ?: '—' }}</td>
+                                    <td>{{ $project->client_last_name ?: '—' }}</td>
+                                    <td>{{ $project->client_suffix ?: '—' }}</td>
+=======
+                                    <td>{{ $project->project_name }}</td>
+                                    <td>—</td>
+                                    <td>{{ $project->client?->company_name ?: '—' }}</td>
+                                    <td>{{ $project->client?->contact_person ?: '—' }}</td>
+                                    <td>—</td>
+>>>>>>> 819c5549f14ea69c7a038fd8920601111c1f40e9
+                                    <td>
+                                        <span class="status-badge {{ $badge['class'] }}">
+                                            <i class="{{ $badge['icon'] }}"></i>
+                                            {{ $displayStatus }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $project->assignedPM?->name ?: '—' }}</td>
+                                    <td>{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
+                                    <td>
+                                        <div class="projects-actions">
+                                            <button
+                                                type="button"
+                                                class="projects-button"
+                                                aria-label="View Project"
+                                                onclick="window.location.href='{{ route('projects.show', $project->id) }}'"
+                                            >
+                                                <span class="projects-button-base" style="background: #dbeafe; color: #0369a1;">
+                                                    <i class="fas fa-eye"></i>
+                                                    <span>View</span>
+                                                </span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="projects-button"
+                                                aria-label="Edit Project"
+                                                onclick="openEditProjectModal(this)"
+                                            >
+                                                <span class="projects-button-base">
+                                                    <i class="fas fa-edit"></i>
+                                                    <span>Edit</span>
+                                                </span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="projects-button"
+                                                aria-label="Archive Project"
+                                                onclick="openArchiveModal({{ $project->id }}, '{{ $project->project_name }}')"
+                                            >
+                                                <span class="projects-button-base" style="background: #fee2e2; color: #991b1b;">
+                                                    <i class="fas fa-archive"></i>
+                                                    <span>Archive</span>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="12" style="text-align: center; color: #6b7280; padding: 24px;">
+                                        No projects found. Click the <strong>New</strong> button to add one.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($projects instanceof \Illuminate\Pagination\LengthAwarePaginator && $projects->hasPages())
+                    @php
+                        $currentPage = $projects->currentPage();
+                        $lastPage = $projects->lastPage();
+                        $pageNumbers = [];
+
+                        if ($lastPage <= 7) {
+                            for ($i = 1; $i <= $lastPage; $i++) {
+                                $pageNumbers[] = $i;
+                            }
+                        } else {
+                            $pageNumbers[] = 1;
+                            if ($currentPage > 3) {
+                                $pageNumbers[] = '...';
+                            }
+                            $start = max(2, $currentPage - 1);
+                            $end = min($lastPage - 1, $currentPage + 1);
+                            for ($i = $start; $i <= $end; $i++) {
+                                $pageNumbers[] = $i;
+                            }
+                            if ($currentPage < $lastPage - 2) {
+                                $pageNumbers[] = '...';
+                            }
+                            $pageNumbers[] = $lastPage;
+                        }
+                    @endphp
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            Showing {{ $projects->firstItem() }} to {{ $projects->lastItem() }}
+                            of {{ $projects->total() }} results
+                        </div>
+                        <div class="pagination-controls">
+                            @if ($projects->onFirstPage())
+                                <span class="page-btn arrow disabled">‹</span>
+                            @else
+                                <a class="page-btn arrow" href="{{ $projects->previousPageUrl() }}" rel="prev">‹</a>
+                            @endif
+
+                            <div class="pagination-nav">
+                                @foreach ($pageNumbers as $page)
+                                    @if ($page === '...')
+                                        <span class="page-btn ellipsis">…</span>
+                                    @elseif ($page == $currentPage)
+                                        <span class="page-btn active">{{ $page }}</span>
+                                    @else
+                                        <a class="page-btn" href="{{ $projects->url($page) }}">{{ $page }}</a>
+                                    @endif
+                                @endforeach
                             </div>
+
+                            @if ($projects->hasMorePages())
+                                <a class="page-btn arrow" href="{{ $projects->nextPageUrl() }}" rel="next">›</a>
+                            @else
+                                <span class="page-btn arrow disabled">›</span>
+                            @endif
                         </div>
                     </div>
+                @endif
 
-                    <div class="project-card">
-                        <div class="project-time">30 mins ago</div>
-                        <div class="project-header">
-                            <div class="project-icon blue">AP</div>
-                            <div class="project-info">
-                                <h3 class="project-title">Dr. A.P Medical Center</h3>
-                                <div class="project-client">Client Name: Dr. Arturo Pingoy</div>
-                                <div class="project-location">Koronadal</div>
-                            </div>
+                <!-- New Project Modal -->
+                <div class="projects-modal" id="projectModal" aria-hidden="true">
+                    <div class="projects-modal-content" role="dialog" aria-modal="true">
+                        <div class="projects-modal-header">
+                            <div class="projects-modal-title">Add New Project</div>
+                            <button class="projects-modal-close" onclick="closeProjectModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
+
+                        <form id="projectForm" action="{{ route('projects.store') }}" method="POST">
+                            @csrf
+                            <div class="projects-form-grid">
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Project Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="projectName"
+                                        name="project_name"
+                                        placeholder="Enter project name"
+                                        value="{{ old('project_name') }}"
+                                        required
+                                    />
+                                    @error('project_name')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group projects-form-full">
+                                    <label class="projects-form-label">Description</label>
+                                    <textarea
+                                        class="projects-form-input"
+                                        id="description"
+                                        name="description"
+                                        placeholder="Enter project description"
+                                        rows="3"
+                                    >{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientPrefix">Client Prefix</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientPrefix"
+                                        name="client_prefix"
+                                        placeholder="Enter client prefix (optional)"
+                                        value="{{ old('client_prefix') }}"
+                                    />
+                                    @error('client_prefix')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientFirstName">Client First Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientFirstName"
+                                        name="client_first_name"
+                                        placeholder="Enter client first name"
+                                        value="{{ old('client_first_name') }}"
+                                        required
+                                    />
+                                    @error('client_first_name')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientLastName">Client Last Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientLastName"
+                                        name="client_last_name"
+                                        placeholder="Enter client last name"
+                                        value="{{ old('client_last_name') }}"
+                                        required
+                                    />
+                                    @error('client_last_name')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label" for="clientSuffix">Client Suffix</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="clientSuffix"
+                                        name="client_suffix"
+                                        placeholder="Enter client suffix (optional)"
+                                        value="{{ old('client_suffix') }}"
+                                    />
+                                    @error('client_suffix')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Location</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="location"
+                                        name="location"
+                                        placeholder="Enter project location"
+                                        value="{{ old('location') }}"
+                                    />
+                                    @error('location')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Industry</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="industry"
+                                        name="industry"
+                                        placeholder="Enter industry"
+                                        value="{{ old('industry') }}"
+                                    />
+                                    @error('industry')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Target Timeline</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="targetTimeline"
+                                        name="target_timeline"
+                                        value="{{ old('target_timeline') }}"
+                                    />
+                                    @error('target_timeline')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Allocated Amount</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="projects-form-input"
+                                        id="allocatedAmount"
+                                        name="allocated_amount"
+                                        placeholder="Enter allocated budget"
+                                        value="{{ old('allocated_amount') }}"
+                                    />
+                                    @error('allocated_amount')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Status</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="status"
+                                        name="status"
+                                        value="Ongoing"
+                                        readonly
+                                    />
+                                    <input type="hidden" name="status" value="Ongoing" />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Assigned PM</label>
+                                    <select
+                                        class="projects-form-input"
+                                        id="assignedPmId"
+                                        name="assigned_pm_id"
+                                    >
+                                        <option value="">-- Select a Project Manager --</option>
+                                        @foreach($projectManagers as $pm)
+                                            <option value="{{ $pm->id }}" {{ old('assigned_pm_id') == $pm->id ? 'selected' : '' }}>
+                                                {{ $pm->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('assigned_pm_id')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="projects-modal-footer">
+                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeProjectModal()">Cancel</button>
+                                <button type="submit" class="projects-btn projects-btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save Project</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
+                </div>
 
-                    <div class="project-card">
-                        <div class="project-time">30 mins ago</div>
-                        <div class="project-header">
-                            <div class="project-icon pink">FP</div>
-                            <div class="project-info">
-                                <h3 class="project-title">First Pacific Inn</h3>
-                                <div class="project-client">Client Name: Mr. Ramon Cruz</div>
-                                <div class="project-location">Davao</div>
-                            </div>
+                <!-- Edit Project Modal -->
+                <div class="projects-modal" id="editProjectModal" aria-hidden="true">
+                    <div class="projects-modal-content" role="dialog" aria-modal="true">
+                        <div class="projects-modal-header">
+                            <div class="projects-modal-title">Edit Project</div>
+                            <button class="projects-modal-close" onclick="closeEditProjectModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
+
+                        <form id="editProjectForm" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="projects-form-grid">
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Project Name</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="editProjectName"
+                                        name="project_name"
+                                        placeholder="Enter project name"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="projects-form-group projects-form-full">
+                                    <label class="projects-form-label">Description</label>
+                                    <textarea
+                                        class="projects-form-input"
+                                        id="editDescription"
+                                        name="description"
+                                        placeholder="Enter project description"
+                                        rows="3"
+                                    ></textarea>
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Location</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="editLocation"
+                                        name="location"
+                                        placeholder="Enter project location"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Industry</label>
+                                    <input
+                                        type="text"
+                                        class="projects-form-input"
+                                        id="editIndustry"
+                                        name="industry"
+                                        placeholder="Enter industry"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Target Timeline</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editTargetTimeline"
+                                        name="target_timeline"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Allocated Amount</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="projects-form-input"
+                                        id="editAllocatedAmount"
+                                        name="allocated_amount"
+                                        placeholder="Enter allocated budget"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Status</label>
+                                    <select class="projects-form-select" id="editProjectStatus" name="status" required>
+                                        <option value="Ongoing">Ongoing</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Assigned PM</label>
+                                    <select
+                                        class="projects-form-input"
+                                        id="editAssignedPmId"
+                                        name="assigned_pm_id"
+                                    >
+                                        <option value="">-- Select a Project Manager --</option>
+                                        @foreach($projectManagers as $pm)
+                                            <option value="{{ $pm->id }}">
+                                                {{ $pm->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="projects-modal-footer">
+                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeEditProjectModal()">Cancel</button>
+                                <button type="submit" class="projects-btn projects-btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Archive Project Modal -->
+                <div class="projects-modal" id="archiveModal" aria-hidden="true">
+                    <div class="projects-modal-content" role="dialog" aria-modal="true">
+                        <div class="projects-modal-header">
+                            <div class="projects-modal-title">Archive Project</div>
+                            <button class="projects-modal-close" onclick="closeArchiveModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="archiveForm" method="POST">
+                            @csrf
+                            <p style="margin-bottom: 20px; color: #374151; font-size: 14px;">
+                                Are you sure you want to archive <strong id="archiveProjectName"></strong>?
+                            </p>
+
+                            <div class="projects-form-group">
+                                <label class="projects-form-label">Archive Reason</label>
+                                <select class="projects-form-select" name="archive_reason" required>
+                                    <option value="">Select reason</option>
+                                    <option value="Finished">Finished</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+
+                            <div class="projects-modal-footer">
+                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeArchiveModal()">Cancel</button>
+                                <button type="submit" class="projects-btn" style="background: #dc2626; color: white;">
+                                    <i class="fas fa-archive"></i>
+                                    <span>Archive</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
+    @include('partials.sidebar-js')
     <script>
-        // Sidebar toggle functionality
-        const headerMenu = document.getElementById('headerMenu');
-        const navToggle = document.getElementById('navToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
+        const projectModal = document.getElementById('projectModal');
+        const projectForm = document.getElementById('projectForm');
+        const editProjectModal = document.getElementById('editProjectModal');
+        const editProjectForm = document.getElementById('editProjectForm');
+        const archiveModal = document.getElementById('archiveModal');
+        const archiveForm = document.getElementById('archiveForm');
+        const archiveProjectName = document.getElementById('archiveProjectName');
+        const editProjectName = document.getElementById('editProjectName');
+        const editDescription = document.getElementById('editDescription');
+        const editLocation = document.getElementById('editLocation');
+        const editIndustry = document.getElementById('editIndustry');
+        const editTargetTimeline = document.getElementById('editTargetTimeline');
+        const editAllocatedAmount = document.getElementById('editAllocatedAmount');
+        const editProjectStatus = document.getElementById('editProjectStatus');
+        const editAssignedPmId = document.getElementById('editAssignedPmId');
 
-        function toggleSidebar() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+        function openProjectModal(shouldReset = false) {
+            if (!projectModal) return;
+            if (shouldReset && projectForm) {
+                projectForm.reset();
+            }
+            projectModal.classList.add('active');
+            projectModal.setAttribute('aria-hidden', 'false');
         }
 
-        headerMenu.addEventListener('click', toggleSidebar);
-        navToggle.addEventListener('click', toggleSidebar);
-
-        // Close sidebar on mobile when clicking outside
-        document.addEventListener('click', function (e) {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
+        function closeProjectModal() {
+            if (!projectModal) return;
+            projectModal.classList.remove('active');
+            projectModal.setAttribute('aria-hidden', 'true');
+            if (projectForm) {
+                projectForm.reset();
             }
-        });
+        }
 
-        // Handle window resize
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('open', 'collapsed');
-                mainContent.classList.remove('expanded');
+        function openEditProjectModal(buttonEl) {
+            const row = buttonEl.closest('tr');
+            if (!row) return;
+            const projectId = row.getAttribute('data-id');
+            
+            // Fetch project data via API or use data attributes
+            fetch(`/api/projects/${projectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (editProjectForm) {
+                        editProjectForm.action = `/projects/${projectId}`;
+                    }
+                    if (editProjectName) editProjectName.value = data.project_name || '';
+                    if (editDescription) editDescription.value = data.description || '';
+                    if (editLocation) editLocation.value = data.location || '';
+                    if (editIndustry) editIndustry.value = data.industry || '';
+                    if (editTargetTimeline) editTargetTimeline.value = data.target_timeline ? data.target_timeline.split(' ')[0] : '';
+                    if (editAllocatedAmount) editAllocatedAmount.value = data.allocated_amount || '';
+                    if (editProjectStatus) editProjectStatus.value = data.status || 'Ongoing';
+                    if (editAssignedPmId) editAssignedPmId.value = data.assigned_pm_id || '';
+
+                    if (editProjectModal) {
+                        editProjectModal.classList.add('active');
+                        editProjectModal.setAttribute('aria-hidden', 'false');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching project data:', error);
+                    alert('Error loading project data');
+                });
+        }
+
+        function closeEditProjectModal() {
+            if (!editProjectModal) return;
+            editProjectModal.classList.remove('active');
+            editProjectModal.setAttribute('aria-hidden', 'true');
+            if (editProjectForm) editProjectForm.reset();
+        }
+
+        function openArchiveModal(projectId, projectName) {
+            if (!archiveModal || !archiveForm) return;
+            
+            archiveForm.action = `/projects/${projectId}/archive`;
+            if (archiveProjectName) {
+                archiveProjectName.textContent = projectName;
+            }
+            
+            archiveModal.classList.add('active');
+            archiveModal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeArchiveModal() {
+            if (!archiveModal) return;
+            archiveModal.classList.remove('active');
+            archiveModal.setAttribute('aria-hidden', 'true');
+            if (archiveForm) archiveForm.reset();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (projectModal) {
+                projectModal.addEventListener('click', function (event) {
+                    if (event.target === projectModal) {
+                        closeProjectModal();
+                    }
+                });
+            }
+            if (editProjectModal) {
+                editProjectModal.addEventListener('click', function (event) {
+                    if (event.target === editProjectModal) {
+                        closeEditProjectModal();
+                    }
+                });
+            }
+            if (archiveModal) {
+                archiveModal.addEventListener('click', function (event) {
+                    if (event.target === archiveModal) {
+                        closeArchiveModal();
+                    }
+                });
+            }
+
+            const shouldShowModal = {{ $errors->any() ? 'true' : 'false' }};
+            if (shouldShowModal) {
+                openProjectModal(false);
             }
         });
     </script>
 </body>
 
 </html>
+

@@ -11,20 +11,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --gray-500: #667085;
+            --accent: #16a34a;
             --white: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --header-bg: var(--accent);
+            --main-bg: #ffffff;
+
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
+            --gray-500: #667085;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
-            --blue-1: #1c57b6;
-            --blue-600: #2563eb;
-            --red-600: #dc2626;
-            --black-1: #313131;
-            --sidebar-bg: #c4c4c4;
-            --header-bg: #4a5568;
-            --main-bg: #e2e8f0;
+            --black-1: #111827;
+
+            --blue-1: var(--accent);
+            --blue-600: var(--accent);
+            --red-600: var(--accent);
+            --green-600: #059669;
+
             --text-lg-medium-font-family: "Inter", sans-serif;
             --text-lg-medium-font-weight: 500;
             --text-lg-medium-font-size: 18px;
@@ -41,6 +46,7 @@
             --text-headline-small-bold-font-weight: 700;
             --text-headline-small-bold-font-size: 18px;
             --text-headline-small-bold-line-height: 28px;
+
             --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
             --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
         }
@@ -55,168 +61,49 @@
         body {
             font-family: var(--text-md-normal-font-family);
             background-color: var(--main-bg);
-            overflow-x: hidden;
-        }
-
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: white;
-            border: 2px solid #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #dc2626;
-            position: relative;
-        }
-
-        .logo .aces-text {
-            color: #dc2626;
-        }
-
-        .logo .aces-text:nth-child(2),
-        .logo .aces-text:nth-child(4) {
-            color: #2563eb;
-        }
-
-        .sidebar-title {
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: var(--text-headline-small-bold-font-size);
-            font-weight: var(--text-headline-small-bold-font-weight);
-            color: black;
-        }
-
-        .nav-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .hamburger-menu {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: var(--gray-700);
-            cursor: pointer;
-        }
-
-        .chevron {
-            font-size: 14px;
             color: var(--gray-700);
         }
 
-        .nav-menu {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .nav-item.active {
-            background-color: white;
-            color: black;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .logout-section {
-            margin-top: auto;
-            padding-top: 20px;
-        }
-
-        .logout-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-        }
-
-        .logout-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
+        /* Sidebar has been moved to partials/sidebar.blade.php */
 
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 280px;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            width: 100%;
+            transition: margin-left 0.3s ease;
         }
-
-        .main-content.expanded {
-            margin-left: 0;
+        
+        /* When sidebar is hidden on desktop */
+        .main-content.sidebar-closed { 
+            margin-left: 0; 
+        }
+        
+        /* Desktop: Reserve space for sidebar */
+        @media (min-width: 769px) {
+            .main-content { 
+                margin-left: 280px; 
+            }
+            .main-content.sidebar-closed { 
+                margin-left: 0; 
+            }
+        }
+        
+        /* Mobile: Sidebar overlays, no margin */
+        @media (max-width: 768px) {
+            .main-content { 
+                margin-left: 0 !important; 
+            }
+            .main-content.sidebar-closed { 
+                margin-left: 0 !important; 
+            }
         }
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #2d3748);
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -264,9 +151,6 @@
             flex: 1;
             padding: 30px;
             background: linear-gradient(135deg, #f7fafc, #edf2f7);
-            border-left: 1px solid #e2e8f0;
-            border-right: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
         }
 
         /* Summary Statistics Card */
@@ -334,35 +218,123 @@
             line-height: 1.2;
         }
 
-        /* Main Content Card */
-        .main-card {
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        .dashboard-card {
             background: white;
             border-radius: 12px;
-            padding: 30px;
+            padding: 24px;
             box-shadow: var(--shadow-md);
-            min-height: 400px;
+            color: var(--gray-700);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dashboard-card.full {
+            grid-column: span 12;
+        }
+
+        .dashboard-card.half {
+            grid-column: span 6;
+        }
+
+        .dashboard-card.third {
+            grid-column: span 4;
+        }
+
+        .dashboard-card-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--gray-500);
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .dashboard-card-title {
+            font-family: var(--text-headline-small-bold-font-family);
             font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .dashboard-card-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dashboard-table thead th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dashboard-table tbody tr:not(:last-child) td {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dashboard-table td {
+            padding: 14px 0;
+            font-size: 15px;
+            color: var(--gray-700);
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background-color: transparent;
+            color: #047857;
+        }
+
+        .status-badge.warning {
+            background-color: transparent;
+            color: #a16207;
+        }
+
+        .status-badge.info {
+            background-color: transparent;
+            color: #1d4ed8;
+        }
+
+
+        .view-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue-600);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-link i {
+            font-size: 14px;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
             .header {
                 padding: 15px 20px;
             }
@@ -388,6 +360,17 @@
             .summary-item:not(:last-child)::after {
                 display: none;
             }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+
+            .dashboard-card,
+            .dashboard-card.full,
+            .dashboard-card.half,
+            .dashboard-card.third {
+                grid-column: span 1;
+            }
         }
 
         @media (max-width: 480px) {
@@ -411,58 +394,7 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <span class="aces-text">A</span><span class="aces-text">C</span><span
-                        class="aces-text">E</span><span class="aces-text">S</span>
-                </div>
-                <div class="sidebar-title">ACES</div>
-            </div>
-
-            <div class="nav-toggle">
-                <button class="hamburger-menu" id="navToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <span class="chevron">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-            </div>
-
-            <nav class="nav-menu">
-                <a href="{{ route('dashboard') }}" class="nav-item active">
-                    <i class="nav-icon fas fa-smile"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ route('quality-assurance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-bolt"></i>
-                    <span>Quality Assurance</span>
-                </a>
-                <a href="{{ route('audit') }}" class="nav-item">
-                    <i class="nav-icon fas fa-gavel"></i>
-                    <span>Audit</span>
-                </a>
-                <a href="{{ route('finance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-chart-bar"></i>
-                    <span>Finance</span>
-                </a>
-                <a href="{{ route('projects') }}" class="nav-item">
-                    <i class="nav-icon fas fa-tasks"></i>
-                    <span>Projects</span>
-                </a>
-                <a href="{{ route('employee-attendance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-hard-hat"></i>
-                    <span>Employee Attendance</span>
-                </a>
-            </nav>
-
-            <div class="logout-section">
-                <a href="#" class="logout-item">
-                    <i class="nav-icon fas fa-sign-out-alt"></i>
-                    <span>Log Out</span>
-                </a>
-            </div>
-        </aside>
+        @include('partials.sidebar')
 
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
@@ -484,7 +416,7 @@
                         </div>
                         <div class="summary-content">
                             <span class="summary-label">Total Projects</span>
-                            <span class="summary-number">27</span>
+                            <span class="summary-number">{{ number_format($summary['total_projects'] ?? 0) }}</span>
                         </div>
                     </div>
                     <div class="summary-item">
@@ -493,7 +425,7 @@
                         </div>
                         <div class="summary-content">
                             <span class="summary-label">Complete Projects</span>
-                            <span class="summary-number">21</span>
+                            <span class="summary-number">{{ number_format($summary['complete_projects'] ?? 0) }}</span>
                         </div>
                     </div>
                     <div class="summary-item">
@@ -502,51 +434,163 @@
                         </div>
                         <div class="summary-content">
                             <span class="summary-label">Ongoing Projects</span>
-                            <span class="summary-number">6</span>
+                            <span class="summary-number">{{ number_format($summary['ongoing_projects'] ?? 0) }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Main Content Card -->
-                <div class="main-card">
-                    <div>Main Dashboard Content Area</div>
+                <!-- Detailed Insights -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card full">
+                        <div class="dashboard-card-header">
+                            <div>
+                                <div class="dashboard-card-title">Active Projects</div>
+                                <div class="dashboard-card-subtitle">Projects currently in execution with status</div>
+                            </div>
+                            <a class="view-link" href="{{ route('projects') }}">
+                                View all
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Client</th>
+                                    <th>Status</th>
+                                    <th>Lead</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $statusMap = [
+                                        'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                        'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
+                                        'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                    ];
+                                @endphp
+
+                                @forelse ($activeProjects as $project)
+                                    @php
+                                        $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                        $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                        $clientName = $project->client_name ?? ($project->client_full_name ?? '—');
+                                        $leadName = $project->lead ?? ($project->lead_full_name ?? '—');
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $project->project_name }}</td>
+                                        <td>{{ $clientName }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $badge['class'] }}">
+                                                <i class="{{ $badge['icon'] }}"></i>
+                                                {{ $projectDisplayStatus ?? '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $leadName }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No active projects yet.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="dashboard-card half">
+                        <div class="dashboard-card-header">
+                            <div>
+                                <div class="dashboard-card-title">Project Material Management</div>
+                                <div class="dashboard-card-subtitle">Recent project materials and inspections</div>
+                            </div>
+                            <a class="view-link" href="{{ route('project-material-management') }}">
+                                View all
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Material</th>
+                                    <th>Supplier</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($recentProjectRecords as $record)
+                                    <tr>
+                                        <td>{{ $record->material_name }}</td>
+                                        <td>{{ $record->supplier ?? '—' }}</td>
+                                        <td>
+                                            <span class="status-badge {{ strtolower($record->status) }}">
+                                                {{ $record->status ?? '—' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ optional($record->created_at)->diffForHumans() }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No recent materials.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="dashboard-card half">
+                        <div class="dashboard-card-header">
+                            <div>
+                                <div class="dashboard-card-title">Transaction Reminders</div>
+                                <div class="dashboard-card-subtitle">Materials with failed status to be returned</div>
+                            </div>
+                            <a class="view-link" href="{{ route('transactions.index') }}">
+                                View all
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Material Name</th>
+                                    <th>Supplier</th>
+                                    <th>Status</th>
+                                    <th>Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($projectsToReturn as $record)
+                                    <tr>
+                                        <td>{{ $record->material_name }}</td>
+                                        <td>{{ $record->supplier ?? '—' }}</td>
+                                        <td>
+                                            <span class="status-badge fail">
+                                                {{ $record->status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ optional($record->updated_at)->diffForHumans() ?? '—' }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No materials currently with failed status to be returned.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <script>
-        // Sidebar toggle functionality
-        const headerMenu = document.getElementById('headerMenu');
-        const navToggle = document.getElementById('navToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-
-        headerMenu.addEventListener('click', toggleSidebar);
-        navToggle.addEventListener('click', toggleSidebar);
-
-        // Close sidebar on mobile when clicking outside
-        document.addEventListener('click', function (e) {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('open', 'collapsed');
-                mainContent.classList.remove('expanded');
-            }
-        });
-    </script>
+    @include('partials.sidebar-js')
 </body>
 
 </html>

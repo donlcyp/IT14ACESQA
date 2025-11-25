@@ -11,26 +11,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --gray-500: #667085;
+            --accent: #16a34a;
             --white: #ffffff;
+
+            --gray-500: #667085;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
             --gray-600: #6b7280;
             --gray-700: #374151;
             --gray-800: #1f2937;
-            --blue-1: #1c57b6;
-            --blue-600: #2563eb;
-            --red-600: #dc2626;
+
+            --blue-1: var(--accent);
+            --blue-600: var(--accent);
+            --red-600: var(--accent);
             --green-600: #059669;
             --yellow-500: #eab308;
             --purple-600: #7c3aed;
             --purple-700: #6d28d9;
             --purple-800: #5b21b6;
             --purple-900: #4c1d95;
-            --black-1: #313131;
-            --sidebar-bg: #c4c4c4;
-            --header-bg: #4a5568;
-            --main-bg: #e2e8f0;
+
+            --black-1: #111827;
+            --sidebar-bg: #f8fafc;
+            --header-bg: var(--accent);
+            --main-bg: #ffffff;
+
             --text-lg-medium-font-family: "Inter", sans-serif;
             --text-lg-medium-font-weight: 500;
             --text-lg-medium-font-size: 18px;
@@ -69,160 +74,46 @@
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: white;
-            border: 2px solid #9ca3af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #dc2626;
-            position: relative;
-        }
-
-        .logo .aces-text {
-            color: #dc2626;
-        }
-
-        .logo .aces-text:nth-child(2),
-        .logo .aces-text:nth-child(4) {
-            color: #2563eb;
-        }
-
-        .sidebar-title {
-            font-family: var(--text-headline-small-bold-font-family);
-            font-size: var(--text-headline-small-bold-font-size);
-            font-weight: var(--text-headline-small-bold-font-weight);
-            color: black;
-        }
-
-        .nav-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .hamburger-menu {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: var(--gray-700);
-            cursor: pointer;
-        }
-
-        .chevron {
-            font-size: 14px;
-            color: var(--gray-700);
-        }
-
-        .nav-menu {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .nav-item.active {
-            background-color: white;
-            color: black;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .logout-section {
-            margin-top: auto;
-            padding-top: 20px;
-        }
-
-        .logout-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--gray-700);
-            font-family: var(--text-md-normal-font-family);
-            font-size: var(--text-md-normal-font-size);
-            transition: all 0.2s ease;
-        }
-
-        .logout-item:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
+        /* Sidebar has been moved to partials/sidebar.blade.php */
 
         /* Main Content Area */
         .main-content {
             flex: 1;
-            margin-left: 280px;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            width: 100%;
+            transition: margin-left 0.3s ease;
         }
-
-        .main-content.expanded {
-            margin-left: 0;
+        
+        /* When sidebar is hidden on desktop */
+        .main-content.sidebar-closed { 
+            margin-left: 0; 
+        }
+        
+        /* Desktop: Reserve space for sidebar */
+        @media (min-width: 769px) {
+            .main-content { 
+                margin-left: 280px; 
+            }
+            .main-content.sidebar-closed { 
+                margin-left: 0; 
+            }
+        }
+        
+        /* Mobile: Sidebar overlays, no margin */
+        @media (max-width: 768px) {
+            .main-content { 
+                margin-left: 0 !important; 
+            }
+            .main-content.sidebar-closed { 
+                margin-left: 0 !important; 
+            }
         }
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #2d3748);
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -278,7 +169,7 @@
         /* Finance Layout */
         .finance-layout {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr; /* Full width content */
             gap: 30px;
             height: 100%;
         }
@@ -465,9 +356,9 @@
         }
 
         .chart-button.active {
-            background: var(--blue-600);
+            background: var(--accent);
             color: white;
-            border-color: var(--blue-600);
+            border-color: var(--accent);
         }
 
         .chart-area {
@@ -476,52 +367,165 @@
             border: 1px solid var(--gray-200);
             border-radius: 8px;
             position: relative;
+            padding: 20px 20px 40px 50px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-end;
             color: var(--gray-500);
             font-family: var(--text-md-normal-font-family);
         }
 
-        /* Finance Sidebar */
-        .finance-actions {
+        .chart-bars-container {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-around;
+            height: calc(100% - 20px);
+            gap: 8px;
+            padding: 0 10px;
+        }
+
+        .chart-bar-group {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            height: 100%;
+            max-width: 60px;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 3px;
+            width: 100%;
+            align-items: flex-end;
+            flex: 1;
+        }
+
+        .chart-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: opacity 0.2s ease;
+            min-height: 0;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar.revenue {
+            background: linear-gradient(180deg, #9333ea 0%, #7c3aed 100%);
+        }
+
+        .chart-bar.expense {
+            background: linear-gradient(180deg, #20b255ff 0%, #16a34a 100%);
+        }
+
+        .chart-bar-label {
+            font-size: 10px;
+            color: var(--gray-500);
+            text-align: center;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .chart-y-axis {
+            position: absolute;
+            left: 10px;
+            top: 20px;
+            bottom: 40px;
+            width: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+            font-size: 10px;
+            color: var(--gray-500);
+            text-align: right;
+        }
+
+        .chart-x-axis {
+            position: absolute;
+            bottom: 0;
+            left: 40px;
+            right: 0;
+            height: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 10px;
+            color: var(--gray-500);
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+        }
+
+        .chart-tooltip.show {
+            opacity: 1;
+        }
+
+        /* Finance Sidebar */
+        .finance-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
         .finance-action-button {
-            background: var(--purple-600);
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 16px 20px;
+            border-radius: 10px;
+            padding: 14px 16px;
             font-family: var(--text-sm-medium-font-family);
-            font-size: var(--text-sm-medium-font-size);
-            font-weight: var(--text-sm-medium-font-weight);
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
             text-align: left;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-xs);
         }
 
         .finance-action-button:hover {
-            background: var(--purple-700);
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-        .finance-action-button:nth-child(1) {
-            background: var(--purple-800);
+        .finance-action-button i {
+            width: 20px;
+            text-align: center;
         }
 
-        .finance-action-button:nth-child(2) {
-            background: var(--purple-700);
+        .finance-actions-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-md);
         }
 
-        .finance-action-button:nth-child(3) {
-            background: var(--purple-600);
-        }
-
-        .finance-action-button:nth-child(4) {
-            background: var(--purple-500);
+        .finance-actions-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: var(--text-headline-small-bold-font-size);
+            font-weight: var(--text-headline-small-bold-font-weight);
+            color: var(--black-1);
+            margin-bottom: 12px;
         }
 
         .finance-graphic {
@@ -551,18 +555,16 @@
             }
 
             .finance-sidebar {
-                flex-direction: row;
+                flex-direction: column;
                 gap: 20px;
             }
 
             .finance-actions {
-                flex: 1;
-                flex-direction: row;
+                grid-template-columns: 1fr;
             }
 
             .finance-action-button {
-                flex: 1;
-                text-align: center;
+                text-align: left;
             }
 
             .finance-graphic {
@@ -571,19 +573,6 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
             .header {
                 padding: 15px 20px;
             }
@@ -612,68 +601,169 @@
                 flex-direction: column;
             }
         }
+
+        /* Financial Data Modal Styles */
+        .financial-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .financial-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .financial-modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .financial-modal.active .financial-modal-content {
+            transform: scale(1);
+        }
+
+        .financial-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .financial-modal-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: var(--text-headline-small-bold-font-size);
+            font-weight: var(--text-headline-small-bold-font-weight);
+            color: var(--gray-800);
+        }
+
+        .financial-modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .financial-modal-close:hover {
+            background: var(--gray-400);
+            color: var(--gray-700);
+        }
+
+        .financial-form-group {
+            margin-bottom: 20px;
+            padding: 0 24px;
+        }
+
+        .financial-form-label {
+            display: block;
+            font-family: var(--text-sm-medium-font-family);
+            font-size: var(--text-sm-medium-font-size);
+            font-weight: var(--text-sm-medium-font-weight);
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .financial-form-input,
+        .financial-form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-family: var(--text-md-normal-font-family);
+            font-size: var(--text-md-normal-font-size);
+            color: var(--gray-800);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .financial-form-input:focus,
+        .financial-form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .financial-form-input::placeholder {
+            color: var(--gray-500);
+        }
+
+        .financial-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 24px;
+            border-top: 1px solid var(--gray-300);
+        }
+
+        .financial-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--text-sm-medium-font-family);
+            font-size: var(--text-sm-medium-font-size);
+            font-weight: var(--text-sm-medium-font-weight);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .financial-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .financial-btn-primary:hover {
+            background: #15803d;
+        }
+
+        .financial-btn-primary:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+        }
+
+        .financial-btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .financial-btn-secondary:hover {
+            background: var(--gray-400);
+        }
     </style>
 </head>
 
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <span class="aces-text">A</span><span class="aces-text">C</span><span
-                        class="aces-text">E</span><span class="aces-text">S</span>
-                </div>
-                <div class="sidebar-title">ACES</div>
-            </div>
-
-            <div class="nav-toggle">
-                <button class="hamburger-menu" id="navToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <span class="chevron">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-            </div>
-
-            <nav class="nav-menu">
-                <a href="{{ route('dashboard') }}" class="nav-item">
-                    <i class="nav-icon fas fa-smile"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ route('quality-assurance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-bolt"></i>
-                    <span>Quality Assurance</span>
-                </a>
-                <a href="{{ route('audit') }}" class="nav-item">
-                    <i class="nav-icon fas fa-gavel"></i>
-                    <span>Audit</span>
-                </a>
-                <a href="{{ route('finance') }}" class="nav-item active">
-                    <i class="nav-icon fas fa-chart-bar"></i>
-                    <span>Finance</span>
-                </a>
-                <a href="{{ route('projects') }}" class="nav-item">
-                    <i class="nav-icon fas fa-tasks"></i>
-                    <span>Projects</span>
-                </a>
-                <a href="{{ route('employee-attendance') }}" class="nav-item">
-                    <i class="nav-icon fas fa-hard-hat"></i>
-                    <span>Employee Attendance</span>
-                </a>
-            </nav>
-
-            <div class="logout-section">
-                <a href="#" class="logout-item">
-                    <i class="nav-icon fas fa-sign-out-alt"></i>
-                    <span>Log Out</span>
-                </a>
-            </div>
-        </aside>
+        @include('partials.sidebar')
 
         <!-- Main Content -->
         <main class="main-content" id="mainContent">
             <!-- Header -->
+
             <header class="header">
                 <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
@@ -690,13 +780,13 @@
                             <div class="overview-card">
                                 <h2 class="overview-title">Financial Overview</h2>
                                 <div class="overview-content">
-                                    <div class="overview-item">Total Revenue: P5,718,923</div>
-                                    <div class="overview-item">Total Expenses: P2,309,895</div>
+                                    <div class="overview-item">Total Revenue: ₱{{ number_format($totalRevenue, 2) }}</div>
+                                    <div class="overview-item">Total Expenses: ₱{{ number_format($totalExpenses, 2) }}</div>
                                 </div>
                             </div>
                             <div class="overview-card net-profit-card">
-                                <div class="net-profit-value">Net Profit: P999,999</div>
-                                <div class="last-updated">Last Updated: 12:00 AM PST, September 27, 2025</div>
+                                <div class="net-profit-value">Net Profit: ₱{{ number_format($netProfit, 2) }}</div>
+                                <div class="last-updated">Last Updated: {{ date('g:i A T, F d, Y') }}</div>
                             </div>
                         </div>
 
@@ -708,11 +798,11 @@
                             </div>
                             <div class="stat-card blue">
                                 <div class="stat-label">Total Transactions</div>
-                                <div class="stat-value">23</div>
+                                <div class="stat-value">{{ $totalTransactions }}</div>
                             </div>
                             <div class="stat-card yellow">
                                 <div class="stat-label">Avg. Profit Margin</div>
-                                <div class="stat-value">15%</div>
+                                <div class="stat-value">{{ $avgProfitMargin }}%</div>
                             </div>
                         </div>
 
@@ -723,15 +813,20 @@
                                     <div class="chart-title">Statistics</div>
                                     <div class="chart-subtitle">Overall Tracking</div>
                                 </div>
-                                <div class="chart-legend">
-                                    <div class="legend-item">
-                                        <div class="legend-dot purple"></div>
-                                        <span>Revenue</span>
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div class="chart-legend">
+                                        <div class="legend-item">
+                                            <div class="legend-dot purple"></div>
+                                            <span>Revenue</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-dot red"></div>
+                                            <span>Expenses</span>
+                                        </div>
                                     </div>
-                                    <div class="legend-item">
-                                        <div class="legend-dot red"></div>
-                                        <span>Expenses</span>
-                                    </div>
+                                    <button class="finance-action-button" onclick="openFinancialDataModal()" style="padding: 8px 16px; font-size: 12px; background: var(--accent);">
+                                        <i class="fas fa-plus"></i> Add Data
+                                    </button>
                                 </div>
                             </div>
                             <div class="chart-controls">
@@ -740,58 +835,165 @@
                                 <button class="chart-button active">12 months</button>
                             </div>
                             <div class="chart-area">
-                                Financial Chart Area (Revenue vs Expenses over 12 months)
+                                <div class="chart-y-axis">
+                                    @php
+                                        $maxRevenue = (float) ($financialData->max('revenue') ?? 0);
+                                        $maxExpenses = (float) ($financialData->max('expenses') ?? 0);
+                                        $rawMax = max($maxRevenue, $maxExpenses);
+                                        $rawMax = $rawMax > 0 ? $rawMax : 1; // avoid zero scale
+                                        $range = $rawMax * 1.1; // add 10% headroom
+                                        $base = pow(10, floor(log10($range)));
+                                        $fraction = $range / $base;
+                                        if ($fraction <= 1) { $nice = 1; }
+                                        elseif ($fraction <= 2) { $nice = 2; }
+                                        elseif ($fraction <= 5) { $nice = 5; }
+                                        else { $nice = 10; }
+                                        $step = $nice * $base / 4; // step for 4 ticks
+                                        // Recompute to ensure 4 steps cover the range
+                                        $scaleMax = ceil($range / $step) * $step;
+                                    @endphp
+                                    <span>₱{{ number_format($scaleMax, 0) }}</span>
+                                    <span>₱{{ number_format($scaleMax * 0.75, 0) }}</span>
+                                    <span>₱{{ number_format($scaleMax * 0.5, 0) }}</span>
+                                    <span>₱{{ number_format($scaleMax * 0.25, 0) }}</span>
+                                    <span>₱0</span>
+                                </div>
+                                <div class="chart-bars-container" id="chartBarsContainer">
+                                    @php
+                                        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                        // Use the same scale as Y-axis
+                                        if (!isset($scaleMax)) {
+                                            $mxRev = (float) ($financialData->max('revenue') ?? 0);
+                                            $mxExp = (float) ($financialData->max('expenses') ?? 0);
+                                            $raw = max($mxRev, $mxExp);
+                                            $raw = $raw > 0 ? $raw : 1;
+                                            $range2 = $raw * 1.1;
+                                            $base2 = pow(10, floor(log10($range2)));
+                                            $frac2 = $range2 / $base2;
+                                            if ($frac2 <= 1) { $nice2 = 1; }
+                                            elseif ($frac2 <= 2) { $nice2 = 2; }
+                                            elseif ($frac2 <= 5) { $nice2 = 5; }
+                                            else { $nice2 = 10; }
+                                            $step2 = $nice2 * $base2 / 4;
+                                            $scaleMax = ceil($range2 / $step2) * $step2;
+                                        }
+                                        $maxValue = $scaleMax;
+                                    @endphp
+                                    @php
+                                        $dataByMonth = $financialData->keyBy('month');
+                                    @endphp
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        @php
+                                            $record = $dataByMonth->get($m);
+                                            $rev = (float) ($record->revenue ?? 0);
+                                            $exp = (float) ($record->expenses ?? 0);
+                                            $revenueHeight = $maxValue > 0 ? ($rev / $maxValue) * 100 : 0;
+                                            $expenseHeight = $maxValue > 0 ? ($exp / $maxValue) * 100 : 0;
+                                            $minPct = 2; // ensure visibility for small non-zero values
+                                            $revenueDisplay = ($rev > 0 && $revenueHeight > 0 && $revenueHeight < $minPct) ? $minPct : $revenueHeight;
+                                            $expenseDisplay = ($exp > 0 && $expenseHeight > 0 && $expenseHeight < $minPct) ? $minPct : $expenseHeight;
+                                        @endphp
+                                        <div class="chart-bar-group">
+                                            <div class="chart-bars">
+                                                <div class="chart-bar revenue" style="height: {{ $revenueDisplay }}%;" data-value="₱{{ number_format($rev, 0) }}" data-label="Revenue"></div>
+                                                <div class="chart-bar expense" style="height: {{ $expenseDisplay }}%;" data-value="₱{{ number_format($exp, 0) }}" data-label="Expenses"></div>
+                                            </div>
+                                            <div class="chart-bar-label">{{ $monthNames[$m - 1] }}</div>
+                                        </div>
+                                    @endfor
+                                </div>
+                                <div class="chart-tooltip" id="chartTooltip"></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Finance Sidebar -->
                     <div class="finance-sidebar">
-                        <div class="finance-actions">
-                            <button class="finance-action-button">Project Budget Management</button>
-                            <button class="finance-action-button">Revenue Recording</button>
-                            <button class="finance-action-button">Expense Tracking</button>
-                            <button class="finance-action-button">Purchase Order</button>
+                        <div class="finance-actions-card">
+                            <div class="finance-actions-title">Finance Actions</div>
+                            <div class="finance-actions">
+                                <a class="finance-action-button" href="{{ route('finance.budget') }}">
+                                    <i class="fas fa-wallet"></i>
+                                    <span>Project Budget Management</span>
+                                </a>
+                                <a class="finance-action-button" href="{{ route('finance.revenue') }}">
+                                    <i class="fas fa-arrow-trend-up"></i>
+                                    <span>Revenue Recording</span>
+                                </a>
+                                <a class="finance-action-button" href="{{ route('finance.expenses') }}">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>Expense Tracking</span>
+                                </a>
+                                <a class="finance-action-button" href="{{ route('finance.purchase-orders') }}">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                    <span>Purchase Order</span>
+                                </a>
+                            </div>
                         </div>
-                        <div class="finance-graphic"></div>
+                    </div>
+                </div>
+
+                <!-- Add Financial Data Modal -->
+                <div class="financial-modal" id="financialDataModal" aria-hidden="true">
+                    <div class="financial-modal-content" role="dialog" aria-modal="true">
+                        <div class="financial-modal-header">
+                            <div class="financial-modal-title">Add Financial Data</div>
+                            <button class="financial-modal-close" onclick="closeFinancialDataModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="financialDataForm">
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Year</label>
+                                <input type="number" class="financial-form-input" id="financialYear" name="year" value="2025" required min="2020" max="2100" />
+                            </div>
+
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Month</label>
+                                <select class="financial-form-select" id="financialMonth" name="month" required>
+                                    <option value="">Select Month</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11" selected>November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Revenue (₱)</label>
+                                <input type="number" class="financial-form-input" id="financialRevenue" name="revenue" placeholder="Enter revenue amount" step="0.01" min="0" required />
+                            </div>
+
+                            <div class="financial-form-group">
+                                <label class="financial-form-label">Expenses (₱)</label>
+                                <input type="number" class="financial-form-input" id="financialExpenses" name="expenses" placeholder="Enter expenses amount" step="0.01" min="0" required />
+                            </div>
+
+                            <div class="financial-modal-footer">
+                                <button type="button" class="financial-btn financial-btn-secondary" onclick="closeFinancialDataModal()">Cancel</button>
+                                <button type="submit" class="financial-btn financial-btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    <span>Save Data</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
+    @include('partials.sidebar-js')
     <script>
-        // Sidebar toggle functionality
-        const headerMenu = document.getElementById('headerMenu');
-        const navToggle = document.getElementById('navToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-
-        headerMenu.addEventListener('click', toggleSidebar);
-        navToggle.addEventListener('click', toggleSidebar);
-
-        // Close sidebar on mobile when clicking outside
-        document.addEventListener('click', function (e) {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !headerMenu.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('open', 'collapsed');
-                mainContent.classList.remove('expanded');
-            }
-        });
-
         // Chart button functionality
         document.querySelectorAll('.chart-button').forEach(button => {
             button.addEventListener('click', function () {
@@ -799,6 +1001,104 @@
                 this.classList.add('active');
             });
         });
+
+        // Chart tooltip functionality
+        const chartTooltip = document.getElementById('chartTooltip');
+        const chartBars = document.querySelectorAll('.chart-bar');
+
+        chartBars.forEach(bar => {
+            bar.addEventListener('mouseenter', function(e) {
+                const value = this.getAttribute('data-value');
+                const label = this.getAttribute('data-label');
+                const rect = this.getBoundingClientRect();
+                const chartArea = document.querySelector('.chart-area');
+                const chartRect = chartArea.getBoundingClientRect();
+
+                chartTooltip.textContent = `${label}: ${value}`;
+                chartTooltip.style.left = (rect.left - chartRect.left + rect.width / 2) + 'px';
+                chartTooltip.style.top = (rect.top - chartRect.top - 35) + 'px';
+                chartTooltip.classList.add('show');
+            });
+
+            bar.addEventListener('mouseleave', function() {
+                chartTooltip.classList.remove('show');
+            });
+        });
+
+        // Financial Data Modal functions
+        const financialDataModal = document.getElementById('financialDataModal');
+        const financialDataForm = document.getElementById('financialDataForm');
+
+        function openFinancialDataModal() {
+            financialDataModal.classList.add('active');
+            financialDataModal.setAttribute('aria-hidden', 'false');
+            financialDataForm.reset();
+            document.getElementById('financialYear').value = '2025';
+            document.getElementById('financialMonth').value = '11';
+        }
+
+        function closeFinancialDataModal() {
+            financialDataModal.classList.remove('active');
+            financialDataModal.setAttribute('aria-hidden', 'true');
+            financialDataForm.reset();
+        }
+
+        // Handle form submission
+        financialDataForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                year: document.getElementById('financialYear').value,
+                month: document.getElementById('financialMonth').value,
+                revenue: document.getElementById('financialRevenue').value,
+                expenses: document.getElementById('financialExpenses').value,
+                _token: '{{ csrf_token() }}'
+            };
+
+            // Show loading state
+            const submitBtn = financialDataForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('{{ route("finance.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': formData._token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Financial data added successfully!');
+                    closeFinancialDataModal();
+                    // Reload page to show updated data
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'An error occurred while saving the data.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Close modal on outside click
+        if (financialDataModal) {
+            financialDataModal.addEventListener('click', (e) => {
+                if (e.target === financialDataModal) {
+                    closeFinancialDataModal();
+                }
+            });
+        }
     </script>
 </body>
 

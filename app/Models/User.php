@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -20,6 +21,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
+        'user_position',
+        'status',
         'password',
     ];
 
@@ -45,4 +49,38 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Check if user can manage project employees.
+     * Only OWNER and PM roles can manage project employees.
+     */
+    public function canManageProjectEmployees(): bool
+    {
+        return in_array($this->role, ['OWNER', 'PM']);
+    }
+
+    /**
+     * Get the employee profile for this user.
+     */
+    public function employeeProfile()
+    {
+        return $this->hasOne(EmployeeList::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the projects managed by this user.
+     */
+    public function managedProjects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'assigned_pm_id', 'id');
+    }
+
+    /**
+     * Get the logs for this user.
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(Log::class, 'user_id', 'id');
+    }
 }
+
