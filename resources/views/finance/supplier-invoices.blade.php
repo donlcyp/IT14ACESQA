@@ -33,6 +33,19 @@
             font-family: "Inter", sans-serif;
             background-color: #f7fafc;
             color: var(--gray-700);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-open {
+            margin-left: 280px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex: 1;
         }
 
         .header {
@@ -43,6 +56,11 @@
             gap: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             color: white;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-open .header {
+            margin-left: 0;
         }
 
         .header-title {
@@ -52,9 +70,87 @@
             flex: 1;
         }
 
+        .sidebar-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px 12px;
+            margin-right: 15px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-toggle-btn:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--gray-300);
+            padding: 20px 0;
+            overflow-y: auto;
+            max-height: calc(100vh - 80px);
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            padding: 0 20px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--gray-700);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: var(--accent);
+        }
+
+        .sidebar-link.active {
+            background: rgba(22, 163, 74, 0.15);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-link i {
+            width: 18px;
+            text-align: center;
+        }
+
         .content-area {
             flex: 1;
             padding: 30px;
+            overflow-y: auto;
         }
 
         .page-title {
@@ -242,29 +338,26 @@
                 padding: 8px;
             }
 
-            .filters {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
     </style>
 </head>
 <body>
+    @include('partials.sidebar')
+
     <header class="header">
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
         <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
     </header>
 
-    <main class="content-area">
-        <a href="{{ route('finance.index') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> Back to Finance Dashboard
-        </a>
+    <div class="main-wrapper">
+        <main class="content-area">
+            <div class="page-title">
+                <i class="fas fa-file-invoice"></i> Supplier Invoices
+            </div>
 
-        <div class="page-title">
-            <i class="fas fa-file-invoice"></i> Supplier Invoices
-        </div>
-
-        <!-- Summary Statistics -->
-        <div class="summary-grid">
+            <!-- Summary Statistics -->
+            <div class="summary-grid">
             <div class="summary-item">
                 <div class="summary-label">Total Suppliers</div>
                 <div class="summary-value">{{ $suppliers->count() }}</div>
@@ -366,6 +459,26 @@
                 row.style.display = supplierMatch && statusMatch ? '' : 'none';
             });
         }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const body = document.body;
+            sidebar.classList.toggle('open');
+            body.classList.toggle('sidebar-open');
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            
+            if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
     </script>
+        </main>
+    </div>
 </body>
 </html>

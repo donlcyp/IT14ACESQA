@@ -6,8 +6,15 @@
   <title>Admin - Users</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#f7fafc; color:#1f2937; }
-    .container { max-width: 1100px; margin: 24px auto; background:#fff; padding:24px; border-radius:12px; box-shadow:0 6px 6px rgba(0,0,0,0.08);}    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#f7fafc; color:#1f2937; transition: margin-left 0.3s ease; }
+    body.sidebar-open { margin-left: 280px; }
+    .top-header { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .toggle-sidebar { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; transition: all 0.2s ease; }
+    .toggle-sidebar:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); opacity: 0.9; }
+    .company-name { font-size: 18px; font-weight: 700; }
+    .container { max-width: 1200px; margin: 24px auto; background:#fff; padding:24px; border-radius:12px; box-shadow:0 6px 6px rgba(0,0,0,0.08);}    
     .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
     .title { font-size:20px; font-weight:700; }
     .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; }
@@ -23,9 +30,18 @@
   </style>
 </head>
 <body>
+  <div class="top-header">
+    <div class="header-left">
+      <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+      <div class="company-name"><i class="fas fa-users"></i> User Management</div>
+    </div>
+  </div>
+
+  @include('partials.sidebar')
+
   <div class="container">
     <div class="header">
-      <div class="title"><i class="fas fa-user-gear"></i> User Management</div>
+      <div class="title"><i class="fas fa-user-gear"></i> Users</div>
       <a class="btn btn-primary" href="{{ route('admin.users.create') }}"><i class="fas fa-plus"></i> New User</a>
     </div>
 
@@ -68,5 +84,23 @@
       <a class="sidebar-link" href="{{ route('dashboard') }}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     </div>
   </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+      sidebar.classList.toggle('open');
+      body.classList.toggle('sidebar-open');
+    }
+    
+    document.addEventListener('click', function(e) {
+      const sidebar = document.querySelector('.sidebar');
+      const toggle = document.querySelector('.toggle-sidebar');
+      if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        toggleSidebar();
+      }
+    });
+  </script>
 </body>
 </html>
+
