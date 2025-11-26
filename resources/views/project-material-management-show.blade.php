@@ -765,13 +765,13 @@
 
             tbody.innerHTML = filtered.map((m, idx) => `
                 <tr data-index="${idx}">
-                    <td>${m.name}</td>
-                    <td>${m.batch || 'N/A'}</td>
+                    <td>${m.material_name || m.name || 'N/A'}</td>
+                    <td>${m.batch_serial_no || m.batch || 'N/A'}</td>
                     <td>${m.supplier || 'N/A'}</td>
-                    <td>${m.quantity}</td>
-                    <td>${m.unit || 'N/A'}</td>
-                    <td>₱${parseFloat(m.price).toFixed(2)}</td>
-                    <td>₱${parseFloat(m.total).toFixed(2)}</td>
+                    <td>${m.quantity_received || m.quantity || 'N/A'}</td>
+                    <td>${m.unit_of_measure || m.unit || 'N/A'}</td>
+                    <td>₱${parseFloat(m.unit_price || m.price || 0).toFixed(2)}</td>
+                    <td>₱${parseFloat(m.total_cost || m.total || 0).toFixed(2)}</td>
                     <td>${formatDate(m.date_received)}</td>
                     <td>${formatDate(m.date_inspected)}</td>
                     <td><span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; ${getStatusStyle(m.status)}">${m.status}</span></td>
@@ -830,8 +830,9 @@
 
                 const filtered = materials.filter(m => m.status === currentFilter);
                 const material = filtered[selectedRowIndex];
+                const materialName = material.material_name || material.name || 'Unknown Material';
                 
-                if (confirm(`Are you sure you want to delete ${material.name}?`)) {
+                if (confirm(`Are you sure you want to delete ${materialName}?`)) {
                     try {
                         const response = await fetch(`/project-material-management/materials/${material.id}`, {
                             method: 'DELETE',
@@ -907,36 +908,43 @@
                 container.innerHTML = '';
                 
                 const editRow = document.createElement('tr');
+                const matName = material.material_name || material.name || '';
+                const matBatch = material.batch_serial_no || material.batch || '';
+                const matQty = material.quantity_received || material.quantity || 0;
+                const matUnit = material.unit_of_measure || material.unit || '';
+                const matPrice = material.unit_price || material.price || 0;
+                const matTotal = material.total_cost || material.total || 0;
+                
                 editRow.innerHTML = `
                     <td>
-                        <input type="text" class="table-input material-name" placeholder="Product name" value="${material.name}" />
+                        <input type="text" class="table-input material-name" placeholder="Product name" value="${matName}" />
                     </td>
                     <td>
-                        <input type="text" class="table-input material-batch" placeholder="Batch/Serial" value="${material.batch || ''}" />
+                        <input type="text" class="table-input material-batch" placeholder="Batch/Serial" value="${matBatch}" />
                     </td>
                     <td>
-                        <input type="number" class="table-input material-quantity" value="${material.quantity}" />
+                        <input type="number" class="table-input material-quantity" value="${matQty}" />
                     </td>
                     <td>
                         <select class="table-select material-unit">
                                 <option value="">Select</option>
-                                <option value="Meter" ${material.unit === 'Meter' ? 'selected' : ''}>Meter</option>
-                                <option value="Feet" ${material.unit === 'Feet' ? 'selected' : ''}>Feet</option>
-                                <option value="Kilogram" ${material.unit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
-                                <option value="Pound" ${material.unit === 'Pound' ? 'selected' : ''}>Pound</option>
-                                <option value="Ton" ${material.unit === 'Ton' ? 'selected' : ''}>Ton</option>
-                                <option value="Piece" ${material.unit === 'Piece' ? 'selected' : ''}>Piece</option>
-                                <option value="Liter" ${material.unit === 'Liter' ? 'selected' : ''}>Liter</option>
-                                <option value="Gallon" ${material.unit === 'Gallon' ? 'selected' : ''}>Gallon</option>
-                                <option value="Box" ${material.unit === 'Box' ? 'selected' : ''}>Box</option>
-                                <option value="Bag" ${material.unit === 'Bag' ? 'selected' : ''}>Bag</option>
+                                <option value="Meter" ${matUnit === 'Meter' ? 'selected' : ''}>Meter</option>
+                                <option value="Feet" ${matUnit === 'Feet' ? 'selected' : ''}>Feet</option>
+                                <option value="Kilogram" ${matUnit === 'Kilogram' ? 'selected' : ''}>Kilogram</option>
+                                <option value="Pound" ${matUnit === 'Pound' ? 'selected' : ''}>Pound</option>
+                                <option value="Ton" ${matUnit === 'Ton' ? 'selected' : ''}>Ton</option>
+                                <option value="Piece" ${matUnit === 'Piece' ? 'selected' : ''}>Piece</option>
+                                <option value="Liter" ${matUnit === 'Liter' ? 'selected' : ''}>Liter</option>
+                                <option value="Gallon" ${matUnit === 'Gallon' ? 'selected' : ''}>Gallon</option>
+                                <option value="Box" ${matUnit === 'Box' ? 'selected' : ''}>Box</option>
+                                <option value="Bag" ${matUnit === 'Bag' ? 'selected' : ''}>Bag</option>
                             </select>
                     </td>
                     <td>
-                        <input type="number" class="table-input material-price" placeholder="0.00" step="0.01" value="${material.price}" />
+                        <input type="number" class="table-input material-price" placeholder="0.00" step="0.01" value="${matPrice}" />
                     </td>
                     <td>
-                        <input type="number" class="table-input material-total" placeholder="0.00" readonly value="${material.total}" />
+                        <input type="number" class="table-input material-total" placeholder="0.00" readonly value="${matTotal}" />
                     </td>
                     <td>
                         <button class="delete-btn" onclick="removeMaterialRow(this)">

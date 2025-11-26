@@ -118,7 +118,7 @@
       </table>
     </div>
 
-    <p><a href="{{ route('finance') }}">← Back to Finance</a></p>
+    <p><a href="{{ route('finance.index') }}">← Back to Finance</a></p>
   </div>
 </body>
 </html>

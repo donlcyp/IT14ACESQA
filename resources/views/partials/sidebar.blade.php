@@ -209,7 +209,7 @@
                 <i class="nav-icon fas fa-exchange-alt"></i>
                 <span>Transactions & Invoice</span>
             </a>
-            <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
+            <a href="{{ route('finance.index') }}" class="nav-item {{ request()->routeIs('finance*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-chart-bar"></i>
                 <span>Finance</span>
             </a>
@@ -254,7 +254,7 @@
                 <i class="nav-icon fas fa-exchange-alt"></i>
                 <span>Transactions & Invoice</span>
             </a>
-            <a href="{{ route('finance') }}" class="nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
+            <a href="{{ route('finance.index') }}" class="nav-item {{ request()->routeIs('finance*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-chart-bar"></i>
                 <span>Finance</span>
             </a>

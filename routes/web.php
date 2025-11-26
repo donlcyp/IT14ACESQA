@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FinanceSectionsController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserManagementController;
 
@@ -81,8 +82,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/transactions/{projectId}/invoice/{supplier}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
         Route::get('/transactions-history', [TransactionController::class, 'history'])->name('transactions.history');
 
-        Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance');
+        Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance.index');
         Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
+        Route::get('/finance/supplier-invoices', [FinanceController::class, 'supplierInvoices'])->name('finance.supplier-invoices');
+        Route::get('/finance/payment-summary', [FinanceController::class, 'paymentSummary'])->name('finance.payment-summary');
         Route::get('/finance/revenue', [FinanceSectionsController::class, 'revenue'])->name('finance.revenue');
         Route::get('/finance/expenses', [FinanceSectionsController::class, 'expenses'])->name('finance.expenses');
         Route::get('/finance/budget', [FinanceSectionsController::class, 'budgetIndex'])->name('finance.budget');

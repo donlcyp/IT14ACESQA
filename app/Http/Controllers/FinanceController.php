@@ -5,50 +5,44 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\FinancialData;
 use App\Models\Invoice;
+use App\Models\Material;
 use Illuminate\Support\Facades\DB;
 
 class FinanceController extends Controller
 {
     public function index()
     {
-        $currentYear = date('Y');
-        
-        // Get financial data for the current year
-        $financialData = FinancialData::where('year', $currentYear)
-            ->orderBy('month', 'asc')
+        // Get all materials with their costs
+        $materials = Material::with(['projectRecord', 'project'])
+            ->orderBy('date_received', 'desc')
             ->get();
 
-        // Calculate summary statistics
-        $totalRevenue = FinancialData::where('year', $currentYear)->sum('revenue');
-        $totalExpenses = FinancialData::where('year', $currentYear)->sum('expenses');
-        $netProfit = $totalRevenue - $totalExpenses;
-        
-        // Get monthly data for current month
-        $currentMonth = date('n');
-        $monthlyRevenue = FinancialData::where('year', $currentYear)
-            ->where('month', $currentMonth)
-            ->value('revenue') ?? 0;
-        $monthlyExpenses = FinancialData::where('year', $currentYear)
-            ->where('month', $currentMonth)
-            ->value('expenses') ?? 0;
+        // Calculate financial metrics from materials
+        $totalExpenses = $materials->sum('total_cost');
+        $approvedExpenses = $materials->where('status', 'approved')->sum('total_cost');
+        $pendingExpenses = $materials->where('status', 'pending')->sum('total_cost');
+        $failedExpenses = $materials->where('status', 'failed')->sum('total_cost');
 
-        // Calculate average profit margin
-        $avgProfitMargin = $totalRevenue > 0 
-            ? round((($totalRevenue - $totalExpenses) / $totalRevenue) * 100, 1) 
-            : 0;
+        // Group by project for cost breakdown
+        $projectCosts = $materials->groupBy('project_id')
+            ->map(function ($items) {
+                return (object) [
+                    'project_id' => $items->first()->project_id,
+                    'project' => $items->first()->project,
+                    'material_count' => $items->count(),
+                    'total_cost' => $items->sum('total_cost'),
+                ];
+            })
+            ->values()
+            ->sortByDesc('total_cost');
 
-        // Count total transactions from invoices table
-        $totalTransactions = Invoice::count();
-
-        return view('finance', compact(
-            'financialData',
-            'totalRevenue',
+        return view('finance.index', compact(
+            'materials',
             'totalExpenses',
-            'netProfit',
-            'monthlyRevenue',
-            'monthlyExpenses',
-            'avgProfitMargin',
-            'totalTransactions'
+            'approvedExpenses',
+            'pendingExpenses',
+            'failedExpenses',
+            'projectCosts'
         ));
     }
 
@@ -83,5 +77,59 @@ class FinanceController extends Controller
                 'message' => 'An error occurred: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function supplierInvoices()
+    {
+        // Get all materials with supplier information
+        $materials = Material::with(['projectRecord', 'project'])
+            ->orderBy('date_received', 'desc')
+            ->get();
+
+        // Get unique suppliers
+        $suppliers = $materials
+            ->where('supplier', '!=', null)
+            ->groupBy('supplier')
+            ->map(function ($items) {
+                return $items->first();
+            })
+            ->values();
+
+        // Calculate invoice summary
+        $totalInvoiceAmount = $materials->sum('total_cost');
+        $paidAmount = $materials->where('status', 'approved')->sum('total_cost');
+        $unpaidAmount = $materials->where('status', '!=', 'approved')->sum('total_cost');
+
+        return view('finance.supplier-invoices', compact(
+            'materials',
+            'suppliers',
+            'totalInvoiceAmount',
+            'paidAmount',
+            'unpaidAmount'
+        ));
+    }
+
+    public function paymentSummary()
+    {
+        // Get all materials
+        $materials = Material::with(['projectRecord', 'project'])
+            ->orderBy('date_received', 'desc')
+            ->get();
+
+        // Get unpaid materials
+        $unpaidMaterials = $materials->where('status', '!=', 'approved');
+
+        // Calculate payment summary
+        $totalAmount = $materials->sum('total_cost');
+        $paidAmount = $materials->where('status', 'approved')->sum('total_cost');
+        $unpaidAmount = $materials->where('status', '!=', 'approved')->sum('total_cost');
+
+        return view('finance.payment-summary', compact(
+            'materials',
+            'unpaidMaterials',
+            'totalAmount',
+            'paidAmount',
+            'unpaidAmount'
+        ));
     }
 }
