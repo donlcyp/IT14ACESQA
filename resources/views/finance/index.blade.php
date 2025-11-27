@@ -6,6 +6,7 @@
     <title>Finance Dashboard - AJJ CRISBER Engineering Services</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --accent: #16a34a;
@@ -40,12 +41,17 @@
         }
 
         body.sidebar-open {
-            margin-left: 280px;
+            margin-left: 0;
         }
 
         .main-wrapper {
             display: flex;
             flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-open .main-wrapper {
+            margin-left: 250px;
         }
 
         .header {
@@ -57,10 +63,11 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             color: white;
             transition: margin-left 0.3s ease;
+            width: 100%;
         }
 
         body.sidebar-open .header {
-            margin-left: 0;
+            margin-left: 250px;
         }
 
         .header-title {
@@ -93,13 +100,25 @@
             width: 250px;
             background: var(--sidebar-bg);
             border-right: 1px solid var(--gray-300);
-            padding: 20px 0;
+            padding: 0;
             overflow-y: auto;
-            max-height: calc(100vh - 80px);
+            position: fixed;
+            left: 0;
+            top: 80px;
+            bottom: 0;
+            height: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
         }
 
         .sidebar-section {
-            margin-bottom: 30px;
+            margin-bottom: 0;
+            padding: 20px 0;
         }
 
         .sidebar-title {
@@ -365,6 +384,35 @@
             background: white;
         }
 
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--black-1);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
         @media (max-width: 768px) {
             .content-area {
                 padding: 20px;
@@ -425,6 +473,29 @@
                 <div class="stat-label">Failed/Returns</div>
                 <div class="stat-value">₱{{ number_format($failedExpenses, 2) }}</div>
                 <div class="stat-subtext">For refund/return</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <!-- Expense Status Breakdown Chart -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-pie-chart"></i> Expense Status Breakdown
+                </div>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Projects by Cost Chart -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-bar-chart"></i> Top Projects by Cost
+                </div>
+                <div class="chart-container">
+                    <canvas id="projectsChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -506,7 +577,7 @@
                                     </span>
                                 </td>
                                 <td>{{ $material->date_received?->format('M d, Y') ?? 'N/A' }}</td>
-                                <td>{{ $material->project?->project_name ?? 'N/A' }}</td>
+                                <td>{{ $material->project?->project_name ?? $material->projectRecord?->project?->project_name ?? 'N/A' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -536,6 +607,129 @@
             if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
                 sidebar.classList.remove('open');
                 document.body.classList.remove('sidebar-open');
+            }
+        });
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Expense Status Breakdown Chart
+            const statusCtx = document.getElementById('statusChart');
+            if (statusCtx) {
+                const approvedExpenses = {{ $approvedExpenses ?? 0 }};
+                const pendingExpenses = {{ $pendingExpenses ?? 0 }};
+                const failedExpenses = {{ $failedExpenses ?? 0 }};
+                const totalExpenses = approvedExpenses + pendingExpenses + failedExpenses;
+                
+                // Only show chart if there's data
+                if (totalExpenses > 0) {
+                    new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Approved', 'Pending', 'Failed'],
+                            datasets: [{
+                                data: [approvedExpenses, pendingExpenses, failedExpenses],
+                                backgroundColor: [
+                                    '#16a34a',
+                                    '#f59e0b',
+                                    '#ef4444'
+                                ],
+                                borderColor: [
+                                    '#15803d',
+                                    '#d97706',
+                                    '#dc2626'
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 15,
+                                        font: {
+                                            size: 12,
+                                            weight: '600'
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const value = context.parsed || 0;
+                                            const percentage = ((value / totalExpenses) * 100).toFixed(1);
+                                            return `₱${value.toLocaleString('en-PH', {minimumFractionDigits: 2})} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    statusCtx.parentElement.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No expense data available</p>';
+                }
+            }
+
+            // Top Projects by Cost Chart
+            const projectsCtx = document.getElementById('projectsChart');
+            if (projectsCtx) {
+                const projectData = [
+                    @foreach($projectCosts->take(5) as $cost)
+                        {
+                            name: '{{ $cost->project?->project_name ?? 'Unknown' }}',
+                            cost: {{ $cost->total_cost ?? 0 }}
+                        },
+                    @endforeach
+                ];
+                
+                // Only show chart if there's data
+                if (projectData.length > 0 && projectData[0].cost > 0) {
+                    new Chart(projectsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: projectData.map(p => p.name),
+                            datasets: [{
+                                label: 'Total Cost',
+                                data: projectData.map(p => p.cost),
+                                backgroundColor: '#16a34a',
+                                borderColor: '#15803d',
+                                borderWidth: 2,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return '₱' + context.parsed.x.toLocaleString('en-PH', {minimumFractionDigits: 2});
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '₱' + value.toLocaleString('en-PH');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    projectsCtx.parentElement.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No project data available</p>';
+                }
             }
         });
     </script>

@@ -13,27 +13,36 @@ class FinanceController extends Controller
     public function index()
     {
         // Get all materials with their costs
-        $materials = Material::with(['projectRecord', 'project'])
+        $materials = Material::with(['projectRecord.project', 'project'])
             ->orderBy('date_received', 'desc')
             ->get();
 
-        // Calculate financial metrics from materials
+        // Calculate financial metrics from materials (case-insensitive status)
         $totalExpenses = $materials->sum('total_cost');
-        $approvedExpenses = $materials->where('status', 'approved')->sum('total_cost');
-        $pendingExpenses = $materials->where('status', 'pending')->sum('total_cost');
-        $failedExpenses = $materials->where('status', 'failed')->sum('total_cost');
+        $approvedExpenses = $materials->filter(function($m) {
+            return strtolower($m->status) === 'approved';
+        })->sum('total_cost');
+        $pendingExpenses = $materials->filter(function($m) {
+            return strtolower($m->status) === 'pending';
+        })->sum('total_cost');
+        $failedExpenses = $materials->filter(function($m) {
+            return strtolower($m->status) === 'fail';
+        })->sum('total_cost');
 
-        // Group by project for cost breakdown
-        $projectCosts = $materials->groupBy('project_id')
-            ->map(function ($items) {
+        // Group by project for cost breakdown - use project relationship with fallback to projectRecord
+        $projectCosts = $materials->groupBy(function ($item) {
+            return $item->project?->id ?? $item->projectRecord?->project?->id ?? 'unknown';
+        })
+            ->map(function ($items, $projectId) {
+                $firstItem = $items->first();
+                $project = $firstItem->project ?? $firstItem->projectRecord?->project;
                 return (object) [
-                    'project_id' => $items->first()->project_id,
-                    'project' => $items->first()->project,
+                    'project_id' => $projectId,
+                    'project' => $project,
                     'material_count' => $items->count(),
                     'total_cost' => $items->sum('total_cost'),
                 ];
             })
-            ->values()
             ->sortByDesc('total_cost');
 
         return view('finance.index', compact(
@@ -95,10 +104,14 @@ class FinanceController extends Controller
             })
             ->values();
 
-        // Calculate invoice summary
+        // Calculate invoice summary (case-insensitive status)
         $totalInvoiceAmount = $materials->sum('total_cost');
-        $paidAmount = $materials->where('status', 'approved')->sum('total_cost');
-        $unpaidAmount = $materials->where('status', '!=', 'approved')->sum('total_cost');
+        $paidAmount = $materials->filter(function($m) {
+            return strtolower($m->status) === 'approved';
+        })->sum('total_cost');
+        $unpaidAmount = $materials->filter(function($m) {
+            return strtolower($m->status) !== 'approved';
+        })->sum('total_cost');
 
         return view('finance.supplier-invoices', compact(
             'materials',
@@ -116,13 +129,19 @@ class FinanceController extends Controller
             ->orderBy('date_received', 'desc')
             ->get();
 
-        // Get unpaid materials
-        $unpaidMaterials = $materials->where('status', '!=', 'approved');
+        // Get unpaid materials (case-insensitive status)
+        $unpaidMaterials = $materials->filter(function($m) {
+            return strtolower($m->status) !== 'approved';
+        });
 
-        // Calculate payment summary
+        // Calculate payment summary (case-insensitive status)
         $totalAmount = $materials->sum('total_cost');
-        $paidAmount = $materials->where('status', 'approved')->sum('total_cost');
-        $unpaidAmount = $materials->where('status', '!=', 'approved')->sum('total_cost');
+        $paidAmount = $materials->filter(function($m) {
+            return strtolower($m->status) === 'approved';
+        })->sum('total_cost');
+        $unpaidAmount = $materials->filter(function($m) {
+            return strtolower($m->status) !== 'approved';
+        })->sum('total_cost');
 
         return view('finance.payment-summary', compact(
             'materials',

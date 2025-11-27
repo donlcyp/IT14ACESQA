@@ -489,11 +489,7 @@
                         </button>
                     </div>
 
-                    @php
-                        $materials = $project->purchaseOrders->pluck('material')->filter();
-                    @endphp
-
-                    @if($materials && $materials->count() > 0)
+                    @if($failedMaterials && $failedMaterials->count() > 0)
                         <table class="data-table">
                             <thead>
                                 <tr>
@@ -507,7 +503,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($materials as $material)
+                                @foreach($failedMaterials as $material)
                                     <tr>
                                         <td>{{ $material->material_name }}</td>
                                         <td>{{ $material->batch_serial_no ?? 'N/A' }}</td>
@@ -544,7 +540,7 @@
             @if($suppliers->count() > 0)
                 <div class="suppliers-grid">
                     @foreach($suppliers as $supplier)
-                        <a href="{{ route('transactions.invoice', ['projectId' => $project->id, 'supplier' => $supplier]) }}" style="text-decoration: none;">
+                        <a href="{{ route('transactions.invoice', ['projectId' => $projectRecord->id ?? $project->id, 'supplier' => $supplier]) }}" style="text-decoration: none;">
                             <div class="supplier-card">
                                 <i class="fas fa-truck"></i>
                                 <div class="supplier-name">{{ $supplier }}</div>

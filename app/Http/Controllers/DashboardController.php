@@ -32,8 +32,9 @@ class DashboardController extends Controller
             'ongoing_projects' => $ongoingProjects,
         ];
 
-        // Active projects (latest 5) - all non-archived
+        // Active projects (latest 5) - all non-archived with client data
         $activeProjects = Project::where('archived', false)
+            ->with('client', 'assignedPM')
             ->orderByDesc('created_at')
             ->take(5)
             ->get();

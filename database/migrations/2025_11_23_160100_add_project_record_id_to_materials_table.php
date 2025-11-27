@@ -38,11 +38,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('materials', function (Blueprint $table) {
+            // Drop foreign keys first
             if (Schema::hasColumn('materials', 'project_record_id')) {
-                $table->dropForeignIdFor(\App\Models\ProjectRecord::class);
+                $table->dropForeign(['project_record_id']);
+                $table->dropColumn('project_record_id');
             }
             if (Schema::hasColumn('materials', 'project_id')) {
-                $table->dropForeignIdFor(\App\Models\Project::class);
+                $table->dropForeign(['project_id']);
+                $table->dropColumn('project_id');
             }
         });
     }

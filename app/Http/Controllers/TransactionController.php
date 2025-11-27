@@ -15,13 +15,17 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        // Get all project records with related materials
-        $projectRecords = \App\Models\ProjectRecord::with(['materials'])
+        // Get all project records with related materials (only Approved and Fail)
+        $projectRecords = \App\Models\ProjectRecord::with(['materials' => function($query) {
+            $query->whereIn('status', ['Approved', 'Fail']);
+        }])
             ->orderByDesc('created_at')
             ->get();
 
-        // Calculate statistics for each project record
-        $projectRecords = $projectRecords->map(function($record) {
+        // Filter out records with no materials and calculate statistics
+        $projectRecords = $projectRecords->filter(function($record) {
+            return $record->materials->count() > 0;
+        })->map(function($record) {
             $materials = $record->materials;
             $failedMaterials = $materials->where('status', 'Fail');
             $record->failed_count = $failedMaterials ? $failedMaterials->count() : 0;
@@ -33,7 +37,7 @@ class TransactionController extends Controller
                 ->filter()
                 ->values();
             return $record;
-        });
+        })->values();
 
         return view('transactions.index', ['projects' => $projectRecords]);
     }
@@ -54,13 +58,19 @@ class TransactionController extends Controller
 
         // Get materials from ProjectRecord if available, otherwise from Project
         if ($projectRecord) {
-            $projectRecord->load(['materials']);
-            $allMaterials = $projectRecord->materials;
+            // Query directly from database for fresh data
+            $allMaterials = Material::where('project_record_id', $projectRecord->id)->get();
+            $failedMaterials = Material::where('project_record_id', $projectRecord->id)
+                ->where('status', 'Fail')
+                ->get();
         } else {
             $project->load(['purchaseOrders' => function($query) {
                 $query->with('material');
             }]);
             $allMaterials = $project->purchaseOrders->pluck('material')->filter();
+            $failedMaterials = Material::whereHas('purchaseOrders', function($q) use ($project) {
+                $q->where('project_id', $project->id);
+            })->where('status', 'Fail')->get();
         }
 
         // Get unique suppliers from materials
@@ -71,7 +81,7 @@ class TransactionController extends Controller
             ->unique()
             ->values();
 
-        return view('transactions.show', compact('project', 'suppliers', 'projectRecord', 'allMaterials'));
+        return view('transactions.show', compact('project', 'suppliers', 'projectRecord', 'allMaterials', 'failedMaterials'));
     }
 
     /**
@@ -89,15 +99,15 @@ class TransactionController extends Controller
         
         // Get materials from ProjectRecord if available
         if ($projectRecord) {
-            $projectRecord->load(['materials']);
-            $materials = $projectRecord->materials
+            // Query directly from database to ensure fresh data
+            $materials = Material::where('project_record_id', $projectRecord->id)
                 ->where('supplier', $supplier)
                 ->where('status', 'Approved')
-                ->values();
-            $failedMaterials = $projectRecord->materials
+                ->get();
+            $failedMaterials = Material::where('project_record_id', $projectRecord->id)
                 ->where('supplier', $supplier)
                 ->where('status', 'Fail')
-                ->values();
+                ->get();
         } else {
             // Fallback to using purchase orders for Project
             $materials = Material::whereHas('purchaseOrders', function($q) use ($project) {

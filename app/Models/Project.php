@@ -23,6 +23,10 @@ class Project extends Model
         'target_timeline',
         'assigned_pm_id',
         'client_id',
+        'client_prefix',
+        'client_first_name',
+        'client_last_name',
+        'client_suffix',
         'allocated_amount',
         'used_amount',
         'status',
@@ -30,6 +34,7 @@ class Project extends Model
         'pm_status',
         'archived',
         'archived_at',
+        'archive_reason',
     ];
 
     protected $casts = [
@@ -63,6 +68,14 @@ class Project extends Model
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class, 'project_id', 'id');
+    }
+
+    /**
+     * Get the materials for this project.
+     */
+    public function materials(): HasMany
+    {
+        return $this->hasMany(Material::class, 'project_id', 'id');
     }
 
     /**

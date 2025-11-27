@@ -108,6 +108,10 @@ class QualityAssuranceController extends Controller
         if (!empty($validated['color'])) {
             \App\Models\ProjMatManage::where('project_id', $validated['project_id'])
                 ->update(['color' => $validated['color']]);
+
+            // Also update the ProjectRecord color
+            \App\Models\ProjectRecord::where('project_id', $validated['project_id'])
+                ->update(['color' => $validated['color']]);
         }
 
         // Only create Material if material_name is provided
@@ -203,6 +207,9 @@ class QualityAssuranceController extends Controller
         try {
             $material = Material::findOrFail($id);
             
+            \Log::info('UpdateMaterial called for ID: ' . $id);
+            \Log::info('Request all inputs: ', $request->all());
+            
             // Extract with fallback to alternative field names
             $materialName = $request->input('material_name') ?? $request->input('name');
             $batchNo = $request->input('batch_serial_no') ?? $request->input('batch');
@@ -210,6 +217,9 @@ class QualityAssuranceController extends Controller
             $unitMeasure = $request->input('unit_of_measure') ?? $request->input('unit');
             $unitPrc = $request->input('unit_price') ?? $request->input('price');
             $totalCst = $request->input('total_cost') ?? $request->input('total');
+            
+            $statusFromRequest = $request->input('status');
+            \Log::info('Status from request: ' . ($statusFromRequest ?? 'NULL'));
             
             $validated = $request->validate([
                 'supplier' => 'nullable|string|max:255',
@@ -246,12 +256,24 @@ class QualityAssuranceController extends Controller
             $validated['unit_of_measure'] = $unitMeasure;
 
             if (($validated['status'] ?? null) === 'Fail' && empty($validated['remarks'])) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Remarks are required when marking material as Failed.'
+                    ], 422);
+                }
                 return back()
                     ->withErrors(['remarks' => 'Remarks are required when marking material as Failed.'])
                     ->withInput();
             }
 
+            \Log::info('Before update - Material status: ' . $material->status);
+            \Log::info('Validated array before update: ', $validated);
+            
             $material->update($validated);
+            
+            \Log::info('After update - Material status: ' . $material->status);
+            \Log::info('Material refreshed from DB - status: ' . $material->fresh()->status);
 
             if ($request->ajax()) {
                 return response()->json([

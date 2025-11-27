@@ -31,6 +31,7 @@ class Material extends Model
         'unit',
         'price',
         'total',
+        'archived',
     ];
 
     protected $casts = [

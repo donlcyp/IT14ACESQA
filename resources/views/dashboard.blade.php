@@ -478,8 +478,16 @@
                                     @php
                                         $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
                                         $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
-                                        $clientName = $project->client_name ?? ($project->client_full_name ?? '—');
-                                        $leadName = $project->lead ?? ($project->lead_full_name ?? '—');
+                                        
+                                        // Get client name from relationship or fallback to project fields
+                                        if ($project->client) {
+                                            $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
+                                        } else {
+                                            $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
+                                        }
+                                        
+                                        // Get lead name from PM relationship or fallback to lead field
+                                        $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
                                     @endphp
                                     <tr>
                                         <td>{{ $project->project_name }}</td>

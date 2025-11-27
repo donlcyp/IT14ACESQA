@@ -215,6 +215,10 @@ class ProjectsController extends Controller
             'note_remarks'     => null,
             'pm_status'        => null,
             'client_id'        => $client->id,
+            'client_prefix'    => $validated['client_prefix'] ?? null,
+            'client_first_name' => $validated['client_first_name'],
+            'client_last_name' => $validated['client_last_name'],
+            'client_suffix'    => $validated['client_suffix'] ?? null,
             'assigned_pm_id'   => $validated['assigned_pm_id'] ?? null,
         ]);
 
@@ -223,6 +227,16 @@ class ProjectsController extends Controller
             'project_id' => $project->id,
             'client_id' => $client->id,
             'employee_id' => null,
+        ]);
+
+        // Automatically create a ProjectRecord (for project material management display)
+        \App\Models\ProjectRecord::create([
+            'project_id' => $project->id,
+            'title' => $validated['project_name'],
+            'client' => $clientName,
+            'inspector' => auth()->user()->name ?? 'Unknown',
+            'time' => now()->format('H:i:s'),
+            'color' => '#16a34a',
         ]);
 
         return redirect()

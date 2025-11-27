@@ -79,7 +79,7 @@
             padding: 8px 12px;
             margin-right: 15px;
             transition: all 0.2s;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
         }
@@ -164,17 +164,20 @@
         }
 
         .back-link {
-            color: var(--accent);
+            color: white;
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 20px;
+            gap: 8px;
+            padding: 8px 12px;
+            margin-right: 15px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
         }
 
         .back-link:hover {
-            text-decoration: underline;
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .card {
@@ -376,12 +379,10 @@
     </style>
 </head>
 <body>
-    @include('partials.sidebar')
-
     <header class="header">
-        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </button>
+        <a href="{{ route('finance.index') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
         <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
     </header>
 
@@ -548,23 +549,7 @@
     </div>
 
     <script>
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const body = document.body;
-            sidebar.classList.toggle('open');
-            body.classList.toggle('sidebar-open');
-        }
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function(event) {
-            const sidebar = document.querySelector('.sidebar');
-            const toggleBtn = document.getElementById('sidebar-toggle');
-            
-            if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
-                sidebar.classList.remove('open');
-                document.body.classList.remove('sidebar-open');
-            }
-        });
+        // Sidebar toggle functionality removed - using back button instead
     </script>
 </body>
 </html>

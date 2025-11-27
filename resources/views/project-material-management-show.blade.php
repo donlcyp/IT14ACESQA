@@ -622,7 +622,7 @@
                         <div class="modal-header">
                             <div class="modal-title">
                                 <div class="modal-icon"><i class="fas fa-bolt"></i></div>
-                                <div class="modal-title-text">Add Material</div>
+                                <div class="modal-title-text">Material</div>
                             </div>
                         <button class="modal-close" onclick="closeMaterialModal()">
                             <i class="fas fa-times"></i>
@@ -640,20 +640,19 @@
                                 <input type="text" class="form-input" placeholder="Enter supplier name" id="mat_supplier" name="supplier" />
                                 </div>
                                         
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">Date Received</label>
-                                    <input type="date" class="form-input" id="mat_received" name="date_received" />
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-input" id="mat_status" name="status">
-                                        <option value="Pending">Idle (No Status)</option>
-                                        <option value="Approved">Approved</option>
-                                        <option value="Fail">Fail</option>
-                                    </select>
-                                </div>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-input" id="mat_status" name="status" onchange="toggleRemarksField()">
+                                    <option value="Pending">Idle (No Status)</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Fail">Fail</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="remarksGroup" style="display: none;">
+                                <label class="form-label">Remarks (Required for Fail status)</label>
+                                <textarea class="form-input" placeholder="Enter remarks for rejection" id="mat_remarks" name="remarks" style="min-height: 80px; resize: vertical;"></textarea>
+                            </div>
                                         
                             <div class="form-group">
                                 <label class="form-label">Storage Location</label>
@@ -674,7 +673,7 @@
                         <div class="modal-header">
                             <div class="modal-title">
                                 <div class="modal-icon"><i class="fas fa-bolt"></i></div>
-                                <div class="modal-title-text">Add Material Items</div>
+                                <div class="modal-title-text">Material Items</div>
                             </div>
                             <button class="modal-close" onclick="closeMaterialModal()">
                             <i class="fas fa-times"></i>
@@ -884,10 +883,18 @@
                 
                 document.getElementById('mat_supplier').value = material.supplier || '';
                 document.getElementById('mat_location').value = material.location || '';
-                document.getElementById('mat_received').value = material.date_received || '';
                 if (statusField) {
                     statusField.value = material.status || 'Pending';
                 }
+                
+                // Populate remarks if it exists
+                const remarksField = document.getElementById('mat_remarks');
+                if (remarksField) {
+                    remarksField.value = material.remarks || '';
+                }
+                
+                // Toggle remarks field visibility
+                toggleRemarksField();
                 
                 // Enable status editing for edit mode
                 if (statusField) {
@@ -956,7 +963,6 @@
                 // Reset form for new material
                 document.getElementById('mat_supplier').value = '';
                 document.getElementById('mat_location').value = '';
-                document.getElementById('mat_received').value = '';
                 if (statusField) {
                     statusField.value = 'Pending';
                 }
@@ -998,10 +1004,9 @@
             // Debug: Check if Step 1 fields are populated
             const supplier = document.getElementById('mat_supplier').value;
             const location = document.getElementById('mat_location').value;
-            const dateReceived = document.getElementById('mat_received').value;
             const status = document.getElementById('mat_status').value;
             
-            console.log('Step 1 values before Step 2:', { supplier, location, dateReceived, status });
+            console.log('Step 1 values before Step 2:', { supplier, location, status });
             
             materialModal.classList.remove('active');
             materialModalStep2.classList.add('active');
@@ -1185,7 +1190,6 @@
 
             const supplierInput = document.getElementById('mat_supplier');
             const locationInput = document.getElementById('mat_location');
-            const dateReceivedInput = document.getElementById('mat_received');
             const statusInput = document.getElementById('mat_status');
 
             if (!editMode && statusInput) {
@@ -1194,7 +1198,7 @@
                 statusInput.style.backgroundColor = '#f3f4f6';
             }
 
-            console.log('Step 1 inputs:', { supplierInput, locationInput, dateReceivedInput, statusInput });
+            console.log('Step 1 inputs:', { supplierInput, locationInput, statusInput });
             console.log('Status input value:', statusInput ? statusInput.value : 'undefined');
             console.log('Status input disabled:', statusInput ? statusInput.disabled : 'undefined');
 
@@ -1202,15 +1206,13 @@
             console.log('Field values:', {
                 supplier: supplierInput ? supplierInput.value : 'MISSING',
                 location: locationInput ? locationInput.value : 'MISSING', 
-                dateReceived: dateReceivedInput ? dateReceivedInput.value : 'MISSING',
                 status: statusInput ? statusInput.value : 'MISSING'
             });
 
-            if (!supplierInput || !locationInput || !dateReceivedInput || !statusInput) {
+            if (!supplierInput || !locationInput || !statusInput) {
                 console.error('Missing form fields:', {
                     supplierInput: !!supplierInput,
                     locationInput: !!locationInput,
-                    dateReceivedInput: !!dateReceivedInput,
                     statusInput: !!statusInput
                 });
                 alert('Error: Some form fields are missing. Please refresh the page and try again.');
@@ -1220,12 +1222,12 @@
 
             const supplier = supplierInput.value;
             const location = locationInput.value;
-            const dateReceived = dateReceivedInput.value;
             const status = editMode ? statusInput.value : 'Pending';
+            const remarks = editMode ? (document.getElementById('mat_remarks')?.value || '') : '';
 
-            console.log('Form values:', { supplier, location, dateReceived, status });
+            console.log('Form values:', { supplier, location, status, remarks });
 
-            if (!supplier || !location || !dateReceived) {
+            if (!supplier || !location) {
                 alert('Please fill in all required fields in Step 1.');
                 if (saveBtn && originalText !== null) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
                 return;
@@ -1277,9 +1279,10 @@
                         unit: unit,
                         price: price,
                         total: total,
-                        date_received: dateReceived,
-                        date_inspected: dateReceived,
+                        date_received: new Date().toISOString().split('T')[0],
+                        date_inspected: new Date().toISOString().split('T')[0],
                         status: status,
+                        remarks: remarks,
                         location: location,
                         _token: csrfToken
                     };
@@ -1404,6 +1407,19 @@
                     closeMaterialModal();
                 }
             });
+        }
+
+        // Toggle remarks field visibility based on status
+        function toggleRemarksField() {
+            const statusField = document.getElementById('mat_status');
+            const remarksGroup = document.getElementById('remarksGroup');
+            if (statusField && remarksGroup) {
+                if (statusField.value === 'Fail') {
+                    remarksGroup.style.display = 'block';
+                } else {
+                    remarksGroup.style.display = 'none';
+                }
+            }
         }
 
         if (materialModalStep2) {

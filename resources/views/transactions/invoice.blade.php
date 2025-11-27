@@ -53,11 +53,12 @@
             min-height: 100vh;
             width: 100%;
             transition: margin-left 0.3s ease;
+            margin-left: 0;
         }
 
         @media (min-width: 769px) {
             .main-content { 
-                margin-left: 280px; 
+                margin-left: 0; 
             }
             .main-content.sidebar-closed { 
                 margin-left: 0; 
@@ -100,6 +101,7 @@
             padding: 8px;
             border-radius: 4px;
             transition: background-color 0.2s ease;
+            display: none;
         }
 
         .header-menu:hover {
@@ -123,6 +125,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            order: -1;
+            margin-right: auto;
         }
 
         .back-btn:hover {
@@ -452,16 +456,11 @@
 
 <body>
     <div class="dashboard-container">
-        @include('partials.sidebar')
-
         <main class="main-content" id="mainContent">
             <header class="header">
-                <a href="{{ route('transactions.show', $project->id) }}" class="back-btn">
+                <a href="{{ route('transactions.show', $projectRecord->id ?? $project->id) }}" class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
-                <button class="header-menu" id="headerMenu">
-                    <i class="fas fa-bars"></i>
-                </button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
@@ -515,11 +514,11 @@
                             <tbody>
                                 @foreach($materials as $material)
                                     <tr>
-                                        <td>{{ $material->name }}</td>
-                                        <td>{{ $material->batch ?? 'N/A' }}</td>
-                                        <td>{{ $material->quantity }} {{ $material->unit }}</td>
-                                        <td>₱{{ number_format($material->price, 2) }}</td>
-                                        <td>₱{{ number_format($material->total, 2) }}</td>
+                                        <td>{{ $material->material_name }}</td>
+                                        <td>{{ $material->batch_serial_no ?? 'N/A' }}</td>
+                                        <td>{{ $material->quantity_received }} {{ $material->unit_of_measure }}</td>
+                                        <td>₱{{ number_format($material->unit_price, 2) }}</td>
+                                        <td>₱{{ number_format($material->total_cost, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -579,20 +578,12 @@
                                 <tbody>
                                     @foreach($failedMaterials as $failed)
                                         <tr>
-                                            <td>{{ $failed->name }}</td>
-                                            <td>{{ $failed->batch ?? 'N/A' }}</td>
-                                            <td>{{ $failed->quantity }} {{ $failed->unit }}</td>
-                                            <td>₱{{ number_format($failed->total, 2) }}</td>
+                                            <td>{{ $failed->material_name }}</td>
+                                            <td>{{ $failed->batch_serial_no ?? 'N/A' }}</td>
+                                            <td>{{ $failed->quantity_received }} {{ $failed->unit_of_measure }}</td>
+                                            <td>₱{{ number_format($failed->total_cost, 2) }}</td>
                                             <td>
-                                                <form method="POST" action="{{ route('transactions.return-reason.update', $failed->id) }}" style="display: flex; flex-direction: column; gap: 8px;">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <textarea name="remarks" rows="2" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #e5e7eb; font-size: 13px; resize: vertical;" placeholder="Enter reason for returning this item">{{ old('remarks', $failed->remarks) }}</textarea>
-                                                    <button type="submit" class="action-btn primary" style="padding: 6px 12px; font-size: 12px; align-self: flex-start;">
-                                                        <i class="fas fa-save"></i>
-                                                        Save Reason
-                                                    </button>
-                                                </form>
+                                                <textarea name="remarks" rows="2" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #e5e7eb; font-size: 13px; resize: vertical;" placeholder="Enter reason for returning this item" readonly>{{ $failed->remarks }}</textarea>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -632,9 +623,9 @@
                                     @foreach($purchaseHistory as $item)
                                         <tr>
                                             <td>{{ $item->date_received ? date('M d, Y', strtotime($item->date_received)) : 'N/A' }}</td>
-                                            <td>{{ $item->name }}</td>
-                                            <td>{{ $item->quantity }}</td>
-                                            <td>₱{{ number_format($item->price, 2) }}</td>
+                                            <td>{{ $item->material_name }}</td>
+                                            <td>{{ $item->quantity_received }}</td>
+                                            <td>₱{{ number_format($item->unit_price, 2) }}</td>
                                             <td>
                                                 <span style="padding: 0; border-radius: 0; font-size: 11px; font-weight: 600; background: transparent;
                                                     @if($item->status == 'Approved') color: #065f46;
@@ -643,7 +634,7 @@
                                                     {{ $item->status }}
                                                 </span>
                                             </td>
-                                            <td>₱{{ number_format($item->total, 2) }}</td>
+                                            <td>₱{{ number_format($item->total_cost, 2) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -708,8 +699,6 @@
             </section>
         </main>
     </div>
-
-    @include('partials.sidebar-js')
 
     <script>
         function downloadInvoice() {
