@@ -247,28 +247,67 @@
 
         .update-item {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--green-600);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--gray-300);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .update-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .update-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--accent), #15803d);
+            border-radius: 12px 0 0 12px;
         }
 
         .update-date {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--gray-600);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .update-title {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--black-1);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            font-size: 18px;
+            line-height: 1.4;
         }
 
         .update-description {
             color: var(--gray-700);
-            line-height: 1.6;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .update-footer {
+            display: flex;
+            gap: 20px;
+            padding-top: 12px;
+            border-top: 1px solid var(--gray-300);
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+
+        .update-footer strong {
+            color: var(--black-1);
+            font-weight: 600;
         }
 
         .images-grid {
@@ -574,7 +613,8 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Description</label>
-                                <textarea class="form-textarea" name="description" placeholder="Enter update details..." required style="min-height: 120px;"></textarea>
+                                <textarea class="form-textarea" name="description" placeholder="Enter update details..." required style="min-height: 180px;"></textarea>
+                                <small style="color: var(--gray-600); display: block; margin-top: 6px;">Max 5000 characters</small>
                             </div>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Add Update
@@ -588,17 +628,18 @@
                                     <div class="update-date">{{ $update->created_at->format('M d, Y H:i') }}</div>
                                     <div class="update-title">{{ $update->title }}</div>
                                     <div class="update-description">{{ $update->description }}</div>
-                                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px;">
-                                        <strong>Status:</strong> 
-                                        <span style="padding: 3px 8px; border-radius: 3px; font-weight: bold;
-                                            @if($update->status === 'Completed') background-color: #dcfce7; color: #166534;
-                                            @elseif($update->status === 'In Progress') background-color: #bfdbfe; color: #1e40af;
-                                            @elseif($update->status === 'On Hold') background-color: #fef3c7; color: #92400e;
-                                            @elseif($update->status === 'Cancelled') background-color: #fee2e2; color: #991b1b;
-                                            @else background-color: #f3f4f6; color: #1f2937;
-                                            @endif
-                                        ">{{ $update->status }}</span>
-                                        <strong style="margin-left: 15px;">By:</strong> {{ $update->updatedBy?->name ?? 'Unknown' }}
+                                    <div class="update-footer">
+                                        <div>
+                                            <strong>Status:</strong>
+                                            <span style="padding: 4px 10px; border-radius: 6px; margin-left: 6px; font-weight: 600;
+                                                @if($update->status === 'Completed') background-color: #dcfce7; color: #166534;
+                                                @else background-color: #bfdbfe; color: #1e40af;
+                                                @endif
+                                            ">{{ $update->status === 'Completed' ? 'Complete' : 'Ongoing' }}</span>
+                                        </div>
+                                        <div>
+                                            <strong>By:</strong> {{ $update->updatedBy?->name ?? 'Unknown' }}
+                                        </div>
                                     </div>
                                 </div>
                             @empty
@@ -606,8 +647,11 @@
                                     <div class="update-date">{{ $project->created_at->format('M d, Y H:i') }}</div>
                                     <div class="update-title">Project Created</div>
                                     <div class="update-description">Project has been successfully created and is ready for work.</div>
-                                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px;">
-                                        <strong>Status:</strong> <span style="padding: 3px 8px; border-radius: 3px; background-color: #f3f4f6; color: #1f2937; font-weight: bold;">Created</span>
+                                    <div class="update-footer">
+                                        <div>
+                                            <strong>Status:</strong>
+                                            <span style="padding: 4px 10px; border-radius: 6px; margin-left: 6px; font-weight: 600; background-color: #f3f4f6; color: #1f2937;">Created</span>
+                                        </div>
                                     </div>
                                 </div>
                             @endforelse
@@ -636,6 +680,25 @@
                             </div>
                             <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
                                 <i class="fas fa-cloud-upload-alt"></i> Upload Image
+                            </button>
+                        </form>
+
+                        <div class="report-title">Upload Documentation Files</div>
+                        <form method="POST" action="{{ route('projects.documents.store', $project->id) }}" enctype="multipart/form-data" style="margin-bottom: 30px;">
+                            @csrf
+                            <div class="form-group">
+                                <label class="form-label">Attachments (Optional)</label>
+                                <div style="padding: 12px; border: 2px dashed var(--gray-400); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" id="dropZone">
+                                    <input type="file" name="attachments[]" id="attachmentInput" style="width: 100%; cursor: pointer;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.zip">
+                                    <small style="color: var(--gray-600); display: block; margin-top: 8px;">
+                                        <i class="fas fa-cloud-upload-alt"></i> Drag files here or click to upload<br>
+                                        Accepted: PDF, DOC, DOCX, XLS, XLSX, Images, ZIP (Max 50MB total)
+                                    </small>
+                                </div>
+                                <div id="attachmentPreview" style="margin-top: 12px;"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload Files
                             </button>
                         </form>
 
@@ -848,6 +911,102 @@
                 }
             `;
             document.head.appendChild(style);
+        }
+
+        // File upload preview
+        const dropZone = document.getElementById('dropZone');
+        const attachmentInput = document.getElementById('attachmentInput');
+        const attachmentPreview = document.getElementById('attachmentPreview');
+
+        if (dropZone && attachmentInput) {
+            dropZone.addEventListener('click', () => attachmentInput.click());
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.style.borderColor = '#16a34a';
+                    dropZone.style.backgroundColor = 'rgba(22, 163, 74, 0.05)';
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.style.borderColor = 'var(--gray-400)';
+                    dropZone.style.backgroundColor = 'transparent';
+                });
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                attachmentInput.files = files;
+                updatePreview();
+            });
+
+            attachmentInput.addEventListener('change', updatePreview);
+
+            function updatePreview() {
+                attachmentPreview.innerHTML = '';
+                const files = attachmentInput.files;
+
+                if (files.length === 0) return;
+
+                const fileList = document.createElement('div');
+                fileList.style.cssText = 'display: grid; gap: 8px;';
+
+                Array.from(files).forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.style.cssText = `
+                        padding: 10px 12px;
+                        background: #f3f4f6;
+                        border-radius: 6px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        font-size: 13px;
+                    `;
+
+                    const fileName = document.createElement('span');
+                    fileName.innerHTML = `<i class="fas fa-file"></i> ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                    fileName.style.cssText = 'color: #1f2937; font-weight: 500;';
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    removeBtn.style.cssText = `
+                        background: none;
+                        border: none;
+                        color: #dc2626;
+                        cursor: pointer;
+                        padding: 0;
+                        font-size: 16px;
+                    `;
+
+                    removeBtn.onclick = (e) => {
+                        e.preventDefault();
+                        const dt = new DataTransfer();
+                        Array.from(attachmentInput.files).forEach((f, i) => {
+                            if (i !== index) dt.items.add(f);
+                        });
+                        attachmentInput.files = dt.files;
+                        updatePreview();
+                    };
+
+                    fileItem.appendChild(fileName);
+                    fileItem.appendChild(removeBtn);
+                    fileList.appendChild(fileItem);
+                });
+
+                attachmentPreview.appendChild(fileList);
+            }
         }
     </script>
 </body>

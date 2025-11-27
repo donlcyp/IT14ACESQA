@@ -25,8 +25,8 @@ class EmployeeAttendance extends Model
 
     protected $casts = [
         'date' => 'date',
-        'time_in' => 'time',
-        'time_out' => 'time',
+        'time_in' => 'datetime',
+        'time_out' => 'datetime',
     ];
 
     /**

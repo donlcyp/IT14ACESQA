@@ -62,6 +62,13 @@ Route::middleware('auth')->group(function () {
                 Route::post('/', [UserManagementController::class, 'store'])->name('store');
             });
         });
+
+        // Activity Logs
+        Route::prefix('logs')->name('logs.')->group(function () {
+            Route::get('/', [App\Http\Controllers\LogController::class, 'index'])->name('index');
+            Route::get('/filter', [App\Http\Controllers\LogController::class, 'filterByUser'])->name('filter');
+            Route::get('/export', [App\Http\Controllers\LogController::class, 'export'])->name('export');
+        });
     });
 
     // ===== QUALITY ASSURANCE (QA): Project Material Management Only =====

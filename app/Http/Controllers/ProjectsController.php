@@ -188,7 +188,9 @@ class ProjectsController extends Controller
             ['company_name' => $clientName],
             [
                 'company_name' => $clientName,
+                'prefix' => $validated['client_prefix'] ?? null,
                 'contact_person' => $validated['client_first_name'] . ' ' . $validated['client_last_name'],
+                'suffix' => $validated['client_suffix'] ?? null,
             ]
         );
 
@@ -338,7 +340,7 @@ class ProjectsController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required|string|max:2000',
+            'description' => 'required|string|max:5000',
         ]);
 
         try {

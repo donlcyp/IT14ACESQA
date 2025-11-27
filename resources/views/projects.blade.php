@@ -726,10 +726,10 @@
                                             {{ $project->project_name }}
                                         </a>
                                     </td>
-                                    <td>{{ $project->client_prefix ?: '—' }}</td>
-                                    <td>{{ $project->client?->company_name ?: $project->client_first_name ?: '—' }}</td>
-                                    <td>{{ $project->client?->contact_person ?: $project->client_last_name ?: '—' }}</td>
-                                    <td>{{ $project->client_suffix ?: '—' }}</td>
+                                    <td>{{ $project->client?->prefix ?: '—' }}</td>
+                                    <td>{{ $project->client?->company_name ?: '—' }}</td>
+                                    <td>{{ $project->client?->contact_person ?: '—' }}</td>
+                                    <td>{{ $project->client?->suffix ?: '—' }}</td>
                                     <td>
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>

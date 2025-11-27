@@ -64,6 +64,33 @@
         table td {
             padding: 10px 12px;
             border-bottom: 1px solid #e5e7eb;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .update-table td {
+            vertical-align: top;
+            font-size: 11px;
+        }
+        .update-title-cell {
+            font-weight: bold;
+            width: 12%;
+            color: #1f2937;
+        }
+        .update-description-cell {
+            width: 35%;
+            line-height: 1.5;
+            color: #374151;
+        }
+        .update-status-cell {
+            width: 12%;
+        }
+        .update-by-cell {
+            width: 15%;
+        }
+        .update-date-cell {
+            width: 12%;
+            white-space: nowrap;
         }
         .section-title {
             font-size: 16px;
@@ -74,26 +101,34 @@
             padding-bottom: 8px;
         }
         .image-container {
-            margin: 15px 0;
-            page-break-inside: avoid;
+            margin: 0;
         }
         .image-wrapper {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 15px;
+            page-break-after: always;
+            page-break-inside: avoid;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .image-content {
-            max-height: 300px;
-            overflow: hidden;
             background-color: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            margin-bottom: 15px;
         }
         .image-content img {
             width: 100%;
             height: auto;
+            max-width: 100%;
+            object-fit: contain;
         }
         .image-info {
-            padding: 10px 12px;
+            padding: 12px;
             background-color: #f3f4f6;
             border-top: 1px solid #d1d5db;
             font-size: 12px;
@@ -173,18 +208,17 @@
     </table>
 
     @if($project->documents && $project->documents->count() > 0)
-    <div class="section-title">Documentation Images</div>
     <div class="image-container">
         @foreach($project->documents as $doc)
         <div class="image-wrapper">
-            <div class="image-content">
-                <img src="{{ storage_path('app/public/' . $doc->file_path) }}" alt="{{ $doc->title }}">
-            </div>
-            <div class="image-info">
-                <div class="image-title">{{ $doc->title }}</div>
-                <div class="image-meta">
+            <div style="margin-bottom: 15px;">
+                <div style="font-size: 18px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">{{ $doc->title }}</div>
+                <div style="color: #6b7280; font-size: 12px; margin-bottom: 10px;">
                     Uploaded: {{ $doc->created_at->format('M d, Y H:i') }} | By: {{ $doc->uploader?->name ?? 'Unknown' }} | Size: {{ number_format($doc->file_size / 1024, 2) }} KB
                 </div>
+            </div>
+            <div class="image-content">
+                <img src="{{ storage_path('app/public/' . $doc->file_path) }}" alt="{{ $doc->title }}">
             </div>
         </div>
         @endforeach
@@ -193,35 +227,32 @@
 
     @if($project->updates && $project->updates->count() > 0)
     <div class="section-title">Project Updates</div>
-    <table>
+    <table class="update-table">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Updated By</th>
-                <th>Date</th>
+                <th class="update-title-cell">Title</th>
+                <th class="update-description-cell">Description</th>
+                <th class="update-status-cell">Status</th>
+                <th class="update-by-cell">Updated By</th>
+                <th class="update-date-cell">Date</th>
             </tr>
         </thead>
         <tbody>
             @foreach($project->updates as $update)
             <tr>
-                <td style="font-weight: bold;">{{ $update->title }}</td>
-                <td>{{ Str::limit($update->description, 100) }}</td>
-                <td>
-                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;
+                <td class="update-title-cell">{{ $update->title }}</td>
+                <td class="update-description-cell" style="white-space: pre-wrap;">{{ $update->description }}</td>
+                <td class="update-status-cell">
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block;
                         @if($update->status === 'Completed') background-color: #dcfce7; color: #166534;
-                        @elseif($update->status === 'In Progress') background-color: #bfdbfe; color: #1e40af;
-                        @elseif($update->status === 'On Hold') background-color: #fef3c7; color: #92400e;
-                        @elseif($update->status === 'Cancelled') background-color: #fee2e2; color: #991b1b;
-                        @else background-color: #f3f4f6; color: #1f2937;
+                        @else background-color: #bfdbfe; color: #1e40af;
                         @endif
                     ">
-                        {{ $update->status }}
+                        {{ $update->status === 'Completed' ? 'Complete' : 'Ongoing' }}
                     </span>
                 </td>
-                <td>{{ $update->updatedBy?->name ?? 'Unknown' }}</td>
-                <td>{{ $update->created_at->format('M d, Y H:i') }}</td>
+                <td class="update-by-cell">{{ $update->updatedBy?->name ?? 'Unknown' }}</td>
+                <td class="update-date-cell">{{ $update->created_at->format('M d, Y H:i') }}</td>
             </tr>
             @endforeach
         </tbody>

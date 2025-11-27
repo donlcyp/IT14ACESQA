@@ -226,6 +226,10 @@
                 <i class="nav-icon fas fa-user-gear"></i>
                 <span>User Management</span>
             </a>
+            <a href="{{ route('logs.index') }}" class="nav-item {{ request()->routeIs('logs.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-history"></i>
+                <span>Activity Logs</span>
+            </a>
         @endif
 
         <!-- PROJECT MANAGER: Projects and Attendance -->
