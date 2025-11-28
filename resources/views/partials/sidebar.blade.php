@@ -201,18 +201,6 @@
                 <i class="nav-icon fas fa-archive"></i>
                 <span>Archives</span>
             </a>
-            <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-bolt"></i>
-                <span>Project Material Management</span>
-            </a>
-            <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-exchange-alt"></i>
-                <span>Transactions & Invoice</span>
-            </a>
-            <a href="{{ route('finance.index') }}" class="nav-item {{ request()->routeIs('finance*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-chart-bar"></i>
-                <span>Finance</span>
-            </a>
             <a href="{{ route('employee') }}" class="nav-item {{ request()->routeIs('employee') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-hard-hat"></i>
                 <span>Employee</span>
@@ -241,26 +229,6 @@
             <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-user-check"></i>
                 <span>Attendance</span>
-            </a>
-        @endif
-
-        <!-- QUALITY ASSURANCE: Project Material Management only -->
-        @if(auth()->check() && auth()->user()->role === 'QA')
-            <a href="{{ route('project-material-management') }}" class="nav-item {{ request()->routeIs('project-material-management*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-bolt"></i>
-                <span>Project Material Management</span>
-            </a>
-        @endif
-
-        <!-- FINANCIAL MANAGER: Transactions & Invoice and Finance -->
-        @if(auth()->check() && auth()->user()->role === 'FM')
-            <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-exchange-alt"></i>
-                <span>Transactions & Invoice</span>
-            </a>
-            <a href="{{ route('finance.index') }}" class="nav-item {{ request()->routeIs('finance*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-chart-bar"></i>
-                <span>Finance</span>
             </a>
         @endif
     </nav>

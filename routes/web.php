@@ -1,11 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\FinanceSectionsController;
-use App\Http\Controllers\FinanceController;
-use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserManagementController;
 
 // Public authentication routes
@@ -69,72 +65,22 @@ Route::middleware('auth')->group(function () {
             Route::get('/filter', [App\Http\Controllers\LogController::class, 'filterByUser'])->name('filter');
             Route::get('/export', [App\Http\Controllers\LogController::class, 'export'])->name('export');
         });
+
+        // Activity Log Routes
+        Route::get('/activity-log', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-log.index');
+        Route::get('/activity-log/{log}', [App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-log.show');
     });
-
-    // ===== QUALITY ASSURANCE (QA): Project Material Management Only =====
-    Route::middleware('role:OWNER,QA')->group(function () {
-        Route::get('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'index'])->name('project-material-management');
-        Route::post('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'store'])->name('project-material-management.store');
-        Route::delete('/project-material-management/{project_record}', [App\Http\Controllers\QualityAssuranceController::class, 'destroy'])->name('project-material-management.destroy');
-        Route::get('/project-material-management/{project_record}', [App\Http\Controllers\QualityAssuranceController::class, 'show'])->name('project-material-management-show');
-        Route::post('/project-material-management/materials', [App\Http\Controllers\QualityAssuranceController::class, 'storeMaterial'])->name('project-material-management.materials.store');
-        Route::put('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'updateMaterial'])->name('project-material-management.materials.update');
-        Route::delete('/project-material-management/materials/{id}', [App\Http\Controllers\QualityAssuranceController::class, 'destroyMaterial'])->name('project-material-management.materials.destroy');
-    });
-
-    // ===== FINANCIAL MANAGER (FM): Transactions & Finance Only =====
-    Route::middleware('role:OWNER,FM')->group(function () {
-        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-        Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
-        Route::get('/transactions/{projectId}/invoice/{supplier}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
-        Route::put('/transactions/return-reason/{material}', [TransactionController::class, 'updateReturnReason'])->name('transactions.return-reason.update');
-        Route::get('/transactions-history', [TransactionController::class, 'history'])->name('transactions.history');
-
-        Route::get('/finance', [App\Http\Controllers\FinanceController::class, 'index'])->name('finance.index');
-        Route::post('/finance', [App\Http\Controllers\FinanceController::class, 'store'])->name('finance.store');
-        Route::get('/finance/supplier-invoices', [FinanceController::class, 'supplierInvoices'])->name('finance.supplier-invoices');
-        Route::get('/finance/payment-summary', [FinanceController::class, 'paymentSummary'])->name('finance.payment-summary');
-        Route::get('/finance/revenue', [FinanceSectionsController::class, 'revenue'])->name('finance.revenue');
-        Route::get('/finance/expenses', [FinanceSectionsController::class, 'expenses'])->name('finance.expenses');
-        Route::get('/finance/budget', [FinanceSectionsController::class, 'budgetIndex'])->name('finance.budget');
-        Route::post('/finance/budget', [FinanceSectionsController::class, 'budgetStore'])->name('finance.budget.store');
-        Route::get('/finance/purchase-orders', [FinanceSectionsController::class, 'purchaseOrdersIndex'])->name('finance.purchase-orders');
-        Route::post('/finance/purchase-orders', [FinanceSectionsController::class, 'purchaseOrdersStore'])->name('finance.purchase-orders.store');
-        Route::post('/finance/purchase-orders/{id}/status', [FinanceSectionsController::class, 'purchaseOrdersUpdateStatus'])->name('finance.purchase-orders.status');
-    });
-
-    // Shared routes
-    Route::get('/materials', [MaterialController::class, 'index'])->name('materials.index');
-    Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
-    Route::delete('/materials/{id}', [MaterialController::class, 'destroy'])->name('materials.destroy');
-
-    Route::get('/transaction', [App\Http\Controllers\AuditController::class, 'index'])->name('transaction');
-    Route::post('/transaction', [App\Http\Controllers\AuditController::class, 'store'])->name('transaction.store');
 
     // API Routes for Project Employee Management (PM and OWNER only)
     Route::post('/api/projects/{project}/employees', [App\Http\Controllers\EmployeeAttendanceController::class, 'assignEmployeesToProject'])
         ->name('api.projects.employees.assign')
         ->middleware(['auth', 'verified']);
 
-    // ===== PDF DOWNLOAD ROUTES =====
-    // OWNER & FM can download financial PDFs
-    Route::middleware('role:OWNER,FM')->group(function () {
-        Route::get('/pdf/invoice/{invoice}', [App\Http\Controllers\PDFController::class, 'downloadInvoice'])->name('pdf.invoice.download');
-        Route::get('/pdf/transaction-report', [App\Http\Controllers\PDFController::class, 'downloadTransactionReport'])->name('pdf.transaction-report.download');
-        Route::get('/pdf/finance-summary', [App\Http\Controllers\PDFController::class, 'downloadFinanceSummary'])->name('pdf.finance-summary.download');
-    });
-
     // OWNER & PM can download project reports
     Route::middleware('role:OWNER,PM')->group(function () {
         Route::get('/pdf/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectReport'])->name('pdf.project.download');
         Route::get('/csv/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectCsv'])->name('csv.project.download');
         Route::get('/pdf/attendance-report', [App\Http\Controllers\PDFController::class, 'downloadAttendanceReport'])->name('pdf.attendance-report.download');
-    });
-
-    // Activity Log Routes (OWNER only)
-    Route::middleware('role:OWNER')->group(function () {
-        Route::get('/activity-log', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-log.index');
-        Route::get('/activity-log/{log}', [App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-log.show');
     });
 });
 

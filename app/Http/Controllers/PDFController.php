@@ -2,52 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
 use App\Models\Project;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class PDFController extends Controller
 {
-    /**
-     * Generate and download invoice PDF
-     */
-    public function downloadInvoice($invoiceId)
-    {
-        $invoice = Invoice::findOrFail($invoiceId);
-
-        $pdf = Pdf::loadView('pdfs.invoice', ['invoice' => $invoice])
-            ->setPaper('a4')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
-
-        return $pdf->download("invoice_{$invoice->invoice_number}.pdf");
-    }
-
-    /**
-     * Generate and download transaction report PDF
-     */
-    public function downloadTransactionReport(Request $request)
-    {
-        $filters = [
-            'date_from' => $request->get('date_from'),
-            'date_to' => $request->get('date_to'),
-            'status' => $request->get('status'),
-        ];
-
-        $pdf = Pdf::loadView('pdfs.transaction-report', ['filters' => $filters])
-            ->setPaper('a4', 'landscape')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
-
-        $filename = 'transaction_report_' . now()->format('Y-m-d_His') . '.pdf';
-        return $pdf->download($filename);
-    }
-
     /**
      * Generate and download project report PDF
      */
@@ -90,29 +50,6 @@ class PDFController extends Controller
             fputcsv($output, ['Project Details', 'Inspector', 'N/A']);
             fputcsv($output, ['Project Details', 'Status', $project->status]);
             fputcsv($output, ['Project Details', 'Archived At', optional($project->archived_at)->toDateTimeString()]);
-
-            // Blank line
-            fputcsv($output, ['']);
-
-            // Section: Materials
-            fputcsv($output, ['Materials']);
-            fputcsv($output, ['Name', 'Quantity', 'Unit', 'Unit Price', 'Total', 'Supplier', 'Date Received', 'Status']);
-            $materials = collect();
-            foreach ($materials as $m) {
-                fputcsv($output, [
-                    $m->name,
-                    $m->quantity,
-                    $m->unit,
-                    $m->price,
-                    $m->total,
-                    $m->supplier,
-                    $m->date_received,
-                    $m->status,
-                ]);
-            }
-            $materialsTotal = $materials->sum('total');
-            fputcsv($output, ['']);
-            fputcsv($output, ['Materials Total', '', '', '', $materialsTotal]);
 
             // Blank line
             fputcsv($output, ['']);
@@ -186,22 +123,6 @@ class PDFController extends Controller
             ->setOption('margin-left', 10);
 
         $filename = 'attendance_report_' . now()->format('Y-m-d_His') . '.pdf';
-        return $pdf->download($filename);
-    }
-
-    /**
-     * Generate and download finance summary PDF
-     */
-    public function downloadFinanceSummary()
-    {
-        $pdf = Pdf::loadView('pdfs.finance-summary')
-            ->setPaper('a4')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
-
-        $filename = 'finance_summary_' . now()->format('Y-m-d_His') . '.pdf';
         return $pdf->download($filename);
     }
 }
