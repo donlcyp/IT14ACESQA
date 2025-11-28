@@ -140,6 +140,7 @@ class DatabaseSeeder extends Seeder
             'date_started' => now()->subMonths(3),
             'assigned_pm_id' => $pm2->id,
             'client_id' => $client2->id,
+            'client_prefix' => 'Ms',
             'client_first_name' => 'Sarah',
             'client_last_name' => 'Johnson',
             'allocated_amount' => 150000,

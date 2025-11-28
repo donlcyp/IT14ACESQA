@@ -33,7 +33,7 @@ class ProjectsController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['projectRecords.materials', 'employees']);
+        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees']);
 
         return view('projects-view', compact('project'));
     }

@@ -511,7 +511,9 @@
                     </div>
                     <div class="detail-card">
                         <div class="detail-label">Client</div>
-                        <div class="detail-value">{{ $project->client?->company_name ?? 'N/A' }}</div>
+                        <div class="detail-value">
+                            {{ $project->client?->company_name ?? trim($project->client_prefix . ' ' . $project->client_first_name . ' ' . $project->client_last_name) }}
+                        </div>
                     </div>
                     <div class="detail-card">
                         <div class="detail-label">Project Manager</div>
