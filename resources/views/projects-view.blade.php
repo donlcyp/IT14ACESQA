@@ -647,17 +647,38 @@
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Role Title</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned From</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned To</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days Worked</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Daily Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Labor Cost</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($project->employees as $employee)
+                                            @php
+                                                // Calculate days worked and labor cost based on attendance
+                                                $attendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
+                                                    ->whereBetween('date', [
+                                                        $employee->pivot->assigned_from ?? $project->created_at,
+                                                        $employee->pivot->assigned_to ?? now()
+                                                    ])
+                                                    ->where('attendance_status', 'Present')
+                                                    ->count();
+                                                
+                                                // Get daily rate from salary (assuming it's stored as monthly salary)
+                                                $monthlySalary = $employee->pivot->salary ?? 0;
+                                                $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0; // Assuming 22 working days per month
+                                                $laborCost = $attendanceRecords * $dailyRate;
+                                            @endphp
                                             <tr style="border-bottom: 1px solid var(--gray-400);">
                                                 <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->role_title ?? '—' }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_from ? \Carbon\Carbon::parse($employee->pivot->assigned_from)->format('M d, Y') : '—' }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_to ? \Carbon\Carbon::parse($employee->pivot->assigned_to)->format('M d, Y') : '—' }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ $attendanceRecords }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($dailyRate, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($laborCost, 2) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <form method="POST" action="{{ route('projects.employees.remove', [$project->id, $employee->id]) }}" style="display: inline;" onsubmit="return confirm('Remove this employee?');">
                                                         @csrf
@@ -671,6 +692,55 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+                            </div>
+
+                            <!-- Employees Summary -->
+                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Employees</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
+                                        {{ $project->employees->count() }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #059669; opacity: 0.8;">Total Days Worked</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #059669;">
+                                        @php
+                                            $totalDaysWorked = 0;
+                                            foreach($project->employees as $emp) {
+                                                $totalDaysWorked += \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                    ->whereBetween('date', [
+                                                        $emp->pivot->assigned_from ?? $project->created_at,
+                                                        $emp->pivot->assigned_to ?? now()
+                                                    ])
+                                                    ->where('attendance_status', 'Present')
+                                                    ->count();
+                                            }
+                                            echo $totalDaysWorked;
+                                        @endphp
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #be185d; opacity: 0.8;">Total Labor Cost</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #be185d;">
+                                        ₱@php
+                                            $totalLaborCost = 0;
+                                            foreach($project->employees as $emp) {
+                                                $empDays = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                    ->whereBetween('date', [
+                                                        $emp->pivot->assigned_from ?? $project->created_at,
+                                                        $emp->pivot->assigned_to ?? now()
+                                                    ])
+                                                    ->where('attendance_status', 'Present')
+                                                    ->count();
+                                                $monthlySalary = $emp->pivot->salary ?? 0;
+                                                $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0;
+                                                $totalLaborCost += $empDays * $dailyRate;
+                                            }
+                                            echo number_format($totalLaborCost, 2);
+                                        @endphp
+                                    </div>
+                                </div>
                             </div>
                         @else
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
