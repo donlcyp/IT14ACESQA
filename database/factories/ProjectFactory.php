@@ -11,10 +11,8 @@ class ProjectFactory extends Factory
 
     public function definition(): array
     {
-        $clientPrefix = $this->faker->optional(0.3)->randomElement(['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Engr.']);
         $clientFirst = $this->faker->firstName();
         $clientLast = $this->faker->lastName();
-        $clientSuffix = $this->faker->optional(0.2)->randomElement(['Jr.', 'Sr.', 'III', 'CPA']);
 
         $leadPrefix = $this->faker->optional(0.3)->randomElement(['Engr.', 'Arch.', 'Dr.', 'Mr.', 'Ms.']);
         $leadFirst = $this->faker->firstName();
@@ -23,11 +21,9 @@ class ProjectFactory extends Factory
 
         return [
             'project_name' => $this->faker->sentence(3),
-            'client_prefix' => $clientPrefix,
             'client_first_name' => $clientFirst,
             'client_last_name' => $clientLast,
-            'client_suffix' => $clientSuffix,
-            'client_name' => trim(implode(' ', array_filter([$clientPrefix, $clientFirst, $clientLast, $clientSuffix]))),
+            'client_name' => trim(implode(' ', array_filter([$clientFirst, $clientLast]))),
             'status' => $this->faker->randomElement(['Ongoing', 'In Review', 'Mobilizing', 'On Hold', 'Completed']),
             'lead_prefix' => $leadPrefix,
             'lead_first_name' => $leadFirst,

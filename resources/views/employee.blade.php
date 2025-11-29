@@ -596,11 +596,11 @@
             font-size: var(--text-md-normal-font-size);
         }
 
-        .employee-table.employees thead {
+        .employee-table thead {
             background: var(--green-600);
         }
-        .employee-table.employees thead th:first-child { border-top-left-radius: 8px; }
-        .employee-table.employees thead th:last-child { border-top-right-radius: 8px; }
+        .employee-table thead th:first-child { border-top-left-radius: 8px; }
+        .employee-table thead th:last-child { border-top-right-radius: 8px; }
         .actions {
             display: inline-flex;
             align-items: center;
@@ -829,35 +829,36 @@
                 <div class="table-card">
                     <h2>Employee Directory</h2>
                     <table class="employee-table">
-                            <thead>
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Position</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($employees as $employee)
                                 <tr>
-                                    <th>Employee ID</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Position</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
+                                    <td>{{ 'EMP' . str_pad($employee->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                    <td>{{ $employee->f_name }}</td>
+                                    <td>{{ $employee->l_name }}</td>
+                                    <td>{{ $employee->position ?? '—' }}</td>
+                                    <td>{{ $employee->user->email ?? '—' }}</td>
+                                    <td>{{ $employee->user->phone ?? '—' }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($employees as $employee)
-                                    <tr>
-                                        <td>{{ 'EMP' . str_pad($employee->id, 3, '0', STR_PAD_LEFT) }}</td>
-                                        <td>{{ $employee->f_name }}</td>
-                                        <td>{{ $employee->l_name }}</td>
-                                        <td>{{ $employee->position ?? '—' }}</td>
-                                        <td>{{ $employee->user->email ?? '—' }}</td>
-                                        <td>{{ $employee->user->phone ?? '—' }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" style="text-align:center; padding: 24px; color: #6b7280;">No employees yet. Add your first employee using the button above.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    @if($employees instanceof \Illuminate\Pagination\LengthAwarePaginator && $employees->hasPages())
+                            @empty
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding: 24px; color: #6b7280;">No employees yet. Add your first employee using the button above.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($employees instanceof \Illuminate\Pagination\LengthAwarePaginator && $employees->hasPages())
                         @php
                             $currentPage = $employees->currentPage();
                             $lastPage = $employees->lastPage();
@@ -913,8 +914,7 @@
                             </div>
                         </div>
                     @endif
-                </div>
-            </section>
+                </section>
         </main>
     </div>
 

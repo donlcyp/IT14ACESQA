@@ -12,11 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('projects', function (Blueprint $table) {
-            // Add client detail columns after client_id
-            $table->string('client_prefix')->nullable()->after('client_id');
-            $table->string('client_first_name')->nullable()->after('client_prefix');
-            $table->string('client_last_name')->nullable()->after('client_first_name');
-            $table->string('client_suffix')->nullable()->after('client_last_name');
+            // Add client detail columns after client_id (with existence checks)
+            if (!Schema::hasColumn('projects', 'client_prefix')) {
+                $table->string('client_prefix')->nullable()->after('client_id');
+            }
+            if (!Schema::hasColumn('projects', 'client_first_name')) {
+                $table->string('client_first_name')->nullable()->after('client_prefix');
+            }
+            if (!Schema::hasColumn('projects', 'client_last_name')) {
+                $table->string('client_last_name')->nullable()->after('client_first_name');
+            }
+            if (!Schema::hasColumn('projects', 'client_suffix')) {
+                $table->string('client_suffix')->nullable()->after('client_last_name');
+            }
         });
     }
 

@@ -13,17 +13,20 @@ class ProjectObserver
      */
     public function created(Project $project): void
     {
-        Log::create([
-            'user_id' => Auth::id(),
-            'action' => 'CREATE_PROJECT',
-            'log_date' => now(),
-            'details' => json_encode([
-                'project_id' => $project->id,
-                'project_name' => $project->project_name,
-                'project_code' => $project->project_code,
-                'allocated_amount' => $project->allocated_amount,
-            ]),
-        ]);
+        $userId = Auth::id();
+        if ($userId) {
+            Log::create([
+                'user_id' => $userId,
+                'action' => 'CREATE_PROJECT',
+                'log_date' => now(),
+                'details' => json_encode([
+                    'project_id' => $project->id,
+                    'project_name' => $project->project_name,
+                    'project_code' => $project->project_code,
+                    'allocated_amount' => $project->allocated_amount,
+                ]),
+            ]);
+        }
     }
 
     /**
@@ -31,42 +34,49 @@ class ProjectObserver
      */
     public function updated(Project $project): void
     {
+        $userId = Auth::id();
         // Check if project is being archived
         if ($project->isDirty('archived')) {
             if ($project->archived === true) {
-                Log::create([
-                    'user_id' => Auth::id(),
-                    'action' => 'ARCHIVE_PROJECT',
-                    'log_date' => now(),
-                    'details' => json_encode([
-                        'project_id' => $project->id,
-                        'project_name' => $project->project_name,
-                        'archive_reason' => $project->archive_reason,
-                    ]),
-                ]);
+                if ($userId) {
+                    Log::create([
+                        'user_id' => $userId,
+                        'action' => 'ARCHIVE_PROJECT',
+                        'log_date' => now(),
+                        'details' => json_encode([
+                            'project_id' => $project->id,
+                            'project_name' => $project->project_name,
+                            'archive_reason' => $project->archive_reason,
+                        ]),
+                    ]);
+                }
             } else {
-                Log::create([
-                    'user_id' => Auth::id(),
-                    'action' => 'UNARCHIVE_PROJECT',
-                    'log_date' => now(),
-                    'details' => json_encode([
-                        'project_id' => $project->id,
-                        'project_name' => $project->project_name,
-                    ]),
-                ]);
+                if ($userId) {
+                    Log::create([
+                        'user_id' => $userId,
+                        'action' => 'UNARCHIVE_PROJECT',
+                        'log_date' => now(),
+                        'details' => json_encode([
+                            'project_id' => $project->id,
+                            'project_name' => $project->project_name,
+                        ]),
+                    ]);
+                }
             }
         } else {
             // Regular update
-            Log::create([
-                'user_id' => Auth::id(),
-                'action' => 'UPDATE_PROJECT',
-                'log_date' => now(),
-                'details' => json_encode([
-                    'project_id' => $project->id,
-                    'project_name' => $project->project_name,
-                    'changes' => $project->getChanges(),
-                ]),
-            ]);
+            if ($userId) {
+                Log::create([
+                    'user_id' => $userId,
+                    'action' => 'UPDATE_PROJECT',
+                    'log_date' => now(),
+                    'details' => json_encode([
+                        'project_id' => $project->id,
+                        'project_name' => $project->project_name,
+                        'changes' => $project->getChanges(),
+                    ]),
+                ]);
+            }
         }
 
         // If project is being archived, archive all its materials
@@ -85,14 +95,17 @@ class ProjectObserver
      */
     public function deleted(Project $project): void
     {
-        Log::create([
-            'user_id' => Auth::id(),
-            'action' => 'DELETE_PROJECT',
-            'log_date' => now(),
-            'details' => json_encode([
-                'project_id' => $project->id,
-                'project_name' => $project->project_name,
-            ]),
-        ]);
+        $userId = Auth::id();
+        if ($userId) {
+            Log::create([
+                'user_id' => $userId,
+                'action' => 'DELETE_PROJECT',
+                'log_date' => now(),
+                'details' => json_encode([
+                    'project_id' => $project->id,
+                    'project_name' => $project->project_name,
+                ]),
+            ]);
+        }
     }
 }
