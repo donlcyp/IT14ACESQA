@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/projects/{project}/updates', [App\Http\Controllers\ProjectsController::class, 'storeUpdate'])->name('projects.updates.store');
 
         // Project Materials
+        Route::get('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'getMaterial'])->name('projects.materials.get');
         Route::post('/projects/{project}/materials', [App\Http\Controllers\ProjectsController::class, 'storeMaterial'])->name('projects.materials.store');
         Route::put('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'updateMaterial'])->name('projects.materials.update');
         Route::delete('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'deleteMaterial'])->name('projects.materials.delete');
@@ -96,6 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:OWNER,PM')->group(function () {
         Route::get('/pdf/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectReport'])->name('pdf.project.download');
         Route::get('/csv/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectCsv'])->name('csv.project.download');
+        Route::get('/pdf/boq/{project}', [App\Http\Controllers\PDFController::class, 'downloadBOQ'])->name('pdf.boq.download');
         Route::get('/pdf/attendance-report', [App\Http\Controllers\PDFController::class, 'downloadAttendanceReport'])->name('pdf.attendance-report.download');
     });
 });

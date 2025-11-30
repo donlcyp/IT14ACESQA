@@ -1162,22 +1162,6 @@
 
 
                 <!-- Status Information Banner -->
-                <div class="info-banner" id="projects-info">
-                    <div class="info-banner-icon">
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="info-banner-content">
-                        <h4>Project Employee Assignment</h4>
-                        <ul>
-                            <li>View all projects and their assigned employees in the table below.</li>
-                            <li>Only <strong>OWNER</strong> and <strong>PM</strong> can add employees to projects.</li>
-                            <li>Employees can only be assigned to <strong>one active project</strong> at a time.</li>
-                            <li>Once a project is marked as <strong>Completed</strong>, employees can be reassigned to other projects.</li>
-                            <li>Click <strong>Manage Employees</strong> to add or remove employees from a project.</li>
-                        </ul>
-                    </div>
-                </div>
-
                 <!-- Projects Table -->
                 <div class="table-card">
                     <table class="projects-table">
@@ -1207,13 +1191,6 @@
                                     </td>
                                     <td>
                                         <div class="project-actions">
-                                            <button 
-                                                class="action-btn {{ !auth()->user()->canManageProjectEmployees() ? 'disabled' : '' }}"
-                                                onclick="openEmployeeModal({{ $project->id }}, '{{ $project->project_name }}', '{{ $project->status }}')"
-                                                {{ !auth()->user()->canManageProjectEmployees() ? 'disabled' : '' }}
-                                            >
-                                                <i class="fas fa-users"></i> Manage
-                                            </button>
                                             <button class="action-btn" onclick="viewProjectEmployees({{ $project->id }})">
                                                 <i class="fas fa-eye"></i> View
                                             </button>
@@ -1234,43 +1211,6 @@
 
             </section>
         </main>
-    </div>
-
-    <!-- Employee Assignment Modal -->
-    <div id="employeeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Manage Employees - <span id="modalProjectName"></span></h2>
-                <button class="modal-close" onclick="closeEmployeeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div id="modalWarning" class="info-banner" style="display: none; margin-bottom: 20px;">
-                <div class="info-banner-icon">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <div class="info-banner-content">
-                    <h4 style="margin: 0;">Project Completed</h4>
-                    <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
-                </div>
-            </div>
-
-            <p style="color: #6b7280; margin-bottom: 16px;">
-                Select employees to assign to this project. Only employees not assigned to other active projects are available.
-            </p>
-
-            <div class="employee-list" id="employeeList">
-                <!-- Populated by JavaScript -->
-            </div>
-
-            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
-                <button class="btn btn-green" onclick="saveEmployeeAssignments()">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- Edit Attendance Modal -->

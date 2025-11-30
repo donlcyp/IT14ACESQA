@@ -304,14 +304,18 @@
             background: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
-            z-index: 2000;
+            z-index: 1000;
             opacity: 0;
             transition: opacity 0.2s ease;
+            visibility: hidden;
+            padding: 16px;
         }
 
         .projects-modal.active {
-            display: flex;
-            opacity: 1;
+            display: flex !important;
+            opacity: 1 !important;
+            z-index: 2000 !important;
+            visibility: visible !important;
         }
 
         .projects-modal-content {
@@ -354,10 +358,6 @@
         }
 
         /* Ensure modals fit within the viewport */
-        .projects-modal {
-            padding: 16px;
-        }
-
         @media (max-width: 640px) {
             .projects-modal-content {
                 max-width: 95vw;
@@ -462,6 +462,166 @@
             margin-top: 24px;
             padding-top: 20px;
             border-top: 1px solid #f3f4f6;
+        }
+
+        .projects-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Modal Styles for Employee Assignment */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: inherit;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            color: #111827;
+        }
+        .info-banner {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 4px;
+            align-items: flex-start;
+        }
+        .info-banner-icon {
+            color: #f59e0b;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .info-banner-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #92400e;
+        }
+        .info-banner-content p {
+            font-size: 13px;
+            color: #b45309;
+            margin-top: 2px;
+        }
+        .employee-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .employee-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+        }
+        .employee-item:hover {
+            background: #f3f4f6;
+        }
+        .employee-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+        .employee-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .employee-name {
+            font-weight: 500;
+            color: #111827;
+        }
+        .employee-code {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .employee-position {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-outline {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .btn-outline:hover {
+            background: #e5e7eb;
+        }
+        .btn-green {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .btn-green:hover {
+            background: #15803d;
         }
 
         .projects-btn {
@@ -676,7 +836,7 @@
                                     <span>Archives</span>
                                 </span>
                             </a>
-                            <button type="button" class="projects-button" aria-label="New Project" onclick="openProjectModal(true)">
+                            <button type="button" id="newProjectBtn" class="projects-button" aria-label="New Project" onclick="window.openProjectModal(true)">
                                 <span class="projects-button-base primary">
                                     <i class="fas fa-plus"></i>
                                     <span>New</span>
@@ -948,6 +1108,22 @@
                                 </div>
 
                                 <div class="projects-form-group">
+                                    <label class="projects-form-label">Project Type</label>
+                                    <select
+                                        class="projects-form-input"
+                                        id="projectType"
+                                        name="project_type"
+                                    >
+                                        <option value="">-- Select Project Type --</option>
+                                        <option value="Plumbing Work" {{ old('project_type') === 'Plumbing Work' ? 'selected' : '' }}>Plumbing Work</option>
+                                        <option value="Fire Safety" {{ old('project_type') === 'Fire Safety' ? 'selected' : '' }}>Fire Safety</option>
+                                    </select>
+                                    @error('project_type')
+                                        <p class="projects-form-error">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="projects-form-group">
                                     <label class="projects-form-label">Target Timeline</label>
                                     <input
                                         type="date"
@@ -1175,6 +1351,43 @@
                 </div>
             </section>
         </main>
+
+        <!-- Employee Assignment Modal -->
+        <div id="employeeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Manage Employees - <span id="modalProjectName"></span></h2>
+                    <button class="modal-close" onclick="closeEmployeeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div id="modalWarning" class="info-banner" style="display: none; margin-bottom: 20px;">
+                    <div class="info-banner-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="info-banner-content">
+                        <h4 style="margin: 0;">Project Completed</h4>
+                        <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
+                    </div>
+                </div>
+
+                <p style="color: #6b7280; margin-bottom: 16px;">
+                    Select employees to assign to this project. Only employees not assigned to other active projects are available.
+                </p>
+
+                <div class="employee-list" id="employeeList">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
+                    <button class="btn btn-green" onclick="saveEmployeeAssignments()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     @include('partials.sidebar-js')
@@ -1195,23 +1408,50 @@
         const editProjectStatus = document.getElementById('editProjectStatus');
         const editAssignedPmId = document.getElementById('editAssignedPmId');
 
-        function openProjectModal(shouldReset = false) {
-            if (!projectModal) return;
-            if (shouldReset && projectForm) {
-                projectForm.reset();
-            }
-            projectModal.classList.add('active');
-            projectModal.setAttribute('aria-hidden', 'false');
-        }
+        // Employee Management Variables
+        let currentProjectId = null;
+        let currentProjectStatus = null;
+        let allEmployees = {!! $allEmployees ? json_encode($allEmployees) : '[]' !!};
+        let projectEmployees = {!! $projectEmployees ? json_encode($projectEmployees) : '[]' !!};
+        let canManage = {{ auth()->user()->canManageProjectEmployees() ? 'true' : 'false' }};
 
-        function closeProjectModal() {
-            if (!projectModal) return;
-            projectModal.classList.remove('active');
-            projectModal.setAttribute('aria-hidden', 'true');
-            if (projectForm) {
-                projectForm.reset();
+        window.openProjectModal = function(shouldReset) {
+            if (typeof shouldReset === 'undefined') shouldReset = false;
+            const modal = document.getElementById('projectModal');
+            
+            if (!modal) {
+                console.error('Project modal not found');
+                return;
             }
-        }
+            
+            const form = document.getElementById('projectForm');
+            if (shouldReset && form) {
+                form.reset();
+            }
+            
+            // Remove active class first to ensure it applies
+            modal.classList.remove('active');
+            
+            // Use setTimeout to ensure the class is applied after removal
+            setTimeout(function() {
+                modal.classList.add('active');
+                modal.setAttribute('aria-hidden', 'false');
+                console.log('Modal should be visible now');
+            }, 10);
+        };
+
+        window.closeProjectModal = function() {
+            const modal = document.getElementById('projectModal');
+            const form = document.getElementById('projectForm');
+            
+            if (!modal) return;
+            
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            if (form) {
+                form.reset();
+            }
+        };
 
         function openEditProjectModal(buttonEl) {
             const row = buttonEl.closest('tr');
@@ -1272,6 +1512,14 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            // New Project Button
+            const newProjectBtn = document.getElementById('newProjectBtn');
+            if (newProjectBtn) {
+                newProjectBtn.addEventListener('click', function () {
+                    openProjectModal(true);
+                });
+            }
+
             if (projectModal) {
                 projectModal.addEventListener('click', function (event) {
                     if (event.target === projectModal) {
@@ -1299,6 +1547,126 @@
                 openProjectModal(false);
             }
         });
+
+        // Employee Management Functions
+        function openEmployeeModal(projectId, projectName, projectStatus) {
+            if (!canManage) {
+                alert('You do not have permission to manage project employees.');
+                return;
+            }
+
+            currentProjectId = projectId;
+            currentProjectStatus = projectStatus;
+            document.getElementById('modalProjectName').textContent = projectName;
+
+            if (projectStatus.toLowerCase() === 'completed') {
+                document.getElementById('modalWarning').style.display = 'flex';
+            } else {
+                document.getElementById('modalWarning').style.display = 'none';
+            }
+
+            loadEmployeesForModal(projectId);
+            document.getElementById('employeeModal').classList.add('active');
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeModal').classList.remove('active');
+            currentProjectId = null;
+        }
+
+        function loadEmployeesForModal(projectId) {
+            const employeeList = document.getElementById('employeeList');
+            const assignedEmployeeIds = projectEmployees[projectId] || [];
+
+            employeeList.innerHTML = '';
+
+            allEmployees.forEach(employee => {
+                const isAssigned = assignedEmployeeIds.includes(employee.id);
+                const isAssignedToOtherProject = employee.assigned_to_other_project && !isAssigned;
+
+                const employeeItem = document.createElement('div');
+                employeeItem.className = 'employee-item';
+                employeeItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <input 
+                            type="checkbox" 
+                            value="${employee.id}"
+                            ${isAssigned ? 'checked' : ''}
+                            ${isAssignedToOtherProject ? 'disabled' : ''}
+                            class="employee-checkbox"
+                        >
+                        <div class="employee-info">
+                            <div class="employee-name">${employee.f_name} ${employee.l_name}</div>
+                            <div class="employee-code">EMP${String(employee.id).padStart(3, '0')}</div>
+                            <div class="employee-position">${employee.position || 'No Position'}</div>
+                            ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600;">Assigned to other active project</div>' : ''}
+                        </div>
+                    </div>
+                `;
+                employeeList.appendChild(employeeItem);
+            });
+        }
+
+        function saveEmployeeAssignments() {
+            const checkboxes = document.querySelectorAll('.employee-checkbox:not(:disabled)');
+            const selectedEmployeeIds = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => parseInt(cb.value));
+
+            if (selectedEmployeeIds.length === 0) {
+                alert('Please select at least one employee to assign.');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            if (!csrfToken) {
+                alert('CSRF token not found. Please refresh the page and try again.');
+                console.error('CSRF token missing');
+                return;
+            }
+
+            fetch(`/api/projects/${currentProjectId}/employees`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    employee_ids: selectedEmployeeIds
+                })
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.error('Non-JSON response received:', text);
+                        throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                    });
+                }
+                
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Employees assigned successfully!');
+                    closeEmployeeModal();
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to assign employees'));
+                }
+            })
+            .catch(error => {
+                console.error('Full error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+        }
     </script>
 </body>
 

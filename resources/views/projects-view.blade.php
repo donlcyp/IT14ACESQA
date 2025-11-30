@@ -4,6 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Project Details - AJJ CRISBER Engineering Services</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
@@ -485,6 +486,267 @@
         .filter-btn:hover {
             border-color: var(--accent);
         }
+
+        /* Timeline/Task Bar Styles */
+        .updates-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+
+        .updates-timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #16a34a, #3b82f6, #9ca3af);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding: 0;
+        }
+
+        .timeline-marker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 3px solid white;
+        }
+
+        .timeline-marker::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 2px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+
+        .timeline-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .timeline-description {
+            font-size: 13px;
+            color: #374151;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .timeline-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .timeline-date,
+        .timeline-author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timeline-date i,
+        .timeline-author i {
+            color: var(--accent);
+        }
+
+        /* Modal Styles for Employee Assignment */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: inherit;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            color: #111827;
+        }
+        .info-banner {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 4px;
+            align-items: flex-start;
+        }
+        .info-banner-icon {
+            color: #f59e0b;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .info-banner-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #92400e;
+        }
+        .info-banner-content p {
+            font-size: 13px;
+            color: #b45309;
+            margin-top: 2px;
+        }
+        .employee-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .employee-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+        }
+        .employee-item:hover {
+            background: #f3f4f6;
+        }
+        .employee-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+        .employee-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .employee-name {
+            font-weight: 500;
+            color: #111827;
+        }
+        .employee-code {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .employee-position {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-outline {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .btn-outline:hover {
+            background: #e5e7eb;
+        }
+        .btn-green {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .btn-green:hover {
+            background: #15803d;
+        }
     </style>
 </head>
 
@@ -550,6 +812,18 @@
                         <div class="detail-value">{{ $project->industry ?? 'Not specified' }}</div>
                     </div>
                     <div class="detail-card">
+                        <div class="detail-label">Project Type</div>
+                        <div class="detail-value">
+                            @if($project->project_type)
+                                <span style="background: @if($project->project_type === 'Plumbing Work') #dbeafe @else #fee2e2 @endif; color: @if($project->project_type === 'Plumbing Work') #0369a1 @else #991b1b @endif; padding: 4px 12px; border-radius: 20px; font-size: 13px;">
+                                    {{ $project->project_type }}
+                                </span>
+                            @else
+                                <span style="color: var(--gray-500);">Not specified</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="detail-card">
                         <div class="detail-label">Budget</div>
                         <div class="detail-value">₱{{ number_format($project->allocated_amount, 2) }}</div>
                     </div>
@@ -560,7 +834,7 @@
                     <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
                     <button class="tab-button" onclick="switchTab('employees')">Employees</button>
                     <button class="tab-button" onclick="switchTab('materials')">Materials</button>
-                    <button class="tab-button" onclick="switchTab('updates')">Project Updates</button>
+                    <button class="tab-button" onclick="switchTab('updates')">Project Tasks</button>
                     <button class="tab-button" onclick="switchTab('images')">Documentation</button>
                     <button class="tab-button" onclick="switchTab('report')">Reports</button>
                 </div>
@@ -631,6 +905,56 @@
                 <div id="employees" class="tab-content">
                     <div class="report-section">
                         <div class="report-title">Project Employees</div>
+
+                        <!-- Employees Summary Cards -->
+                        <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Employees</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
+                                    {{ $project->employees->count() }}
+                                </div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #059669; opacity: 0.8;">Total Days Worked</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #059669;">
+                                    @php
+                                        $totalDaysWorked = 0;
+                                        foreach($project->employees as $emp) {
+                                            $totalDaysWorked += \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                ->whereBetween('date', [
+                                                    $emp->pivot->assigned_from ?? $project->created_at,
+                                                    $emp->pivot->assigned_to ?? now()
+                                                ])
+                                                ->where('attendance_status', 'Present')
+                                                ->count();
+                                        }
+                                        echo $totalDaysWorked;
+                                    @endphp
+                                </div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #be185d; opacity: 0.8;">Total Labor Cost</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #be185d;">
+                                    ₱@php
+                                        $totalLaborCost = 0;
+                                        foreach($project->employees as $emp) {
+                                            $empDays = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                ->whereBetween('date', [
+                                                    $emp->pivot->assigned_from ?? $project->created_at,
+                                                    $emp->pivot->assigned_to ?? now()
+                                                ])
+                                                ->where('attendance_status', 'Present')
+                                                ->count();
+                                            $monthlySalary = $emp->pivot->salary ?? 0;
+                                            $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0;
+                                            $totalLaborCost += $empDays * $dailyRate;
+                                        }
+                                        echo number_format($totalLaborCost, 2);
+                                    @endphp
+                                </div>
+                            </div>
+                        </div>
+
                         <div style="display: flex; gap: 12px; margin-bottom: 20px;">
                             <button class="btn btn-primary" onclick="openEmployeeModal()">
                                 <i class="fas fa-plus"></i> Add Employee
@@ -694,54 +1018,6 @@
                                 </table>
                             </div>
 
-                            <!-- Employees Summary -->
-                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Employees</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
-                                        {{ $project->employees->count() }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #059669; opacity: 0.8;">Total Days Worked</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #059669;">
-                                        @php
-                                            $totalDaysWorked = 0;
-                                            foreach($project->employees as $emp) {
-                                                $totalDaysWorked += \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
-                                                    ->whereBetween('date', [
-                                                        $emp->pivot->assigned_from ?? $project->created_at,
-                                                        $emp->pivot->assigned_to ?? now()
-                                                    ])
-                                                    ->where('attendance_status', 'Present')
-                                                    ->count();
-                                            }
-                                            echo $totalDaysWorked;
-                                        @endphp
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #be185d; opacity: 0.8;">Total Labor Cost</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #be185d;">
-                                        ₱@php
-                                            $totalLaborCost = 0;
-                                            foreach($project->employees as $emp) {
-                                                $empDays = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
-                                                    ->whereBetween('date', [
-                                                        $emp->pivot->assigned_from ?? $project->created_at,
-                                                        $emp->pivot->assigned_to ?? now()
-                                                    ])
-                                                    ->where('attendance_status', 'Present')
-                                                    ->count();
-                                                $monthlySalary = $emp->pivot->salary ?? 0;
-                                                $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0;
-                                                $totalLaborCost += $empDays * $dailyRate;
-                                            }
-                                            echo number_format($totalLaborCost, 2);
-                                        @endphp
-                                    </div>
-                                </div>
-                            </div>
                         @else
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
                                 <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
@@ -871,11 +1147,11 @@
                 <!-- Updates Tab -->
                 <div id="updates" class="tab-content">
                     <div class="report-section">
-                        <div class="report-title">Add Project Update</div>
+                        <div class="report-title">Add Project Task</div>
                         <form method="POST" action="{{ route('projects.updates.store', $project->id) }}" style="margin-bottom: 30px;">
                             @csrf
                             <div class="form-group">
-                                <label class="form-label">Update Title</label>
+                                <label class="form-label">Task Title</label>
                                 <input type="text" name="title" class="form-input" placeholder="Enter update title" required>
                             </div>
                             <div class="form-group">
@@ -884,40 +1160,46 @@
                                 <small style="color: var(--gray-600); display: block; margin-top: 6px;">Max 5000 characters</small>
                             </div>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Update
+                                <i class="fas fa-plus"></i> Add Task
                             </button>
                         </form>
 
-                        <div class="report-title">Recent Updates</div>
-                        <div class="updates-list">
+                        <div class="report-title">Project Tasks</div>
+                        <div class="updates-timeline">
                             @forelse($project->updates as $update)
-                                <div class="update-item">
-                                    <div class="update-date">{{ $update->created_at->format('M d, Y H:i') }}</div>
-                                    <div class="update-title">{{ $update->title }}</div>
-                                    <div class="update-description">{{ $update->description }}</div>
-                                    <div class="update-footer">
-                                        <div>
-                                            <strong>Status:</strong>
-                                            <span style="padding: 4px 10px; border-radius: 6px; margin-left: 6px; font-weight: 600;
-                                                @if($update->status === 'Completed') background-color: #dcfce7; color: #166534;
-                                                @else background-color: #bfdbfe; color: #1e40af;
+                                <div class="timeline-item">
+                                    <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #16a34a @else #3b82f6 @endif;"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-header">
+                                            <h4 class="timeline-title">{{ $update->title }}</h4>
+                                            <span class="timeline-status" style="background-color: @if($update->status === 'Completed') #dcfce7; color: #166534; @else #bfdbfe; color: #1e40af; @endif">
+                                                @if($update->status === 'Completed')
+                                                    <i class="fas fa-check-circle"></i> Complete
+                                                @else
+                                                    <i class="fas fa-hourglass-half"></i> Ongoing
                                                 @endif
-                                            ">{{ $update->status === 'Completed' ? 'Complete' : 'Ongoing' }}</span>
+                                            </span>
                                         </div>
-                                        <div>
-                                            <strong>By:</strong> {{ $update->updatedBy?->name ?? 'Unknown' }}
+                                        <p class="timeline-description">{{ $update->description }}</p>
+                                        <div class="timeline-meta">
+                                            <span class="timeline-date"><i class="fas fa-calendar"></i> {{ $update->created_at->format('M d, Y') }} at {{ $update->created_at->format('H:i') }}</span>
+                                            <span class="timeline-author"><i class="fas fa-user"></i> {{ $update->updatedBy?->name ?? 'Unknown' }}</span>
                                         </div>
                                     </div>
                                 </div>
                             @empty
-                                <div class="update-item">
-                                    <div class="update-date">{{ $project->created_at->format('M d, Y H:i') }}</div>
-                                    <div class="update-title">Project Created</div>
-                                    <div class="update-description">Project has been successfully created and is ready for work.</div>
-                                    <div class="update-footer">
-                                        <div>
-                                            <strong>Status:</strong>
-                                            <span style="padding: 4px 10px; border-radius: 6px; margin-left: 6px; font-weight: 600; background-color: #f3f4f6; color: #1f2937;">Created</span>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker" style="background-color: #9ca3af;"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-header">
+                                            <h4 class="timeline-title">Project Created</h4>
+                                            <span class="timeline-status" style="background-color: #f3f4f6; color: #1f2937;">
+                                                <i class="fas fa-calendar-plus"></i> Created
+                                            </span>
+                                        </div>
+                                        <p class="timeline-description">Project has been successfully created and is ready for work.</p>
+                                        <div class="timeline-meta">
+                                            <span class="timeline-date"><i class="fas fa-calendar"></i> {{ $project->created_at->format('M d, Y') }} at {{ $project->created_at->format('H:i') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1053,6 +1335,9 @@
                             <a href="{{ route('pdf.project.download', $project->id) }}" class="btn btn-primary">
                                 <i class="fas fa-file-pdf"></i> Download PDF Report
                             </a>
+                            <a href="{{ route('pdf.boq.download', $project->id) }}" class="btn btn-primary">
+                                <i class="fas fa-list"></i> Download BOQ
+                            </a>
                             <a href="{{ route('csv.project.download', $project->id) }}" class="btn btn-secondary">
                                 <i class="fas fa-file-csv"></i> Download CSV Report
                             </a>
@@ -1061,6 +1346,126 @@
                 </div>
             </section>
         </main>
+
+        <!-- Material Modal -->
+        <div id="materialModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="materialTitle">Add Material</h2>
+                    <button class="modal-close" onclick="closeMaterialModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="materialForm" method="POST" action="{{ route('projects.materials.store', $project->id) }}">
+                    @csrf
+                    <input type="hidden" id="materialIdField" name="material_id" value="">
+                    
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Item Description</label>
+                            <input type="text" id="itemDescription" name="item_description" placeholder="Enter item description" required 
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Quantity</label>
+                                <input type="number" id="materialQuantity" name="quantity" placeholder="0" required 
+                                    style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unit</label>
+                                <select id="materialUnit" name="unit" 
+                                    style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                                    <option value="">-- Select Unit --</option>
+                                    <option value="pcs">Pieces (pcs)</option>
+                                    <option value="set">Set</option>
+                                    <option value="box">Box</option>
+                                    <option value="pack">Pack</option>
+                                    <option value="meter">Meter (m)</option>
+                                    <option value="square_meter">Square Meter (m²)</option>
+                                    <option value="cubic_meter">Cubic Meter (m³)</option>
+                                    <option value="kg">Kilogram (kg)</option>
+                                    <option value="liter">Liter (L)</option>
+                                    <option value="gallon">Gallon (gal)</option>
+                                    <option value="roll">Roll</option>
+                                    <option value="sheet">Sheet</option>
+                                    <option value="bag">Bag</option>
+                                    <option value="bundle">Bundle</option>
+                                    <option value="dozen">Dozen</option>
+                                    <option value="unit">Unit</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unit Rate (₱)</label>
+                            <input type="number" id="materialUnitRate" name="unit_rate" placeholder="0.00" step="0.01" required 
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Status</label>
+                            <select id="materialStatus" name="status" 
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Remarks</label>
+                            <textarea id="materialRemarks" name="remarks" placeholder="Add any remarks" rows="3"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeMaterialModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Save Material</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Employee Assignment Modal -->
+        <div id="employeeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Manage Employees - {{ $project->project_name }}</h2>
+                    <button class="modal-close" onclick="closeEmployeeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div id="modalWarning" class="info-banner" style="display: none; margin-bottom: 20px;">
+                    <div class="info-banner-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="info-banner-content">
+                        <h4 style="margin: 0;">Project Completed</h4>
+                        <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
+                    </div>
+                </div>
+
+                <p style="color: #6b7280; margin-bottom: 16px;">
+                    Select employees to assign to this project. Only employees not assigned to other active projects are available.
+                </p>
+
+                <div class="employee-list" id="employeeList">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
+                    <button class="btn btn-green" onclick="saveEmployeeAssignments()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1305,20 +1710,230 @@
             });
         }
 
-        // Modal functions for employees and materials
+        // Employee Management Variables
+        let currentProjectId = {{ $project->id }};
+        let currentProjectStatus = '{{ $project->status }}';
+        let allEmployees = {!! json_encode($allEmployees ?? []) !!};
+        let projectEmployees = {!! json_encode($projectEmployees ?? []) !!};
+
         function openEmployeeModal() {
-            // This would open a modal to add employee
-            alert('Employee management feature - will be implemented');
+            const modal = document.getElementById('employeeModal');
+            if (!modal) {
+                console.error('Employee modal not found');
+                return;
+            }
+
+            // Show warning if project is completed
+            if (currentProjectStatus.toLowerCase() === 'completed') {
+                document.getElementById('modalWarning').style.display = 'flex';
+            } else {
+                document.getElementById('modalWarning').style.display = 'none';
+            }
+
+            loadEmployeesForModal(currentProjectId);
+            modal.classList.add('active');
+        }
+
+        function closeEmployeeModal() {
+            const modal = document.getElementById('employeeModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function loadEmployeesForModal(projectId) {
+            const employeeList = document.getElementById('employeeList');
+            const assignedEmployeeIds = projectEmployees[projectId] || [];
+
+            employeeList.innerHTML = '';
+
+            allEmployees.forEach(employee => {
+                const isAssigned = assignedEmployeeIds.includes(employee.id);
+                const isAssignedToOtherProject = employee.assigned_to_other_project && !isAssigned;
+
+                const employeeItem = document.createElement('div');
+                employeeItem.className = 'employee-item';
+                employeeItem.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <input 
+                            type="checkbox" 
+                            value="${employee.id}"
+                            ${isAssigned ? 'checked' : ''}
+                            ${isAssignedToOtherProject ? 'disabled' : ''}
+                            class="employee-checkbox"
+                        >
+                        <div class="employee-info">
+                            <div class="employee-name">${employee.f_name} ${employee.l_name}</div>
+                            <div class="employee-code">EMP${String(employee.id).padStart(3, '0')}</div>
+                            <div class="employee-position">${employee.position || 'No Position'}</div>
+                            ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600;">Assigned to other active project</div>' : ''}
+                        </div>
+                    </div>
+                `;
+                employeeList.appendChild(employeeItem);
+            });
+        }
+
+        function saveEmployeeAssignments() {
+            const checkboxes = document.querySelectorAll('.employee-checkbox:not(:disabled)');
+            const selectedEmployeeIds = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => parseInt(cb.value));
+
+            if (selectedEmployeeIds.length === 0) {
+                alert('Please select at least one employee to assign.');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            if (!csrfToken) {
+                alert('CSRF token not found. Please refresh the page and try again.');
+                console.error('CSRF token missing');
+                return;
+            }
+
+            fetch(`/api/projects/${currentProjectId}/employees`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    employee_ids: selectedEmployeeIds
+                })
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        console.error('Non-JSON response received:', text);
+                        throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                    });
+                }
+                
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Employees assigned successfully!');
+                    closeEmployeeModal();
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to assign employees'));
+                }
+            })
+            .catch(error => {
+                console.error('Full error:', error);
+                alert('An error occurred: ' + error.message);
+            });
         }
 
         function openMaterialModal() {
-            // This would open a modal to add material
-            alert('Material management feature - will be implemented');
+            const modal = document.getElementById('materialModal');
+            const form = document.getElementById('materialForm');
+            document.getElementById('materialTitle').textContent = 'Add Material';
+            
+            // Reset form
+            if (form) form.reset();
+            
+            // Clear hidden ID field
+            const materialIdField = document.getElementById('materialIdField');
+            if (materialIdField) materialIdField.value = '';
+            
+            // Update form action
+            form.action = `/projects/{{ $project->id }}/materials`;
+            form.method = 'POST';
+            
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeMaterialModal() {
+            const modal = document.getElementById('materialModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
 
         function editMaterial(materialId) {
-            // This would open a modal to edit material
-            alert('Edit material feature - Material ID: ' + materialId);
+            const modal = document.getElementById('materialModal');
+            const form = document.getElementById('materialForm');
+            document.getElementById('materialTitle').textContent = 'Edit Material';
+            
+            // Fetch material data
+            fetch(`/projects/{{ $project->id }}/materials/${materialId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('itemDescription').value = data.item_description || '';
+                    document.getElementById('materialQuantity').value = data.quantity || '';
+                    document.getElementById('materialUnit').value = data.unit || '';
+                    document.getElementById('materialUnitRate').value = data.unit_rate || '';
+                    document.getElementById('materialStatus').value = data.status || 'pending';
+                    document.getElementById('materialRemarks').value = data.remarks || '';
+                    document.getElementById('materialIdField').value = materialId;
+                    
+                    // Update form action and method
+                    form.action = `/projects/{{ $project->id }}/materials/${materialId}`;
+                    form.method = 'POST';
+                    
+                    // Add hidden method field for PUT
+                    let methodField = form.querySelector('input[name="_method"]');
+                    if (!methodField) {
+                        methodField = document.createElement('input');
+                        methodField.type = 'hidden';
+                        methodField.name = '_method';
+                        form.appendChild(methodField);
+                    }
+                    methodField.value = 'PUT';
+                    
+                    if (modal) {
+                        modal.style.display = 'flex';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching material:', error);
+                    alert('Error loading material data');
+                });
+        }
+
+        function saveMaterial() {
+            const form = document.getElementById('materialForm');
+            form.submit();
+        }
+
+        function filterMaterials(status) {
+            const rows = document.querySelectorAll('.material-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === status) {
+                    btn.classList.add('active');
+                    btn.style.background = 'var(--accent)';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = 'var(--accent)';
+                } else {
+                    btn.style.background = 'white';
+                    btn.style.color = 'inherit';
+                    btn.style.borderColor = 'var(--gray-400)';
+                }
+            });
+            
+            rows.forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
     </script>
 </body>

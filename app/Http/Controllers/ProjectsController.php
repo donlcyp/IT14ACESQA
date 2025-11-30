@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Material;
+use App\Models\Employee;
+use App\Models\EmployeeAttendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,14 +30,39 @@ class ProjectsController extends Controller
                 ];
             });
 
-        return view('projects', compact('projects', 'clients', 'projectManagers'));
+        // Get all employees with their current project assignments
+        $allEmployees = Employee::all()->map(function ($employee) {
+            $assignedProject = $employee->projects()->first();
+            $employee->assigned_to_other_project = $assignedProject && $assignedProject->status !== 'Completed';
+            
+            return $employee;
+        })->toArray();
+        
+        // Build project-employees mapping
+        $projectEmployees = [];
+        foreach ($projects as $project) {
+            $projectEmployees[$project->id] = $project->employees->pluck('id')->toArray();
+        }
+
+        return view('projects', compact('projects', 'clients', 'projectManagers', 'allEmployees', 'projectEmployees'));
     }
 
     public function show(Project $project)
     {
         $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials']);
 
-        return view('projects-view', compact('project'));
+        // Get all employees with their current project assignments
+        $allEmployees = Employee::all()->map(function ($employee) {
+            $assignedProject = $employee->projects()->first();
+            $employee->assigned_to_other_project = $assignedProject && $assignedProject->status !== 'Completed';
+            
+            return $employee;
+        });
+        
+        // Build project-employees mapping
+        $projectEmployees = [$project->id => $project->employees->pluck('id')->toArray()];
+
+        return view('projects-view', compact('project', 'allEmployees', 'projectEmployees'));
     }
 
     /**
@@ -440,6 +467,18 @@ class ProjectsController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('projects.show', $project->id)->with('error', 'Failed to delete material: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get a single material for editing
+     */
+    public function getMaterial(Project $project, Material $material)
+    {
+        if ($material->project_id !== $project->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        return response()->json($material);
     }
 
     /**

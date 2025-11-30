@@ -125,4 +125,22 @@ class PDFController extends Controller
         $filename = 'attendance_report_' . now()->format('Y-m-d_His') . '.pdf';
         return $pdf->download($filename);
     }
+
+    /**
+     * Generate and download BOQ (Bill of Quantity) PDF
+     */
+    public function downloadBOQ($projectId)
+    {
+        $project = Project::with(['materials', 'client', 'assignedPM'])->findOrFail($projectId);
+
+        $pdf = Pdf::loadView('pdfs.boq-report', ['project' => $project])
+            ->setPaper('a4', 'portrait')
+            ->setOption('margin-top', 5)
+            ->setOption('margin-right', 5)
+            ->setOption('margin-bottom', 5)
+            ->setOption('margin-left', 5);
+
+        $filename = 'BOQ_' . preg_replace('/[^A-Za-z0-9_-]+/', '_', $project->project_name) . '_' . now()->format('Ymd_His') . '.pdf';
+        return $pdf->download($filename);
+    }
 }

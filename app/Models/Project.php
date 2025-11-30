@@ -18,6 +18,7 @@ class Project extends Model
         'description',
         'location',
         'industry',
+        'project_type',
         'date_started',
         'date_ended',
         'target_timeline',
