@@ -692,10 +692,8 @@
                         <thead>
                             <tr>
                                 <th>Project Name</th>
-                                <th>Client Prefix</th>
                                 <th>Client First Name</th>
                                 <th>Client Last Name</th>
-                                <th>Client Suffix</th>
                                 <th>Status</th>
                                 <th>Assigned Project Manager</th>
                                 <th>Created</th>
@@ -726,10 +724,8 @@
                                             {{ $project->project_name }}
                                         </a>
                                     </td>
-                                    <td>{{ $project->client_prefix ?: '—' }}</td>
                                     <td>{{ $project->client_first_name ?: '—' }}</td>
                                     <td>{{ $project->client_last_name ?: '—' }}</td>
-                                    <td>{{ $project->client_suffix ?: '—' }}</td>
                                     <td>
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>
@@ -890,21 +886,6 @@
                                 </div>
 
                                 <div class="projects-form-group">
-                                    <label class="projects-form-label" for="clientPrefix">Client Prefix</label>
-                                    <input
-                                        type="text"
-                                        class="projects-form-input"
-                                        id="clientPrefix"
-                                        name="client_prefix"
-                                        placeholder="Enter client prefix (optional)"
-                                        value="{{ old('client_prefix') }}"
-                                    />
-                                    @error('client_prefix')
-                                        <p class="projects-form-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="projects-form-group">
                                     <label class="projects-form-label" for="clientFirstName">Client First Name</label>
                                     <input
                                         type="text"
@@ -932,21 +913,6 @@
                                         required
                                     />
                                     @error('client_last_name')
-                                        <p class="projects-form-error">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label" for="clientSuffix">Client Suffix</label>
-                                    <input
-                                        type="text"
-                                        class="projects-form-input"
-                                        id="clientSuffix"
-                                        name="client_suffix"
-                                        placeholder="Enter client suffix (optional)"
-                                        value="{{ old('client_suffix') }}"
-                                    />
-                                    @error('client_suffix')
                                         <p class="projects-form-error">{{ $message }}</p>
                                     @enderror
                                 </div>

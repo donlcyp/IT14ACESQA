@@ -29,8 +29,10 @@ class Material extends Model
         'batch',
         'quantity',
         'unit',
+        'unit_rate',
         'price',
         'total',
+        'item_description',
         'archived',
     ];
 

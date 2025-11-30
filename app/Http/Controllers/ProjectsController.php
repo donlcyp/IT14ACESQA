@@ -33,7 +33,7 @@ class ProjectsController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees']);
+        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials']);
 
         return view('projects-view', compact('project'));
     }
@@ -169,28 +169,22 @@ class ProjectsController extends Controller
             'industry'         => ['nullable', 'string', 'max:255'],
             'target_timeline'  => ['nullable', 'date'],
             'allocated_amount' => ['nullable', 'numeric', 'min:0'],
-            'client_prefix'    => ['nullable', 'string', 'max:50'],
             'client_first_name' => ['required', 'string', 'max:255'],
             'client_last_name' => ['required', 'string', 'max:255'],
-            'client_suffix'    => ['nullable', 'string', 'max:50'],
             'assigned_pm_id'   => ['nullable', 'exists:users,id'],
         ]);
 
         // Create or get client
         $clientName = trim(
-            ($validated['client_prefix'] ? $validated['client_prefix'] . ' ' : '') .
             $validated['client_first_name'] . ' ' .
-            $validated['client_last_name'] .
-            ($validated['client_suffix'] ? ' ' . $validated['client_suffix'] : '')
+            $validated['client_last_name']
         );
         
         $client = \App\Models\Client::firstOrCreate(
             ['company_name' => $clientName],
             [
                 'company_name' => $clientName,
-                'prefix' => $validated['client_prefix'] ?? null,
                 'contact_person' => $validated['client_first_name'] . ' ' . $validated['client_last_name'],
-                'suffix' => $validated['client_suffix'] ?? null,
             ]
         );
 
@@ -215,10 +209,8 @@ class ProjectsController extends Controller
             'note_remarks'     => null,
             'pm_status'        => null,
             'client_id'        => $client->id,
-            'client_prefix'    => $validated['client_prefix'] ?? null,
             'client_first_name' => $validated['client_first_name'],
             'client_last_name' => $validated['client_last_name'],
-            'client_suffix'    => $validated['client_suffix'] ?? null,
             'assigned_pm_id'   => $validated['assigned_pm_id'] ?? null,
         ]);
 
@@ -369,6 +361,122 @@ class ProjectsController extends Controller
             return redirect()->route('projects.show', $project->id)->with('success', 'Project update added successfully!');
         } catch (\Exception $e) {
             return redirect()->route('projects.show', $project->id)->with('error', 'Failed to add update: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Store a material for the project
+     */
+    public function storeMaterial(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'item_description' => 'required|string|max:255',
+            'quantity' => 'required|numeric|min:0.01',
+            'unit' => 'required|string|max:50',
+            'unit_rate' => 'required|numeric|min:0',
+            'status' => 'nullable|in:pending,approved,failed',
+        ]);
+
+        try {
+            Material::create([
+                'project_id' => $project->id,
+                'item_description' => $validated['item_description'],
+                'quantity' => $validated['quantity'],
+                'unit' => $validated['unit'],
+                'unit_rate' => $validated['unit_rate'],
+                'status' => $validated['status'] ?? 'pending',
+            ]);
+
+            return redirect()->route('projects.show', $project->id)->with('success', 'Material added successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to add material: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update a material for the project
+     */
+    public function updateMaterial(Request $request, Project $project, Material $material)
+    {
+        if ($material->project_id !== $project->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        $validated = $request->validate([
+            'item_description' => 'required|string|max:255',
+            'quantity' => 'required|numeric|min:0.01',
+            'unit' => 'required|string|max:50',
+            'unit_rate' => 'required|numeric|min:0',
+            'status' => 'nullable|in:pending,approved,failed',
+        ]);
+
+        try {
+            $material->update([
+                'item_description' => $validated['item_description'],
+                'quantity' => $validated['quantity'],
+                'unit' => $validated['unit'],
+                'unit_rate' => $validated['unit_rate'],
+                'status' => $validated['status'] ?? 'pending',
+            ]);
+
+            return redirect()->route('projects.show', $project->id)->with('success', 'Material updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to update material: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete a material from the project
+     */
+    public function deleteMaterial(Project $project, Material $material)
+    {
+        if ($material->project_id !== $project->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        try {
+            $material->delete();
+            return redirect()->route('projects.show', $project->id)->with('success', 'Material deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to delete material: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Assign an employee to a project
+     */
+    public function assignEmployee(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'employee_id' => 'required|exists:employee_list,id',
+            'role_title' => 'required|string|max:255',
+            'assigned_from' => 'nullable|date',
+            'assigned_to' => 'nullable|date',
+        ]);
+
+        try {
+            $project->employees()->attach($validated['employee_id'], [
+                'role_title' => $validated['role_title'],
+                'assigned_from' => $validated['assigned_from'] ?? now(),
+                'assigned_to' => $validated['assigned_to'] ?? null,
+            ]);
+
+            return redirect()->route('projects.show', $project->id)->with('success', 'Employee assigned successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to assign employee: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove an employee from a project
+     */
+    public function removeEmployee(Project $project, $employee)
+    {
+        try {
+            $project->employees()->detach($employee);
+            return redirect()->route('projects.show', $project->id)->with('success', 'Employee removed successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to remove employee: ' . $e->getMessage());
         }
     }
 }

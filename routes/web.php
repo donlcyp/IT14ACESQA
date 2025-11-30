@@ -26,12 +26,28 @@ Route::middleware('auth')->group(function () {
         Route::post('/projects/{project}/approve', [App\Http\Controllers\ProjectsController::class, 'approve'])->name('projects.approve');
         Route::post('/projects/{project}/complete', [App\Http\Controllers\ProjectsController::class, 'complete'])->name('projects.complete');
 
+        // Project Material Management
+        Route::get('/project-material-management', [App\Http\Controllers\QualityAssuranceController::class, 'index'])->name('project-material-management');
+
+        // Transactions (Material Returns)
+        Route::get('/transactions', [App\Http\Controllers\TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('/transactions/{id}', [App\Http\Controllers\TransactionController::class, 'show'])->name('transactions.show');
+
         // Project Documents
         Route::post('/projects/{project}/documents', [App\Http\Controllers\ProjectsController::class, 'storeDocument'])->name('projects.documents.store');
         Route::delete('/projects/{project}/documents/{document}', [App\Http\Controllers\ProjectsController::class, 'deleteDocument'])->name('projects.documents.delete');
 
         // Project Updates
         Route::post('/projects/{project}/updates', [App\Http\Controllers\ProjectsController::class, 'storeUpdate'])->name('projects.updates.store');
+
+        // Project Materials
+        Route::post('/projects/{project}/materials', [App\Http\Controllers\ProjectsController::class, 'storeMaterial'])->name('projects.materials.store');
+        Route::put('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'updateMaterial'])->name('projects.materials.update');
+        Route::delete('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'deleteMaterial'])->name('projects.materials.delete');
+
+        // Project Employees
+        Route::post('/projects/{project}/employees', [App\Http\Controllers\ProjectsController::class, 'assignEmployee'])->name('projects.employees.assign');
+        Route::delete('/projects/{project}/employees/{employee}', [App\Http\Controllers\ProjectsController::class, 'removeEmployee'])->name('projects.employees.remove');
 
         // Archives
         Route::get('/archives', [App\Http\Controllers\ProjectsController::class, 'archives'])->name('archives');

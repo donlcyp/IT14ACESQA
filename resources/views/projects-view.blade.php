@@ -463,6 +463,28 @@
             gap: 20px;
             margin-bottom: 30px;
         }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--gray-400);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+        }
     </style>
 </head>
 
@@ -512,7 +534,7 @@
                     <div class="detail-card">
                         <div class="detail-label">Client</div>
                         <div class="detail-value">
-                            {{ $project->client?->company_name ?? trim($project->client_prefix . ' ' . $project->client_first_name . ' ' . $project->client_last_name) }}
+                            {{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}
                         </div>
                     </div>
                     <div class="detail-card">
@@ -536,6 +558,8 @@
                 <!-- Tabs -->
                 <div class="tabs">
                     <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+                    <button class="tab-button" onclick="switchTab('employees')">Employees</button>
+                    <button class="tab-button" onclick="switchTab('materials')">Materials</button>
                     <button class="tab-button" onclick="switchTab('updates')">Project Updates</button>
                     <button class="tab-button" onclick="switchTab('images')">Documentation</button>
                     <button class="tab-button" onclick="switchTab('report')">Reports</button>
@@ -598,6 +622,247 @@
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
                                 <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
                                 <p>No employees assigned to this project yet.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Employees Tab -->
+                <div id="employees" class="tab-content">
+                    <div class="report-section">
+                        <div class="report-title">Project Employees</div>
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                            <button class="btn btn-primary" onclick="openEmployeeModal()">
+                                <i class="fas fa-plus"></i> Add Employee
+                            </button>
+                        </div>
+
+                        @if ($project->employees && $project->employees->count() > 0)
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Employee</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Role Title</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned From</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned To</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days Worked</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Daily Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Labor Cost</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($project->employees as $employee)
+                                            @php
+                                                // Calculate days worked and labor cost based on attendance
+                                                $attendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
+                                                    ->whereBetween('date', [
+                                                        $employee->pivot->assigned_from ?? $project->created_at,
+                                                        $employee->pivot->assigned_to ?? now()
+                                                    ])
+                                                    ->where('attendance_status', 'Present')
+                                                    ->count();
+                                                
+                                                // Get daily rate from salary (assuming it's stored as monthly salary)
+                                                $monthlySalary = $employee->pivot->salary ?? 0;
+                                                $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0; // Assuming 22 working days per month
+                                                $laborCost = $attendanceRecords * $dailyRate;
+                                            @endphp
+                                            <tr style="border-bottom: 1px solid var(--gray-400);">
+                                                <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->role_title ?? '—' }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_from ? \Carbon\Carbon::parse($employee->pivot->assigned_from)->format('M d, Y') : '—' }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_to ? \Carbon\Carbon::parse($employee->pivot->assigned_to)->format('M d, Y') : '—' }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ $attendanceRecords }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($dailyRate, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($laborCost, 2) }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">
+                                                    <form method="POST" action="{{ route('projects.employees.remove', [$project->id, $employee->id]) }}" style="display: inline;" onsubmit="return confirm('Remove this employee?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" style="background: #fee2e2; color: #991b1b; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                                            <i class="fas fa-trash"></i> Remove
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Employees Summary -->
+                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Employees</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
+                                        {{ $project->employees->count() }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #059669; opacity: 0.8;">Total Days Worked</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #059669;">
+                                        @php
+                                            $totalDaysWorked = 0;
+                                            foreach($project->employees as $emp) {
+                                                $totalDaysWorked += \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                    ->whereBetween('date', [
+                                                        $emp->pivot->assigned_from ?? $project->created_at,
+                                                        $emp->pivot->assigned_to ?? now()
+                                                    ])
+                                                    ->where('attendance_status', 'Present')
+                                                    ->count();
+                                            }
+                                            echo $totalDaysWorked;
+                                        @endphp
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #be185d; opacity: 0.8;">Total Labor Cost</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #be185d;">
+                                        ₱@php
+                                            $totalLaborCost = 0;
+                                            foreach($project->employees as $emp) {
+                                                $empDays = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                    ->whereBetween('date', [
+                                                        $emp->pivot->assigned_from ?? $project->created_at,
+                                                        $emp->pivot->assigned_to ?? now()
+                                                    ])
+                                                    ->where('attendance_status', 'Present')
+                                                    ->count();
+                                                $monthlySalary = $emp->pivot->salary ?? 0;
+                                                $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0;
+                                                $totalLaborCost += $empDays * $dailyRate;
+                                            }
+                                            echo number_format($totalLaborCost, 2);
+                                        @endphp
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
+                                <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                <p>No employees assigned to this project yet.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Materials Tab -->
+                <div id="materials" class="tab-content">
+                    <div class="report-section">
+                        <div class="report-title">Project Materials</div>
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                            <button class="btn btn-primary" onclick="openMaterialModal()">
+                                <i class="fas fa-plus"></i> Add Material
+                            </button>
+                        </div>
+
+                        <!-- Material Status Filter -->
+                        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                            <button onclick="filterMaterials('all')" class="filter-btn active" data-filter="all" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                                All Materials
+                            </button>
+                            <button onclick="filterMaterials('pending')" class="filter-btn" data-filter="pending" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                                Pending
+                            </button>
+                            <button onclick="filterMaterials('approved')" class="filter-btn" data-filter="approved" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                                Approved
+                            </button>
+                            <button onclick="filterMaterials('failed')" class="filter-btn" data-filter="failed" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                                Failed
+                            </button>
+                        </div>
+
+                        @if ($project->materials && $project->materials->count() > 0)
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1);">Qty</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Unit</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Unit Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Total</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Status</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="materialsTableBody">
+                                        @foreach ($project->materials as $material)
+                                            <tr class="material-row" data-status="{{ $material->status ?? 'pending' }}" style="border-bottom: 1px solid var(--gray-400);">
+                                                <td style="padding: 12px; color: var(--black-1);">{{ $material->item_description ?? '—' }}</td>
+                                                <td style="padding: 12px; text-align: center; color: var(--gray-700);">{{ $material->quantity ?? 0 }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">{{ $material->unit ?? '—' }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($material->unit_rate ?? 0, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format(($material->quantity ?? 0) * ($material->unit_rate ?? 0), 2) }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">
+                                                    @php
+                                                        $statusColor = match($material->status ?? 'pending') {
+                                                            'approved' => '#dcfce7',
+                                                            'failed' => '#fee2e2',
+                                                            'pending' => '#fef3c7',
+                                                            default => '#f3f4f6'
+                                                        };
+                                                        $statusTextColor = match($material->status ?? 'pending') {
+                                                            'approved' => '#166534',
+                                                            'failed' => '#991b1b',
+                                                            'pending' => '#92400e',
+                                                            default => '#374151'
+                                                        };
+                                                    @endphp
+                                                    <span style="padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: {{ $statusColor }}; color: {{ $statusTextColor }};">
+                                                        {{ ucfirst($material->status ?? 'Pending') }}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 12px; color: var(--gray-700);">
+                                                    <div style="display: flex; gap: 6px;">
+                                                        <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 12px; font-size: 12px;" onclick="editMaterial({{ $material->id }})">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </button>
+                                                        <form method="POST" action="{{ route('projects.materials.delete', [$project->id, $material->id]) }}" style="display: inline;" onsubmit="return confirm('Delete this material?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 12px; font-size: 12px;">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Materials Summary -->
+                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #166534; opacity: 0.8;">Approved Materials</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #166534;">
+                                        ₱{{ number_format($project->materials->where('status', 'approved')->sum(fn($m) => $m->quantity * $m->unit_rate), 2) }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #fef3c7, #fde047); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #92400e; opacity: 0.8;">Pending Materials</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #92400e;">
+                                        ₱{{ number_format($project->materials->where('status', 'pending')->sum(fn($m) => $m->quantity * $m->unit_rate), 2) }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #991b1b; opacity: 0.8;">Failed Materials</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #991b1b;">
+                                        ₱{{ number_format($project->materials->where('status', 'failed')->sum(fn($m) => $m->quantity * $m->unit_rate), 2) }}
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
+                                <i class="fas fa-box" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                <p>No materials added to this project yet.</p>
                             </div>
                         @endif
                     </div>
@@ -1009,6 +1274,51 @@
 
                 attachmentPreview.appendChild(fileList);
             }
+        }
+
+        // Filter materials by status
+        function filterMaterials(status) {
+            const rows = document.querySelectorAll('.material-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-filter="${status}"]`).classList.add('active');
+            document.querySelector(`[data-filter="${status}"]`).style.background = 'var(--accent)';
+            document.querySelector(`[data-filter="${status}"]`).style.color = 'white';
+
+            // Filter rows
+            rows.forEach(row => {
+                if (status === 'all' || row.getAttribute('data-status') === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Reset other buttons
+            buttons.forEach(btn => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'white';
+                    btn.style.color = '#1f2937';
+                }
+            });
+        }
+
+        // Modal functions for employees and materials
+        function openEmployeeModal() {
+            // This would open a modal to add employee
+            alert('Employee management feature - will be implemented');
+        }
+
+        function openMaterialModal() {
+            // This would open a modal to add material
+            alert('Material management feature - will be implemented');
+        }
+
+        function editMaterial(materialId) {
+            // This would open a modal to edit material
+            alert('Edit material feature - Material ID: ' + materialId);
         }
     </script>
 </body>
