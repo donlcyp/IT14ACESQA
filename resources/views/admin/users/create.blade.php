@@ -59,7 +59,7 @@
             <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $r }}</option>
           @endforeach
         </select>
-        <div class="help">OWNER has full access. PM manages projects. QA handles material checks. FM manages finance.</div>
+        <div class="help">OWNER has full access. PM manages projects. USER is for general staff.</div>
         @error('role') <div class="error">{{ $message }}</div> @enderror
       </div>
 

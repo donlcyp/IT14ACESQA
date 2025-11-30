@@ -44,17 +44,10 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Materials that have failed status (need to be returned)
-        $projectsToReturn = Material::where('status', 'Fail')
-            ->orderByDesc('created_at')
-            ->take(5)
-            ->get();
-
         return view('dashboard', compact(
             'summary',
             'activeProjects',
-            'recentProjectRecords',
-            'projectsToReturn'
+            'recentProjectRecords'
         ));
     }
 }

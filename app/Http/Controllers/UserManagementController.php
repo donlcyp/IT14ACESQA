@@ -55,6 +55,6 @@ class UserManagementController extends Controller
     private function roles(): array
     {
         // Allowed roles in the system
-        return ['OWNER', 'PM', 'QA', 'FM'];
+        return ['OWNER', 'PM', 'USER'];
     }
 }

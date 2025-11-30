@@ -240,11 +240,8 @@ class ProjectsController extends Controller
         ]);
 
         return redirect()
-            ->route('project-material-management', [
-                'project_id' => $project->id,
-                'open_modal' => 1,
-            ])
-            ->with('success', 'Project added successfully! Project record created in material management.');
+            ->route('projects')
+            ->with('success', 'Project added successfully!');
     }
 
     private function generateProjectCode(): string
