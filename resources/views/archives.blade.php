@@ -311,7 +311,24 @@
         .muted { color: #6b7280; font-size: 14px; }
         .report-table { width: 100%; border-collapse: collapse; }
         .report-table th, .report-table td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 14px; }
-        .toggle-btn { background: white; border: 1px solid #e5e7eb; color: #111827; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .toggle-btn { 
+            background: white; 
+            border: 1px solid #e5e7eb; 
+            color: #111827; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        .toggle-btn:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
 
         /* Tables */
         .audit-table {
@@ -578,23 +595,25 @@
                                     </td>
                                     <td>{{ $project->archived_at ? \Carbon\Carbon::parse($project->archived_at)->format('M d, Y') : '—' }}</td>
                                     <td>
-                                        <form action="{{ route('projects.unarchive', $project) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="audit-button primary" style="padding: 6px 12px; font-size: 12px;">
-                                                <i class="fas fa-undo"></i>
-                                                Restore
+                                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                            <form action="{{ route('projects.unarchive', $project) }}" method="POST" style="display:inline; margin:0;">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="audit-button primary" style="padding: 6px 12px; font-size: 12px; margin:0;">
+                                                    <i class="fas fa-undo"></i>
+                                                    Restore
+                                                </button>
+                                            </form>
+                                            <button class="toggle-btn" onclick="toggleReport('report-{{ $project->id }}')" style="margin:0;">
+                                                <i class="fas fa-file-alt"></i> Report
                                             </button>
-                                        </form>
-                                        <button class="toggle-btn" onclick="toggleReport('report-{{ $project->id }}')" style="margin-left:8px;">
-                                            <i class="fas fa-file-alt"></i> Report
-                                        </button>
-                                        <a href="{{ route('pdf.project.download', $project->id) }}" class="toggle-btn" style="margin-left:8px; text-decoration:none; display:inline-block;">
-                                            <i class="fas fa-file-pdf"></i> PDF
-                                        </a>
-                                        <a href="{{ route('csv.project.download', $project->id) }}" class="toggle-btn" style="margin-left:8px; text-decoration:none; display:inline-block;">
-                                            <i class="fas fa-file-csv"></i> CSV
-                                        </a>
+                                            <a href="{{ route('pdf.project.download', $project->id) }}" class="toggle-btn" style="text-decoration:none; display:inline-flex; align-items:center; margin:0;">
+                                                <i class="fas fa-file-pdf"></i> PDF
+                                            </a>
+                                            <a href="{{ route('csv.project.download', $project->id) }}" class="toggle-btn" style="text-decoration:none; display:inline-flex; align-items:center; margin:0;">
+                                                <i class="fas fa-file-csv"></i> CSV
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr id="report-{{ $project->id }}" style="display:none;">

@@ -941,6 +941,7 @@
                         <select id="position" name="position">
                             <option value="" {{ old('position') === null ? 'selected' : '' }}>Select position</option>
                             <option value="Project Manager" {{ old('position') === 'Project Manager' ? 'selected' : '' }}>Project Manager</option>
+                            <option value="Site Supervisor" {{ old('position') === 'Site Supervisor' ? 'selected' : '' }}>Site Supervisor</option>
                             <option value="Finance Manager" {{ old('position') === 'Finance Manager' ? 'selected' : '' }}>Finance Manager</option>
                             <option value="HR/Timekeeper" {{ old('position') === 'HR/Timekeeper' ? 'selected' : '' }}>HR/Timekeeper</option>
                             <option value="Quality Assurance Officer" {{ old('position') === 'Quality Assurance Officer' ? 'selected' : '' }}>Quality Assurance Officer</option>
@@ -953,11 +954,7 @@
                     </div>
                     <div class="form-field">
                         <label for="phone">Phone</label>
-                        <input type="text" id="phone" name="phone" value="{{ old('phone') }}">
-                    </div>
-                    <div class="form-field">
-                        <label for="document">Document/Photo (JPG, PNG, or PDF, max 5MB)</label>
-                        <input type="file" id="document" name="document" accept=".jpg,.jpeg,.png,.pdf">
+                        <input type="text" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+63-000-000-0000">
                     </div>
                 </div>
                 <div class="form-actions" style="margin-top: 24px;">
@@ -976,6 +973,48 @@
             const cancelBtn = document.getElementById('cancelEmployeeModal');
             const modal = document.getElementById('employeeModal');
             const form = document.getElementById('employeeForm');
+            const phoneInput = document.getElementById('phone');
+
+            // Format phone number in real-time
+            function formatPhoneNumber(value) {
+                // Remove all non-numeric characters except +
+                let cleaned = value.replace(/[^\d+]/g, '');
+                
+                // Remove leading + if present
+                cleaned = cleaned.replace(/^\+/, '');
+                
+                // If starts with 0, replace with 63
+                if (cleaned.startsWith('0')) {
+                    cleaned = '63' + cleaned.substring(1);
+                }
+                
+                // Remove all non-digits
+                cleaned = cleaned.replace(/\D/g, '');
+                
+                // If it's 10 digits, prepend 63
+                if (cleaned.length === 10) {
+                    cleaned = '63' + cleaned;
+                }
+                
+                // Format as +63-XXX-XXX-XXXX
+                if (cleaned.length === 12) {
+                    return '+' + cleaned.substring(0, 2) + '-' + cleaned.substring(2, 5) + '-' + cleaned.substring(5, 8) + '-' + cleaned.substring(8, 12);
+                }
+                
+                return value;
+            }
+
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function (e) {
+                    const formatted = formatPhoneNumber(e.target.value);
+                    e.target.value = formatted;
+                });
+
+                phoneInput.addEventListener('blur', function (e) {
+                    const formatted = formatPhoneNumber(e.target.value);
+                    e.target.value = formatted;
+                });
+            }
 
             function openModal() {
                 if (!modal) return;

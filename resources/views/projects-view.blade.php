@@ -832,9 +832,8 @@
                 <!-- Tabs -->
                 <div class="tabs">
                     <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+                    <button class="tab-button" onclick="switchTab('boq')">Bill of Quantity</button>
                     <button class="tab-button" onclick="switchTab('employees')">Employees</button>
-                    <button class="tab-button" onclick="switchTab('materials')">Materials</button>
-                    <button class="tab-button" onclick="switchTab('updates')">Project Tasks</button>
                     <button class="tab-button" onclick="switchTab('images')">Documentation</button>
                     <button class="tab-button" onclick="switchTab('report')">Reports</button>
                 </div>
@@ -874,9 +873,6 @@
                                         <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Employee</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Role Title</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned From</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned To</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -884,9 +880,6 @@
                                             <tr style="border-bottom: 1px solid var(--gray-400);">
                                                 <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->role_title ?? '—' }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_from ? \Carbon\Carbon::parse($employee->pivot->assigned_from)->format('M d, Y') : '—' }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_to ? \Carbon\Carbon::parse($employee->pivot->assigned_to)->format('M d, Y') : '—' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -896,6 +889,160 @@
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
                                 <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
                                 <p>No employees assigned to this project yet.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Bill of Quantity Tab -->
+                <div id="boq" class="tab-content">
+                    <div class="report-section">
+                        <div class="report-title">Bill of Quantity</div>
+                        
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                            <button type="button" class="btn btn-primary" onclick="return openBOQModal();">
+                                <i class="fas fa-plus"></i> Add BOQ Item
+                            </button>
+                            <a href="{{ route('pdf.boq.download', $project->id) }}" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-file-pdf"></i> Download BOQ PDF
+                            </a>
+                        </div>
+
+                        @if ($project->materials && $project->materials->count() > 0)
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 60px;">Item No.</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Qty</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Unit</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 120px;">Material</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 120px;">Labor</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 100px;">Unit Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 120px;">Total</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1); width: 100px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="boqTableBody">
+                                        @php
+                                            $totalMaterial = 0;
+                                            $totalLabor = 0;
+                                            $grandTotal = 0;
+                                        @endphp
+                                        @foreach ($project->materials as $material)
+                                            @php
+                                                $materialCost = $material->material_cost ?? ($material->unit_rate ?? 0);
+                                                $laborCost = $material->labor_cost ?? 0;
+                                                $unitTotal = $materialCost + $laborCost;
+                                                $itemTotal = $unitTotal * ($material->quantity ?? 0);
+                                                $totalMaterial += $materialCost * ($material->quantity ?? 0);
+                                                $totalLabor += $laborCost * ($material->quantity ?? 0);
+                                                $grandTotal += $itemTotal;
+                                            @endphp
+                                            <tr class="boq-row" style="border-bottom: 1px solid var(--gray-400);">
+                                                <td style="padding: 12px; text-align: center; color: var(--black-1); font-weight: 600;">{{ $material->item_no ?? '—' }}</td>
+                                                <td style="padding: 12px; color: var(--black-1);">
+                                                    <div style="font-weight: 500;">{{ $material->item_description ?? $material->material_name ?? '—' }}</div>
+                                                    @if($material->category)
+                                                        <div style="font-size: 12px; color: var(--gray-600);">{{ $material->category }}</div>
+                                                    @endif
+                                                    @if($material->notes)
+                                                        <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">{{ $material->notes }}</div>
+                                                    @endif
+                                                </td>
+                                                <td style="padding: 12px; text-align: center; color: var(--gray-700); font-weight: 600;">{{ $material->quantity ?? 0 }}</td>
+                                                <td style="padding: 12px; text-align: center; color: var(--gray-700);">{{ $material->unit ?? '—' }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($materialCost, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($laborCost, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($unitTotal, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--black-1); font-weight: 700; background: #e8f5e9; border-radius: 4px;">₱{{ number_format($itemTotal, 2) }}</td>
+                                                <td style="padding: 12px; color: var(--gray-700);">
+                                                    <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+                                                        <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="editBOQItem({{ $material->id }})">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn" style="background: #e0e7ff; color: #4f46e5; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="viewBOQTasks('{{ $material->item_description }}', {{ $material->id }})">>
+                                                            <i class="fas fa-tasks"></i>
+                                                        </button>
+                                                        <form method="POST" action="{{ route('projects.materials.delete', [$project->id, $material->id]) }}" style="display: inline;" onsubmit="return confirmDeleteBOQ();">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="border-top: 2px solid var(--accent); background: var(--sidebar-bg); font-weight: 700; font-size: 16px;">
+                                            <td colspan="4" style="padding: 15px 12px; text-align: right;">SUBTOTAL:</td>
+                                            <td style="padding: 15px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalMaterial, 2) }}</td>
+                                            <td style="padding: 15px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalLabor, 2) }}</td>
+                                            <td colspan="1" style="padding: 15px 12px; text-align: right; color: #059669;"></td>
+                                            <td style="padding: 15px 12px; text-align: right; background: #c8e6c9; color: #1b5e20;">₱{{ number_format($grandTotal, 2) }}</td>
+                                            <td></td>
+                                        </tr>
+                                        @php
+                                            $vat = $grandTotal * 0.12;
+                                            $grandTotalWithVAT = $grandTotal + $vat;
+                                        @endphp
+                                        <tr style="background: #fff3cd; font-weight: 700; font-size: 14px; border-top: 1px solid #ffc107;">
+                                            <td colspan="4" style="padding: 12px 12px; text-align: right;">VAT 12%:</td>
+                                            <td colspan="3" style="padding: 12px 12px; text-align: right; color: #856404;"></td>
+                                            <td style="padding: 12px 12px; text-align: right; background: #fff3cd; color: #856404;">₱{{ number_format($vat, 2) }}</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr style="background: #d4edda; font-weight: 700; font-size: 18px; border-top: 2px solid #28a745;">
+                                            <td colspan="4" style="padding: 15px 12px; text-align: right;">Grand Total w/ VAT:</td>
+                                            <td colspan="3" style="padding: 15px 12px; text-align: right; color: #155724;"></td>
+                                            <td style="padding: 15px 12px; text-align: right; background: #d4edda; color: #155724;">₱{{ number_format($grandTotalWithVAT, 2) }}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- BOQ Summary -->
+                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Material Cost</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
+                                        ₱{{ number_format($totalMaterial, 2) }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #6a1b9a; opacity: 0.8;">Total Labor Cost</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #6a1b9a;">
+                                        ₱{{ number_format($totalLabor, 2) }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #c8e6c9, #a5d6a7); padding: 15px; border-radius: 8px;">
+                                    <div style="font-size: 12px; color: #1b5e20; opacity: 0.8;">Subtotal</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #1b5e20;">
+                                        ₱{{ number_format($grandTotal, 2) }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #fff3cd, #ffe082); padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                                    <div style="font-size: 12px; color: #856404; opacity: 0.8;">VAT 12%</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #856404;">
+                                        ₱{{ number_format($vat, 2) }}
+                                    </div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 15px; border-radius: 8px; border-left: 4px solid #28a745; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.15);">
+                                    <div style="font-size: 12px; color: #155724; opacity: 0.8; font-weight: 600;">Grand Total w/ VAT</div>
+                                    <div style="font-size: 28px; font-weight: 700; color: #155724;">
+                                        ₱{{ number_format($grandTotalWithVAT, 2) }}
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
+                                <i class="fas fa-list" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                <p>No BOQ items added to this project yet.</p>
                             </div>
                         @endif
                     </div>
@@ -968,9 +1115,6 @@
                                         <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Employee</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Role Title</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned From</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Assigned To</th>
                                             <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days Worked</th>
                                             <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Daily Rate</th>
                                             <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Labor Cost</th>
@@ -989,17 +1133,23 @@
                                                     ->where('attendance_status', 'Present')
                                                     ->count();
                                                 
-                                                // Get daily rate from salary (assuming it's stored as monthly salary)
-                                                $monthlySalary = $employee->pivot->salary ?? 0;
-                                                $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0; // Assuming 22 working days per month
+                                                // Get daily rate based on employee position
+                                                $positionDailyRates = [
+                                                    'Project Manager' => 3000.00,
+                                                    'Site Supervisor' => 1200.00,
+                                                    'Finance Manager' => 1200.00,
+                                                    'Quality Assurance Officer' => 1100.00,
+                                                    'HR/Timekeeper' => 750.00,
+                                                    'Construction Worker' => 700.00
+                                                ];
+                                                
+                                                $employeePosition = $employee->position ?? 'Construction Worker';
+                                                $dailyRate = $positionDailyRates[$employeePosition] ?? 700.00;
                                                 $laborCost = $attendanceRecords * $dailyRate;
                                             @endphp
                                             <tr style="border-bottom: 1px solid var(--gray-400);">
                                                 <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->role_title ?? '—' }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_from ? \Carbon\Carbon::parse($employee->pivot->assigned_from)->format('M d, Y') : '—' }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->pivot->assigned_to ? \Carbon\Carbon::parse($employee->pivot->assigned_to)->format('M d, Y') : '—' }}</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ $attendanceRecords }}</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($dailyRate, 2) }}</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($laborCost, 2) }}</td>
@@ -1027,186 +1177,7 @@
                     </div>
                 </div>
 
-                <!-- Materials Tab -->
-                <div id="materials" class="tab-content">
-                    <div class="report-section">
-                        <div class="report-title">Project Materials</div>
-                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-                            <button class="btn btn-primary" onclick="openMaterialModal()">
-                                <i class="fas fa-plus"></i> Add Material
-                            </button>
-                        </div>
-
-                        <!-- Material Status Filter -->
-                        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-                            <button onclick="filterMaterials('all')" class="filter-btn active" data-filter="all" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                                All Materials
-                            </button>
-                            <button onclick="filterMaterials('pending')" class="filter-btn" data-filter="pending" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                                Pending
-                            </button>
-                            <button onclick="filterMaterials('approved')" class="filter-btn" data-filter="approved" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                                Approved
-                            </button>
-                            <button onclick="filterMaterials('failed')" class="filter-btn" data-filter="failed" style="padding: 8px 16px; border: 1px solid var(--gray-400); background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-                                Failed
-                            </button>
-                        </div>
-
-                        @if ($project->materials && $project->materials->count() > 0)
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1);">Qty</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Unit</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Unit Rate</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Total</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Status</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="materialsTableBody">
-                                        @foreach ($project->materials as $material)
-                                            <tr class="material-row" data-status="{{ $material->status ?? 'pending' }}" style="border-bottom: 1px solid var(--gray-400);">
-                                                <td style="padding: 12px; color: var(--black-1);">{{ $material->item_description ?? '—' }}</td>
-                                                <td style="padding: 12px; text-align: center; color: var(--gray-700);">{{ $material->quantity ?? 0 }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $material->unit ?? '—' }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($material->unit_rate ?? 0, 2) }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format(($material->quantity ?? 0) * ($material->unit_rate ?? 0), 2) }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">
-                                                    @php
-                                                        $statusColor = match($material->status ?? 'pending') {
-                                                            'approved' => '#dcfce7',
-                                                            'failed' => '#fee2e2',
-                                                            'pending' => '#fef3c7',
-                                                            default => '#f3f4f6'
-                                                        };
-                                                        $statusTextColor = match($material->status ?? 'pending') {
-                                                            'approved' => '#166534',
-                                                            'failed' => '#991b1b',
-                                                            'pending' => '#92400e',
-                                                            default => '#374151'
-                                                        };
-                                                    @endphp
-                                                    <span style="padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; background-color: {{ $statusColor }}; color: {{ $statusTextColor }};">
-                                                        {{ ucfirst($material->status ?? 'Pending') }}
-                                                    </span>
-                                                </td>
-                                                <td style="padding: 12px; color: var(--gray-700);">
-                                                    <div style="display: flex; gap: 6px;">
-                                                        <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 12px; font-size: 12px;" onclick="editMaterial({{ $material->id }})">
-                                                            <i class="fas fa-edit"></i> Edit
-                                                        </button>
-                                                        <form method="POST" action="{{ route('projects.materials.delete', [$project->id, $material->id]) }}" style="display: inline;" onsubmit="return confirm('Delete this material?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 12px; font-size: 12px;">
-                                                                <i class="fas fa-trash"></i> Delete
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Materials Summary -->
-                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                                <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #166534; opacity: 0.8;">Approved Materials</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #166534;">
-                                        ₱{{ number_format($project->materials->where('status', 'approved')->sum(fn($m) => $m->quantity * $m->unit_rate), 2) }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #fef3c7, #fde047); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #92400e; opacity: 0.8;">Pending Materials</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #92400e;">
-                                        ₱{{ number_format($project->materials->where('status', 'pending')->sum(fn($m) => $m->quantity * $m->unit_rate), 2) }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #991b1b; opacity: 0.8;">Failed Materials</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #991b1b;">
-                                        ₱{{ number_format($project->materials->where('status', 'failed')->sum(fn($m) => $m->quantity * $m->unit_rate), 2) }}
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
-                                <i class="fas fa-box" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
-                                <p>No materials added to this project yet.</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
                 <!-- Updates Tab -->
-                <div id="updates" class="tab-content">
-                    <div class="report-section">
-                        <div class="report-title">Add Project Task</div>
-                        <form method="POST" action="{{ route('projects.updates.store', $project->id) }}" style="margin-bottom: 30px;">
-                            @csrf
-                            <div class="form-group">
-                                <label class="form-label">Task Title</label>
-                                <input type="text" name="title" class="form-input" placeholder="Enter update title" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-textarea" name="description" placeholder="Enter update details..." required style="min-height: 180px;"></textarea>
-                                <small style="color: var(--gray-600); display: block; margin-top: 6px;">Max 5000 characters</small>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Task
-                            </button>
-                        </form>
-
-                        <div class="report-title">Project Tasks</div>
-                        <div class="updates-timeline">
-                            @forelse($project->updates as $update)
-                                <div class="timeline-item">
-                                    <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #16a34a @else #3b82f6 @endif;"></div>
-                                    <div class="timeline-content">
-                                        <div class="timeline-header">
-                                            <h4 class="timeline-title">{{ $update->title }}</h4>
-                                            <span class="timeline-status" style="background-color: @if($update->status === 'Completed') #dcfce7; color: #166534; @else #bfdbfe; color: #1e40af; @endif">
-                                                @if($update->status === 'Completed')
-                                                    <i class="fas fa-check-circle"></i> Complete
-                                                @else
-                                                    <i class="fas fa-hourglass-half"></i> Ongoing
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <p class="timeline-description">{{ $update->description }}</p>
-                                        <div class="timeline-meta">
-                                            <span class="timeline-date"><i class="fas fa-calendar"></i> {{ $update->created_at->format('M d, Y') }} at {{ $update->created_at->format('H:i') }}</span>
-                                            <span class="timeline-author"><i class="fas fa-user"></i> {{ $update->updatedBy?->name ?? 'Unknown' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="timeline-item">
-                                    <div class="timeline-marker" style="background-color: #9ca3af;"></div>
-                                    <div class="timeline-content">
-                                        <div class="timeline-header">
-                                            <h4 class="timeline-title">Project Created</h4>
-                                            <span class="timeline-status" style="background-color: #f3f4f6; color: #1f2937;">
-                                                <i class="fas fa-calendar-plus"></i> Created
-                                            </span>
-                                        </div>
-                                        <p class="timeline-description">Project has been successfully created and is ready for work.</p>
-                                        <div class="timeline-meta">
-                                            <span class="timeline-date"><i class="fas fa-calendar"></i> {{ $project->created_at->format('M d, Y') }} at {{ $project->created_at->format('H:i') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Images Tab -->
                 <div id="images" class="tab-content">
@@ -1347,36 +1318,42 @@
             </section>
         </main>
 
-        <!-- Material Modal -->
-        <div id="materialModal" class="modal" style="display: none;">
-            <div class="modal-content" style="max-width: 600px;">
+        <!-- BOQ Item Modal -->
+        <div id="boqModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 700px;">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="materialTitle">Add Material</h2>
-                    <button class="modal-close" onclick="closeMaterialModal()">
+                    <h2 class="modal-title" id="boqTitle">Add BOQ Item</h2>
+                    <button class="modal-close" onclick="closeBOQModal()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
 
-                <form id="materialForm" method="POST" action="{{ route('projects.materials.store', $project->id) }}">
+                <form id="boqForm" method="POST" action="{{ route('projects.materials.store', $project->id) }}" onsubmit="return submitBOQForm(event)">
                     @csrf
-                    <input type="hidden" id="materialIdField" name="material_id" value="">
+                    <input type="hidden" id="boqIdField" name="material_id" value="">
                     
                     <div style="padding: 20px;">
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Item Description</label>
-                            <input type="text" id="itemDescription" name="item_description" placeholder="Enter item description" required 
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Category</label>
+                            <input type="text" id="boqCategory" name="category" placeholder="e.g., COLD & HOT WATER" 
                                 style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Item Description *</label>
+                            <textarea id="boqItemDescription" name="item_description" placeholder="Enter detailed item description" required rows="3"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                             <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Quantity</label>
-                                <input type="number" id="materialQuantity" name="quantity" placeholder="0" required 
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Quantity *</label>
+                                <input type="number" id="boqQuantity" name="quantity" placeholder="0" step="0.01" required 
                                     style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
                             </div>
                             <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unit</label>
-                                <select id="materialUnit" name="unit" 
+                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unit *</label>
+                                <select id="boqUnit" name="unit" required
                                     style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
                                     <option value="">-- Select Unit --</option>
                                     <option value="pcs">Pieces (pcs)</option>
@@ -1395,36 +1372,164 @@
                                     <option value="bundle">Bundle</option>
                                     <option value="dozen">Dozen</option>
                                     <option value="unit">Unit</option>
+                                    <option value="lot">Lot</option>
                                 </select>
                             </div>
                         </div>
 
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unit Rate (₱)</label>
-                            <input type="number" id="materialUnitRate" name="unit_rate" placeholder="0.00" step="0.01" required 
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Material Cost (₱)</label>
+                            <input type="number" id="boqMaterialCost" name="material_cost" placeholder="0.00" step="0.01" 
                                 style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px; padding: 12px; background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 6px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #0369a1;">Labor Cost (Auto-calculated)</label>
+                            <input type="number" id="boqLaborCost" name="labor_cost" placeholder="0.00" step="0.01" readonly
+                                style="width: 100%; padding: 8px; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 14px; background: #dbeafe; color: #0369a1;">
+                            <small style="color: #0369a1; display: block; margin-top: 6px;">Calculated as: Material Cost ÷ 2</small>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Notes</label>
+                            <textarea id="boqNotes" name="notes" placeholder="Additional notes or remarks" rows="2"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
                         </div>
 
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Status</label>
-                            <select id="materialStatus" name="status" 
+                            <select id="boqStatus" name="status" 
                                 style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
                                 <option value="pending">Pending</option>
                                 <option value="approved">Approved</option>
                                 <option value="failed">Failed</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeBOQModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Save BOQ Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- BOQ Tasks Modal -->
+        <div id="boqTasksModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="boqTasksTitle">Tasks for Item</h2>
+                    <button class="modal-close" onclick="closeBOQTasksModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div style="padding: 20px;">
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 10px 0; color: #1f2937;">Item Details:</h4>
+                        <div id="boqItemDetails" style="background: #f3f4f6; padding: 12px; border-radius: 6px; font-size: 14px; color: #374151;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <button type="button" class="btn btn-primary" onclick="openAddTaskModal()" style="width: 100%; padding: 10px 16px;">
+                            <i class="fas fa-plus"></i> Add Task for This Item
+                        </button>
+                    </div>
+
+                    <div>
+                        <h4 style="margin: 0 0 15px 0; color: #1f2937;">Related Project Tasks:</h4>
+                        <div id="boqTasksList" style="max-height: 400px; overflow-y: auto;">
+                            <div class="updates-timeline">
+                                @forelse($project->updates as $update)
+                                    <div class="timeline-item" style="margin-bottom: 15px;">
+                                        <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #16a34a @else #3b82f6 @endif;"></div>
+                                        <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
+                                            <div class="timeline-header">
+                                                <h5 style="margin: 0 0 5px 0; color: #1f2937;">{{ $update->title }}</h5>
+                                                <span class="timeline-status" style="background-color: @if($update->status === 'Completed') #dcfce7; color: #166534; @else #bfdbfe; color: #1e40af; @endif; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                                    @if($update->status === 'Completed')
+                                                        <i class="fas fa-check-circle"></i> Complete
+                                                    @else
+                                                        <i class="fas fa-hourglass-half"></i> Ongoing
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">{{ $update->description }}</p>
+                                            <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
+                                                <i class="fas fa-calendar"></i> {{ $update->created_at->format('M d, Y') }}
+                                                <i class="fas fa-user" style="margin-left: 10px;"></i> {{ $update->updatedBy?->name ?? 'Unknown' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div style="text-align: center; padding: 20px; color: #9ca3af;">
+                                        <i class="fas fa-tasks" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                                        <p>No tasks available for this project yet.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeBOQTasksModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Task Modal for BOQ Item -->
+        <div id="addTaskModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">Add Task for Item</h2>
+                    <button class="modal-close" onclick="closeAddTaskModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="addTaskForm" method="POST" action="{{ route('projects.updates.store', $project->id) }}" onsubmit="return submitAddTaskForm(event)">
+                    @csrf
+                    <input type="hidden" id="currentBOQItemId" name="material_id" value="">
+                    <input type="hidden" id="currentBOQItemName" name="boq_item_name" value="">
+                    
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Task Title *</label>
+                            <input type="text" id="taskTitle" name="title" placeholder="Enter task title" required 
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        </div>
 
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Remarks</label>
-                            <textarea id="materialRemarks" name="remarks" placeholder="Add any remarks" rows="3"
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description *</label>
+                            <textarea id="taskDescription" name="description" placeholder="Enter task description" required rows="3"
                                 style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Status</label>
+                            <select id="taskStatus" name="status" 
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Completed">Completed</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="In Progress">In Progress</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 15px; padding: 12px; background: #f0f9ff; border-left: 4px solid #0369a1; border-radius: 4px;">
+                            <small style="color: #0369a1; display: block;">
+                                <i class="fas fa-info-circle"></i> This task will be linked to: <strong id="linkedItemDisplay"></strong>
+                            </small>
                         </div>
                     </div>
 
                     <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeMaterialModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Save Material</button>
+                        <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeAddTaskModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Add Task</button>
                     </div>
                 </form>
             </div>
@@ -1477,7 +1582,36 @@
             // Show selected tab
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
+            
+            // Store active tab in localStorage
+            localStorage.setItem('activeTab', tabName);
         }
+
+        // Restore active tab on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const activeTab = localStorage.getItem('activeTab') || 'overview';
+            const tabElement = document.getElementById(activeTab);
+            
+            if (tabElement) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+                
+                // Show the stored tab
+                tabElement.classList.add('active');
+                
+                // Mark the button as active
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach(btn => {
+                    if (btn.textContent.includes(activeTab === 'boq' ? 'Bill' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1))) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // Clear the stored tab so default works next time if not overridden
+            localStorage.removeItem('activeTab');
+        });
 
         function viewImage(imageSrc, imageTitle) {
             // Create modal
@@ -1682,34 +1816,6 @@
         }
 
         // Filter materials by status
-        function filterMaterials(status) {
-            const rows = document.querySelectorAll('.material-row');
-            const buttons = document.querySelectorAll('.filter-btn');
-
-            // Update active button
-            buttons.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[data-filter="${status}"]`).classList.add('active');
-            document.querySelector(`[data-filter="${status}"]`).style.background = 'var(--accent)';
-            document.querySelector(`[data-filter="${status}"]`).style.color = 'white';
-
-            // Filter rows
-            rows.forEach(row => {
-                if (status === 'all' || row.getAttribute('data-status') === status) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            // Reset other buttons
-            buttons.forEach(btn => {
-                if (!btn.classList.contains('active')) {
-                    btn.style.background = 'white';
-                    btn.style.color = '#1f2937';
-                }
-            });
-        }
-
         // Employee Management Variables
         let currentProjectId = {{ $project->id }};
         let currentProjectStatus = '{{ $project->status }}';
@@ -1835,50 +1941,229 @@
             });
         }
 
-        function openMaterialModal() {
-            const modal = document.getElementById('materialModal');
-            const form = document.getElementById('materialForm');
-            document.getElementById('materialTitle').textContent = 'Add Material';
+        function validateBOQForm() {
+            const itemDescription = document.getElementById('boqItemDescription').value.trim();
+            const quantity = parseFloat(document.getElementById('boqQuantity').value) || 0;
+            const unit = document.getElementById('boqUnit').value.trim();
             
-            // Reset form
-            if (form) form.reset();
+            if (!itemDescription) {
+                alert('Please enter an item description');
+                document.getElementById('boqItemDescription').focus();
+                return false;
+            }
             
-            // Clear hidden ID field
-            const materialIdField = document.getElementById('materialIdField');
-            if (materialIdField) materialIdField.value = '';
+            if (quantity <= 0) {
+                alert('Please enter a valid quantity (greater than 0)');
+                document.getElementById('boqQuantity').focus();
+                return false;
+            }
             
-            // Update form action
-            form.action = `/projects/{{ $project->id }}/materials`;
-            form.method = 'POST';
+            if (!unit) {
+                alert('Please select a unit');
+                document.getElementById('boqUnit').focus();
+                return false;
+            }
             
-            if (modal) {
-                modal.style.display = 'flex';
+            return true;
+        }
+
+        function submitBOQForm(event) {
+            event.preventDefault();
+            
+            if (!validateBOQForm()) {
+                return false;
+            }
+            
+            // Manually collect form data to ensure values are captured
+            const formData = new FormData();
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('input[name="_token"]');
+            if (csrfToken) {
+                formData.append('_token', csrfToken.value);
+            }
+            
+            // Add method for updating if material_id is set
+            const materialId = document.getElementById('boqIdField').value;
+            if (materialId) {
+                formData.append('_method', 'PUT');
+            }
+            
+            // Manually add form fields with their values
+            const itemDescription = document.getElementById('boqItemDescription').value.trim();
+            const quantity = document.getElementById('boqQuantity').value.trim();
+            const unit = document.getElementById('boqUnit').value.trim();
+            const materialCost = document.getElementById('boqMaterialCost').value.trim();
+            const laborCost = document.getElementById('boqLaborCost').value.trim();
+            const category = document.getElementById('boqCategory').value.trim();
+            const notes = document.getElementById('boqNotes').value.trim();
+            const status = document.getElementById('boqStatus').value.trim();
+            
+            // Add to FormData
+            formData.append('item_description', itemDescription);
+            formData.append('quantity', quantity);
+            formData.append('unit', unit);
+            formData.append('unit_rate', materialCost);
+            formData.append('material_cost', materialCost);
+            formData.append('labor_cost', laborCost);
+            formData.append('category', category);
+            formData.append('notes', notes);
+            formData.append('status', status);
+            
+            const form = document.getElementById('boqForm');
+            const url = form.action;
+            
+            // Log all form data for debugging
+            console.log('Submitting BOQ form to:', url);
+            console.log('Material ID:', materialId);
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        console.error('JSON error response:', err);
+                        throw err;
+                    }).catch(e => {
+                        return response.text().then(text => {
+                            console.error('Text response:', text);
+                            throw new Error(text || 'HTTP ' + response.status);
+                        });
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success response:', data);
+                if (data.success) {
+                    alert(data.message || 'Material added successfully!');
+                    closeBOQModal();
+                    
+                    // Store current tab in localStorage before reload
+                    localStorage.setItem('activeTab', 'boq');
+                    
+                    // Reload the page to refresh materials list
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to save BOQ item'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + (error.message || 'Failed to save BOQ item'));
+            });
+            
+            return false;
+        }
+
+        function openBOQModal() {
+            try {
+                console.log('openBOQModal called');
+                
+                const modal = document.getElementById('boqModal');
+                const form = document.getElementById('boqForm');
+                const title = document.getElementById('boqTitle');
+                
+                console.log('Modal:', modal);
+                console.log('Form:', form);
+                console.log('Title:', title);
+                
+                if (!modal) {
+                    console.error('BOQ modal element not found');
+                    alert('Error: BOQ modal not found. Please refresh the page.');
+                    return false;
+                }
+                
+                if (!form) {
+                    console.error('BOQ form element not found');
+                    alert('Error: BOQ form not found. Please refresh the page.');
+                    return false;
+                }
+                
+                if (!title) {
+                    console.error('BOQ title element not found');
+                    alert('Error: BOQ title not found. Please refresh the page.');
+                    return false;
+                }
+                
+                title.textContent = 'Add BOQ Item';
+                form.reset();
+                
+                // Clear hidden ID field
+                const boqIdField = document.getElementById('boqIdField');
+                if (boqIdField) boqIdField.value = '';
+                
+                // Update form action
+                form.action = `/projects/{{ $project->id }}/materials`;
+                form.method = 'POST';
+                
+                // Remove PUT method field if exists
+                const methodField = form.querySelector('input[name="_method"]');
+                if (methodField) {
+                    methodField.remove();
+                }
+                
+                // Ensure labor cost is calculated
+            setTimeout(() => {
+                initializeBOQMaterialCostListener();
+                updateLaborCostDisplay();
+            }, 100);                modal.style.display = 'flex';
+                console.log('Modal displayed');
+                return false;
+            } catch (error) {
+                console.error('Error in openBOQModal:', error);
+                alert('Error opening modal: ' + error.message);
+                return false;
             }
         }
 
-        function closeMaterialModal() {
-            const modal = document.getElementById('materialModal');
+        function closeBOQModal() {
+            const modal = document.getElementById('boqModal');
             if (modal) {
                 modal.style.display = 'none';
             }
         }
 
-        function editMaterial(materialId) {
-            const modal = document.getElementById('materialModal');
-            const form = document.getElementById('materialForm');
-            document.getElementById('materialTitle').textContent = 'Edit Material';
+        function confirmDeleteBOQ() {
+            if (confirm('Delete this item?')) {
+                localStorage.setItem('activeTab', 'boq');
+                return true;
+            }
+            return false;
+        }
+
+        function editBOQItem(materialId) {
+            const modal = document.getElementById('boqModal');
+            const form = document.getElementById('boqForm');
+            document.getElementById('boqTitle').textContent = 'Edit BOQ Item';
             
             // Fetch material data
             fetch(`/projects/{{ $project->id }}/materials/${materialId}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('itemDescription').value = data.item_description || '';
-                    document.getElementById('materialQuantity').value = data.quantity || '';
-                    document.getElementById('materialUnit').value = data.unit || '';
-                    document.getElementById('materialUnitRate').value = data.unit_rate || '';
-                    document.getElementById('materialStatus').value = data.status || 'pending';
-                    document.getElementById('materialRemarks').value = data.remarks || '';
-                    document.getElementById('materialIdField').value = materialId;
+                    document.getElementById('boqCategory').value = data.category || '';
+                    document.getElementById('boqItemDescription').value = data.item_description || '';
+                    document.getElementById('boqQuantity').value = data.quantity || '';
+                    document.getElementById('boqUnit').value = data.unit || '';
+                    document.getElementById('boqMaterialCost').value = data.material_cost || '';
+                    document.getElementById('boqLaborCost').value = data.labor_cost || '';
+                    document.getElementById('boqNotes').value = data.notes || '';
+                    document.getElementById('boqStatus').value = data.status || 'pending';
+                    document.getElementById('boqIdField').value = materialId;
                     
                     // Update form action and method
                     form.action = `/projects/{{ $project->id }}/materials/${materialId}`;
@@ -1899,42 +2184,246 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching material:', error);
-                    alert('Error loading material data');
+                    console.error('Error fetching BOQ item:', error);
+                    alert('Error loading BOQ item data');
                 });
         }
 
-        function saveMaterial() {
-            const form = document.getElementById('materialForm');
-            form.submit();
+        // Auto-calculate labor cost when quantity changes
+        function initializeBOQMaterialCostListener() {
+            const materialCostField = document.getElementById('boqMaterialCost');
+            if (materialCostField && !materialCostField.hasAttribute('data-listener-attached')) {
+                materialCostField.setAttribute('data-listener-attached', 'true');
+                materialCostField.addEventListener('input', function() {
+                    const materialCost = parseFloat(this.value) || 0;
+                    const laborCost = materialCost / 2;
+                    document.getElementById('boqLaborCost').value = laborCost.toFixed(2);
+                });
+            }
         }
 
-        function filterMaterials(status) {
-            const rows = document.querySelectorAll('.material-row');
-            const buttons = document.querySelectorAll('.filter-btn');
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeBOQMaterialCostListener);
+
+        // Initialize labor cost on modal open
+        function updateLaborCostDisplay() {
+            const materialCost = parseFloat(document.getElementById('boqMaterialCost').value) || 0;
+            const laborCost = materialCost / 2;
+            document.getElementById('boqLaborCost').value = laborCost.toFixed(2);
+        }
+
+        // BOQ Tasks Modal Functions
+        let currentBOQItem = {
+            id: null,
+            description: null
+        };
+
+        function viewBOQTasks(itemDescription, materialId) {
+            const modal = document.getElementById('boqTasksModal');
+            const title = document.getElementById('boqTasksTitle');
+            const details = document.getElementById('boqItemDetails');
             
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.filter === status) {
-                    btn.classList.add('active');
-                    btn.style.background = 'var(--accent)';
-                    btn.style.color = 'white';
-                    btn.style.borderColor = 'var(--accent)';
-                } else {
-                    btn.style.background = 'white';
-                    btn.style.color = 'inherit';
-                    btn.style.borderColor = 'var(--gray-400)';
-                }
-            });
+            if (!modal) {
+                alert('Tasks modal not found');
+                return;
+            }
             
-            rows.forEach(row => {
-                if (status === 'all' || row.dataset.status === status) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+            // Store current BOQ item for task creation
+            currentBOQItem.id = materialId;
+            currentBOQItem.description = itemDescription;
+            
+            title.textContent = 'Tasks for: ' + itemDescription;
+            details.innerHTML = `
+                <strong>Item Description:</strong><br>
+                ${itemDescription}<br><br>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                    <i class="fas fa-info-circle"></i> View all project tasks related to this BOQ item
+                </div>
+            `;
+            
+            loadTasksForItem(materialId);
+            modal.style.display = 'flex';
+        }
+
+        function closeBOQTasksModal() {
+            const modal = document.getElementById('boqTasksModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function loadTasksForItem(materialId) {
+            const tasksList = document.getElementById('boqTasksList');
+            
+            // Filter the tasks based on material_id
+            fetch(`/projects/{{ $project->id }}/tasks?material_id=${materialId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load tasks');
+                return response.json();
+            })
+            .then(data => {
+                if (data.tasks && data.tasks.length > 0) {
+                    let html = '<div class="updates-timeline">';
+                    
+                    data.tasks.forEach(task => {
+                        const statusClass = task.status === 'Completed' 
+                            ? '#dcfce7; color: #166534' 
+                            : '#bfdbfe; color: #1e40af';
+                        const statusBg = task.status === 'Completed' ? '#16a34a' : '#3b82f6';
+                        
+                        html += `
+                            <div class="timeline-item" style="margin-bottom: 15px;">
+                                <div class="timeline-marker" style="background-color: ${statusBg};"></div>
+                                <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
+                                    <div class="timeline-header">
+                                        <h5 style="margin: 0 0 5px 0; color: #1f2937;">${task.title}</h5>
+                                        <span class="timeline-status" style="background-color: ${statusClass}; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                            ${task.status === 'Completed' ? '<i class="fas fa-check-circle"></i> Complete' : '<i class="fas fa-hourglass-half"></i> Ongoing'}
+                                        </span>
+                                    </div>
+                                    <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">${task.description}</p>
+                                    <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
+                                        <i class="fas fa-calendar"></i> ${new Date(task.created_at).toLocaleDateString()}
+                                        <i class="fas fa-user" style="margin-left: 10px;"></i> ${task.updated_by_user?.name || 'Unknown'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    tasksList.innerHTML = html;
+                } else {
+                    tasksList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #9ca3af;">
+                            <i class="fas fa-tasks" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                            <p>No tasks assigned to this item yet. Click "Add Task for This Item" to create one.</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading tasks:', error);
+                tasksList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #dc2626;">
+                        <p>Error loading tasks. Please try again.</p>
+                    </div>
+                `;
             });
         }
+
+        function openAddTaskModal() {
+            const modal = document.getElementById('addTaskModal');
+            if (!modal) {
+                alert('Add task modal not found');
+                return;
+            }
+
+            // Set the hidden fields with current BOQ item info
+            document.getElementById('currentBOQItemId').value = currentBOQItem.id || '';
+            document.getElementById('currentBOQItemName').value = currentBOQItem.description || '';
+            document.getElementById('linkedItemDisplay').textContent = currentBOQItem.description || 'Unknown Item';
+            
+            // Reset form
+            document.getElementById('addTaskForm').reset();
+            document.getElementById('taskStatus').value = 'Ongoing';
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeAddTaskModal() {
+            const modal = document.getElementById('addTaskModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function submitAddTaskForm(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const status = document.getElementById('taskStatus').value;
+            const boqItemName = document.getElementById('currentBOQItemName').value;
+            
+            if (!title) {
+                alert('Please enter a task title');
+                document.getElementById('taskTitle').focus();
+                return false;
+            }
+            
+            if (!description) {
+                alert('Please enter a task description');
+                document.getElementById('taskDescription').focus();
+                return false;
+            }
+            
+            const form = document.getElementById('addTaskForm');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            if (!csrfToken) {
+                alert('CSRF token not found. Please refresh the page.');
+                return false;
+            }
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: formData
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                
+                if (!response.ok) {
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || `Server error: ${response.status}`);
+                        });
+                    } else {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                }
+                
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // If response is not JSON, assume success
+                    return { success: true, message: 'Task added successfully' };
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Task added successfully for: ' + boqItemName);
+                    closeAddTaskModal();
+                    
+                    // Reload only the tasks list for this item
+                    if (currentBOQItem.id) {
+                        loadTasksForItem(currentBOQItem.id);
+                    }
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to add task'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+            
+            return false;
+        }
+
     </script>
 </body>
 

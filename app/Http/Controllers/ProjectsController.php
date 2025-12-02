@@ -367,6 +367,52 @@ class ProjectsController extends Controller
     }
 
     /**
+     * Get tasks filtered by material_id
+     */
+    public function getTasksByMaterial(Request $request, Project $project)
+    {
+        $materialId = $request->query('material_id');
+
+        if (!$materialId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Material ID is required'
+            ], 400);
+        }
+
+        try {
+            $tasks = \App\Models\ProjectUpdate::where('project_id', $project->id)
+                ->where('material_id', $materialId)
+                ->with('updatedBy')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($task) {
+                    return [
+                        'id' => $task->id,
+                        'title' => $task->title,
+                        'description' => $task->description,
+                        'status' => $task->status,
+                        'created_at' => $task->created_at,
+                        'updated_by_user' => $task->updatedBy ? [
+                            'id' => $task->updatedBy->id,
+                            'name' => $task->updatedBy->name
+                        ] : null
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'tasks' => $tasks
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching tasks: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Store a project update
      */
     public function storeUpdate(Request $request, Project $project)
@@ -374,6 +420,8 @@ class ProjectsController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:5000',
+            'status' => 'nullable|in:Ongoing,Completed,On Hold,Cancelled,In Progress',
+            'material_id' => 'nullable|exists:materials,id',
         ]);
 
         try {
@@ -382,11 +430,26 @@ class ProjectsController extends Controller
                 'updated_by' => auth()->user()->id,
                 'title' => $validated['title'],
                 'description' => $validated['description'],
-                'status' => 'In Progress', // Default status
+                'status' => $validated['status'] ?? 'Ongoing',
+                'material_id' => $validated['material_id'] ?? null,
             ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Project update added successfully!'
+                ]);
+            }
 
             return redirect()->route('projects.show', $project->id)->with('success', 'Project update added successfully!');
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to add update: ' . $e->getMessage()
+                ], 422);
+            }
+
             return redirect()->route('projects.show', $project->id)->with('error', 'Failed to add update: ' . $e->getMessage());
         }
     }
@@ -396,26 +459,66 @@ class ProjectsController extends Controller
      */
     public function storeMaterial(Request $request, Project $project)
     {
+        \Log::info('storeMaterial called - Raw input:', $request->all());
+        
         $validated = $request->validate([
-            'item_description' => 'required|string|max:255',
+            'item_description' => 'required|string|max:500',
             'quantity' => 'required|numeric|min:0.01',
             'unit' => 'required|string|max:50',
-            'unit_rate' => 'required|numeric|min:0',
+            'unit_rate' => 'nullable|numeric|min:0',
+            'material_cost' => 'nullable|numeric|min:0',
+            'labor_cost' => 'nullable|numeric|min:0',
+            'category' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
             'status' => 'nullable|in:pending,approved,failed',
         ]);
 
+        \Log::info('storeMaterial validated data:', $validated);
+
         try {
-            Material::create([
+            // Auto-generate item_no (get next number for this project)
+            $maxItemNo = Material::where('project_id', $project->id)->max('item_no') ?? 0;
+            $nextItemNo = $maxItemNo + 1;
+
+            // Auto-calculate labor cost: Half of material cost
+            $materialCost = $validated['material_cost'] ?? 0;
+            $laborCost = $materialCost / 2;
+
+            $material = Material::create([
                 'project_id' => $project->id,
+                'item_no' => $nextItemNo,
                 'item_description' => $validated['item_description'],
                 'quantity' => $validated['quantity'],
                 'unit' => $validated['unit'],
-                'unit_rate' => $validated['unit_rate'],
+                'unit_rate' => $validated['unit_rate'] ?? 0,
+                'material_cost' => $validated['material_cost'] ?? 0,
+                'labor_cost' => $laborCost,
+                'category' => $validated['category'] ?? null,
+                'notes' => $validated['notes'] ?? null,
                 'status' => $validated['status'] ?? 'pending',
             ]);
 
+            \Log::info('Material created:', $material->toArray());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Material added successfully!',
+                    'data' => $material
+                ]);
+            }
+
             return redirect()->route('projects.show', $project->id)->with('success', 'Material added successfully!');
         } catch (\Exception $e) {
+            \Log::error('storeMaterial error:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to add material: ' . $e->getMessage()
+                ], 422);
+            }
+
             return redirect()->route('projects.show', $project->id)->with('error', 'Failed to add material: ' . $e->getMessage());
         }
     }
@@ -430,19 +533,31 @@ class ProjectsController extends Controller
         }
 
         $validated = $request->validate([
-            'item_description' => 'required|string|max:255',
+            'item_description' => 'required|string|max:500',
             'quantity' => 'required|numeric|min:0.01',
             'unit' => 'required|string|max:50',
-            'unit_rate' => 'required|numeric|min:0',
+            'unit_rate' => 'nullable|numeric|min:0',
+            'material_cost' => 'nullable|numeric|min:0',
+            'labor_cost' => 'nullable|numeric|min:0',
+            'category' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
             'status' => 'nullable|in:pending,approved,failed',
         ]);
 
         try {
+            // Auto-calculate labor cost: Half of material cost
+            $materialCost = $validated['material_cost'] ?? 0;
+            $laborCost = $materialCost / 2;
+
             $material->update([
                 'item_description' => $validated['item_description'],
                 'quantity' => $validated['quantity'],
                 'unit' => $validated['unit'],
-                'unit_rate' => $validated['unit_rate'],
+                'unit_rate' => $validated['unit_rate'] ?? 0,
+                'material_cost' => $validated['material_cost'] ?? 0,
+                'labor_cost' => $laborCost,
+                'category' => $validated['category'] ?? null,
+                'notes' => $validated['notes'] ?? null,
                 'status' => $validated['status'] ?? 'pending',
             ]);
 

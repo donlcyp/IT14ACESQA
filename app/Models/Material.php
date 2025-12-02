@@ -13,6 +13,7 @@ class Material extends Model
     protected $fillable = [
         'project_record_id',
         'project_id',
+        'item_no',
         'material_name',
         'batch_serial_no',
         'supplier',
@@ -34,6 +35,12 @@ class Material extends Model
         'total',
         'item_description',
         'archived',
+        'category',
+        'material_cost',
+        'labor_cost',
+        'unit_total',
+        'item_total',
+        'notes',
     ];
 
     protected $casts = [

@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $owner = User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
+            'phone' => '+63-901-234-5678',
             'password' => Hash::make('password'),
             'role' => 'OWNER',
             'user_position' => 'Administrator',
@@ -47,6 +48,7 @@ class DatabaseSeeder extends Seeder
         $pm1 = User::create([
             'name' => 'Shane Beriong',
             'email' => 'pm1@example.com',
+            'phone' => '+63-902-234-5678',
             'password' => Hash::make('password'),
             'role' => 'PM',
             'user_position' => 'Project Manager',
@@ -56,6 +58,7 @@ class DatabaseSeeder extends Seeder
         $pm2 = User::create([
             'name' => 'Project Manager',
             'email' => 'pm2@example.com',
+            'phone' => '+63-903-234-5678',
             'password' => Hash::make('password'),
             'role' => 'PM',
             'user_position' => 'Project Manager',
@@ -65,6 +68,7 @@ class DatabaseSeeder extends Seeder
         $fm = User::create([
             'name' => 'Finance Manager',
             'email' => 'fm@example.com',
+            'phone' => '+63-904-234-5678',
             'password' => Hash::make('password'),
             'role' => 'FM',
             'user_position' => 'Finance Manager',
@@ -74,6 +78,7 @@ class DatabaseSeeder extends Seeder
         $qa = User::create([
             'name' => 'QA Officer',
             'email' => 'qa@example.com',
+            'phone' => '+63-905-234-5678',
             'password' => Hash::make('password'),
             'role' => 'USER',
             'user_position' => 'Quality Assurance Officer',
@@ -83,6 +88,7 @@ class DatabaseSeeder extends Seeder
         $fieldStaff = User::create([
             'name' => 'Field Staff',
             'email' => 'fieldstaff@example.com',
+            'phone' => '+63-906-234-5678',
             'password' => Hash::make('password'),
             'role' => 'USER',
             'user_position' => 'Field Staff',
@@ -378,6 +384,143 @@ class DatabaseSeeder extends Seeder
             'f_name' => 'QA',
             'l_name' => 'Officer',
             'position' => 'Quality Assurance Officer',
+        ]);
+
+        // Additional employees
+        $emp_user1 = User::create([
+            'name' => 'Maria Santos',
+            'email' => 'maria.santos@ajjcrisber.com',
+            'phone' => '+63-945-123-4567',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Construction Worker',
+            'status' => 'Active',
+        ]);
+
+        $emp_user2 = User::create([
+            'name' => 'Juan Dela Cruz',
+            'email' => 'juan.delacruz@ajjcrisber.com',
+            'phone' => '+63-945-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Construction Worker',
+            'status' => 'Active',
+        ]);
+
+        $emp_user3 = User::create([
+            'name' => 'Rosa Garcia',
+            'email' => 'rosa.garcia@ajjcrisber.com',
+            'phone' => '+63-945-345-6789',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Quality Assurance Officer',
+            'status' => 'Active',
+        ]);
+
+        $emp_user4 = User::create([
+            'name' => 'Carlos Mendoza',
+            'email' => 'carlos.mendoza@ajjcrisber.com',
+            'phone' => '+63-945-456-7890',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Construction Worker',
+            'status' => 'Active',
+        ]);
+
+        $emp_user5 = User::create([
+            'name' => 'Lucia Fernandez',
+            'email' => 'lucia.fernandez@ajjcrisber.com',
+            'phone' => '+63-945-567-8901',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Construction Worker',
+            'status' => 'Active',
+        ]);
+
+        $emp_user6 = User::create([
+            'name' => 'Antonio Lopez',
+            'email' => 'antonio.lopez@ajjcrisber.com',
+            'phone' => '+63-945-678-9012',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Project Manager',
+            'status' => 'Active',
+        ]);
+
+        $emp_user7 = User::create([
+            'name' => 'Diana Reyes',
+            'email' => 'diana.reyes@ajjcrisber.com',
+            'phone' => '+63-945-789-0123',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Quality Assurance Officer',
+            'status' => 'Active',
+        ]);
+
+        $emp_user8 = User::create([
+            'name' => 'Roberto Torres',
+            'email' => 'roberto.torres@ajjcrisber.com',
+            'phone' => '+63-945-890-1234',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Construction Worker',
+            'status' => 'Active',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user1->id,
+            'f_name' => 'Maria',
+            'l_name' => 'Santos',
+            'position' => 'Construction Worker',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user2->id,
+            'f_name' => 'Juan',
+            'l_name' => 'Dela Cruz',
+            'position' => 'Construction Worker',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user3->id,
+            'f_name' => 'Rosa',
+            'l_name' => 'Garcia',
+            'position' => 'Quality Assurance Officer',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user4->id,
+            'f_name' => 'Carlos',
+            'l_name' => 'Mendoza',
+            'position' => 'Construction Worker',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user5->id,
+            'f_name' => 'Lucia',
+            'l_name' => 'Fernandez',
+            'position' => 'Construction Worker',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user6->id,
+            'f_name' => 'Antonio',
+            'l_name' => 'Lopez',
+            'position' => 'Project Manager',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user7->id,
+            'f_name' => 'Diana',
+            'l_name' => 'Reyes',
+            'position' => 'Quality Assurance Officer',
+        ]);
+
+        EmployeeList::create([
+            'user_id' => $emp_user8->id,
+            'f_name' => 'Roberto',
+            'l_name' => 'Torres',
+            'position' => 'Construction Worker',
         ]);
 
         // ============ LOGS ============

@@ -53,6 +53,10 @@
         .aux{display:flex; align-items:center; justify-content:space-between; margin-top:6px}
         .link{font-size:12px; color:#2563eb; text-decoration:none}
         .link:hover{text-decoration:underline}
+        .help-section{margin-top:16px; padding-top:16px; border-top:1px solid var(--gray-300); display:flex; gap:12px; font-size:12px}
+        .help-item{flex:1}
+        .help-item a{display:flex; align-items:center; gap:6px; color:#2563eb; text-decoration:none}
+        .help-item a:hover{text-decoration:underline}
         @media (max-width: 960px){ .container{grid-template-columns:1fr;} .hero{display:none;} }
     </style>
 </head>
@@ -96,6 +100,22 @@
         @error('email')
             <div class="error">{{ $message }}</div>
         @enderror
+
+        <div class="help-section">
+            <div class="help-item">
+                <a href="{{ route('support.forgot-password') }}" title="Reset your password">
+                    <i class="fas fa-key" style="font-size: 11px;"></i>
+                    Forgot Password?
+                </a>
+            </div>
+            <div class="help-item">
+                <a href="{{ route('support.form') }}" title="Contact support">
+                    <i class="fas fa-headset" style="font-size: 11px;"></i>
+                    Contact Support
+                </a>
+            </div>
+        </div>
+
         <div class="footer">Don't have an account? <a class="link" href="mailto:admin@ajjcrisber.com?subject=Access%20request&body=Please%20provision%20an%20account%20for%20me." title="Contact your administrator">Contact your administrator</a></div>
     </form>
     </section>

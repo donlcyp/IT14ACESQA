@@ -10,7 +10,7 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Employee::query();
+        $query = Employee::query()->with('user');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -46,6 +46,8 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('Employee store request received', $request->all());
+        
         $data = $request->validate([
             'first_name'      => ['required', 'string', 'max:255'],
             'last_name'       => ['required', 'string', 'max:255'],
@@ -56,12 +58,20 @@ class EmployeeController extends Controller
             'phone'           => ['nullable', 'string', 'max:50'],
         ]);
 
+        \Log::info('Employee data validated', $data);
+
+        // Format phone number if provided
+        if (!empty($data['phone'])) {
+            $data['phone'] = $this->formatPhoneNumber($data['phone']);
+        }
+
         // Create or find user first
         $fullName = $data['first_name'] . ' ' . $data['last_name'];
         $user = \App\Models\User::firstOrCreate(
             ['email' => $data['email'] ?? ('emp.' . time() . '@system.local')],
             [
                 'name' => $fullName,
+                'phone' => $data['phone'] ?? null,
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'USER',
                 'user_position' => $data['position'],
@@ -69,26 +79,39 @@ class EmployeeController extends Controller
             ]
         );
 
+        \Log::info('User created/found', ['user_id' => $user->id, 'email' => $user->email]);
+
+        // Update phone if it was provided and the user already exists
+        if ($data['phone'] && $user->wasRecentlyCreated === false) {
+            $user->update(['phone' => $data['phone']]);
+        }
+
         // Create employee linked to user (update if exists)
         $employeeData = [
             'user_id' => $user->id,
             'f_name' => $data['first_name'],
             'l_name' => $data['last_name'],
-            'position' => $data['position'] ?? null,
+            'position' => !empty($data['position']) ? $data['position'] : null,
         ];
 
         // Handle optional document upload (store separately if needed)
         if ($request->hasFile('document')) {
             $path = $request->file('document')->store('employee_docs', 'public');
-            // Store document path in a separate way if needed (not in employee_list table)
+            \Log::info('Document uploaded', ['path' => $path]);
         }
 
-        Employee::updateOrCreate(
+        $employee = Employee::updateOrCreate(
             ['user_id' => $user->id],
             $employeeData
         );
 
-        return redirect()->route('employee')->with('success', 'Employee added successfully.');
+        \Log::info('Employee created/updated', ['employee_id' => $employee->id]);
+
+        // Redirect to employee page with a search/sort that will show the newly added employee
+        return redirect()
+            ->route('employee')
+            ->with('success', 'Employee added successfully.')
+            ->with('showNewEmployee', $data['first_name'] . ' ' . $data['last_name']);
     }
 
     protected function generateEmployeeCode(): string
@@ -102,5 +125,37 @@ class EmployeeController extends Controller
         $numeric = (int) preg_replace('/[^0-9]/', '', $latest);
 
         return 'EMP' . str_pad($numeric + 1, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Format phone number to +63-000-000-0000 format
+     */
+    protected function formatPhoneNumber(string $phone): string
+    {
+        // Remove all non-numeric characters except +
+        $phone = preg_replace('/[^\d+]/', '', $phone);
+
+        // Remove leading + if present
+        $phone = ltrim($phone, '+');
+
+        // If starts with 0, replace with 63
+        if (strpos($phone, '0') === 0) {
+            $phone = '63' . substr($phone, 1);
+        }
+
+        // Ensure we have the right length (should be 12 digits for +63)
+        $phone = preg_replace('/[^\d]/', '', $phone);
+
+        // If it's 10 digits (like 9234567890), prepend 63
+        if (strlen($phone) === 10) {
+            $phone = '63' . $phone;
+        }
+
+        // Format as +63-XXX-XXX-XXXX
+        if (strlen($phone) === 12) {
+            $phone = '+' . substr($phone, 0, 2) . '-' . substr($phone, 2, 3) . '-' . substr($phone, 5, 3) . '-' . substr($phone, 8, 4);
+        }
+
+        return $phone;
     }
 }

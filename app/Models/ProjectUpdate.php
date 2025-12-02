@@ -15,6 +15,7 @@ class ProjectUpdate extends Model
         'title',
         'description',
         'status',
+        'material_id',
     ];
 
     protected $casts = [
@@ -36,5 +37,13 @@ class ProjectUpdate extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
+
+    /**
+     * Get the material this update is linked to
+     */
+    public function material(): BelongsTo
+    {
+        return $this->belongsTo(Material::class, 'material_id', 'id');
     }
 }

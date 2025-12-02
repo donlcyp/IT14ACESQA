@@ -9,6 +9,12 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Public support routes
+Route::get('/forgot-password', [\App\Http\Controllers\SupportController::class, 'showForgotPassword'])->name('support.forgot-password');
+Route::post('/forgot-password', [\App\Http\Controllers\SupportController::class, 'submitForgotPassword'])->name('support.forgot-password');
+Route::get('/support', [\App\Http\Controllers\SupportController::class, 'showSupportForm'])->name('support.form');
+Route::post('/support', [\App\Http\Controllers\SupportController::class, 'submitSupportTicket'])->name('support.submit-ticket');
+
 // Protected application routes
 Route::middleware('auth')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
@@ -39,6 +45,7 @@ Route::middleware('auth')->group(function () {
 
         // Project Updates
         Route::post('/projects/{project}/updates', [App\Http\Controllers\ProjectsController::class, 'storeUpdate'])->name('projects.updates.store');
+        Route::get('/projects/{project}/tasks', [App\Http\Controllers\ProjectsController::class, 'getTasksByMaterial'])->name('projects.tasks.get');
 
         // Project Materials
         Route::get('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'getMaterial'])->name('projects.materials.get');
@@ -73,6 +80,20 @@ Route::middleware('auth')->group(function () {
                 Route::get('/', [UserManagementController::class, 'index'])->name('index');
                 Route::get('/create', [UserManagementController::class, 'create'])->name('create');
                 Route::post('/', [UserManagementController::class, 'store'])->name('store');
+            });
+
+            // Support Management
+            Route::prefix('support')->name('support.')->group(function () {
+                // Password Reset Requests
+                Route::get('/password-resets', [\App\Http\Controllers\AdminSupportController::class, 'passwordResets'])->name('password-resets');
+                Route::get('/password-resets/{id}', [\App\Http\Controllers\AdminSupportController::class, 'showPasswordReset'])->name('password-reset.show');
+                Route::post('/password-resets/{id}/resolve', [\App\Http\Controllers\AdminSupportController::class, 'resolvePasswordReset'])->name('password-reset.resolve');
+                Route::post('/password-resets/{id}/reject', [\App\Http\Controllers\AdminSupportController::class, 'rejectPasswordReset'])->name('password-reset.reject');
+
+                // Support Tickets
+                Route::get('/tickets', [\App\Http\Controllers\AdminSupportController::class, 'supportTickets'])->name('tickets');
+                Route::get('/tickets/{id}', [\App\Http\Controllers\AdminSupportController::class, 'showSupportTicket'])->name('ticket.show');
+                Route::post('/tickets/{id}/respond', [\App\Http\Controllers\AdminSupportController::class, 'respondToTicket'])->name('ticket.respond');
             });
         });
 

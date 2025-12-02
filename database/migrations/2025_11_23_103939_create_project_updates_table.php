@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('updated_by')->constrained('users')->onDelete('restrict');
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['Created', 'In Progress', 'Completed', 'On Hold', 'Cancelled'])->default('In Progress');
+            $table->enum('status', ['Ongoing', 'Completed', 'On Hold', 'Cancelled', 'In Progress'])->default('Ongoing');
             $table->timestamps();
 
             // Indexes
