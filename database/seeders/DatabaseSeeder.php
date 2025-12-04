@@ -3,15 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Client;
-use App\Models\Project;
-use App\Models\Material;
-use App\Models\ProjectRecord;
-use App\Models\EmployeeList;
-use App\Models\PurchaseOrder;
-use App\Models\Invoice;
-use App\Models\EmployeeAttendance;
-use App\Models\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
@@ -22,10 +13,90 @@ class DatabaseSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         
-        // Clear existing data
-        DB::table('logs')->truncate();
-        DB::table('invoices')->truncate();
-        DB::table('purchase_orders')->truncate();
+        // Clear existing users
+        DB::table('users')->truncate();
+
+        // ============ CREATE USERS WITH ROLES ============
+
+        // OWNER - Full system access
+        User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'phone' => '+63-901-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'OWNER',
+            'user_position' => 'Administrator',
+            'status' => 'Active',
+        ]);
+
+        // PROJECT MANAGERS - Can manage projects and attendance
+        User::create([
+            'name' => 'Shane Beriong',
+            'email' => 'pm1@example.com',
+            'phone' => '+63-902-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'PM',
+            'user_position' => 'Project Manager',
+            'status' => 'Active',
+        ]);
+
+        User::create([
+            'name' => 'Project Manager 2',
+            'email' => 'pm2@example.com',
+            'phone' => '+63-903-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'PM',
+            'user_position' => 'Project Manager',
+            'status' => 'Active',
+        ]);
+
+        // GENERAL USERS - Limited access
+        User::create([
+            'name' => 'QA Officer',
+            'email' => 'qa@example.com',
+            'phone' => '+63-905-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Quality Assurance Officer',
+            'status' => 'Active',
+        ]);
+
+        User::create([
+            'name' => 'Field Staff',
+            'email' => 'fieldstaff@example.com',
+            'phone' => '+63-906-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Field Staff',
+            'status' => 'Active',
+        ]);
+
+        User::create([
+            'name' => 'Finance Officer',
+            'email' => 'finance@example.com',
+            'phone' => '+63-907-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'Finance Officer',
+            'status' => 'Active',
+        ]);
+
+        User::create([
+            'name' => 'HR Coordinator',
+            'email' => 'hr@example.com',
+            'phone' => '+63-908-234-5678',
+            'password' => Hash::make('password'),
+            'role' => 'USER',
+            'user_position' => 'HR Coordinator',
+            'status' => 'Active',
+        ]);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        $this->command->info('✓ Seeder completed successfully!');
+        $this->command->info('✓ Total Users Created: ' . User::count());
+    }
+}
         DB::table('materials')->truncate();
         DB::table('project_records')->truncate();
         DB::table('projects')->truncate();
