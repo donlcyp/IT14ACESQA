@@ -415,7 +415,7 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="summary-content">
-                            <span class="summary-label">Total Projects</span>
+                            <span class="summary-label">@if($isEmployee ?? false)My Projects@else Total Projects @endif</span>
                             <span class="summary-number">{{ number_format($summary['total_projects'] ?? 0) }}</span>
                         </div>
                     </div>
@@ -441,24 +441,174 @@
 
                 <!-- Detailed Insights -->
                 <div class="dashboard-grid">
-                    <div class="dashboard-card full">
-                        <div class="dashboard-card-header">
-                            <div>
-                                <div class="dashboard-card-title">Active Projects</div>
-                                <div class="dashboard-card-subtitle">Projects currently in execution with status</div>
+                    @if ($isEmployee ?? false)
+                        <!-- EMPLOYEE VIEW -->
+                        <div class="dashboard-card full">
+                            <div class="dashboard-card-header">
+                                <div>
+                                    <div class="dashboard-card-title">My Assigned Project</div>
+                                    <div class="dashboard-card-subtitle">Project you are currently working on</div>
+                                </div>
                             </div>
-                            <a class="view-link" href="{{ route('projects') }}">
-                                View all
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
+
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Client</th>
+                                        <th>Status</th>
+                                        <th>Lead</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($assignedProjects as $project)
+                                        @php
+                                            $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                            $statusMap = [
+                                                'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                                'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                                'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                                'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                                'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
+                                                'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                            ];
+                                            $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                            
+                                            // Get client name from relationship or fallback to project fields
+                                            if ($project->client) {
+                                                $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
+                                            } else {
+                                                $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
+                                            }
+                                            
+                                            // Get lead name from PM relationship or fallback to lead field
+                                            $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $project->project_name }}</td>
+                                            <td>{{ $clientName }}</td>
+                                            <td>
+                                                <span class="status-badge {{ $badge['class'] }}">
+                                                    <i class="{{ $badge['icon'] }}"></i>
+                                                    {{ $projectDisplayStatus ?? '—' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $leadName }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" style="color:#6b7280; padding:12px 0;">You are not assigned to any project.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
 
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Client</th>
-                                    <th>Status</th>
+                        <!-- Today's Attendance -->
+                        <div class="dashboard-card half">
+                            <div class="dashboard-card-header">
+                                <div>
+                                    <div class="dashboard-card-title">Today's Attendance</div>
+                                    <div class="dashboard-card-subtitle">Your current attendance status</div>
+                                </div>
+                            </div>
+
+                            @if ($todayAttendance)
+                                <div style="padding: 20px;">
+                                    <table class="dashboard-table">
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Status</strong></td>
+                                                <td>
+                                                    <span class="status-badge {{ strtolower(str_replace(' ', '-', $todayAttendance->attendance_status)) }}">
+                                                        {{ $todayAttendance->attendance_status }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Punch In</strong></td>
+                                                <td>{{ $todayAttendance->punch_in_time ? $todayAttendance->punch_in_time->format('H:i:s') : 'Not yet punched in' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Punch Out</strong></td>
+                                                <td>{{ $todayAttendance->punch_out_time ? $todayAttendance->punch_out_time->format('H:i:s') : '—' }}</td>
+                                            </tr>
+                                            @if ($todayAttendance->is_late)
+                                                <tr>
+                                                    <td><strong>Late Arrival</strong></td>
+                                                    <td><span style="color: #dc2626; font-weight: 600;">Yes ({{ $todayAttendance->late_minutes }} minutes)</span></td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div style="padding: 20px; color: #6b7280;">
+                                    <p>No attendance record for today yet. <a href="{{ $isEmployee ? route('my-attendance') : route('employee-attendance') }}" style="color: #16a34a; text-decoration: none; font-weight: 600;">Punch in now</a></p>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Recent Attendance History -->
+                        <div class="dashboard-card half">
+                            <div class="dashboard-card-header">
+                                <div>
+                                    <div class="dashboard-card-title">Recent Attendance</div>
+                                    <div class="dashboard-card-subtitle">Last 5 attendance records</div>
+                                </div>
+                                <a class="view-link" href="{{ $isEmployee ? route('my-attendance') : route('employee-attendance') }}">
+                                    View all
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Punch In</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($recentAttendance as $record)
+                                        <tr>
+                                            <td>{{ $record->date->format('M d, Y') }}</td>
+                                            <td>
+                                                <span class="status-badge {{ strtolower(str_replace(' ', '-', $record->attendance_status)) }}">
+                                                    {{ $record->attendance_status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $record->punch_in_time ? $record->punch_in_time->format('H:i') : '—' }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" style="color:#6b7280; padding:12px 0;">No attendance records yet.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <!-- ADMIN/PM VIEW -->
+                        <div class="dashboard-card full">
+                            <div class="dashboard-card-header">
+                                <div>
+                                    <div class="dashboard-card-title">Active Projects</div>
+                                    <div class="dashboard-card-subtitle">Projects currently in execution with status</div>
+                                </div>
+                                <a class="view-link" href="{{ route('projects') }}">
+                                    View all
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Client</th>
+                                        <th>Status</th>
                                     <th>Lead</th>
                                 </tr>
                             </thead>
@@ -593,6 +743,7 @@
                             </tbody>
                         </table>
                     </div>
+                    @endif
                 </div>
             </section>
         </main>

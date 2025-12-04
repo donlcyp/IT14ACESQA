@@ -1107,62 +1107,267 @@
 
                 <!-- Page Title -->
                 <div class="page-header" style="margin-bottom: 24px;">
-                    <h1 class="page-title">Project Employee Assignments</h1>
+                    @if ($isEmployee ?? false)
+                        <h1 class="page-title">My Attendance</h1>
+                    @else
+                        <h1 class="page-title">Project Employee Assignments</h1>
+                    @endif
                 </div>
 
-                <!-- Projects Tab -->
+                @if ($isEmployee ?? false)
+                    <!-- EMPLOYEE VIEW -->
+                    
+                    <!-- Employee Info Card -->
+                    <div style="background: white; padding: 24px; border-radius: 10px; border: 1px solid var(--gray-300); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--gray-900);">{{ $currentEmployee->f_name }} {{ $currentEmployee->l_name }}</h2>
+                                <p style="margin: 4px 0 0; color: var(--gray-600); font-size: 14px;">Position: <strong>{{ $currentEmployee->position }}</strong></p>
+                                @if ($assignedProject)
+                                    <p style="margin: 4px 0 0; color: var(--gray-600); font-size: 14px;">Project: <strong>{{ $assignedProject->project_name }}</strong></p>
+                                @endif
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 28px; font-weight: 700; color: #16a34a;" id="clockTime">--:--:--</div>
+                                <div style="font-size: 12px; color: var(--gray-600);" id="clockDate">Today</div>
+                            </div>
+                        </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card stat-total">
-                        <div class="stat-left">
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                            <div class="stat-text">
-                                <p>Total Employees</p>
-                            </div>
+                        <!-- Punch In/Out Buttons for Employee -->
+                        <div style="display: flex; gap: 10px;">
+                            <button id="punchInBtn" class="btn" style="flex: 1; background: #16a34a; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;" onclick="performEmployeePunchIn()">
+                                <i class="fas fa-arrow-right"></i> PUNCH IN
+                            </button>
+                            <button id="punchOutBtn" class="btn" style="flex: 1; background: #dc2626; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;" onclick="performEmployeePunchOut()">
+                                <i class="fas fa-arrow-left"></i> PUNCH OUT
+                            </button>
                         </div>
-                        <span class="stat-value">{{ $stats['total'] }}</span>
-                    </div>
-                    <div class="stat-card stat-idle">
-                        <div class="stat-left">
-                            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
-                            <div class="stat-text">
-                                <p>Idle (No Status)</p>
-                            </div>
-                        </div>
-                        <span class="stat-value">{{ $stats['idle'] }}</span>
-                    </div>
-                    <div class="stat-card stat-onsite">
-                        <div class="stat-left">
-                            <div class="stat-icon"><i class="fas fa-check"></i></div>
-                            <div class="stat-text">
-                                <p>On Site</p>
-                            </div>
-                        </div>
-                        <span class="stat-value">{{ $stats['on_site'] }}</span>
-                    </div>
-                    <div class="stat-card stat-absent">
-                        <div class="stat-left">
-                            <div class="stat-icon"><i class="fas fa-user-times"></i></div>
-                            <div class="stat-text">
-                                <p>Absent</p>
-                            </div>
-                        </div>
-                        <span class="stat-value">{{ $stats['absent'] }}</span>
-                    </div>
-                    <div class="stat-card stat-leave">
-                        <div class="stat-left">
-                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                            <div class="stat-text">
-                                <p>On Leave</p>
-                            </div>
-                        </div>
-                        <span class="stat-value">{{ $stats['on_leave'] }}</span>
-                    </div>
-                </div>
 
+                        <!-- Punch Status Display -->
+                        <div style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 6px; border-left: 4px solid #3b82f6;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Status</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #3b82f6;" id="punchStatus">Not Punched</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Punch In Time</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: var(--gray-900);" id="punchInDisplay">—</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Punch Out Time</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: var(--gray-900);" id="punchOutDisplay">—</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Late Status</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #dc2626;" id="lateStatus">On Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Status Information Banner -->
-                <!-- Projects Table -->
+                    <!-- Employee Statistics -->
+                    <div class="stats-grid">
+                        <div class="stat-card stat-total">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                                <div class="stat-text">
+                                    <p>Total Days</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['total_days'] }}</span>
+                        </div>
+                        <div class="stat-card stat-onsite">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-check"></i></div>
+                                <div class="stat-text">
+                                    <p>On Site</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['on_site'] }}</span>
+                        </div>
+                        <div class="stat-card stat-absent">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-user-times"></i></div>
+                                <div class="stat-text">
+                                    <p>Absent</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['absent'] }}</span>
+                        </div>
+                        <div class="stat-card stat-leave">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                                <div class="stat-text">
+                                    <p>On Leave</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['on_leave'] }}</span>
+                        </div>
+                        <div class="stat-card stat-absent">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="stat-text">
+                                    <p>Late Arrivals</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['late_count'] }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Recent Attendance Records -->
+                    <div class="table-card">
+                        <div style="padding: 20px; border-bottom: 1px solid var(--gray-300);">
+                            <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--gray-900);">Recent Attendance</h3>
+                        </div>
+                        <table class="projects-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Punch In</th>
+                                    <th>Punch Out</th>
+                                    <th>Late</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($recentRecords as $record)
+                                    <tr>
+                                        <td>{{ $record->date->format('M d, Y') }}</td>
+                                        <td>
+                                            <span class="project-status {{ strtolower(str_replace(' ', '-', $record->attendance_status)) }}">
+                                                {{ $record->attendance_status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $record->punch_in_time ? $record->punch_in_time->format('H:i:s') : '—' }}</td>
+                                        <td>{{ $record->punch_out_time ? $record->punch_out_time->format('H:i:s') : '—' }}</td>
+                                        <td>
+                                            @if ($record->is_late)
+                                                <span style="color: #dc2626; font-weight: 600;">Yes ({{ $record->late_minutes }} min)</span>
+                                            @else
+                                                <span style="color: #16a34a; font-weight: 600;">No</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 20px; color: var(--gray-600);">No attendance records yet</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                @else
+                    <!-- ADMIN/PM VIEW -->
+                    
+                    <!-- Punch In/Out Section -->
+                    <div style="background: white; padding: 24px; border-radius: 10px; border: 1px solid var(--gray-300); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                            <div>
+                                <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--gray-900);">Quick Punch In/Out</h2>
+                                <p style="margin: 4px 0 0; color: var(--gray-600); font-size: 14px;">Record your attendance quickly</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 28px; font-weight: 700; color: #16a34a;" id="clockTime">--:--:--</div>
+                                <div style="font-size: 12px; color: var(--gray-600);" id="clockDate">Today</div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div>
+                                <label style="display: block; font-size: 13px; color: var(--gray-600); font-weight: 600; margin-bottom: 8px;">Select Your Name</label>
+                                <select id="punchEmployee" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 14px;">
+                                    <option value="">-- Choose Employee --</option>
+                                    @foreach ($allEmployees as $emp)
+                                        <option value="{{ $emp->id }}">{{ $emp->f_name }} {{ $emp->l_name }} ({{ $emp->position }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                                <button id="punchInBtn" class="btn" style="flex: 1; background: #16a34a; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;" onclick="performPunchIn()">
+                                    <i class="fas fa-arrow-right"></i> PUNCH IN
+                                </button>
+                                <button id="punchOutBtn" class="btn" style="flex: 1; background: #dc2626; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;" onclick="performPunchOut()">
+                                    <i class="fas fa-arrow-left"></i> PUNCH OUT
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Punch Status Display -->
+                        <div style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 6px; border-left: 4px solid #3b82f6;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Status</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #3b82f6;" id="punchStatus">Not Punched</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Punch In Time</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: var(--gray-900);" id="punchInDisplay">—</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Punch Out Time</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: var(--gray-900);" id="punchOutDisplay">—</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Late Status</div>
+                                    <div style="font-size: 16px; font-weight: 700; color: #dc2626;" id="lateStatus">On Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects Tab -->
+
+                    <div class="stats-grid">
+                        <div class="stat-card stat-total">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                                <div class="stat-text">
+                                    <p>Total Employees</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['total'] }}</span>
+                        </div>
+                        <div class="stat-card stat-idle">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                                <div class="stat-text">
+                                    <p>Idle (No Status)</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['idle'] }}</span>
+                        </div>
+                        <div class="stat-card stat-onsite">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-check"></i></div>
+                                <div class="stat-text">
+                                    <p>On Site</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['on_site'] }}</span>
+                        </div>
+                        <div class="stat-card stat-absent">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-user-times"></i></div>
+                                <div class="stat-text">
+                                    <p>Absent</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['absent'] }}</span>
+                        </div>
+                        <div class="stat-card stat-leave">
+                            <div class="stat-left">
+                                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                                <div class="stat-text">
+                                    <p>On Leave</p>
+                                </div>
+                            </div>
+                            <span class="stat-value">{{ $stats['on_leave'] }}</span>
+                        </div>
+                    </div>
+                @endif
                 <div class="table-card">
                     <table class="projects-table">
                         <thead>
@@ -1847,4 +2052,354 @@
                 closeAllProjectsAttendanceModal();
             }
         });
+
+        // ===== PUNCH CLOCK FUNCTIONALITY =====
+        
+        // Update clock display every second
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            
+            document.getElementById('clockTime').textContent = timeStr;
+            document.getElementById('clockDate').textContent = dateStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Load employee punch status if this is an employee view
+        const isEmployee = {!! json_encode($isEmployee ?? false) !!};
+        if (isEmployee) {
+            loadEmployeePunchStatus();
+        }
+
+        // Load punch status when employee is selected
+        document.getElementById('punchEmployee').addEventListener('change', function() {
+            const employeeId = this.value;
+            if (employeeId) {
+                loadPunchStatus(employeeId);
+            } else {
+                resetPunchDisplay();
+            }
+        });
+
+        function resetPunchDisplay() {
+            document.getElementById('punchStatus').textContent = 'Not Punched';
+            document.getElementById('punchInDisplay').textContent = '—';
+            document.getElementById('punchOutDisplay').textContent = '—';
+            document.getElementById('lateStatus').textContent = 'On Time';
+            document.getElementById('punchInBtn').disabled = false;
+            document.getElementById('punchOutBtn').disabled = true;
+        }
+
+        function loadPunchStatus(employeeId) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            fetch(`/punch-status/${employeeId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load punch status');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updatePunchDisplay(data);
+            })
+            .catch(error => {
+                console.error('Error loading punch status:', error);
+                resetPunchDisplay();
+            });
+        }
+
+        function updatePunchDisplay(data) {
+            const punchStatus = document.getElementById('punchStatus');
+            const punchInDisplay = document.getElementById('punchInDisplay');
+            const punchOutDisplay = document.getElementById('punchOutDisplay');
+            const lateStatus = document.getElementById('lateStatus');
+            const punchInBtn = document.getElementById('punchInBtn');
+            const punchOutBtn = document.getElementById('punchOutBtn');
+
+            // Update punch in display
+            if (data.punch_in_time) {
+                const punchInTime = new Date(data.punch_in_time);
+                punchInDisplay.textContent = punchInTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                punchInBtn.disabled = true;
+                punchInBtn.style.opacity = '0.5';
+                punchOutBtn.disabled = false;
+                punchOutBtn.style.opacity = '1';
+            } else {
+                punchInDisplay.textContent = '—';
+                punchInBtn.disabled = false;
+                punchInBtn.style.opacity = '1';
+                punchOutBtn.disabled = true;
+                punchOutBtn.style.opacity = '0.5';
+            }
+
+            // Update punch out display
+            if (data.punch_out_time) {
+                const punchOutTime = new Date(data.punch_out_time);
+                punchOutDisplay.textContent = punchOutTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                punchOutBtn.disabled = true;
+                punchOutBtn.style.opacity = '0.5';
+            } else {
+                punchOutDisplay.textContent = '—';
+            }
+
+            // Update status
+            if (data.punch_in_time && data.punch_out_time) {
+                punchStatus.textContent = 'Punched Out';
+                punchStatus.style.color = '#6b7280';
+            } else if (data.punch_in_time) {
+                punchStatus.textContent = 'Punched In';
+                punchStatus.style.color = '#16a34a';
+            } else {
+                punchStatus.textContent = 'Not Punched';
+                punchStatus.style.color = '#3b82f6';
+            }
+
+            // Update late status
+            if (data.is_late) {
+                lateStatus.textContent = `⚠️ LATE - ${data.late_minutes} min`;
+                lateStatus.style.color = '#dc2626';
+            } else if (data.punch_in_time) {
+                lateStatus.textContent = '✓ On Time';
+                lateStatus.style.color = '#16a34a';
+            } else {
+                lateStatus.textContent = 'On Time';
+                lateStatus.style.color = '#6b7280';
+            }
+        }
+
+        // ===== EMPLOYEE PUNCH IN/OUT FUNCTIONS =====
+        
+        function performEmployeePunchIn() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            fetch(`/punch-in`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to punch in');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('✓ Punch In Successful!', data.message, 'success');
+                    loadEmployeePunchStatus();
+                    
+                    // If late, show extra notification
+                    if (data.is_late) {
+                        setTimeout(() => {
+                            showNotification('⚠️ Late Notice', `You are ${data.late_minutes} minutes late`, 'warning');
+                        }, 500);
+                    }
+                } else {
+                    showNotification('Error', data.message || 'Failed to punch in', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Punch in error:', error);
+                showNotification('Error', error.message || 'An error occurred while punching in', 'error');
+            });
+        }
+
+        function performEmployeePunchOut() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            fetch(`/punch-out`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to punch out');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('✓ Punch Out Successful!', `Hours worked: ${data.hours_worked.toFixed(2)} hrs`, 'success');
+                    loadEmployeePunchStatus();
+                } else {
+                    showNotification('Error', data.message || 'Failed to punch out', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Punch out error:', error);
+                showNotification('Error', error.message || 'An error occurred while punching out', 'error');
+            });
+        }
+
+        function loadEmployeePunchStatus() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            fetch(`/punch-status`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load punch status');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updatePunchDisplay(data);
+            })
+            .catch(error => {
+                console.error('Error loading punch status:', error);
+            });
+        }
+
+        function performPunchIn() {
+            const employeeId = document.getElementById('punchEmployee').value;
+            
+            if (!employeeId) {
+                alert('Please select an employee first');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            fetch(`/punch-in/${employeeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to punch in');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('✓ Punch In Successful!', data.message, 'success');
+                    loadPunchStatus(employeeId);
+                    
+                    // If late, show extra notification
+                    if (data.is_late) {
+                        setTimeout(() => {
+                            showNotification('⚠️ Late Notice', `You are ${data.late_minutes} minutes late`, 'warning');
+                        }, 500);
+                    }
+                } else {
+                    showNotification('Error', data.message || 'Failed to punch in', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Punch in error:', error);
+                showNotification('Error', error.message || 'An error occurred while punching in', 'error');
+            });
+        }
+
+        function performPunchOut() {
+            const employeeId = document.getElementById('punchEmployee').value;
+            
+            if (!employeeId) {
+                alert('Please select an employee first');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            fetch(`/punch-out/${employeeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to punch out');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('✓ Punch Out Successful!', `Hours worked: ${data.hours_worked.toFixed(2)} hrs`, 'success');
+                    loadPunchStatus(employeeId);
+                } else {
+                    showNotification('Error', data.message || 'Failed to punch out', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Punch out error:', error);
+                showNotification('Error', error.message || 'An error occurred while punching out', 'error');
+            });
+        }
+
+        function showNotification(title, message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            const bgColor = type === 'success' ? '#dcfce7' : type === 'error' ? '#fee2e2' : type === 'warning' ? '#fef3c7' : '#dbeafe';
+            const borderColor = type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : type === 'warning' ? '#f59e0b' : '#3b82f6';
+            const textColor = type === 'success' ? '#166534' : type === 'error' ? '#7f1d1d' : type === 'warning' ? '#92400e' : '#1e40af';
+
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${bgColor};
+                border-left: 4px solid ${borderColor};
+                padding: 16px;
+                border-radius: 8px;
+                color: ${textColor};
+                font-weight: 600;
+                z-index: 9999;
+                min-width: 300px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            `;
+
+            notification.innerHTML = `
+                <div style="font-size: 14px; font-weight: 700;">${title}</div>
+                <div style="font-size: 13px; font-weight: 400; margin-top: 4px;">${message}</div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Remove after 4 seconds
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.3s ease-out';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
     </script>

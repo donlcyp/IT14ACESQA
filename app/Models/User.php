@@ -61,6 +61,48 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is HR/Timekeeper.
+     * HR role can validate employee attendance.
+     */
+    public function isHR(): bool
+    {
+        return $this->role === 'HR';
+    }
+
+    /**
+     * Check if user can validate attendance.
+     * Only HR/Timekeeper role can validate attendance.
+     */
+    public function canValidateAttendance(): bool
+    {
+        return $this->role === 'HR';
+    }
+
+    /**
+     * Check if user is OWNER.
+     */
+    public function isOwner(): bool
+    {
+        return $this->role === 'OWNER';
+    }
+
+    /**
+     * Check if user is PM.
+     */
+    public function isPM(): bool
+    {
+        return $this->role === 'PM';
+    }
+
+    /**
+     * Check if user is Employee.
+     */
+    public function isEmployee(): bool
+    {
+        return $this->role === 'EMPLOYEE';
+    }
+
+    /**
      * Get the employee profile for this user.
      */
     public function employeeProfile()

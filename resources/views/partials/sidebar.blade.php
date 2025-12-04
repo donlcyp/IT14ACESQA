@@ -27,13 +27,13 @@
         background-color: #f8fafc;
         border-right: 1px solid #e2e8f0;
         transform: translateX(-100%);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
         overflow-y: auto;
     }
 
     /* When open, slide into view */
     .sidebar.open {
         transform: translateX(0);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         box-shadow: 8px 0 24px rgba(15, 23, 42, 0.08);
     }
 
@@ -229,6 +229,34 @@
             <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-user-check"></i>
                 <span>Attendance</span>
+            </a>
+        @endif
+
+        <!-- HR/TIMEKEEPER: Attendance Validation -->
+        @if(auth()->check() && auth()->user()->role === 'HR')
+            <a href="{{ route('attendance-validation.dashboard') }}" class="nav-item {{ request()->routeIs('attendance-validation.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-clipboard-check"></i>
+                <span>Attendance Validation</span>
+            </a>
+            <a href="{{ route('attendance-validation.index') }}" class="nav-item {{ request()->routeIs('attendance-validation.index') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-list-check"></i>
+                <span>Pending Reviews</span>
+            </a>
+            <a href="{{ route('attendance-validation.approved') }}" class="nav-item {{ request()->routeIs('attendance-validation.approved') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-check-circle"></i>
+                <span>Approved</span>
+            </a>
+            <a href="{{ route('attendance-validation.rejected') }}" class="nav-item {{ request()->routeIs('attendance-validation.rejected') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-times-circle"></i>
+                <span>Rejected</span>
+            </a>
+        @endif
+
+        <!-- EMPLOYEE: My Attendance (for employees who have employee profile) -->
+        @if(auth()->check() && \App\Models\Employee::where('user_id', auth()->user()->id)->exists())
+            <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <span>My Attendance</span>
             </a>
         @endif
     </nav>

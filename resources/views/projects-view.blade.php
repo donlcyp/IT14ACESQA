@@ -833,6 +833,7 @@
                 <div class="tabs">
                     <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
                     <button class="tab-button" onclick="switchTab('boq')">Bill of Quantity</button>
+                    <button class="tab-button" onclick="switchTab('finance')">Finance & Transactions</button>
                     <button class="tab-button" onclick="switchTab('employees')">Employees</button>
                     <button class="tab-button" onclick="switchTab('images')">Documentation</button>
                     <button class="tab-button" onclick="switchTab('report')">Reports</button>
@@ -1045,6 +1046,154 @@
                                 <p>No BOQ items added to this project yet.</p>
                             </div>
                         @endif
+                    </div>
+                </div>
+
+                <!-- Finance & Transactions Tab -->
+                <div id="finance" class="tab-content">
+                    <div class="report-section">
+                        <div class="report-title">Finance & Transactions Summary</div>
+                        
+                        <!-- Financial Summary Cards -->
+                        <div style="margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                            @php
+                                $materials = $project->materials ?? collect();
+                                $totalExpenses = $materials->sum(function($m) {
+                                    return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
+                                });
+                                $approvedExpenses = $materials->filter(function($m) {
+                                    return strtolower($m->status ?? 'pending') === 'approved';
+                                })->sum(function($m) {
+                                    return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
+                                });
+                                $pendingExpenses = $materials->filter(function($m) {
+                                    return strtolower($m->status ?? 'pending') === 'pending';
+                                })->sum(function($m) {
+                                    return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
+                                });
+                                $failedExpenses = $materials->filter(function($m) {
+                                    return strtolower($m->status ?? 'pending') === 'failed';
+                                })->sum(function($m) {
+                                    return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
+                                });
+                                $approvedCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'approved'; })->count();
+                                $pendingCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'pending'; })->count();
+                                $failedCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'failed'; })->count();
+                            @endphp
+                            
+                            <div style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); padding: 18px; border-radius: 8px; border-left: 4px solid #a855f7;">
+                                <div style="font-size: 11px; color: #7e22ce; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Total Expenses</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #7e22ce; margin-top: 8px;">₱{{ number_format($totalExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #7e22ce; opacity: 0.7; margin-top: 4px;">{{ $materials->count() }} items</div>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 18px; border-radius: 8px; border-left: 4px solid #16a34a;">
+                                <div style="font-size: 11px; color: #166534; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Approved</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #16a34a; margin-top: 8px;">₱{{ number_format($approvedExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #166534; opacity: 0.7; margin-top: 4px;">{{ $approvedCount }} items ready for payment</div>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 18px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                                <div style="font-size: 11px; color: #92400e; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Pending</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #f59e0b; margin-top: 8px;">₱{{ number_format($pendingExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #92400e; opacity: 0.7; margin-top: 4px;">{{ $pendingCount }} items under review</div>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); padding: 18px; border-radius: 8px; border-left: 4px solid #dc2626;">
+                                <div style="font-size: 11px; color: #991b1b; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Failed/Returns</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #dc2626; margin-top: 8px;">₱{{ number_format($failedExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #991b1b; opacity: 0.7; margin-top: 4px;">{{ $failedCount }} items for return</div>
+                            </div>
+                        </div>
+
+                        <!-- Budget vs Actual -->
+                        <div style="margin-bottom: 30px; background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                            <div style="font-weight: 600; font-size: 15px; margin-bottom: 15px;">Budget vs Actual</div>
+                            @php
+                                $allocatedBudget = $project->allocated_amount ?? 0;
+                                $percentageUsed = $allocatedBudget > 0 ? round(($totalExpenses / $allocatedBudget) * 100, 1) : 0;
+                                $remaining = max(0, $allocatedBudget - $totalExpenses);
+                            @endphp
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+                                    <span>Allocated Budget: <strong>₱{{ number_format($allocatedBudget, 2) }}</strong></span>
+                                    <span style="color: var(--gray-600);">Used: {{ $percentageUsed }}%</span>
+                                </div>
+                                <div style="height: 8px; background: var(--gray-300); border-radius: 4px; overflow: hidden;">
+                                    <div style="height: 100%; background: {{ $percentageUsed > 100 ? '#dc2626' : ($percentageUsed > 80 ? '#f59e0b' : '#16a34a') }}; width: {{ min($percentageUsed, 100) }}%;"></div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 13px;">
+                                <div>
+                                    <div style="color: var(--gray-600); margin-bottom: 4px;">Total Expenses</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--gray-900);">₱{{ number_format($totalExpenses, 2) }}</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--gray-600); margin-bottom: 4px;">Remaining</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: {{ $remaining < 0 ? '#dc2626' : '#059669' }};">₱{{ number_format($remaining, 2) }}</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--gray-600); margin-bottom: 4px;">Budget Status</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: {{ $percentageUsed > 100 ? '#dc2626' : ($percentageUsed > 80 ? '#f59e0b' : '#059669') }};">
+                                        {{ $percentageUsed > 100 ? 'Over Budget' : ($percentageUsed > 80 ? 'Near Limit' : 'On Track') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transaction Details Table -->
+                        <div>
+                            <div style="font-weight: 600; font-size: 15px; margin-bottom: 15px;">Transaction Details</div>
+                            @if ($materials && $materials->count() > 0)
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
+                                                <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
+                                                <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Qty</th>
+                                                <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 100px;">Unit Rate</th>
+                                                <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 100px;">Total Cost</th>
+                                                <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 100px;">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($materials as $material)
+                                                @php
+                                                    $itemTotal = ($material->material_cost ?? 0 + $material->labor_cost ?? 0) * ($material->quantity ?? 0);
+                                                    $statusColor = match(strtolower($material->status ?? 'pending')) {
+                                                        'approved' => ['#dcfce7', '#166534', '#16a34a'],
+                                                        'pending' => ['#fef3c7', '#92400e', '#f59e0b'],
+                                                        'failed' => ['#fee2e2', '#991b1b', '#dc2626'],
+                                                        default => ['#f3f4f6', '#374151', '#6b7280']
+                                                    };
+                                                @endphp
+                                                <tr style="border-bottom: 1px solid var(--gray-400);">
+                                                    <td style="padding: 12px; color: var(--black-1);">
+                                                        <div style="font-weight: 500;">{{ $material->item_description ?? 'N/A' }}</div>
+                                                        @if($material->category)
+                                                            <div style="font-size: 11px; color: var(--gray-600);">{{ $material->category }}</div>
+                                                        @endif
+                                                    </td>
+                                                    <td style="padding: 12px; text-align: center; color: var(--gray-700);">{{ $material->quantity ?? 0 }}</td>
+                                                    <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($material->material_cost ?? 0, 2) }}</td>
+                                                    <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f9fafb;">₱{{ number_format($itemTotal, 2) }}</td>
+                                                    <td style="padding: 12px; text-align: center;">
+                                                        <span style="background: {{ $statusColor[0] }}; color: {{ $statusColor[2] }}; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                                                            {{ ucfirst($material->status ?? 'pending') }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
+                                    <i class="fas fa-chart-line" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                    <p>No transactions recorded yet. Add BOQ items to begin tracking finances.</p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -2031,19 +2180,32 @@
             .then(response => {
                 console.log('Response status:', response.status);
                 console.log('Response headers:', response.headers);
+                console.log('Response content-type:', response.headers.get('content-type'));
                 
                 if (!response.ok) {
-                    return response.json().then(err => {
-                        console.error('JSON error response:', err);
-                        throw err;
-                    }).catch(e => {
-                        return response.text().then(text => {
-                            console.error('Text response:', text);
-                            throw new Error(text || 'HTTP ' + response.status);
+                    // Try to parse as JSON, fallback to text
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(err => {
+                            console.error('JSON error response:', err);
+                            throw new Error(err.message || 'HTTP ' + response.status);
                         });
-                    });
+                    } else {
+                        return response.text().then(text => {
+                            console.error('Text error response:', text);
+                            throw new Error('HTTP ' + response.status + ': ' + (text || 'Unknown error'));
+                        });
+                    }
                 }
-                return response.json();
+                
+                // Parse successful response
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    console.warn('Response is not JSON, but status is ok:', response.status);
+                    return { success: true, message: 'Material saved successfully!' };
+                }
             })
             .then(data => {
                 console.log('Success response:', data);
@@ -2152,9 +2314,24 @@
             document.getElementById('boqTitle').textContent = 'Edit BOQ Item';
             
             // Fetch material data
-            fetch(`/projects/{{ $project->id }}/materials/${materialId}`)
-                .then(response => response.json())
+            const url = `/projects/{{ $project->id }}/materials/${materialId}`;
+            console.log('Fetching material from:', url);
+            
+            fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Material data received:', data);
                     document.getElementById('boqCategory').value = data.category || '';
                     document.getElementById('boqItemDescription').value = data.item_description || '';
                     document.getElementById('boqQuantity').value = data.quantity || '';
@@ -2185,7 +2362,7 @@
                 })
                 .catch(error => {
                     console.error('Error fetching BOQ item:', error);
-                    alert('Error loading BOQ item data');
+                    alert(`Error loading BOQ item data: ${error.message}\n\nURL: ${url}`);
                 });
         }
 

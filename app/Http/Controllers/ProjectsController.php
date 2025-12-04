@@ -561,8 +561,24 @@ class ProjectsController extends Controller
                 'status' => $validated['status'] ?? 'pending',
             ]);
 
+            // Return JSON for AJAX requests, redirect for form submissions
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Material updated successfully!',
+                    'data' => $material
+                ]);
+            }
+
             return redirect()->route('projects.show', $project->id)->with('success', 'Material updated successfully!');
         } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update material: ' . $e->getMessage()
+                ], 422);
+            }
+
             return redirect()->route('projects.show', $project->id)->with('error', 'Failed to update material: ' . $e->getMessage());
         }
     }

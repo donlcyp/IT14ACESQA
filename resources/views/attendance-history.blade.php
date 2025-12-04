@@ -443,7 +443,7 @@
             <section class="content-area">
                 <div class="page-header">
                     <h1 class="page-title">Attendance History</h1>
-                    <a href="{{ route('employee-attendance') }}" class="btn btn-outline">
+                    <a href="{{ route('my-attendance') }}" class="btn btn-outline">
                         <i class="fas fa-arrow-left"></i> Back to Current Attendance
                     </a>
                 </div>

@@ -62,7 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/projects/{project}/archive', [App\Http\Controllers\ProjectsController::class, 'archive'])->name('projects.archive');
         Route::put('/projects/{project}/unarchive', [App\Http\Controllers\ProjectsController::class, 'unarchive'])->name('projects.unarchive');
 
-        // Employee & Attendance
+        // Employee & Attendance (OWNER & PM only)
         Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
         Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'storeAttendance'])->name('employee-attendance.store');
         Route::get('/employee-attendance-history', [App\Http\Controllers\EmployeeAttendanceController::class, 'history'])->name('employee-attendance.history');
@@ -109,6 +109,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/activity-log/{log}', [App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-log.show');
     });
 
+    // ===== EMPLOYEE ONLY: Attendance and Punch In/Out =====
+    Route::middleware('auth')->group(function () {
+        // These routes allow any authenticated user with an employee profile to punch in/out
+        Route::get('/my-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('my-attendance');
+        Route::post('/punch-in', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchInEmployee'])->name('punch.in.employee');
+        Route::post('/punch-out', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchOutEmployee'])->name('punch.out.employee');
+        Route::get('/punch-status', [App\Http\Controllers\EmployeeAttendanceController::class, 'getPunchStatusEmployee'])->name('punch.status.employee');
+    });
+
     // API Routes for Project Employee Management (PM and OWNER only)
     Route::post('/api/projects/{project}/employees', [App\Http\Controllers\EmployeeAttendanceController::class, 'assignEmployeesToProject'])
         ->name('api.projects.employees.assign')
@@ -120,6 +129,26 @@ Route::middleware('auth')->group(function () {
         Route::get('/csv/project/{project}', [App\Http\Controllers\PDFController::class, 'downloadProjectCsv'])->name('csv.project.download');
         Route::get('/pdf/boq/{project}', [App\Http\Controllers\PDFController::class, 'downloadBOQ'])->name('pdf.boq.download');
         Route::get('/pdf/attendance-report', [App\Http\Controllers\PDFController::class, 'downloadAttendanceReport'])->name('pdf.attendance-report.download');
+    });
+
+    // ===== HR/TIMEKEEPER ONLY: Attendance Validation =====
+    Route::middleware('role:HR')->group(function () {
+        Route::prefix('attendance-validation')->name('attendance-validation.')->group(function () {
+            // Dashboard and main views
+            Route::get('/', [App\Http\Controllers\AttendanceValidationController::class, 'index'])->name('index');
+            Route::get('/dashboard', [App\Http\Controllers\AttendanceValidationController::class, 'dashboard'])->name('dashboard');
+            Route::get('/approved', [App\Http\Controllers\AttendanceValidationController::class, 'approved'])->name('approved');
+            Route::get('/rejected', [App\Http\Controllers\AttendanceValidationController::class, 'rejected'])->name('rejected');
+            Route::get('/filter', [App\Http\Controllers\AttendanceValidationController::class, 'filter'])->name('filter');
+
+            // Single validation review and actions
+            Route::get('/{attendance}', [App\Http\Controllers\AttendanceValidationController::class, 'show'])->name('show');
+            Route::post('/{attendance}/approve', [App\Http\Controllers\AttendanceValidationController::class, 'approve'])->name('approve');
+            Route::post('/{attendance}/reject', [App\Http\Controllers\AttendanceValidationController::class, 'reject'])->name('reject');
+
+            // Employee history
+            Route::get('/employee/{employee}/history', [App\Http\Controllers\AttendanceValidationController::class, 'employeeHistory'])->name('employee.history');
+        });
     });
 });
 
