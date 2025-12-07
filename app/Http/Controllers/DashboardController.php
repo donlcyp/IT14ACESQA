@@ -82,12 +82,14 @@ class DashboardController extends Controller
                 ->get();
 
             // Recent materials (latest 5)
-            $recentProjectRecords = Material::orderByDesc('created_at')
+            $recentProjectRecords = Material::with('project')
+                ->orderByDesc('created_at')
                 ->take(5)
                 ->get();
 
             // Materials that have failed status (need to be returned)
-            $projectsToReturn = Material::where('status', 'Fail')
+            $projectsToReturn = Material::with('project')
+                ->where('status', 'Fail')
                 ->orderByDesc('created_at')
                 ->take(5)
                 ->get();
@@ -100,5 +102,58 @@ class DashboardController extends Controller
                 'isEmployee'
             ));
         }
+    }
+
+    public function financeGraphs()
+    {
+        // Get all active projects with their materials
+        $activeProjects = Project::where('archived', false)
+            ->with('materials')
+            ->orderByDesc('created_at')
+            ->get();
+
+        // Calculate totals and prepare data for charts
+        $totalBudget = $activeProjects->sum('allocated_amount');
+        
+        $totalSpent = 0;
+        foreach ($activeProjects as $project) {
+            foreach ($project->materials as $material) {
+                $materialCost = $material->material_cost ?? 0;
+                $laborCost = $material->labor_cost ?? 0;
+                $quantity = $material->quantity ?? 0;
+                $totalSpent += ($materialCost + $laborCost) * $quantity;
+            }
+        }
+
+        // Prepare data for each project
+        $projectsData = $activeProjects->map(function ($project) {
+            $projectSpent = 0;
+            $materialCost = 0;
+            $laborCost = 0;
+            
+            foreach ($project->materials as $material) {
+                $mCost = $material->material_cost ?? 0;
+                $lCost = $material->labor_cost ?? 0;
+                $qty = $material->quantity ?? 0;
+                $itemTotal = ($mCost + $lCost) * $qty;
+                $projectSpent += $itemTotal;
+                $materialCost += $mCost * $qty;
+                $laborCost += $lCost * $qty;
+            }
+
+            return [
+                'name' => $project->project_name ?? $project->project_code,
+                'budget' => $project->allocated_amount ?? 0,
+                'spent' => $projectSpent,
+                'materialCost' => $materialCost,
+                'laborCost' => $laborCost,
+            ];
+        })->toArray();
+
+        return view('finance-graphs', compact(
+            'projectsData',
+            'totalBudget',
+            'totalSpent'
+        ));
     }
 }

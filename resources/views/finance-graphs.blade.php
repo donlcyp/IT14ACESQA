@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>Financial Graphs - AJJ CRISBER Engineering Services</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --accent: #16a34a;
+            --white: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --header-bg: var(--accent);
+            --main-bg: #ffffff;
+
+            --gray-300: #d0d5dd;
+            --gray-400: #e9e9e9;
+            --gray-500: #667085;
+            --gray-600: #6b7280;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --black-1: #111827;
+
+            --text-lg-medium-font-family: "Inter", sans-serif;
+            --text-lg-medium-font-weight: 500;
+            --text-lg-medium-font-size: 18px;
+            --text-lg-medium-line-height: 28px;
+            --text-md-normal-font-family: "Inter", sans-serif;
+            --text-md-normal-font-weight: 400;
+            --text-md-normal-font-size: 16px;
+            --text-md-normal-line-height: 24px;
+            --text-sm-medium-font-family: "Inter", sans-serif;
+            --text-sm-medium-font-weight: 500;
+            --text-sm-medium-font-size: 14px;
+            --text-sm-medium-line-height: 20px;
+            --text-headline-small-bold-font-family: "Inter", sans-serif;
+            --text-headline-small-bold-font-weight: 700;
+            --text-headline-small-bold-font-size: 18px;
+            --text-headline-small-bold-line-height: 28px;
+
+            --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+            --shadow-md: 0 6px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--text-md-normal-font-family);
+            background-color: var(--main-bg);
+            color: var(--gray-700);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            transition: margin-left 0.3s ease;
+        }
+
+        @media (min-width: 769px) {
+            .main-content {
+                margin-left: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .header-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .header-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            color: white;
+            font-family: "Zen Dots", sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            flex: 1;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .back-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .graphs-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        .graph-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            grid-column: span 12;
+        }
+
+        .graph-card.half {
+            grid-column: span 6;
+        }
+
+        .graph-card-title {
+            font-family: var(--text-headline-small-bold-font-family);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container.small {
+            height: 300px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-left: 4px solid var(--accent);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        @media (max-width: 1024px) {
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .graph-card.half {
+                grid-column: span 12;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header-title {
+                font-size: 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .summary-stats {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        @include('partials.sidebar')
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="header">
+                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
+            </header>
+
+            <!-- Content Area -->
+            <section class="content-area">
+                <div class="page-header">
+                    <h1 class="page-title">Financial Graphs & Analytics</h1>
+                    <a href="{{ route('dashboard') }}" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="summary-stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Budget</div>
+                        <div class="stat-value">₱{{ number_format($totalBudget ?? 0, 2) }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Spent</div>
+                        <div class="stat-value">₱{{ number_format($totalSpent ?? 0, 2) }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Remaining</div>
+                        <div class="stat-value">₱{{ number_format(($totalBudget ?? 0) - ($totalSpent ?? 0), 2) }}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Budget Usage</div>
+                        <div class="stat-value">{{ $totalBudget ? round(($totalSpent / $totalBudget) * 100, 1) : 0 }}%</div>
+                    </div>
+                </div>
+
+                <!-- Graphs Grid -->
+                <div class="graphs-grid">
+                    <!-- Budget vs Spent Overview -->
+                    <div class="graph-card half">
+                        <div class="graph-card-title">Budget vs Spent Overview</div>
+                        <div class="chart-container small">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Budget Distribution -->
+                    <div class="graph-card half">
+                        <div class="graph-card-title">Project Budget Distribution</div>
+                        <div class="chart-container small">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Spending Trend -->
+                    <div class="graph-card">
+                        <div class="graph-card-title">Monthly Spending Trend</div>
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Project Spending Breakdown -->
+                    <div class="graph-card">
+                        <div class="graph-card-title">Spending by Project</div>
+                        <div class="chart-container">
+                            <canvas id="projectChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Status Breakdown -->
+                    <div class="graph-card half">
+                        <div class="graph-card-title">Budget Status Breakdown</div>
+                        <div class="chart-container small">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Material Cost Breakdown -->
+                    <div class="graph-card half">
+                        <div class="graph-card-title">Material vs Labor Costs</div>
+                        <div class="chart-container small">
+                            <canvas id="costTypeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    @include('partials.sidebar-js')
+
+    <script>
+        // Chart Colors
+        const chartColors = {
+            primary: '#16a34a',
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#3b82f6',
+            light: '#f3f4f6'
+        };
+
+        // Data from backend
+        const projectsData = @json($projectsData ?? []);
+        const totalBudget = @json($totalBudget ?? 0);
+        const totalSpent = @json($totalSpent ?? 0);
+
+        // Chart 1: Budget vs Spent
+        const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+        new Chart(budgetCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Spent', 'Remaining'],
+                datasets: [{
+                    data: [totalSpent, totalBudget - totalSpent],
+                    backgroundColor: [chartColors.primary, chartColors.light],
+                    borderColor: ['#fff', '#fff'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Chart 2: Project Distribution
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        new Chart(distributionCtx, {
+            type: 'pie',
+            data: {
+                labels: projectsData.map(p => p.name),
+                datasets: [{
+                    data: projectsData.map(p => p.budget),
+                    backgroundColor: [
+                        chartColors.primary,
+                        chartColors.success,
+                        chartColors.info,
+                        chartColors.warning,
+                        chartColors.danger
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Chart 3: Spending Trend
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Monthly Spending',
+                    data: [0, 0, 0, 0, 0, 150000, 200000, 250000, 300000, 350000, 400000, 500000],
+                    borderColor: chartColors.primary,
+                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: chartColors.primary,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₱' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 4: Project Spending
+        const projectCtx = document.getElementById('projectChart').getContext('2d');
+        new Chart(projectCtx, {
+            type: 'bar',
+            data: {
+                labels: projectsData.map(p => p.name),
+                datasets: [
+                    {
+                        label: 'Budget',
+                        data: projectsData.map(p => p.budget),
+                        backgroundColor: chartColors.primary
+                    },
+                    {
+                        label: 'Spent',
+                        data: projectsData.map(p => p.spent),
+                        backgroundColor: chartColors.warning
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₱' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 5: Status Breakdown
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Healthy', 'Critical', 'Over Budget'],
+                datasets: [{
+                    data: [
+                        projectsData.filter(p => (p.budget - p.spent) > (p.budget * 0.2)).length,
+                        projectsData.filter(p => (p.budget - p.spent) <= (p.budget * 0.2) && (p.budget - p.spent) > 0).length,
+                        projectsData.filter(p => (p.budget - p.spent) < 0).length
+                    ],
+                    backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Chart 6: Cost Type Breakdown
+        const costTypeCtx = document.getElementById('costTypeChart').getContext('2d');
+        const totalMaterialCost = projectsData.reduce((sum, p) => sum + (p.materialCost || 0), 0);
+        const totalLaborCost = projectsData.reduce((sum, p) => sum + (p.laborCost || 0), 0);
+
+        new Chart(costTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Material Costs', 'Labor Costs'],
+                datasets: [{
+                    data: [totalMaterialCost, totalLaborCost],
+                    backgroundColor: [chartColors.primary, chartColors.info],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -13,7 +13,7 @@ class UserManagementController extends Controller
      */
     public function index()
     {
-        $users = User::orderBy('name')->paginate(15);
+        $users = User::orderBy('name')->paginate(10);
         $roles = $this->roles();
         return view('admin.users.index', compact('users', 'roles'));
     }

@@ -827,6 +827,14 @@
                         <div class="detail-label">Budget</div>
                         <div class="detail-value">₱{{ number_format($project->allocated_amount, 2) }}</div>
                     </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Date Started</div>
+                        <div class="detail-value">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started yet' }}</div>
+                    </div>
+                    <div class="detail-card">
+                        <div class="detail-label">Date Ended</div>
+                        <div class="detail-value">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'Not ended yet' }}</div>
+                    </div>
                 </div>
 
                 <!-- Tabs -->
@@ -899,6 +907,58 @@
                 <div id="boq" class="tab-content">
                     <div class="report-section">
                         <div class="report-title">Bill of Quantity</div>
+                        
+                        @if ($project->materials && $project->materials->count() > 0)
+                        <!-- BOQ Summary Cards - Below Title -->
+                        @php
+                            $totalMaterial = 0;
+                            $totalLabor = 0;
+                            $grandTotal = 0;
+                            foreach ($project->materials as $material) {
+                                $materialCost = $material->material_cost ?? 0;
+                                $laborCost = $material->labor_cost ?? 0;
+                                $unitTotal = $materialCost + $laborCost;
+                                $itemTotal = $unitTotal * ($material->quantity ?? 0);
+                                $totalMaterial += $materialCost * ($material->quantity ?? 0);
+                                $totalLabor += $laborCost * ($material->quantity ?? 0);
+                                $grandTotal += $itemTotal;
+                            }
+                            $vat = $grandTotal * 0.12;
+                            $grandTotalWithVAT = $grandTotal + $vat;
+                        @endphp
+                        <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Material Cost</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
+                                    ₱{{ number_format($totalMaterial, 2) }}
+                                </div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #6a1b9a; opacity: 0.8;">Total Labor Cost</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #6a1b9a;">
+                                    ₱{{ number_format($totalLabor, 2) }}
+                                </div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #c8e6c9, #a5d6a7); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #1b5e20; opacity: 0.8;">Subtotal</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #1b5e20;">
+                                    ₱{{ number_format($grandTotal, 2) }}
+                                </div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #fff3cd, #ffe082); padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                                <div style="font-size: 12px; color: #856404; opacity: 0.8;">VAT 12%</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #856404;">
+                                    ₱{{ number_format($vat, 2) }}
+                                </div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 15px; border-radius: 8px; border-left: 4px solid #28a745; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.15);">
+                                <div style="font-size: 12px; color: #155724; opacity: 0.8; font-weight: 600;">Grand Total w/ VAT</div>
+                                <div style="font-size: 28px; font-weight: 700; color: #155724;">
+                                    ₱{{ number_format($grandTotalWithVAT, 2) }}
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         
                         <div style="display: flex; gap: 12px; margin-bottom: 20px;">
                             <button type="button" class="btn btn-primary" onclick="return openBOQModal();">
@@ -1005,40 +1065,6 @@
                                         </tr>
                                     </tfoot>
                                 </table>
-                            </div>
-
-                            <!-- BOQ Summary -->
-                            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                                <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Material Cost</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
-                                        ₱{{ number_format($totalMaterial, 2) }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #6a1b9a; opacity: 0.8;">Total Labor Cost</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #6a1b9a;">
-                                        ₱{{ number_format($totalLabor, 2) }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #c8e6c9, #a5d6a7); padding: 15px; border-radius: 8px;">
-                                    <div style="font-size: 12px; color: #1b5e20; opacity: 0.8;">Subtotal</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #1b5e20;">
-                                        ₱{{ number_format($grandTotal, 2) }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #fff3cd, #ffe082); padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
-                                    <div style="font-size: 12px; color: #856404; opacity: 0.8;">VAT 12%</div>
-                                    <div style="font-size: 24px; font-weight: 700; color: #856404;">
-                                        ₱{{ number_format($vat, 2) }}
-                                    </div>
-                                </div>
-                                <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 15px; border-radius: 8px; border-left: 4px solid #28a745; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.15);">
-                                    <div style="font-size: 12px; color: #155724; opacity: 0.8; font-weight: 600;">Grand Total w/ VAT</div>
-                                    <div style="font-size: 28px; font-weight: 700; color: #155724;">
-                                        ₱{{ number_format($grandTotalWithVAT, 2) }}
-                                    </div>
-                                </div>
                             </div>
                         @else
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
@@ -1522,6 +1548,23 @@
                                     <option value="dozen">Dozen</option>
                                     <option value="unit">Unit</option>
                                     <option value="lot">Lot</option>
+                                    <option value="inch">Inch (in)</option>
+                                    <option value="foot">Foot (ft)</option>
+                                    <option value="yard">Yard (yd)</option>
+                                    <option value="gram">Gram (g)</option>
+                                    <option value="ton">Ton (t)</option>
+                                    <option value="milliliter">Milliliter (ml)</option>
+                                    <option value="cup">Cup</option>
+                                    <option value="tablespoon">Tablespoon (tbsp)</option>
+                                    <option value="teaspoon">Teaspoon (tsp)</option>
+                                    <option value="bottle">Bottle</option>
+                                    <option value="can">Can</option>
+                                    <option value="carton">Carton</option>
+                                    <option value="tube">Tube</option>
+                                    <option value="spool">Spool</option>
+                                    <option value="coil">Coil</option>
+                                    <option value="pair">Pair</option>
+                                    <option value="ream">Ream</option>
                                 </select>
                             </div>
                         </div>
