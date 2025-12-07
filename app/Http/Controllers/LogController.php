@@ -20,7 +20,7 @@ class LogController extends Controller
 
         $logs = Log::with('user')
             ->orderBy('log_date', 'desc')
-            ->paginate(50);
+            ->paginate(10);
 
         return view('logs.index', compact('logs'));
     }
@@ -47,7 +47,7 @@ class LogController extends Controller
             $query->where('action', $action);
         }
 
-        $logs = $query->orderBy('log_date', 'desc')->paginate(50);
+        $logs = $query->orderBy('log_date', 'desc')->paginate(10);
 
         return view('logs.index', compact('logs'));
     }

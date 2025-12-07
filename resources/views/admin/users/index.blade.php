@@ -335,41 +335,81 @@
     /* Pagination */
     .pagination-container {
       display: flex;
-      justify-content: center;
-      padding: 20px;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 0;
+      user-select: none;
     }
-
-    .pagination {
+    .pagination-info {
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+    }
+    .pagination-controls {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
-
-    .pagination a,
-    .pagination span {
-      padding: 8px 12px;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+    .pagination-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .page-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 8px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    a.page-btn {
+      color: #374151;
+      text-decoration: underline;
+    }
+    a.page-btn:hover {
+      color: #111827;
+      text-decoration: underline;
+      background: transparent;
+    }
+    span.page-btn {
       text-decoration: none;
-      color: var(--accent);
-      font-size: 13px;
-      transition: all 0.3s ease;
+      color: #374151;
     }
-
-    .pagination a:hover {
-      background-color: var(--accent);
+    span.page-btn.active {
+      background: var(--accent);
       color: white;
-      border-color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      padding: 0 12px;
     }
-
-    .pagination .active {
-      background-color: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
-    .pagination .disabled {
+    span.page-btn.disabled {
       opacity: 0.5;
+      color: #9ca3af;
       cursor: not-allowed;
+      pointer-events: none;
+      text-decoration: none;
+    }
+    .page-btn.arrow {
+      font-size: 20px;
+      font-weight: 400;
+    }
+    .page-btn.ellipsis {
+      cursor: default;
+      pointer-events: none;
     }
 
     /* Back Link */
@@ -387,6 +427,27 @@
     .back-link:hover {
       transform: translateX(-5px);
       color: #15803d;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background-color: var(--accent);
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-action:hover {
+      background-color: #15803d;
+      transform: scale(1.1);
     }
 
     /* Responsive */
@@ -409,6 +470,204 @@
       th, td {
         padding: 10px;
         font-size: 13px;
+      }
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 32px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      animation: slideUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-title i {
+      color: var(--accent);
+      font-size: 28px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      color: #111827;
+      background: #f3f4f6;
+      border-radius: 6px;
+    }
+
+    .modal-body {
+      margin-bottom: 24px;
+    }
+
+    .form-group-modal {
+      margin-bottom: 20px;
+    }
+
+    .form-group-modal label {
+      display: block;
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group-modal input,
+    .form-group-modal select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .form-group-modal input:focus,
+    .form-group-modal select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+
+    .form-help {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .modal-footer .btn {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    /* View Modal Details */
+    .modal-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-item-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+    }
+
+    .detail-item-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1f2937;
+    }
+
+    .detail-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .detail-badge.verified {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .detail-badge.unverified {
+      background-color: #fee2e2;
+      color: #7c2d12;
+    }
+
+    @media (max-width: 600px) {
+      .modal-details {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -435,9 +694,9 @@
           <h1 class="page-title">
             <i class="fas fa-user-gear"></i> Manage Users
           </h1>
-          <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+          <button onclick="openCreateUserModal()" class="btn btn-primary">
             <i class="fas fa-plus"></i> Add New User
-          </a>
+          </button>
         </div>
 
         <!-- Flash Message -->
@@ -456,8 +715,8 @@
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
-                  <th>Verified</th>
                   <th>Created</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -472,18 +731,12 @@
                         {{ $user->role ?? 'N/A' }}
                       </span>
                     </td>
-                    <td>
-                      @if ($user->email_verified_at)
-                        <span class="badge badge-verified">
-                          <i class="fas fa-check"></i> Verified
-                        </span>
-                      @else
-                        <span class="badge badge-unverified">
-                          <i class="fas fa-times"></i> Not Verified
-                        </span>
-                      @endif
-                    </td>
                     <td>{{ optional($user->created_at)->diffForHumans() ?? 'N/A' }}</td>
+                    <td>
+                      <a href="#" onclick="openViewUserModal({{ json_encode($user) }}); return false;" class="btn-action" title="View user details">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
@@ -498,16 +751,58 @@
         </div>
 
         <!-- Pagination -->
-        @if ($users->count() > 0)
+        @if ($users->hasPages())
+          @php
+            $currentPage = $users->currentPage();
+            $lastPage = $users->lastPage();
+          @endphp
           <div class="pagination-container">
-            {{ $users->links() }}
+            <div class="pagination-info">
+              Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
+            </div>
+            <div class="pagination-controls">
+              @if ($users->onFirstPage())
+                <span class="page-btn arrow disabled">‹</span>
+              @else
+                <a class="page-btn arrow" href="{{ $users->previousPageUrl() }}" rel="prev">‹</a>
+              @endif
+
+              <div class="pagination-nav">
+                @if ($currentPage > 1)
+                  <a class="page-btn" href="{{ $users->url(1) }}">1</a>
+                @endif
+                
+                @if ($currentPage > 2)
+                  <span class="page-btn ellipsis">...</span>
+                @endif
+                
+                @if ($currentPage > 2)
+                  <a class="page-btn" href="{{ $users->url($currentPage - 1) }}">{{ $currentPage - 1 }}</a>
+                @endif
+                
+                <span class="page-btn active">{{ $currentPage }}</span>
+                
+                @if ($currentPage < $lastPage - 1)
+                  <a class="page-btn" href="{{ $users->url($currentPage + 1) }}">{{ $currentPage + 1 }}</a>
+                @endif
+                
+                @if ($currentPage < $lastPage - 1)
+                  <span class="page-btn ellipsis">...</span>
+                @endif
+                
+                @if ($currentPage < $lastPage)
+                  <a class="page-btn" href="{{ $users->url($lastPage) }}">{{ $lastPage }}</a>
+                @endif
+              </div>
+
+              @if ($users->hasMorePages())
+                <a class="page-btn arrow" href="{{ $users->nextPageUrl() }}" rel="next">›</a>
+              @else
+                <span class="page-btn arrow disabled">›</span>
+              @endif
+            </div>
           </div>
         @endif
-
-        <!-- Back Link -->
-        <a href="{{ route('dashboard') }}" class="back-link">
-          <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
       </div>
     </div>
   </div>
@@ -532,6 +827,187 @@
         if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
           toggleSidebar();
         }
+      }
+    });
+  </script>
+
+  <!-- Create User Modal -->
+  <div id="createUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-user-plus"></i>
+          Create User
+        </div>
+      </div>
+
+      <form method="POST" action="{{ route('admin.users.store') }}" class="modal-body">
+        @csrf
+
+        <div class="form-group-modal">
+          <label for="name">Full Name</label>
+          <input id="name" name="name" type="text" value="{{ old('name') }}" required>
+          @error('name') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="form-group-modal">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" value="{{ old('email') }}" required>
+          @error('email') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="form-group-modal">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            @foreach ($roles as $r)
+              <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $r }}</option>
+            @endforeach
+          </select>
+          <div class="form-help">OWNER has full access. PM manages projects. QA handles material checks. FM manages finance.</div>
+          @error('role') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="form-group-modal">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required>
+          @error('password') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="form-group-modal">
+          <label for="password_confirmation">Confirm Password</label>
+          <input id="password_confirmation" name="password_confirmation" type="password" required>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Create
+          </button>
+          <button type="button" onclick="closeCreateUserModal()" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openCreateUserModal() {
+      document.getElementById('createUserModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCreateUserModal() {
+      document.getElementById('createUserModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('createUserModal');
+      if (event.target === modal) {
+        closeCreateUserModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeCreateUserModal();
+      }
+    });
+  </script>
+
+  <!-- View User Modal -->
+  <div id="viewUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-user"></i>
+          User Details
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-details">
+          <div class="detail-item">
+            <div class="detail-item-label">Full Name</div>
+            <div class="detail-item-value" id="viewUserName">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item-label">Email</div>
+            <div class="detail-item-value" id="viewUserEmail">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item-label">Role</div>
+            <div class="detail-item-value" id="viewUserRole">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item-label">Verification Status</div>
+            <div id="viewUserVerified" style="margin-top: 2px;"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item-label">Created</div>
+            <div class="detail-item-value" id="viewUserCreated">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item-label">ID</div>
+            <div class="detail-item-value" id="viewUserId">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" onclick="closeViewUserModal()" class="btn btn-secondary">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openViewUserModal(user) {
+      document.getElementById('viewUserName').textContent = user.name || '—';
+      document.getElementById('viewUserEmail').textContent = user.email || '—';
+      document.getElementById('viewUserRole').textContent = user.role || 'N/A';
+      document.getElementById('viewUserId').textContent = user.id || '—';
+      
+      // Format created date
+      if (user.created_at) {
+        const date = new Date(user.created_at);
+        document.getElementById('viewUserCreated').textContent = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+      }
+      
+      // Verification status badge
+      const verifiedBadge = user.email_verified_at 
+        ? '<span class="detail-badge verified"><i class="fas fa-check"></i> Verified</span>'
+        : '<span class="detail-badge unverified"><i class="fas fa-times"></i> Not Verified</span>';
+      document.getElementById('viewUserVerified').innerHTML = verifiedBadge;
+      
+      document.getElementById('viewUserModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeViewUserModal() {
+      document.getElementById('viewUserModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close view modal when clicking outside
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('viewUserModal');
+      if (event.target === modal) {
+        closeViewUserModal();
+      }
+    });
+
+    // Close view modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeViewUserModal();
       }
     });
   </script>

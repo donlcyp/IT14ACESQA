@@ -271,6 +271,33 @@
             border-collapse: collapse;
         }
 
+        .dashboard-table tbody tr:not(:last-child) td {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dashboard-table td {
+            padding: 14px 12px;
+            font-size: 14px;
+            color: var(--gray-700);
+            vertical-align: middle;
+        }
+
+        .dashboard-table td:nth-child(3),
+        .dashboard-table td:nth-child(5),
+        .dashboard-table td:nth-child(6),
+        .dashboard-table td:nth-child(7) {
+            text-align: right;
+        }
+
+        .dashboard-table td:nth-child(5) {
+            text-align: center;
+        }
+
+        .dashboard-table td:nth-child(7) {
+            font-weight: 600;
+            text-align: center;
+        }
+
         .dashboard-table thead th {
             text-align: left;
             font-size: 12px;
@@ -278,19 +305,29 @@
             color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            padding-bottom: 12px;
+            padding: 12px;
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .dashboard-table tbody tr:not(:last-child) td {
-            border-bottom: 1px solid #e5e7eb;
+        .dashboard-table thead th:nth-child(3),
+        .dashboard-table thead th:nth-child(5),
+        .dashboard-table thead th:nth-child(6),
+        .dashboard-table thead th:nth-child(7) {
+            text-align: right;
         }
 
-        .dashboard-table td {
-            padding: 14px 0;
-            font-size: 15px;
-            color: var(--gray-700);
-            vertical-align: middle;
+        .dashboard-table thead th:nth-child(5) {
+            text-align: center;
+        }
+
+        .dashboard-table thead th:nth-child(7) {
+            text-align: center;
+        }
+
+        /* Center Status column in first dashboard card (Active Projects) */
+        .dashboard-grid > .dashboard-card:nth-child(1) .dashboard-table td:nth-child(3),
+        .dashboard-grid > .dashboard-card:nth-child(1) .dashboard-table thead th:nth-child(3) {
+            text-align: center;
         }
 
         .status-badge {
@@ -608,64 +645,64 @@
                                     <tr>
                                         <th>Project</th>
                                         <th>Client</th>
-                                        <th>Status</th>
-                                    <th>Lead</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php
-                                    $statusMap = [
-                                        'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
-                                        'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
-                                        'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
-                                        'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
-                                        'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
-                                        'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
-                                    ];
-                                @endphp
-
-                                @forelse ($activeProjects as $project)
+                                        <th style="text-align: center;">Status</th>
+                                        <th>Lead</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     @php
-                                        $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
-                                        $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
-                                        
-                                        // Get client name from relationship or fallback to project fields
-                                        if ($project->client) {
-                                            $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
-                                        } else {
-                                            $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
-                                        }
-                                        
-                                        // Get lead name from PM relationship or fallback to lead field
-                                        $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
+                                        $statusMap = [
+                                            'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                            'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                            'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                            'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                            'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
+                                            'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                        ];
                                     @endphp
-                                    <tr>
-                                        <td>{{ $project->project_name }}</td>
-                                        <td>{{ $clientName }}</td>
-                                        <td>
-                                            <span class="status-badge {{ $badge['class'] }}">
-                                                <i class="{{ $badge['icon'] }}"></i>
-                                                {{ $projectDisplayStatus ?? '—' }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $leadName }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No active projects yet.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+
+                                    @forelse ($activeProjects as $project)
+                                        @php
+                                            $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                            $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                            
+                                            // Get client name from relationship or fallback to project fields
+                                            if ($project->client) {
+                                                $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
+                                            } else {
+                                                $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
+                                            }
+                                            
+                                            // Get lead name from PM relationship or fallback to lead field
+                                            $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $project->project_name }}</td>
+                                            <td>{{ $clientName }}</td>
+                                            <td style="text-align: center;">
+                                                <span class="status-badge {{ $badge['class'] }}">
+                                                    <i class="{{ $badge['icon'] }}"></i>
+                                                    {{ $projectDisplayStatus ?? '—' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $leadName }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" style="color:#6b7280; padding:12px 0;">No active projects yet.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                     </div>
 
-                    <div class="dashboard-card half">
+                    <div class="dashboard-card full">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title">Project Material Management</div>
-                                <div class="dashboard-card-subtitle">Recent project materials and inspections</div>
+                                <div class="dashboard-card-title">Bill of Quantities (BOQ)</div>
+                                <div class="dashboard-card-subtitle">Recent BOQ items from all projects</div>
                             </div>
-                            <a class="view-link" href="{{ route('project-material-management') }}">
+                            <a class="view-link" href="{{ route('projects') }}">
                                 View all
                                 <i class="fas fa-arrow-right"></i>
                             </a>
@@ -674,70 +711,133 @@
                         <table class="dashboard-table">
                             <thead>
                                 <tr>
-                                    <th>Project</th>
-                                    <th>Material</th>
-                                    <th>Supplier</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
+                                    <th style="text-align: center;">Project</th>
+                                    <th style="text-align: center;">Item Description</th>
+                                    <th style="text-align: center;">Qty</th>
+                                    <th style="text-align: center;">Unit</th>
+                                    <th style="text-align: center;">Material Cost</th>
+                                    <th style="text-align: center;">Labor Cost</th>
+                                    <th style="text-align: center;">Total</th>
+                                    <th style="text-align: center;">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($recentProjectRecords as $record)
+                                    @php
+                                        $materialCost = $record->material_cost ?? ($record->unit_rate ?? 0);
+                                        $laborCost = $record->labor_cost ?? 0;
+                                        $unitTotal = $materialCost + $laborCost;
+                                        $itemTotal = $unitTotal * ($record->quantity ?? 0);
+                                    @endphp
                                     <tr>
-                                        <td>{{ $record->material_name }}</td>
-                                        <td>{{ $record->supplier ?? '—' }}</td>
-                                        <td>
+                                        <td style="text-align: center;">
+                                            @if ($record->project)
+                                                <a href="{{ route('projects.show', $record->project->id) }}" style="color: var(--accent); text-decoration: none; font-weight: 500;">
+                                                    {{ $record->project->project_name ?? $record->project->project_code }}
+                                                </a>
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                        <td style="text-align: center;">
+                                            @if ($record->project)
+                                                <a href="{{ route('projects.show', $record->project->id) }}" style="color: #6b7280; text-decoration: none;">
+                                                    {{ $record->item_description ?? $record->material_name ?? '—' }}
+                                                </a>
+                                            @else
+                                                {{ $record->item_description ?? $record->material_name ?? '—' }}
+                                            @endif
+                                        </td>
+                                        <td style="text-align: center;">{{ $record->quantity ?? '—' }}</td>
+                                        <td style="text-align: center;">{{ $record->unit ?? '—' }}</td>
+                                        <td style="text-align: center;">₱{{ number_format($materialCost, 2) }}</td>
+                                        <td style="text-align: center;">₱{{ number_format($laborCost, 2) }}</td>
+                                        <td style="text-align: center; font-weight: 600;">₱{{ number_format($itemTotal, 2) }}</td>
+                                        <td style="text-align: center;">
                                             <span class="status-badge {{ strtolower($record->status) }}">
                                                 {{ $record->status ?? '—' }}
                                             </span>
                                         </td>
-                                        <td>{{ optional($record->created_at)->diffForHumans() }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No recent materials.</td>
+                                        <td colspan="8" style="color:#6b7280; padding:12px 0;">No BOQ items available.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="dashboard-card half">
+                    <div class="dashboard-card full">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title">Transaction Reminders</div>
-                                <div class="dashboard-card-subtitle">Materials with failed status to be returned</div>
+                                <div class="dashboard-card-title">Finance & Transactions Summary</div>
+                                <div class="dashboard-card-subtitle">Project budgets and financial overview</div>
                             </div>
-                            <a class="view-link" href="{{ route('transactions.index') }}">
-                                View all
-                                <i class="fas fa-arrow-right"></i>
+                            <a class="view-link" href="{{ route('finance-graphs') }}" title="View financial graphs">
+                                <i class="fas fa-chart-bar"></i>
                             </a>
                         </div>
 
                         <table class="dashboard-table">
                             <thead>
                                 <tr>
-                                    <th>Material Name</th>
-                                    <th>Supplier</th>
-                                    <th>Status</th>
-                                    <th>Last Updated</th>
+                                    <th style="text-align: center;">Project Name</th>
+                                    <th style="text-align: center;">Project Budget</th>
+                                    <th style="text-align: center;">Spent</th>
+                                    <th style="text-align: center;">Remaining Budget</th>
+                                    <th style="text-align: center;">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($projectsToReturn as $record)
+                                @forelse ($activeProjects as $project)
+                                    @php
+                                        $projectBudget = $project->allocated_amount ?? 0;
+                                        // Calculate total spent from all materials in this project
+                                        $totalSpent = 0;
+                                        if ($project->materials && $project->materials->count() > 0) {
+                                            foreach ($project->materials as $material) {
+                                                $materialCost = $material->material_cost ?? 0;
+                                                $laborCost = $material->labor_cost ?? 0;
+                                                $quantity = $material->quantity ?? 0;
+                                                $totalSpent += ($materialCost + $laborCost) * $quantity;
+                                            }
+                                        }
+                                        $remainingBudget = $projectBudget - $totalSpent;
+                                        
+                                        // Determine status based on remaining budget
+                                        if ($projectBudget == 0) {
+                                            $budgetStatus = 'info';
+                                            $statusText = 'No Budget';
+                                        } elseif ($remainingBudget < 0) {
+                                            $budgetStatus = 'fail';
+                                            $statusText = 'Over Budget';
+                                        } elseif ($remainingBudget < ($projectBudget * 0.2)) {
+                                            $budgetStatus = 'warning';
+                                            $statusText = 'Critical';
+                                        } else {
+                                            $budgetStatus = 'success';
+                                            $statusText = 'Healthy';
+                                        }
+                                    @endphp
                                     <tr>
-                                        <td>{{ $record->material_name }}</td>
-                                        <td>{{ $record->supplier ?? '—' }}</td>
-                                        <td>
-                                            <span class="status-badge fail">
-                                                {{ $record->status }}
+                                        <td style="text-align: center;">
+                                            <a href="{{ route('projects.show', $project->id) }}" style="color: var(--accent); text-decoration: none; font-weight: 500;">
+                                                {{ $project->project_name ?? $project->project_code }}
+                                            </a>
+                                        </td>
+                                        <td style="text-align: center;">₱{{ number_format($projectBudget, 2) }}</td>
+                                        <td style="text-align: center;">₱{{ number_format($totalSpent, 2) }}</td>
+                                        <td style="text-align: center; font-weight: 600; white-space: nowrap;">₱{{ number_format($remainingBudget, 2) }}</td>
+                                        <td style="text-align: center;">
+                                            <span class="status-badge {{ $budgetStatus }}">
+                                                {{ $statusText }}
                                             </span>
                                         </td>
-                                        <td>{{ optional($record->updated_at)->diffForHumans() ?? '—' }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="color:#6b7280; padding:12px 0;">No materials currently with failed status to be returned.</td>
+                                        <td colspan="5" style="color:#6b7280; padding:12px 0;">No active projects available.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

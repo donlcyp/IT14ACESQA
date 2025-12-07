@@ -200,7 +200,7 @@
         <!-- Header -->
         <div class="header">
             <div class="company-info">
-                <div class="company-logo">AJS Aiji Crisber</div>
+                <div class="company-logo">ACES AJJ CRISBER</div>
                 <div class="company-details">
                     AJJ CRISBER ENGINEERING SERVICES
                 </div>
@@ -373,7 +373,7 @@
                 <strong>Submitted by:</strong>
                 <br><br><br>
                 ___________________<br>
-                <strong>CRISBEN B. BERSONG</strong><br>
+                <strong>CRISBEN B. BERIONG</strong><br>
                 General Manager
             </div>
             <div class="footer-section">

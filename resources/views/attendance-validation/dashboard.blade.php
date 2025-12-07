@@ -226,7 +226,7 @@
                     <div style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
                         <div>
                             <div style="font-weight: 600; color: #1f2937; font-size: 13px;">{{ $record->f_name }} {{ $record->l_name }}</div>
-                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">{{ $record->punch_in_time->format('H:i:s') }}</div>
+                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">{{ $record->punch_in_time ? $record->punch_in_time->format('H:i:s') : 'N/A' }}</div>
                         </div>
                         <div style="text-align: right; flex-shrink: 0;">
                             @if($record->is_late)
@@ -263,7 +263,7 @@
                         <div>
                             <div style="font-weight: 600; color: #1f2937; font-size: 13px;">{{ $record->f_name }} {{ $record->l_name }}</div>
                             <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">
-                                {{ $record->date->format('Y-m-d') }} - {{ $record->punch_in_time->format('H:i:s') }}
+                                {{ $record->date->format('Y-m-d') }} - {{ $record->punch_in_time ? $record->punch_in_time->format('H:i:s') : 'N/A' }}
                             </div>
                             <div style="font-size: 11px; color: #991b1b; font-weight: 600; margin-top: 2px;">
                                 <i class="fas fa-clock"></i> {{ $record->late_minutes }} min late

@@ -1320,6 +1320,7 @@
 
                     <!-- Projects Tab -->
 
+                    @if(auth()->check() && auth()->user()->role === 'OWNER')
                     <div class="stats-grid">
                         <div class="stat-card stat-total">
                             <div class="stat-left">
@@ -1367,7 +1368,10 @@
                             <span class="stat-value">{{ $stats['on_leave'] }}</span>
                         </div>
                     </div>
+                    @endif
                 @endif
+                
+                @if(auth()->check() && auth()->user()->role === 'OWNER')
                 <div class="table-card">
                     <table class="projects-table">
                         <thead>
@@ -1412,6 +1416,7 @@
                         </tbody>
                     </table>
                 </div>
+                @endif
                 </div>
 
             </section>

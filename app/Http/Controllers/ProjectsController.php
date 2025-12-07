@@ -194,6 +194,7 @@ class ProjectsController extends Controller
             'description'      => ['nullable', 'string', 'max:1000'],
             'location'         => ['nullable', 'string', 'max:255'],
             'industry'         => ['nullable', 'string', 'max:255'],
+            'project_type'     => ['required', 'in:Plumbing Work,Fire Safety'],
             'target_timeline'  => ['nullable', 'date'],
             'allocated_amount' => ['nullable', 'numeric', 'min:0'],
             'client_first_name' => ['required', 'string', 'max:255'],
@@ -227,6 +228,7 @@ class ProjectsController extends Controller
             'description'      => $validated['description'] ?? null,
             'location'         => $validated['location'] ?? null,
             'industry'         => $validated['industry'] ?? null,
+            'project_type'     => $validated['project_type'],
             'date_started'     => null,
             'date_ended'       => null,
             'target_timeline'  => $validated['target_timeline'] ?? null,
@@ -259,11 +261,8 @@ class ProjectsController extends Controller
         ]);
 
         return redirect()
-            ->route('project-material-management', [
-                'project_id' => $project->id,
-                'open_modal' => 1,
-            ])
-            ->with('success', 'Project added successfully! Project record created in material management.');
+            ->route('projects.show', $project->id)
+            ->with('success', 'Project added successfully!');
     }
 
     private function generateProjectCode(): string
@@ -294,6 +293,8 @@ class ProjectsController extends Controller
             'location' => ['nullable', 'string', 'max:255'],
             'industry' => ['nullable', 'string', 'max:255'],
             'target_timeline' => ['nullable', 'date'],
+            'date_started' => ['nullable', 'date'],
+            'date_ended' => ['nullable', 'date'],
             'allocated_amount' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'in:Ongoing,Completed'],
             'assigned_pm_id' => ['nullable', 'exists:users,id'],
@@ -305,6 +306,8 @@ class ProjectsController extends Controller
             'location' => $validated['location'] ?? null,
             'industry' => $validated['industry'] ?? null,
             'target_timeline' => $validated['target_timeline'] ?? null,
+            'date_started' => $validated['date_started'] ?? null,
+            'date_ended' => $validated['date_ended'] ?? null,
             'allocated_amount' => $validated['allocated_amount'] ?? null,
             'status' => $validated['status'],
             'assigned_pm_id' => $validated['assigned_pm_id'] ?? null,

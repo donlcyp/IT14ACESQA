@@ -19,6 +19,7 @@ Route::post('/support', [\App\Http\Controllers\SupportController::class, 'submit
 Route::middleware('auth')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/finance-graphs', [App\Http\Controllers\DashboardController::class, 'financeGraphs'])->name('finance-graphs');
 
     // ===== SHARED ROUTES: OWNER & PROJECT MANAGER =====
     Route::middleware('role:OWNER,PM')->group(function () {

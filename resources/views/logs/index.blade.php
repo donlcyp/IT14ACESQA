@@ -346,36 +346,81 @@
     /* Pagination */
     .pagination-container {
       display: flex;
-      justify-content: center;
-      padding: 20px;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 0;
+      user-select: none;
     }
-
-    .pagination {
+    .pagination-info {
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+    }
+    .pagination-controls {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
-
-    .pagination a,
-    .pagination span {
-      padding: 8px 12px;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+    .pagination-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .page-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 8px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    a.page-btn {
+      color: #374151;
+      text-decoration: underline;
+    }
+    a.page-btn:hover {
+      color: #111827;
+      text-decoration: underline;
+      background: transparent;
+    }
+    span.page-btn {
       text-decoration: none;
-      color: var(--accent);
-      font-size: 13px;
-      transition: all 0.3s ease;
+      color: #374151;
     }
-
-    .pagination a:hover {
-      background-color: var(--accent);
+    span.page-btn.active {
+      background: var(--accent);
       color: white;
-      border-color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      padding: 0 12px;
     }
-
-    .pagination .active {
-      background-color: var(--accent);
-      color: white;
-      border-color: var(--accent);
+    span.page-btn.disabled {
+      opacity: 0.5;
+      color: #9ca3af;
+      cursor: not-allowed;
+      pointer-events: none;
+      text-decoration: none;
+    }
+    .page-btn.arrow {
+      font-size: 20px;
+      font-weight: 400;
+    }
+    .page-btn.ellipsis {
+      cursor: default;
+      pointer-events: none;
     }
 
     .pagination .disabled {
@@ -577,16 +622,58 @@
         </div>
 
         <!-- Pagination -->
-        @if($logs->count() > 0)
+        @if ($logs->hasPages())
+          @php
+            $currentPage = $logs->currentPage();
+            $lastPage = $logs->lastPage();
+          @endphp
           <div class="pagination-container">
-            {{ $logs->links() }}
+            <div class="pagination-info">
+              Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} of {{ $logs->total() }} logs
+            </div>
+            <div class="pagination-controls">
+              @if ($logs->onFirstPage())
+                <span class="page-btn arrow disabled">‹</span>
+              @else
+                <a class="page-btn arrow" href="{{ $logs->previousPageUrl() }}" rel="prev">‹</a>
+              @endif
+
+              <div class="pagination-nav">
+                @if ($currentPage > 1)
+                  <a class="page-btn" href="{{ $logs->url(1) }}">1</a>
+                @endif
+                
+                @if ($currentPage > 2)
+                  <span class="page-btn ellipsis">...</span>
+                @endif
+                
+                @if ($currentPage > 2)
+                  <a class="page-btn" href="{{ $logs->url($currentPage - 1) }}">{{ $currentPage - 1 }}</a>
+                @endif
+                
+                <span class="page-btn active">{{ $currentPage }}</span>
+                
+                @if ($currentPage < $lastPage - 1)
+                  <a class="page-btn" href="{{ $logs->url($currentPage + 1) }}">{{ $currentPage + 1 }}</a>
+                @endif
+                
+                @if ($currentPage < $lastPage - 1)
+                  <span class="page-btn ellipsis">...</span>
+                @endif
+                
+                @if ($currentPage < $lastPage)
+                  <a class="page-btn" href="{{ $logs->url($lastPage) }}">{{ $lastPage }}</a>
+                @endif
+              </div>
+
+              @if ($logs->hasMorePages())
+                <a class="page-btn arrow" href="{{ $logs->nextPageUrl() }}" rel="next">›</a>
+              @else
+                <span class="page-btn arrow disabled">›</span>
+              @endif
+            </div>
           </div>
         @endif
-
-        <!-- Back Link -->
-        <a href="{{ route('dashboard') }}" class="back-link">
-          <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
       </div>
     </div>
   </div>

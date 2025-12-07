@@ -178,7 +178,7 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
-            <img src="{{ asset('images/aces-logo.png') }}" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="{{ asset('images/aces.png') }}" alt="ACES logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <div class="logo-fallback">ACES</div>
         </div>
         <div class="sidebar-title">ACES</div>
@@ -257,6 +257,11 @@
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span>My Attendance</span>
+            </a>
+        @elseif(auth()->check())
+            <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <span>Attendance</span>
             </a>
         @endif
     </nav>

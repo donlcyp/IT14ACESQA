@@ -1108,11 +1108,12 @@
                                 </div>
 
                                 <div class="projects-form-group">
-                                    <label class="projects-form-label">Project Type</label>
+                                    <label class="projects-form-label">Project Type <span style="color: #ef4444;">*</span></label>
                                     <select
                                         class="projects-form-input"
                                         id="projectType"
                                         name="project_type"
+                                        required
                                     >
                                         <option value="">-- Select Project Type --</option>
                                         <option value="Plumbing Work" {{ old('project_type') === 'Plumbing Work' ? 'selected' : '' }}>Plumbing Work</option>
@@ -1267,6 +1268,26 @@
                                 </div>
 
                                 <div class="projects-form-group">
+                                    <label class="projects-form-label">Date Started</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editDateStarted"
+                                        name="date_started"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Date Ended</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editDateEnded"
+                                        name="date_ended"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
                                     <label class="projects-form-label">Allocated Amount</label>
                                     <input
                                         type="number"
@@ -1404,6 +1425,8 @@
         const editLocation = document.getElementById('editLocation');
         const editIndustry = document.getElementById('editIndustry');
         const editTargetTimeline = document.getElementById('editTargetTimeline');
+        const editDateStarted = document.getElementById('editDateStarted');
+        const editDateEnded = document.getElementById('editDateEnded');
         const editAllocatedAmount = document.getElementById('editAllocatedAmount');
         const editProjectStatus = document.getElementById('editProjectStatus');
         const editAssignedPmId = document.getElementById('editAssignedPmId');
@@ -1469,7 +1492,18 @@
                     if (editDescription) editDescription.value = data.description || '';
                     if (editLocation) editLocation.value = data.location || '';
                     if (editIndustry) editIndustry.value = data.industry || '';
-                    if (editTargetTimeline) editTargetTimeline.value = data.target_timeline ? data.target_timeline.split(' ')[0] : '';
+                    
+                    // Format dates for HTML date inputs (YYYY-MM-DD)
+                    const formatDateForInput = (dateString) => {
+                        if (!dateString) return '';
+                        const date = new Date(dateString);
+                        if (isNaN(date)) return '';
+                        return date.toISOString().split('T')[0];
+                    };
+                    
+                    if (editTargetTimeline) editTargetTimeline.value = formatDateForInput(data.target_timeline) || '';
+                    if (editDateStarted) editDateStarted.value = formatDateForInput(data.date_started) || '';
+                    if (editDateEnded) editDateEnded.value = formatDateForInput(data.date_ended) || '';
                     if (editAllocatedAmount) editAllocatedAmount.value = data.allocated_amount || '';
                     if (editProjectStatus) editProjectStatus.value = data.status || 'Ongoing';
                     if (editAssignedPmId) editAssignedPmId.value = data.assigned_pm_id || '';
