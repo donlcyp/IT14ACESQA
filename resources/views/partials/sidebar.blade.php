@@ -193,10 +193,6 @@
 
         <!-- OWNER: All menu items visible -->
         @if(auth()->check() && auth()->user()->role === 'OWNER')
-            <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-tasks"></i>
-                <span>Projects</span>
-            </a>
             <a href="{{ route('archives') }}" class="nav-item {{ request()->routeIs('archives') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-archive"></i>
                 <span>Archives</span>
@@ -220,15 +216,11 @@
             </a>
         @endif
 
-        <!-- PROJECT MANAGER: Projects and Attendance -->
+        <!-- PROJECT MANAGER: Projects only -->
         @if(auth()->check() && auth()->user()->role === 'PM')
             <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-tasks"></i>
                 <span>Projects</span>
-            </a>
-            <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-user-check"></i>
-                <span>Attendance</span>
             </a>
         @endif
 

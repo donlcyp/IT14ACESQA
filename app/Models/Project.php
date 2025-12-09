@@ -136,4 +136,37 @@ class Project extends Model
     {
         return $this->assignedPM?->name ?? 'N/A';
     }
+
+    /**
+     * Calculate total material cost (Material Cost + Labor Cost) for all materials in project
+     */
+    public function calculateTotalMaterialCost(): float
+    {
+        return $this->materials()
+            ->get()
+            ->sum(function ($material) {
+                $materialCost = ($material->material_cost ?? 0) * ($material->quantity ?? 0);
+                $laborCost = ($material->labor_cost ?? 0) * ($material->quantity ?? 0);
+                return $materialCost + $laborCost;
+            });
+    }
+
+    /**
+     * Get the effective amount used (from materials if available, otherwise from used_amount field)
+     */
+    public function getEffectiveUsedAmount(): float
+    {
+        $materialsTotal = $this->calculateTotalMaterialCost();
+        return $materialsTotal > 0 ? $materialsTotal : ($this->used_amount ?? 0);
+    }
+
+    /**
+     * Get approved purchase orders count
+     */
+    public function getApprovedOrdersCount(): int
+    {
+        return $this->purchaseOrders()
+            ->whereRaw('LOWER(status) = ?', ['approved'])
+            ->count();
+    }
 }

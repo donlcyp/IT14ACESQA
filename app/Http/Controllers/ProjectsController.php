@@ -49,7 +49,7 @@ class ProjectsController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials']);
+        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials', 'purchaseOrders']);
 
         // Get all employees with their current project assignments
         $allEmployees = Employee::all()->map(function ($employee) {
@@ -321,31 +321,69 @@ class ProjectsController extends Controller
      */
     public function storeDocument(Request $request, Project $project)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
-        ]);
+        // Handle both single image upload and multiple file uploads
+        $isImageUpload = $request->hasFile('image');
+        $isFileUpload = $request->hasFile('attachments');
 
-        try {
-            // Store the file
-            $file = $request->file('image');
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs('projects/' . $project->id, $fileName, 'public');
-
-            // Create document record
-            \App\Models\ProjectDocument::create([
-                'project_id' => $project->id,
-                'title' => $validated['title'],
-                'file_path' => $filePath,
-                'file_name' => $fileName,
-                'mime_type' => $file->getMimeType(),
-                'file_size' => $file->getSize(),
-                'uploaded_by' => auth()->user()->id,
+        if ($isImageUpload) {
+            // Single image upload
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
             ]);
 
-            return redirect()->route('projects.show', $project->id)->with('success', 'Image uploaded successfully!');
-        } catch (\Exception $e) {
-            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to upload image: ' . $e->getMessage());
+            try {
+                $file = $request->file('image');
+                $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                $filePath = $file->storeAs('projects/' . $project->id, $fileName, 'public');
+
+                \App\Models\ProjectDocument::create([
+                    'project_id' => $project->id,
+                    'title' => $validated['title'],
+                    'file_path' => $filePath,
+                    'file_name' => $fileName,
+                    'mime_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                    'uploaded_by' => auth()->user()->id,
+                ]);
+
+                return redirect()->route('projects.show', $project->id)->with('success', 'Image uploaded successfully!');
+            } catch (\Exception $e) {
+                return redirect()->route('projects.show', $project->id)->with('error', 'Failed to upload image: ' . $e->getMessage());
+            }
+        } elseif ($isFileUpload) {
+            // Multiple file upload
+            $validated = $request->validate([
+                'attachments.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,zip|max:51200', // 50MB per file
+            ]);
+
+            try {
+                $files = $request->file('attachments');
+                $uploadedCount = 0;
+
+                foreach ($files as $file) {
+                    $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                    $filePath = $file->storeAs('projects/' . $project->id, $fileName, 'public');
+
+                    \App\Models\ProjectDocument::create([
+                        'project_id' => $project->id,
+                        'title' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
+                        'file_path' => $filePath,
+                        'file_name' => $fileName,
+                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $file->getSize(),
+                        'uploaded_by' => auth()->user()->id,
+                    ]);
+
+                    $uploadedCount++;
+                }
+
+                return redirect()->route('projects.show', $project->id)->with('success', "Successfully uploaded {$uploadedCount} file(s)!");
+            } catch (\Exception $e) {
+                return redirect()->route('projects.show', $project->id)->with('error', 'Failed to upload files: ' . $e->getMessage());
+            }
+        } else {
+            return redirect()->route('projects.show', $project->id)->with('error', 'No files selected for upload.');
         }
     }
 

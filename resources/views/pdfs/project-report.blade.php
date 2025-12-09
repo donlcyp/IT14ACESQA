@@ -210,17 +210,22 @@
     @if($project->documents && $project->documents->count() > 0)
     <div class="image-container">
         @foreach($project->documents as $doc)
-        <div class="image-wrapper">
-            <div style="margin-bottom: 15px;">
-                <div style="font-size: 18px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">{{ $doc->title }}</div>
-                <div style="color: #6b7280; font-size: 12px; margin-bottom: 10px;">
-                    Uploaded: {{ $doc->created_at->format('M d, Y H:i') }} | By: {{ $doc->uploader?->name ?? 'Unknown' }} | Size: {{ number_format($doc->file_size / 1024, 2) }} KB
+            @php
+                $isImage = in_array(strtolower(pathinfo($doc->file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+            @endphp
+            @if($isImage)
+            <div class="image-wrapper">
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 18px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">{{ $doc->title }}</div>
+                    <div style="color: #6b7280; font-size: 12px; margin-bottom: 10px;">
+                        Uploaded: {{ $doc->created_at->format('M d, Y H:i') }} | By: {{ $doc->uploader?->name ?? 'Unknown' }} | Size: {{ number_format($doc->file_size / 1024, 2) }} KB
+                    </div>
+                </div>
+                <div class="image-content">
+                    <img src="{{ storage_path('app/public/' . $doc->file_path) }}" alt="{{ $doc->title }}">
                 </div>
             </div>
-            <div class="image-content">
-                <img src="{{ storage_path('app/public/' . $doc->file_path) }}" alt="{{ $doc->title }}">
-            </div>
-        </div>
+            @endif
         @endforeach
     </div>
     @endif

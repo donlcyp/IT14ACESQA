@@ -3,26 +3,241 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use TCPDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PDFController extends Controller
 {
     /**
-     * Generate and download project report PDF
+     * Generate and download project report PDF using TCPDF (no GD required)
      */
     public function downloadProjectReport($projectId)
     {
-        $project = Project::with(['employees', 'documents', 'updates', 'client'])->findOrFail($projectId);
+        $project = Project::with([
+            'employees.user', 
+            'documents', 
+            'updates', 
+            'client', 
+            'materials', 
+            'purchaseOrders',
+            'assignedPM'
+        ])->findOrFail($projectId);
 
-        $pdf = Pdf::loadView('pdfs.project-report', ['project' => $project])
-            ->setPaper('a4')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
-
-        return $pdf->download("project_{$project->project_name}.pdf");
+        try {
+            $pdf = new TCPDF();
+            $pdf->AddPage();
+            $pdf->SetFont('helvetica', 'B', 16);
+            
+            // Header
+            $pdf->SetTextColor(5, 150, 105); // Green
+            $pdf->Cell(0, 10, $project->project_name, 0, 1, 'C');
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->SetTextColor(100, 100, 100);
+            $pdf->Cell(0, 5, 'Report Generated: ' . now()->format('M d, Y H:i A'), 0, 1, 'C');
+            $pdf->Ln(5);
+            
+            // PROJECT DETAILS SECTION
+            $pdf->SetFont('helvetica', 'B', 12);
+            $pdf->SetTextColor(5, 150, 105);
+            $pdf->Cell(0, 8, 'Project Details', 0, 1, 'L');
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->SetTextColor(0, 0, 0);
+            
+            // Get client name from multiple sources
+            $clientName = 'N/A';
+            if ($project->client && $project->client->company_name) {
+                $clientName = $project->client->company_name;
+            } elseif ($project->client_first_name || $project->client_last_name) {
+                $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? ''));
+            }
+            
+            $summaryData = [
+                ['Project Name', $project->project_name],
+                ['Client', $clientName],
+                ['Status', $project->pm_status ?? $project->status ?? 'N/A'],
+                ['Start Date', $project->date_started ? $project->date_started->format('M d, Y') : 'N/A'],
+                ['End Date', $project->date_ended ? $project->date_ended->format('M d, Y') : 'N/A'],
+                ['Target Date', $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'N/A'],
+                ['Project Manager', $project->assignedPM?->name ?? 'N/A'],
+                ['Location', $project->location ?? 'N/A'],
+            ];
+            
+            $pdf->SetFillColor(240, 240, 240);
+            $fill = true;
+            foreach ($summaryData as $row) {
+                $pdf->Cell(80, 7, $row[0], 1, 0, 'L', $fill);
+                $pdf->Cell(0, 7, $row[1], 1, 1, 'L', $fill);
+                $fill = !$fill;
+            }
+            $pdf->Ln(5);
+            
+            // BUDGET SECTION
+            $pdf->SetFont('helvetica', 'B', 12);
+            $pdf->SetTextColor(5, 150, 105);
+            $pdf->Cell(0, 8, 'Budget Information', 0, 1, 'L');
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->SetTextColor(0, 0, 0);
+            
+            $usedAmount = $project->getEffectiveUsedAmount();
+            $allocatedAmount = $project->allocated_amount ?? 0;
+            $budgetData = [
+                ['Allocated Budget', 'PHP ' . number_format($allocatedAmount, 2)],
+                ['Amount Used', 'PHP ' . number_format($usedAmount, 2)],
+                ['Remaining Budget', 'PHP ' . number_format(max(0, $allocatedAmount - $usedAmount), 2)],
+                ['Budget Utilized', number_format(($allocatedAmount > 0 ? ($usedAmount / $allocatedAmount * 100) : 0), 2) . '%'],
+            ];
+            
+            $pdf->SetFillColor(240, 240, 240);
+            $fill = true;
+            foreach ($budgetData as $row) {
+                $pdf->Cell(80, 7, $row[0], 1, 0, 'L', $fill);
+                $pdf->Cell(0, 7, $row[1], 1, 1, 'L', $fill);
+                $fill = !$fill;
+            }
+            $pdf->Ln(5);
+            
+            // BILL OF QUANTITY SECTION
+            if ($project->materials && $project->materials->count() > 0) {
+                $pdf->AddPage();
+                $pdf->SetFont('helvetica', 'B', 12);
+                $pdf->SetTextColor(5, 150, 105);
+                $pdf->Cell(0, 8, 'Bill of Quantity', 0, 1, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                
+                $pdf->SetFillColor(240, 240, 240);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->Cell(50, 6, 'Item', 1, 0, 'L', true);
+                $pdf->Cell(20, 6, 'Unit', 1, 0, 'L', true);
+                $pdf->Cell(18, 6, 'Qty', 1, 0, 'C', true);
+                $pdf->Cell(28, 6, 'Material', 1, 0, 'R', true);
+                $pdf->Cell(25, 6, 'Labor', 1, 0, 'R', true);
+                $pdf->Cell(28, 6, 'Total', 1, 1, 'R', true);
+                
+                $pdf->SetFont('helvetica', '', 7);
+                $pdf->SetFillColor(255, 255, 255);
+                $totalBOQ = 0;
+                foreach ($project->materials as $material) {
+                    $itemTotal = ($material->material_cost + $material->labor_cost) * $material->quantity;
+                    $totalBOQ += $itemTotal;
+                    
+                    $pdf->Cell(50, 6, substr($material->item_name, 0, 30), 1, 0, 'L');
+                    $pdf->Cell(20, 6, substr($material->unit, 0, 10), 1, 0, 'L');
+                    $pdf->Cell(18, 6, $material->quantity, 1, 0, 'C');
+                    $pdf->Cell(28, 6, 'PHP ' . number_format($material->material_cost, 2), 1, 0, 'R');
+                    $pdf->Cell(25, 6, 'PHP ' . number_format($material->labor_cost, 2), 1, 0, 'R');
+                    $pdf->Cell(28, 6, 'PHP ' . number_format($itemTotal, 2), 1, 1, 'R');
+                }
+                
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetFillColor(200, 220, 200);
+                $pdf->Cell(50, 6, '', 1, 0, 'L', true);
+                $pdf->Cell(20, 6, '', 1, 0, 'L', true);
+                $pdf->Cell(18, 6, '', 1, 0, 'C', true);
+                $pdf->Cell(28, 6, '', 1, 0, 'R', true);
+                $pdf->Cell(25, 6, 'TOTAL:', 1, 0, 'R', true);
+                $pdf->Cell(28, 6, 'PHP ' . number_format($totalBOQ, 2), 1, 1, 'R', true);
+                $pdf->Ln(5);
+            }
+            
+            // PURCHASE ORDERS SECTION
+            if ($project->purchaseOrders && $project->purchaseOrders->count() > 0) {
+                $pdf->SetFont('helvetica', 'B', 12);
+                $pdf->SetTextColor(5, 150, 105);
+                $pdf->Cell(0, 8, 'Purchase Orders', 0, 1, 'L');
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(0, 0, 0);
+                
+                $pdf->SetFillColor(240, 240, 240);
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->Cell(35, 6, 'PO Number', 1, 0, 'L', true);
+                $pdf->Cell(30, 6, 'Supplier', 1, 0, 'L', true);
+                $pdf->Cell(25, 6, 'Amount', 1, 0, 'R', true);
+                $pdf->Cell(25, 6, 'Status', 1, 0, 'L', true);
+                $pdf->Cell(30, 6, 'Date', 1, 1, 'L', true);
+                
+                $pdf->SetFont('helvetica', '', 7);
+                $pdf->SetFillColor(255, 255, 255);
+                foreach ($project->purchaseOrders as $po) {
+                    $pdf->Cell(35, 6, substr($po->po_number, 0, 15), 1, 0, 'L');
+                    $pdf->Cell(30, 6, substr($po->supplier_name, 0, 20), 1, 0, 'L');
+                    $pdf->Cell(25, 6, 'PHP ' . number_format($po->total_amount, 2), 1, 0, 'R');
+                    $pdf->Cell(25, 6, $po->status, 1, 0, 'L');
+                    $pdf->Cell(30, 6, $po->created_at->format('M d, Y'), 1, 1, 'L');
+                }
+                $pdf->Ln(5);
+            }
+            
+            // EMPLOYEES SECTION
+            if ($project->employees && $project->employees->count() > 0) {
+                $pdf->SetFont('helvetica', 'B', 12);
+                $pdf->SetTextColor(5, 150, 105);
+                $pdf->Cell(0, 8, 'Assigned Employees (' . $project->employees->count() . ')', 0, 1, 'L');
+                $pdf->SetFont('helvetica', '', 9);
+                $pdf->SetTextColor(0, 0, 0);
+                
+                $pdf->SetFillColor(240, 240, 240);
+                $pdf->SetFont('helvetica', 'B', 9);
+                $pdf->Cell(60, 7, 'Name', 1, 0, 'L', true);
+                $pdf->Cell(50, 7, 'Position', 1, 0, 'L', true);
+                $pdf->Cell(30, 7, 'Role', 1, 1, 'L', true);
+                
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetFillColor(255, 255, 255);
+                foreach ($project->employees as $emp) {
+                    // Get employee name from f_name and l_name
+                    $firstName = $emp->f_name ?? '';
+                    $lastName = $emp->l_name ?? '';
+                    $name = trim("{$firstName} {$lastName}") ?: 'N/A';
+                    
+                    $position = $emp->position ?? 'N/A';
+                    $role = $emp->user?->role ?? 'N/A';
+                    
+                    $pdf->Cell(60, 7, substr($name, 0, 30), 1, 0, 'L');
+                    $pdf->Cell(50, 7, substr($position, 0, 25), 1, 0, 'L');
+                    $pdf->Cell(30, 7, $role, 1, 1, 'L');
+                }
+                $pdf->Ln(5);
+            }
+            
+            // PROJECT UPDATES SECTION
+            if ($project->updates && $project->updates->count() > 0) {
+                $pdf->AddPage();
+                $pdf->SetFont('helvetica', 'B', 12);
+                $pdf->SetTextColor(5, 150, 105);
+                $pdf->Cell(0, 8, 'Project Tasks & Updates (' . $project->updates->count() . ')', 0, 1, 'L');
+                $pdf->SetFont('helvetica', '', 9);
+                $pdf->SetTextColor(0, 0, 0);
+                
+                $pdf->SetFillColor(240, 240, 240);
+                $pdf->SetFont('helvetica', 'B', 9);
+                $pdf->Cell(35, 7, 'Date', 1, 0, 'L', true);
+                $pdf->Cell(30, 7, 'Title', 1, 0, 'L', true);
+                $pdf->Cell(0, 7, 'Description', 1, 1, 'L', true);
+                
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetFillColor(255, 255, 255);
+                foreach ($project->updates as $update) {
+                    $date = $update->created_at->format('M d, Y');
+                    $title = substr($update->title ?? $update->update_description ?? '', 0, 30);
+                    $desc = substr($update->description ?? $update->update_description ?? '', 0, 80);
+                    $pdf->Cell(35, 7, $date, 1, 0, 'L');
+                    $pdf->Cell(30, 7, $title, 1, 0, 'L');
+                    $pdf->MultiCell(0, 7, $desc, 1, 'L');
+                }
+            }
+            
+            $pdfContent = $pdf->Output('', 'S');
+            return response()->streamDownload(
+                fn () => print($pdfContent),
+                "project_{$project->project_name}.pdf",
+                ['Content-Type' => 'application/pdf']
+            );
+        } catch (\Exception $e) {
+            \Log::error('PDF generation error: ' . $e->getMessage());
+            return back()->with('error', 'PDF generation failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -105,42 +320,26 @@ class PDFController extends Controller
     }
 
     /**
-     * Generate and download attendance report PDF
-     */
-    public function downloadAttendanceReport(Request $request)
-    {
-        $filters = [
-            'date_from' => $request->get('date_from'),
-            'date_to' => $request->get('date_to'),
-            'project_id' => $request->get('project_id'),
-        ];
-
-        $pdf = Pdf::loadView('pdfs.attendance-report', ['filters' => $filters])
-            ->setPaper('a4', 'landscape')
-            ->setOption('margin-top', 10)
-            ->setOption('margin-right', 10)
-            ->setOption('margin-bottom', 10)
-            ->setOption('margin-left', 10);
-
-        $filename = 'attendance_report_' . now()->format('Y-m-d_His') . '.pdf';
-        return $pdf->download($filename);
-    }
-
-    /**
-     * Generate and download BOQ (Bill of Quantity) PDF
+     * Generate and download BOQ (Bill of Quantity) as PDF using Blade template
      */
     public function downloadBOQ($projectId)
     {
         $project = Project::with(['materials', 'client', 'assignedPM'])->findOrFail($projectId);
 
-        $pdf = Pdf::loadView('pdfs.boq-report', ['project' => $project])
-            ->setPaper('a4', 'portrait')
-            ->setOption('margin-top', 5)
-            ->setOption('margin-right', 5)
-            ->setOption('margin-bottom', 5)
-            ->setOption('margin-left', 5);
+        try {
+            $pdf = Pdf::loadView('pdfs.boq-report', ['project' => $project])
+                ->setPaper('a4', 'portrait')
+                ->setOption('margin-top', 5)
+                ->setOption('margin-right', 5)
+                ->setOption('margin-bottom', 5)
+                ->setOption('margin-left', 5)
+                ->setOption('enable-local-file-access', true);
 
-        $filename = 'BOQ_' . preg_replace('/[^A-Za-z0-9_-]+/', '_', $project->project_name) . '_' . now()->format('Ymd_His') . '.pdf';
-        return $pdf->download($filename);
+            $filename = 'BOQ_' . preg_replace('/[^A-Za-z0-9_-]+/', '_', $project->project_name) . '_' . now()->format('Ymd_His') . '.pdf';
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            \Log::error('BOQ PDF generation error: ' . $e->getMessage());
+            return back()->with('error', 'BOQ PDF generation failed: ' . $e->getMessage());
+        }
     }
 }

@@ -1401,26 +1401,58 @@
                         @if($project->documents && $project->documents->count() > 0)
                             <div class="images-grid">
                                 @foreach($project->documents as $doc)
+                                    @php
+                                        $isImage = in_array(strtolower(pathinfo($doc->file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                        $mimeType = $doc->mime_type ?? '';
+                                        $fileExt = strtoupper(pathinfo($doc->file_name, PATHINFO_EXTENSION));
+                                    @endphp
                                     <div class="image-card">
                                         <div style="height: 200px; background: var(--gray-200); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-radius: 6px 6px 0 0;">
-                                            <img src="{{ asset('storage/' . $doc->file_path) }}" alt="{{ $doc->title }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                            <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
-                                                <button onclick="viewImage('{{ asset('storage/' . $doc->file_path) }}', '{{ $doc->title }}')" style="background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; color: #16a34a; font-size: 14px;">
-                                                    <i class="fas fa-eye"></i> View
-                                                </button>
-                                                <form method="POST" action="{{ route('projects.documents.delete', [$project->id, $doc->id]) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this image?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" style="background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; color: #dc2626; font-size: 14px;">
-                                                        <i class="fas fa-trash"></i> Delete
+                                            @if($isImage)
+                                                <img src="{{ asset('storage/' . $doc->file_path) }}" alt="{{ $doc->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
+                                                    <button onclick="viewImage('{{ asset('storage/' . $doc->file_path) }}', '{{ $doc->title }}')" style="background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; color: #16a34a; font-size: 14px;" title="View Image">
+                                                        <i class="fas fa-eye"></i>
                                                     </button>
-                                                </form>
-                                            </div>
+                                                </div>
+                                            @else
+                                                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #e5e7eb, #d1d5db);">
+                                                    @if(str_contains($mimeType, 'pdf'))
+                                                        <i class="fas fa-file-pdf" style="font-size: 48px; color: #dc2626; margin-bottom: 10px;"></i>
+                                                    @elseif(str_contains($mimeType, 'word') || str_contains($doc->file_name, 'docx') || str_contains($doc->file_name, 'doc'))
+                                                        <i class="fas fa-file-word" style="font-size: 48px; color: #2563eb; margin-bottom: 10px;"></i>
+                                                    @elseif(str_contains($mimeType, 'excel') || str_contains($mimeType, 'spreadsheet') || str_contains($doc->file_name, 'xlsx') || str_contains($doc->file_name, 'xls'))
+                                                        <i class="fas fa-file-excel" style="font-size: 48px; color: #16a34a; margin-bottom: 10px;"></i>
+                                                    @elseif(str_contains($mimeType, 'zip') || str_contains($doc->file_name, 'zip'))
+                                                        <i class="fas fa-file-archive" style="font-size: 48px; color: #9333ea; margin-bottom: 10px;"></i>
+                                                    @else
+                                                        <i class="fas fa-file" style="font-size: 48px; color: #6b7280; margin-bottom: 10px;"></i>
+                                                    @endif
+                                                    <span style="color: #374151; font-weight: 600; font-size: 12px;">{{ $fileExt }}</span>
+                                                </div>
+                                            @endif
                                         </div>
                                         <div class="image-info">
                                             <div class="image-name">{{ $doc->title }}</div>
                                             <div class="image-date">{{ $doc->created_at->format('M d, Y H:i') }}</div>
-                                            <div style="font-size: 12px; color: var(--gray-600);">By {{ $doc->uploader?->name ?? 'Unknown' }}</div>
+                                            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 10px;">{{ number_format($doc->file_size / 1024, 2) }} KB • By {{ $doc->uploader?->name ?? 'Unknown' }}</div>
+                                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                                @if(!$isImage)
+                                                    <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" style="background: #16a34a; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Open Document">
+                                                        <i class="fas fa-external-link-alt"></i> Open
+                                                    </a>
+                                                @endif
+                                                <a href="{{ asset('storage/' . $doc->file_path) }}" download style="background: #0969a2; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Download">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                                <form method="POST" action="{{ route('projects.documents.delete', [$project->id, $doc->id]) }}" style="display: inline; flex: 1;" onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" style="background: #dc2626; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Delete">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -1433,7 +1465,7 @@
                                     </div>
                                     <div class="image-info">
                                         <div class="image-name">Documentation Gallery</div>
-                                        <div class="image-date">No images uploaded yet</div>
+                                        <div class="image-date">No documents uploaded yet</div>
                                     </div>
                                 </div>
                             </div>
@@ -1450,16 +1482,16 @@
                                 <div class="stat-value">{{ $project->employees->count() }}</div>
                                 <div class="stat-label">Assigned Employees</div>
                             </div>
+                            @php
+                                $effectiveUsedAmount = $project->getEffectiveUsedAmount();
+                                $budgetUtilized = $project->allocated_amount > 0 ? round(($effectiveUsedAmount / $project->allocated_amount) * 100, 2) : 0;
+                            @endphp
                             <div class="stat-item">
-                                <div class="stat-value">{{ $project->purchaseOrders->count() ?? 0 }}</div>
-                                <div class="stat-label">Purchase Orders</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">₱{{ number_format($project->used_amount ?? 0, 2) }}</div>
+                                <div class="stat-value">₱{{ number_format($effectiveUsedAmount, 2) }}</div>
                                 <div class="stat-label">Amount Used</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ $project->allocated_amount > 0 ? round((($project->used_amount ?? 0) / $project->allocated_amount) * 100, 2) : 0 }}%</div>
+                                <div class="stat-value">{{ $budgetUtilized }}%</div>
                                 <div class="stat-label">Budget Utilized</div>
                             </div>
                         </div>
@@ -1831,17 +1863,196 @@
                 border-radius: 8px;
                 overflow: hidden;
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                display: flex;
+                flex-direction: column;
             `;
+
+            // Image wrapper for zooming
+            const imageWrapper = document.createElement('div');
+            imageWrapper.style.cssText = `
+                flex: 1;
+                overflow: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f5f5f5;
+                position: relative;
+            `;
+
+            let zoomLevel = 1;
+            const maxZoom = 3;
+            const minZoom = 0.5;
+            let panX = 0;
+            let panY = 0;
+            let isPanning = false;
+            let startX = 0;
+            let startY = 0;
 
             const img = document.createElement('img');
             img.src = imageSrc;
             img.alt = imageTitle;
             img.style.cssText = `
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
                 max-height: 85vh;
+                object-fit: contain;
+                transform: scale(${zoomLevel}) translate(${panX}px, ${panY}px);
+                transition: transform 0.2s ease;
+                cursor: grab;
+                user-select: none;
             `;
+
+            // Zoom controls
+            const controlsBar = document.createElement('div');
+            controlsBar.style.cssText = `
+                background: rgba(0, 0, 0, 0.7);
+                padding: 12px 15px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            `;
+
+            const zoomOutBtn = document.createElement('button');
+            zoomOutBtn.innerHTML = '<i class="fas fa-minus"></i>';
+            zoomOutBtn.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.3);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            `;
+            zoomOutBtn.onmouseover = () => {
+                zoomOutBtn.style.background = 'rgba(255,255,255,0.3)';
+            };
+            zoomOutBtn.onmouseout = () => {
+                zoomOutBtn.style.background = 'rgba(255,255,255,0.2)';
+            };
+
+            const zoomDisplay = document.createElement('span');
+            zoomDisplay.textContent = '100%';
+            zoomDisplay.style.cssText = `
+                color: white;
+                font-size: 14px;
+                min-width: 50px;
+                text-align: center;
+            `;
+
+            const zoomInBtn = document.createElement('button');
+            zoomInBtn.innerHTML = '<i class="fas fa-plus"></i>';
+            zoomInBtn.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.3);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            `;
+            zoomInBtn.onmouseover = () => {
+                zoomInBtn.style.background = 'rgba(255,255,255,0.3)';
+            };
+            zoomInBtn.onmouseout = () => {
+                zoomInBtn.style.background = 'rgba(255,255,255,0.2)';
+            };
+
+            const resetBtn = document.createElement('button');
+            resetBtn.textContent = 'Reset';
+            resetBtn.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.3);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 13px;
+                transition: all 0.2s;
+            `;
+            resetBtn.onmouseover = () => {
+                resetBtn.style.background = 'rgba(255,255,255,0.3)';
+            };
+            resetBtn.onmouseout = () => {
+                resetBtn.style.background = 'rgba(255,255,255,0.2)';
+            };
+
+            const updateZoom = () => {
+                zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
+                img.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
+                zoomDisplay.textContent = Math.round(zoomLevel * 100) + '%';
+                zoomOutBtn.disabled = zoomLevel <= minZoom;
+                zoomInBtn.disabled = zoomLevel >= maxZoom;
+                zoomOutBtn.style.opacity = zoomLevel <= minZoom ? '0.5' : '1';
+                zoomInBtn.style.opacity = zoomLevel >= maxZoom ? '0.5' : '1';
+                
+                // Update cursor
+                if (zoomLevel > 1) {
+                    img.style.cursor = 'grabbing';
+                } else {
+                    img.style.cursor = 'grab';
+                }
+            };
+
+            zoomInBtn.onclick = () => {
+                zoomLevel += 0.2;
+                updateZoom();
+            };
+
+            zoomOutBtn.onclick = () => {
+                zoomLevel -= 0.2;
+                updateZoom();
+            };
+
+            resetBtn.onclick = () => {
+                zoomLevel = 1;
+                panX = 0;
+                panY = 0;
+                updateZoom();
+            };
+
+            // Mouse wheel zoom
+            imageWrapper.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zoomLevel += 0.1;
+                } else {
+                    zoomLevel -= 0.1;
+                }
+                updateZoom();
+            }, { passive: false });
+
+            // Pan with mouse drag
+            img.addEventListener('mousedown', (e) => {
+                if (zoomLevel > 1) {
+                    isPanning = true;
+                    startX = e.clientX - panX;
+                    startY = e.clientY - panY;
+                    img.style.cursor = 'grabbing';
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    panX = e.clientX - startX;
+                    panY = e.clientY - startY;
+                    
+                    // Limit pan range based on zoom level
+                    const maxPan = (zoomLevel - 1) * 50;
+                    panX = Math.max(-maxPan, Math.min(maxPan, panX));
+                    panY = Math.max(-maxPan, Math.min(maxPan, panY));
+                    
+                    img.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isPanning) {
+                    isPanning = false;
+                    img.style.cursor = zoomLevel > 1 ? 'grab' : 'grab';
+                }
+            });
 
             const closeBtn = document.createElement('button');
             closeBtn.innerHTML = '<i class="fas fa-times"></i>';
@@ -1861,6 +2072,7 @@
                 font-size: 20px;
                 color: #333;
                 transition: all 0.2s;
+                z-index: 10000;
             `;
 
             closeBtn.onmouseover = () => closeBtn.style.background = 'white';
@@ -1870,7 +2082,7 @@
             title.innerHTML = imageTitle;
             title.style.cssText = `
                 position: absolute;
-                bottom: 0;
+                bottom: 60px;
                 left: 0;
                 right: 0;
                 background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
@@ -1878,6 +2090,7 @@
                 padding: 20px 15px 15px;
                 font-weight: 500;
                 font-size: 16px;
+                z-index: 10000;
             `;
 
             const closeModal = () => {
@@ -1890,11 +2103,19 @@
                 if (e.target === modal) closeModal();
             };
 
-            container.appendChild(img);
+            imageWrapper.appendChild(img);
+            controlsBar.appendChild(zoomOutBtn);
+            controlsBar.appendChild(zoomDisplay);
+            controlsBar.appendChild(zoomInBtn);
+            controlsBar.appendChild(resetBtn);
+
             container.appendChild(closeBtn);
             container.appendChild(title);
+            container.appendChild(imageWrapper);
+            container.appendChild(controlsBar);
             modal.appendChild(container);
             document.body.appendChild(modal);
+
 
             // Add animation styles
             const style = document.createElement('style');
