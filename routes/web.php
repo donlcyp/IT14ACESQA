@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/finance-graphs', [App\Http\Controllers\DashboardController::class, 'financeGraphs'])->name('finance-graphs');
+    Route::get('/api/spending-trend', [App\Http\Controllers\DashboardController::class, 'getSpendingTrend'])->name('api.spending-trend');
 
     // ===== SHARED ROUTES: OWNER & PROJECT MANAGER =====
     Route::middleware('role:OWNER,PM')->group(function () {

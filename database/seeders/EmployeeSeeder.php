@@ -19,20 +19,23 @@ class EmployeeSeeder extends Seeder
         // Disable foreign key constraints temporarily
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         
-        // Clear existing employees
+        // Clear existing employees only
         Employee::truncate();
         
         // Re-enable foreign key constraints
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Create Owner user
-        $ownerUser = User::create([
-            'name' => 'Crisber Beriong',
-            'email' => 'owner.crisber@example.com',
-            'phone' => '+63 917 123 4567',
-            'password' => bcrypt('password123'),
-            'role' => 'OWNER'
-        ]);
+        // Owner user - skip if already exists
+        $ownerUser = User::where('email', 'owner.crisber@example.com')->first();
+        if (!$ownerUser) {
+            $ownerUser = User::create([
+                'name' => 'Crisber Beriong',
+                'email' => 'owner.crisber@example.com',
+                'phone' => '+63 917 123 4567',
+                'password' => bcrypt('password123'),
+                'role' => 'OWNER'
+            ]);
+        }
 
         // Get all users to assign to employees
         $users = User::all();
@@ -86,20 +89,28 @@ class EmployeeSeeder extends Seeder
                              . str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT) . ' ' 
                              . str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
                 
-                $user = User::create([
-                    'name' => $faker->firstName() . ' ' . $faker->lastName(),
-                    'email' => $email,
-                    'phone' => $phoneNumber,
-                    'password' => bcrypt('password123'),
-                    'role' => $role
-                ]);
+                // Check if user already exists, if not create it
+                $user = User::where('email', $email)->first();
+                if (!$user) {
+                    $user = User::create([
+                        'name' => $faker->firstName() . ' ' . $faker->lastName(),
+                        'email' => $email,
+                        'phone' => $phoneNumber,
+                        'password' => bcrypt('password123'),
+                        'role' => $role
+                    ]);
+                }
                 
-                Employee::create([
-                    'user_id' => $user->id,
-                    'f_name' => $user->name,
-                    'l_name' => $faker->lastName(),
-                    'position' => $position,
-                ]);
+                // Check if employee already exists for this user
+                $employee = Employee::where('user_id', $user->id)->first();
+                if (!$employee) {
+                    Employee::create([
+                        'user_id' => $user->id,
+                        'f_name' => $user->name,
+                        'l_name' => $faker->lastName(),
+                        'position' => $position,
+                    ]);
+                }
                 
                 $employeeCounter++;
             }

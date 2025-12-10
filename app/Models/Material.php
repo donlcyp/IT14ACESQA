@@ -48,6 +48,15 @@ class Material extends Model
         'date_inspected' => 'date',
         'unit_price' => 'decimal:2',
         'total_cost' => 'decimal:2',
+        'quantity' => 'integer',
+        'quantity_received' => 'integer',
+        'material_cost' => 'decimal:2',
+        'labor_cost' => 'decimal:2',
+        'unit_rate' => 'decimal:2',
+        'price' => 'decimal:2',
+        'total' => 'decimal:2',
+        'unit_total' => 'decimal:2',
+        'item_total' => 'decimal:2',
     ];
 
     /**

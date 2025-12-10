@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Employee;
 use App\Models\EmployeeAttendance;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -155,5 +156,151 @@ class DashboardController extends Controller
             'totalBudget',
             'totalSpent'
         ));
+    }
+
+    /**
+     * Get spending trend data based on filter (daily, weekly, monthly, yearly)
+     * Supports navigation to previous periods
+     */
+    public function getSpendingTrend(Request $request)
+    {
+        $filter = $request->query('filter', 'day'); // Default to daily
+        $offset = (int) $request->query('offset', 0); // Negative for previous periods
+        $year = (int) $request->query('year', now()->year); // Year for context
+        $month = (int) $request->query('month', now()->month); // Month for context
+
+        $trendData = [];
+        $labels = [];
+        $title = '';
+        $periodInfo = '';
+
+        // Get materials based on filter
+        $materials = Material::with(['project', 'projectRecord.project'])
+            ->orderBy('created_at')
+            ->get();
+
+        switch ($filter) {
+            case 'day':
+                // Daily trend for the current month (31 days)
+                $targetDate = Carbon::createFromDate($year, $month, 1)->addMonths($offset);
+                $year = $targetDate->year;
+                $month = $targetDate->month;
+                $daysInMonth = $targetDate->daysInMonth;
+
+                $trendData = array_fill(0, $daysInMonth, 0);
+                $labels = array_map(fn($day) => "Day $day", range(1, $daysInMonth));
+
+                foreach ($materials as $material) {
+                    $materialDate = $material->created_at ? Carbon::parse($material->created_at) : null;
+                    if ($materialDate && $materialDate->year == $year && $materialDate->month == $month) {
+                        $day = $materialDate->day - 1;
+                        $cost = ($material->material_cost ?? 0) * ($material->quantity ?? 0) +
+                                ($material->labor_cost ?? 0) * ($material->quantity ?? 0);
+                        $trendData[$day] += $cost;
+                    }
+                }
+
+                $title = "Daily Spending Trend - " . $targetDate->format('F Y');
+                $periodInfo = $targetDate->format('F Y');
+                break;
+
+            case 'week':
+                // Weekly trend for the current month
+                $targetDate = Carbon::createFromDate($year, $month, 1)->addMonths($offset);
+                $year = $targetDate->year;
+                $month = $targetDate->month;
+                $daysInMonth = $targetDate->daysInMonth;
+
+                // Calculate weeks in month
+                $weeks = [];
+                $currentWeek = 1;
+                $weekDay = 1;
+                $trendData = [];
+
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $weeks[$day] = $currentWeek;
+                    $weekDay++;
+                    if ($weekDay > 7) {
+                        $currentWeek++;
+                        $weekDay = 1;
+                    }
+                }
+
+                $uniqueWeeks = array_unique(array_values($weeks));
+                $trendData = array_fill(0, max($uniqueWeeks), 0);
+                $labels = array_map(fn($w) => "Week $w", range(1, max($uniqueWeeks)));
+
+                foreach ($materials as $material) {
+                    $materialDate = $material->created_at ? Carbon::parse($material->created_at) : null;
+                    if ($materialDate && $materialDate->year == $year && $materialDate->month == $month) {
+                        $day = $materialDate->day;
+                        if (isset($weeks[$day])) {
+                            $weekNum = $weeks[$day] - 1;
+                            $cost = ($material->material_cost ?? 0) * ($material->quantity ?? 0) +
+                                    ($material->labor_cost ?? 0) * ($material->quantity ?? 0);
+                            $trendData[$weekNum] += $cost;
+                        }
+                    }
+                }
+
+                $title = "Weekly Spending Trend - " . $targetDate->format('F Y');
+                $periodInfo = $targetDate->format('F Y');
+                break;
+
+            case 'year':
+                // Yearly trend - all 12 months
+                $targetYear = $year + $offset;
+                $trendData = array_fill(0, 12, 0);
+                $labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                foreach ($materials as $material) {
+                    $materialDate = $material->created_at ? Carbon::parse($material->created_at) : null;
+                    if ($materialDate && $materialDate->year == $targetYear) {
+                        $month = $materialDate->month - 1;
+                        $cost = ($material->material_cost ?? 0) * ($material->quantity ?? 0) +
+                                ($material->labor_cost ?? 0) * ($material->quantity ?? 0);
+                        $trendData[$month] += $cost;
+                    }
+                }
+
+                $title = "Yearly Spending Trend - $targetYear";
+                $periodInfo = "Year $targetYear";
+                break;
+
+            case 'day':
+            default:
+                // Daily trend for the current month (31 days)
+                $targetDate = Carbon::createFromDate($year, $month, 1)->addMonths($offset);
+                $year = $targetDate->year;
+                $month = $targetDate->month;
+                $daysInMonth = $targetDate->daysInMonth;
+
+                $trendData = array_fill(0, $daysInMonth, 0);
+                $labels = array_map(fn($day) => "Day $day", range(1, $daysInMonth));
+
+                foreach ($materials as $material) {
+                    $materialDate = $material->created_at ? Carbon::parse($material->created_at) : null;
+                    if ($materialDate && $materialDate->year == $year && $materialDate->month == $month) {
+                        $day = $materialDate->day - 1;
+                        $cost = ($material->material_cost ?? 0) * ($material->quantity ?? 0) +
+                                ($material->labor_cost ?? 0) * ($material->quantity ?? 0);
+                        $trendData[$day] += $cost;
+                    }
+                }
+
+                $title = "Daily Spending Trend - " . $targetDate->format('F Y');
+                $periodInfo = $targetDate->format('F Y');
+                break;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $trendData,
+            'title' => $title,
+            'periodInfo' => $periodInfo,
+            'filter' => $filter,
+            'year' => $year,
+            'month' => $month,
+        ]);
     }
 }

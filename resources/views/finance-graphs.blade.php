@@ -324,7 +324,22 @@
 
                     <!-- Spending Trend -->
                     <div class="graph-card">
-                        <div class="graph-card-title">Monthly Spending Trend</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="graph-card-title" style="margin-bottom: 0;">
+                                <span id="trendTitle">Monthly Spending Trend</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <button id="prevPeriodBtn" style="padding: 8px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">← Previous</button>
+                                
+                                <select id="filterSelect" style="padding: 8px 12px; border: 1px solid #d0d5dd; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                    <option value="day" selected>Daily</option>
+                                    <option value="week">Weekly</option>
+                                    <option value="year">Yearly</option>
+                                </select>
+                                
+                                <button id="nextPeriodBtn" style="padding: 8px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Next →</button>
+                            </div>
+                        </div>
                         <div class="chart-container">
                             <canvas id="trendChart"></canvas>
                         </div>
@@ -430,45 +445,141 @@
             }
         });
 
-        // Chart 3: Spending Trend
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Monthly Spending',
-                    data: [0, 0, 0, 0, 0, 150000, 200000, 250000, 300000, 350000, 400000, 500000],
-                    borderColor: chartColors.primary,
-                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: chartColors.primary,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₱' + value.toLocaleString();
+        // Chart 3: Spending Trend (Dynamic)
+        let trendChart = null;
+        let currentFilter = 'day';
+        let currentOffset = 0;
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth() + 1;
+
+        async function loadSpendingTrend() {
+            try {
+                const response = await fetch(`/api/spending-trend?filter=${currentFilter}&offset=${currentOffset}&year=${currentYear}&month=${currentMonth}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Update title
+                document.getElementById('trendTitle').textContent = data.title;
+
+                // Update year/month for navigation
+                currentYear = data.year;
+                currentMonth = data.month;
+
+                // Destroy existing chart if it exists
+                if (trendChart) {
+                    trendChart.destroy();
+                }
+
+                // Clear and reset canvas
+                const canvas = document.getElementById('trendChart');
+                const container = canvas.parentElement;
+                canvas.remove();
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = 'trendChart';
+                container.appendChild(newCanvas);
+
+                // Ensure data is an array
+                const chartData = Array.isArray(data.data) ? data.data : Object.values(data.data);
+
+                // Create new chart
+                const trendCtx = document.getElementById('trendChart').getContext('2d');
+                trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: data.title.split(' - ')[0],
+                            data: chartData,
+                            borderColor: chartColors.primary,
+                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: chartColors.primary,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₱' + value.toLocaleString();
+                                    }
+                                }
                             }
                         }
                     }
+                });
+            } catch (error) {
+                console.error('Error loading spending trend:', error);
+                // Fallback: show empty chart on error
+                if (trendChart) {
+                    trendChart.destroy();
                 }
+                const canvas = document.getElementById('trendChart');
+                const container = canvas.parentElement;
+                canvas.remove();
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = 'trendChart';
+                container.appendChild(newCanvas);
+
+                const trendCtx = document.getElementById('trendChart').getContext('2d');
+                trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Error'],
+                        datasets: [{
+                            label: 'Error loading data',
+                            data: [0],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)'
+                        }]
+                    }
+                });
             }
-        });
+        }
+
+        // Event listeners for filter controls
+        const filterSelect = document.getElementById('filterSelect');
+        const prevBtn = document.getElementById('prevPeriodBtn');
+        const nextBtn = document.getElementById('nextPeriodBtn');
+
+        if (filterSelect) {
+            filterSelect.addEventListener('change', (e) => {
+                currentFilter = e.target.value;
+                currentOffset = 0; // Reset offset when changing filter
+                loadSpendingTrend();
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                currentOffset--;
+                loadSpendingTrend();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                currentOffset++;
+                loadSpendingTrend();
+            });
+        }
+
+        // Load initial spending trend
+        loadSpendingTrend();
 
         // Chart 4: Project Spending
         const projectCtx = document.getElementById('projectChart').getContext('2d');

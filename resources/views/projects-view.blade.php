@@ -115,13 +115,12 @@
             }
         }
 
-        .header-title {
+       .header-title {
             color: white;
+            font-family: "Zen Dots", sans-serif;
             font-size: 24px;
-            font-weight: 700;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-weight: 400;
+            flex: 1;
         }
 
         /* Content Area */
@@ -177,6 +176,9 @@
             font-size: 28px;
             font-weight: 700;
             color: var(--black-1);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .projects-actions {
@@ -1004,12 +1006,12 @@
                                             <tr class="boq-row" style="border-bottom: 1px solid var(--gray-400);">
                                                 <td style="padding: 12px; text-align: center; color: var(--black-1); font-weight: 600;">{{ $material->item_no ?? '—' }}</td>
                                                 <td style="padding: 12px; color: var(--black-1);">
-                                                    <div style="font-weight: 500;">{{ $material->item_description ?? $material->material_name ?? '—' }}</div>
+                                                    <div style="font-weight: 500; white-space: pre-wrap; line-height: 1.6; font-size: 15px;">{{ $material->item_description ?? $material->material_name ?? '—' }}</div>
                                                     @if($material->category)
-                                                        <div style="font-size: 12px; color: var(--gray-600);">{{ $material->category }}</div>
+                                                        <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px;"><strong>Category:</strong> {{ $material->category }}</div>
                                                     @endif
                                                     @if($material->notes)
-                                                        <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">{{ $material->notes }}</div>
+                                                        <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;"><strong>Notes:</strong> {{ $material->notes }}</div>
                                                     @endif
                                                 </td>
                                                 <td style="padding: 12px; text-align: center; color: var(--gray-700); font-weight: 600;">{{ $material->quantity ?? 0 }}</td>
@@ -1195,9 +1197,9 @@
                                                 @endphp
                                                 <tr style="border-bottom: 1px solid var(--gray-400);">
                                                     <td style="padding: 12px; color: var(--black-1);">
-                                                        <div style="font-weight: 500;">{{ $material->item_description ?? 'N/A' }}</div>
+                                                        <div style="font-weight: 500; white-space: pre-wrap; line-height: 1.6; font-size: 15px;">{{ $material->item_description ?? 'N/A' }}</div>
                                                         @if($material->category)
-                                                            <div style="font-size: 11px; color: var(--gray-600);">{{ $material->category }}</div>
+                                                            <div style="font-size: 11px; color: var(--gray-600); margin-top: 6px;"><strong>Category:</strong> {{ $material->category }}</div>
                                                         @endif
                                                     </td>
                                                     <td style="padding: 12px; text-align: center; color: var(--gray-700);">{{ $material->quantity ?? 0 }}</td>
@@ -1565,15 +1567,16 @@
                         </div>
 
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Item Description *</label>
-                            <textarea id="boqItemDescription" name="item_description" placeholder="Enter detailed item description" required rows="3"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Item Description * <span style="font-size: 12px; color: #6b7280; font-weight: 400;">(Use line breaks for hierarchy)</span></label>
+                            <textarea id="boqItemDescription" name="item_description" placeholder="Enter item description&#10;Example:&#10;PVC Pipe Schedule 40&#10;  - 50mm diameter&#10;  - per meter" required rows="4"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 15px; white-space: pre-wrap;"></textarea>
+                            <small style="color: #6b7280; display: block; margin-top: 6px;">💡 Tip: Use line breaks and indentation to create a structured format</small>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                             <div>
                                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Quantity *</label>
-                                <input type="number" id="boqQuantity" name="quantity" placeholder="0" step="0.01" required 
+                                <input type="number" id="boqQuantity" name="quantity" placeholder="0" step="1" min="1" required 
                                     style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
                             </div>
                             <div>
@@ -1635,7 +1638,7 @@
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Notes</label>
                             <textarea id="boqNotes" name="notes" placeholder="Additional notes or remarks" rows="2"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: var(--text-md-normal-font-family);"></textarea>
                         </div>
 
                         <div style="margin-bottom: 15px;">
@@ -1682,10 +1685,27 @@
 
                     <div>
                         <h4 style="margin: 0 0 15px 0; color: #1f2937;">Related Project Tasks:</h4>
+                        
+                        <!-- Task Status Filter -->
+                        <div style="margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="task-filter-btn" data-filter="all" onclick="filterTasks('all')" 
+                                style="padding: 6px 14px; border: 2px solid var(--accent); background: var(--accent); color: white; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
+                                <i class="fas fa-check"></i> All Tasks
+                            </button>
+                            <button type="button" class="task-filter-btn" data-filter="ongoing" onclick="filterTasks('ongoing')"
+                                style="padding: 6px 14px; border: 2px solid #3b82f6; background: white; color: #3b82f6; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
+                                <i class="fas fa-hourglass-half"></i> Ongoing
+                            </button>
+                            <button type="button" class="task-filter-btn" data-filter="completed" onclick="filterTasks('completed')"
+                                style="padding: 6px 14px; border: 2px solid #16a34a; background: white; color: #16a34a; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
+                                <i class="fas fa-check-circle"></i> Completed
+                            </button>
+                        </div>
+
                         <div id="boqTasksList" style="max-height: 400px; overflow-y: auto;">
                             <div class="updates-timeline">
                                 @forelse($project->updates as $update)
-                                    <div class="timeline-item" style="margin-bottom: 15px;">
+                                    <div class="timeline-item task-item" data-status="{{ strtolower($update->status === 'Completed' ? 'completed' : 'ongoing') }}" style="margin-bottom: 15px;">
                                         <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #16a34a @else #3b82f6 @endif;"></div>
                                         <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
                                             <div class="timeline-header">
@@ -1747,7 +1767,7 @@
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description *</label>
                             <textarea id="taskDescription" name="description" placeholder="Enter task description" required rows="3"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif;"></textarea>
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: var(--text-md-normal-font-family);"></textarea>
                         </div>
 
                         <div style="margin-bottom: 15px;">
@@ -1787,25 +1807,27 @@
                     </button>
                 </div>
 
-                <div id="modalWarning" class="info-banner" style="display: none; margin-bottom: 20px;">
-                    <div class="info-banner-icon">
-                        <i class="fas fa-exclamation-circle"></i>
+                <div style="padding: 20px;">
+                    <div id="modalWarning" class="info-banner" style="display: none; margin-bottom: 20px;">
+                        <div class="info-banner-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="info-banner-content">
+                            <h4 style="margin: 0;">Project Completed</h4>
+                            <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
+                        </div>
                     </div>
-                    <div class="info-banner-content">
-                        <h4 style="margin: 0;">Project Completed</h4>
-                        <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
+
+                    <p style="color: #6b7280; margin-bottom: 16px;">
+                        Select employees to assign to this project. Only employees not assigned to other active projects are available.
+                    </p>
+
+                    <div class="employee-list" id="employeeList">
+                        <!-- Populated by JavaScript -->
                     </div>
                 </div>
 
-                <p style="color: #6b7280; margin-bottom: 16px;">
-                    Select employees to assign to this project. Only employees not assigned to other active projects are available.
-                </p>
-
-                <div class="employee-list" id="employeeList">
-                    <!-- Populated by JavaScript -->
-                </div>
-
-                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <div style="display: flex; gap: 12px; justify-content: flex-end; padding: 15px 20px; border-top: 1px solid #e5e7eb;">
                     <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
                     <button class="btn btn-green" onclick="saveEmployeeAssignments()">
                         <i class="fas fa-save"></i> Save Changes
@@ -2253,6 +2275,10 @@
         let allEmployees = {!! json_encode($allEmployees ?? []) !!};
         let projectEmployees = {!! json_encode($projectEmployees ?? []) !!};
 
+        // Debug: Check if employees are loaded
+        console.log('All Employees:', allEmployees);
+        console.log('Project Employees:', projectEmployees);
+
         function openEmployeeModal() {
             const modal = document.getElementById('employeeModal');
             if (!modal) {
@@ -2282,7 +2308,22 @@
             const employeeList = document.getElementById('employeeList');
             const assignedEmployeeIds = projectEmployees[projectId] || [];
 
+            console.log('Loading employees for project:', projectId);
+            console.log('Assigned IDs:', assignedEmployeeIds);
+            console.log('Total employees available:', allEmployees.length);
+
             employeeList.innerHTML = '';
+
+            if (!allEmployees || allEmployees.length === 0) {
+                employeeList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                        <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                        <p style="margin: 0;">No employees available in the system.</p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #6b7280;">Please create employees first.</p>
+                    </div>
+                `;
+                return;
+            }
 
             allEmployees.forEach(employee => {
                 const isAssigned = assignedEmployeeIds.includes(employee.id);
@@ -2374,7 +2415,7 @@
 
         function validateBOQForm() {
             const itemDescription = document.getElementById('boqItemDescription').value.trim();
-            const quantity = parseFloat(document.getElementById('boqQuantity').value) || 0;
+            const quantity = parseInt(document.getElementById('boqQuantity').value) || 0;
             const unit = document.getElementById('boqUnit').value.trim();
             
             if (!itemDescription) {
@@ -2731,13 +2772,14 @@
                     let html = '<div class="updates-timeline">';
                     
                     data.tasks.forEach(task => {
+                        const taskStatus = task.status === 'Completed' ? 'completed' : 'ongoing';
                         const statusClass = task.status === 'Completed' 
                             ? '#dcfce7; color: #166534' 
                             : '#bfdbfe; color: #1e40af';
                         const statusBg = task.status === 'Completed' ? '#16a34a' : '#3b82f6';
                         
                         html += `
-                            <div class="timeline-item" style="margin-bottom: 15px;">
+                            <div class="timeline-item task-item" data-status="${taskStatus}" style="margin-bottom: 15px;">
                                 <div class="timeline-marker" style="background-color: ${statusBg};"></div>
                                 <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
                                     <div class="timeline-header">
@@ -2758,6 +2800,15 @@
                     
                     html += '</div>';
                     tasksList.innerHTML = html;
+                    
+                    // Reset filter to 'all' after loading
+                    document.querySelectorAll('.task-filter-btn').forEach(btn => btn.style.background = 'white');
+                    document.querySelectorAll('.task-filter-btn').forEach(btn => btn.style.color = 'inherit');
+                    const allBtn = document.querySelector('.task-filter-btn[data-filter="all"]');
+                    if (allBtn) {
+                        allBtn.style.background = 'var(--accent)';
+                        allBtn.style.color = 'white';
+                    }
                 } else {
                     tasksList.innerHTML = `
                         <div style="text-align: center; padding: 20px; color: #9ca3af;">
@@ -2774,6 +2825,41 @@
                         <p>Error loading tasks. Please try again.</p>
                     </div>
                 `;
+            });
+        }
+
+        function filterTasks(filter) {
+            // Update button styles
+            document.querySelectorAll('.task-filter-btn').forEach(btn => {
+                btn.style.background = 'white';
+                btn.style.color = btn.getAttribute('data-filter') === 'ongoing' ? '#3b82f6' : 
+                                   btn.getAttribute('data-filter') === 'completed' ? '#16a34a' : 'inherit';
+            });
+            
+            // Highlight active filter
+            const activeBtn = document.querySelector(`.task-filter-btn[data-filter="${filter}"]`);
+            if (activeBtn) {
+                if (filter === 'all') {
+                    activeBtn.style.background = 'var(--accent)';
+                    activeBtn.style.color = 'white';
+                } else if (filter === 'ongoing') {
+                    activeBtn.style.background = '#3b82f6';
+                    activeBtn.style.color = 'white';
+                } else if (filter === 'completed') {
+                    activeBtn.style.background = '#16a34a';
+                    activeBtn.style.color = 'white';
+                }
+            }
+            
+            // Filter task items
+            const taskItems = document.querySelectorAll('.task-item');
+            taskItems.forEach(item => {
+                if (filter === 'all') {
+                    item.style.display = 'block';
+                } else {
+                    const itemStatus = item.getAttribute('data-status');
+                    item.style.display = itemStatus === filter ? 'block' : 'none';
+                }
             });
         }
 

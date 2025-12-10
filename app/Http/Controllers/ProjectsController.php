@@ -20,16 +20,13 @@ class ProjectsController extends Controller
             ->withQueryString();
 
         $clients = \App\Models\Client::all();
-        $projectManagers = \App\Models\Employee::where('position', 'Project Manager')
-            ->with('user')
+        $projectManagers = \App\Models\User::where('role', 'PM')
+            ->orderBy('name')
             ->get()
-            ->filter(function ($employee) {
-                return $employee->user_id && $employee->user;
-            })
-            ->map(function ($employee) {
+            ->map(function ($user) {
                 return (object)[
-                    'id' => $employee->user_id,
-                    'name' => $employee->user->name ?? ($employee->f_name . ' ' . $employee->l_name),
+                    'id' => $user->id,
+                    'name' => $user->name,
                 ];
             })
             ->values();
@@ -37,10 +34,14 @@ class ProjectsController extends Controller
         // Get all employees with their current project assignments
         $allEmployees = Employee::all()->map(function ($employee) {
             $assignedProject = $employee->projects()->first();
-            $employee->assigned_to_other_project = $assignedProject && $assignedProject->status !== 'Completed';
-            
-            return $employee;
-        })->toArray();
+            return [
+                'id' => $employee->id,
+                'f_name' => $employee->f_name,
+                'l_name' => $employee->l_name,
+                'position' => $employee->position,
+                'assigned_to_other_project' => $assignedProject && $assignedProject->status !== 'Completed'
+            ];
+        })->values()->toArray();
         
         // Build project-employees mapping
         $projectEmployees = [];
@@ -58,10 +59,14 @@ class ProjectsController extends Controller
         // Get all employees with their current project assignments
         $allEmployees = Employee::all()->map(function ($employee) {
             $assignedProject = $employee->projects()->first();
-            $employee->assigned_to_other_project = $assignedProject && $assignedProject->status !== 'Completed';
-            
-            return $employee;
-        });
+            return [
+                'id' => $employee->id,
+                'f_name' => $employee->f_name,
+                'l_name' => $employee->l_name,
+                'position' => $employee->position,
+                'assigned_to_other_project' => $assignedProject && $assignedProject->status !== 'Completed'
+            ];
+        })->values()->toArray();
         
         // Build project-employees mapping
         $projectEmployees = [$project->id => $project->employees->pluck('id')->toArray()];
