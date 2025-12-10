@@ -108,6 +108,14 @@ Route::middleware('auth')->group(function () {
         // Activity Log Routes
         Route::get('/activity-log', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-log.index');
         Route::get('/activity-log/{log}', [App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-log.show');
+
+        // Salary/Rate Settings
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/salary-rates', [App\Http\Controllers\PositionDailyRateController::class, 'index'])->name('salary-rates');
+            Route::post('/salary-rates', [App\Http\Controllers\PositionDailyRateController::class, 'store'])->name('salary-rates.store');
+            Route::put('/salary-rates/{rate}', [App\Http\Controllers\PositionDailyRateController::class, 'update'])->name('salary-rates.update');
+            Route::delete('/salary-rates/{rate}', [App\Http\Controllers\PositionDailyRateController::class, 'destroy'])->name('salary-rates.destroy');
+        });
     });
 
     // ===== EMPLOYEE ONLY: Attendance and Punch In/Out =====
@@ -150,6 +158,17 @@ Route::middleware('auth')->group(function () {
             // Employee history
             Route::get('/employee/{employee}/history', [App\Http\Controllers\AttendanceValidationController::class, 'employeeHistory'])->name('employee.history');
         });
+    });
+
+    // ===== BUNDY CLOCK API ROUTES =====
+    // These routes handle incoming data from bundy clock (time clock) devices
+    // No authentication required - devices send data directly
+    // Security should be handled via IP whitelist or API tokens in production
+    Route::prefix('api/bundy-clock')->name('bundy-clock.')->group(function () {
+        Route::post('/punch', [App\Http\Controllers\BundyClockController::class, 'receivePunch'])->name('punch');
+        Route::post('/batch', [App\Http\Controllers\BundyClockController::class, 'receiveBatchPunch'])->name('batch');
+        Route::get('/health', [App\Http\Controllers\BundyClockController::class, 'healthCheck'])->name('health');
+        Route::post('/test', [App\Http\Controllers\BundyClockController::class, 'test'])->name('test'); // Disable in production
     });
 });
 

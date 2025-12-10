@@ -1259,17 +1259,29 @@
                                 <div style="font-size: 24px; font-weight: 700; color: #be185d;">
                                     ₱@php
                                         $totalLaborCost = 0;
+                                        // Get rates from database
+                                        $positionDailyRates = \App\Models\PositionDailyRate::getRatesArray();
+                                        $defaultRate = 700.00;
+                                        
                                         foreach($project->employees as $emp) {
-                                            $empDays = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                            // Get attendance records with punch times
+                                            $attendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
                                                 ->whereBetween('date', [
                                                     $emp->pivot->assigned_from ?? $project->created_at,
                                                     $emp->pivot->assigned_to ?? now()
                                                 ])
                                                 ->where('attendance_status', 'Present')
-                                                ->count();
-                                            $monthlySalary = $emp->pivot->salary ?? 0;
-                                            $dailyRate = $monthlySalary > 0 ? round($monthlySalary / 22, 2) : 0;
-                                            $totalLaborCost += $empDays * $dailyRate;
+                                                ->whereNotNull('punch_in_time')
+                                                ->whereNotNull('punch_out_time')
+                                                ->get();
+                                            
+                                            $employeePosition = $emp->position ?? 'Construction Worker';
+                                            $dailyRate = $positionDailyRates[$employeePosition] ?? $defaultRate;
+                                            
+                                            // Calculate labor cost based on actual hours worked
+                                            foreach($attendanceRecords as $attendance) {
+                                                $totalLaborCost += $attendance->calculateLaborCost($dailyRate);
+                                            }
                                         }
                                         echo number_format($totalLaborCost, 2);
                                     @endphp
@@ -1290,8 +1302,9 @@
                                         <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Employee</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days Worked</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Daily Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Hours Worked</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Hourly Rate</th>
                                             <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Labor Cost</th>
                                             <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
                                         </tr>
@@ -1299,34 +1312,39 @@
                                     <tbody>
                                         @foreach ($project->employees as $employee)
                                             @php
-                                                // Calculate days worked and labor cost based on attendance
-                                                $attendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
+                                                // Get attendance records with actual hours worked
+                                                $empAttendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
                                                     ->whereBetween('date', [
                                                         $employee->pivot->assigned_from ?? $project->created_at,
                                                         $employee->pivot->assigned_to ?? now()
                                                     ])
                                                     ->where('attendance_status', 'Present')
-                                                    ->count();
+                                                    ->whereNotNull('punch_in_time')
+                                                    ->whereNotNull('punch_out_time')
+                                                    ->get();
                                                 
-                                                // Get daily rate based on employee position
-                                                $positionDailyRates = [
-                                                    'Project Manager' => 3000.00,
-                                                    'Site Supervisor' => 1200.00,
-                                                    'Finance Manager' => 1200.00,
-                                                    'Quality Assurance Officer' => 1100.00,
-                                                    'HR/Timekeeper' => 750.00,
-                                                    'Construction Worker' => 700.00
-                                                ];
+                                                $daysWorked = $empAttendanceRecords->count();
+                                                $totalHoursWorked = $empAttendanceRecords->sum(function($att) {
+                                                    return $att->getHoursWorked() ?? 0;
+                                                });
                                                 
+                                                // Get daily rate from database
                                                 $employeePosition = $employee->position ?? 'Construction Worker';
-                                                $dailyRate = $positionDailyRates[$employeePosition] ?? 700.00;
-                                                $laborCost = $attendanceRecords * $dailyRate;
+                                                $dailyRate = \App\Models\PositionDailyRate::getRateForPosition($employeePosition, 700.00);
+                                                $hourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($dailyRate);
+                                                
+                                                // Calculate labor cost based on actual hours worked
+                                                $laborCost = 0;
+                                                foreach($empAttendanceRecords as $att) {
+                                                    $laborCost += $att->calculateLaborCost($dailyRate);
+                                                }
                                             @endphp
                                             <tr style="border-bottom: 1px solid var(--gray-400);">
                                                 <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ $attendanceRecords }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($dailyRate, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">{{ $daysWorked }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ number_format($totalHoursWorked, 2) }} hrs</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($hourlyRate, 2) }}/hr</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($laborCost, 2) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <form method="POST" action="{{ route('projects.employees.remove', [$project->id, $employee->id]) }}" style="display: inline;" onsubmit="return confirm('Remove this employee?');">

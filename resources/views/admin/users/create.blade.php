@@ -214,13 +214,19 @@
       </div>
 
       <div class="form-group">
+        <label for="phone">Phone</label>
+        <input id="phone" name="phone" type="text" value="{{ old('phone') }}" placeholder="e.g. +63-917-123-4567">
+        @error('phone') <div class="error">{{ $message }}</div> @enderror
+      </div>
+
+      <div class="form-group">
         <label for="role">Role</label>
         <select id="role" name="role" required>
           @foreach ($roles as $r)
             <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $r }}</option>
           @endforeach
         </select>
-        <div class="help">OWNER has full access. PM manages projects. QA handles material checks. FM manages finance.</div>
+        <div class="help">OWNER has full access (hidden once assigned). PM manages projects. QA handles material checks. FM manages finance. USER is the standard account.</div>
         @error('role') <div class="error">{{ $message }}</div> @enderror
       </div>
 
@@ -260,6 +266,30 @@
       const toggle = document.querySelector('.toggle-sidebar');
       if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
         toggleSidebar();
+      }
+    });
+
+    // Phone number formatting: +63-XXX-XXX-XXXX
+    document.getElementById('phone').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      
+      if (value.length > 0) {
+        // Remove leading 63 if present (will be added with +)
+        if (value.startsWith('63')) {
+          value = value.substring(2);
+        }
+        // Limit to 10 digits after country code
+        if (value.length > 10) {
+          value = value.substring(0, 10);
+        }
+        
+        if (value.length >= 1) {
+          const part1 = value.substring(0, 3);
+          const part2 = value.substring(3, 6);
+          const part3 = value.substring(6, 10);
+          
+          e.target.value = '+63-' + part1 + (part2 ? '-' + part2 : '') + (part3 ? '-' + part3 : '');
+        }
       }
     });
   </script>

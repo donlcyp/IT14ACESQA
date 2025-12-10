@@ -159,6 +159,27 @@
         background-color: rgba(239, 68, 68, 0.1);
     }
 
+    /* Sidebar Overlay/Backdrop */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(15, 23, 42, 0.5);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        display: none;
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+        display: block;
+    }
+
     /* Main Content */
     .main-content {
         flex: 1;
@@ -173,6 +194,9 @@
             width: 280px;
         }
 </style>
+
+<!-- Sidebar Overlay/Backdrop -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
@@ -193,6 +217,10 @@
 
         <!-- OWNER: All menu items visible -->
         @if(auth()->check() && auth()->user()->role === 'OWNER')
+            <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-folder-open"></i>
+                <span>Projects</span>
+            </a>
             <a href="{{ route('archives') }}" class="nav-item {{ request()->routeIs('archives') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-archive"></i>
                 <span>Archives</span>
@@ -213,6 +241,10 @@
             <a href="{{ route('logs.index') }}" class="nav-item {{ request()->routeIs('logs.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-history"></i>
                 <span>Activity Logs</span>
+            </a>
+            <a href="{{ route('settings.salary-rates') }}" class="nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-peso-sign"></i>
+                <span>Salary Settings</span>
             </a>
         @endif
 

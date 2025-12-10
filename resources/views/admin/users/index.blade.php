@@ -714,6 +714,7 @@
                 <tr>
                   <th>Name</th>
                   <th>Email</th>
+                  <th>Phone</th>
                   <th>Role</th>
                   <th>Created</th>
                   <th>Actions</th>
@@ -726,6 +727,7 @@
                       <strong>{{ $user->name }}</strong>
                     </td>
                     <td>{{ $user->email }}</td>
+                    <td>{{ $user->phone ?? 'N/A' }}</td>
                     <td>
                       <span class="badge badge-role">
                         {{ $user->role ?? 'N/A' }}
@@ -857,13 +859,19 @@
         </div>
 
         <div class="form-group-modal">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="text" value="{{ old('phone') }}" placeholder="e.g. +63-917-123-4567">
+          @error('phone') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="form-group-modal">
           <label for="role">Role</label>
           <select id="role" name="role" required>
             @foreach ($roles as $r)
               <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $r }}</option>
             @endforeach
           </select>
-          <div class="form-help">OWNER has full access. PM manages projects. QA handles material checks. FM manages finance.</div>
+          <div class="form-help">OWNER has full access (hidden once assigned). PM manages projects. QA handles material checks. FM manages finance. USER is the standard account.</div>
           @error('role') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
         </div>
 
@@ -915,6 +923,33 @@
         closeCreateUserModal();
       }
     });
+
+    // Phone number formatting: +63-XXX-XXX-XXXX
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length > 0) {
+          // Remove leading 63 if present (will be added with +)
+          if (value.startsWith('63')) {
+            value = value.substring(2);
+          }
+          // Limit to 10 digits after country code
+          if (value.length > 10) {
+            value = value.substring(0, 10);
+          }
+          
+          if (value.length >= 1) {
+            const part1 = value.substring(0, 3);
+            const part2 = value.substring(3, 6);
+            const part3 = value.substring(6, 10);
+            
+            e.target.value = '+63-' + part1 + (part2 ? '-' + part2 : '') + (part3 ? '-' + part3 : '');
+          }
+        }
+      });
+    }
   </script>
 
   <!-- View User Modal -->
@@ -938,12 +973,12 @@
             <div class="detail-item-value" id="viewUserEmail">—</div>
           </div>
           <div class="detail-item">
-            <div class="detail-item-label">Role</div>
-            <div class="detail-item-value" id="viewUserRole">—</div>
+            <div class="detail-item-label">Phone</div>
+            <div class="detail-item-value" id="viewUserPhone">—</div>
           </div>
           <div class="detail-item">
-            <div class="detail-item-label">Verification Status</div>
-            <div id="viewUserVerified" style="margin-top: 2px;"></div>
+            <div class="detail-item-label">Role</div>
+            <div class="detail-item-value" id="viewUserRole">—</div>
           </div>
           <div class="detail-item">
             <div class="detail-item-label">Created</div>
@@ -968,6 +1003,7 @@
     function openViewUserModal(user) {
       document.getElementById('viewUserName').textContent = user.name || '—';
       document.getElementById('viewUserEmail').textContent = user.email || '—';
+      document.getElementById('viewUserPhone').textContent = user.phone || '—';
       document.getElementById('viewUserRole').textContent = user.role || 'N/A';
       document.getElementById('viewUserId').textContent = user.id || '—';
       
@@ -980,12 +1016,6 @@
           day: 'numeric' 
         });
       }
-      
-      // Verification status badge
-      const verifiedBadge = user.email_verified_at 
-        ? '<span class="detail-badge verified"><i class="fas fa-check"></i> Verified</span>'
-        : '<span class="detail-badge unverified"><i class="fas fa-times"></i> Not Verified</span>';
-      document.getElementById('viewUserVerified').innerHTML = verifiedBadge;
       
       document.getElementById('viewUserModal').classList.add('show');
       document.body.style.overflow = 'hidden';

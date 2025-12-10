@@ -23,12 +23,16 @@ class ProjectsController extends Controller
         $projectManagers = \App\Models\Employee::where('position', 'Project Manager')
             ->with('user')
             ->get()
+            ->filter(function ($employee) {
+                return $employee->user_id && $employee->user;
+            })
             ->map(function ($employee) {
                 return (object)[
                     'id' => $employee->user_id,
                     'name' => $employee->user->name ?? ($employee->f_name . ' ' . $employee->l_name),
                 ];
-            });
+            })
+            ->values();
 
         // Get all employees with their current project assignments
         $allEmployees = Employee::all()->map(function ($employee) {

@@ -37,6 +37,7 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:50'],
             'role' => ['required', 'in:' . implode(',', $roles)],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -44,6 +45,7 @@ class UserManagementController extends Controller
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'role' => $validated['role'],
             'password' => Hash::make($validated['password']),
             'email_verified_at' => now(),
@@ -55,6 +57,13 @@ class UserManagementController extends Controller
     private function roles(): array
     {
         // Allowed roles in the system
-        return ['OWNER', 'PM', 'QA', 'FM'];
+        $roles = ['OWNER', 'PM', 'QA', 'FM', 'USER'];
+
+        // Only allow OWNER if none exists to enforce single owner rule
+        if (User::where('role', 'OWNER')->exists()) {
+            $roles = array_values(array_filter($roles, fn ($role) => $role !== 'OWNER'));
+        }
+
+        return $roles;
     }
 }

@@ -1052,6 +1052,243 @@
             background: transparent;
         }
 
+        /* Quick Punch Employee Cards */
+        .quick-punch-section {
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid var(--gray-300);
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .quick-punch-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .quick-punch-title h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .quick-punch-title p {
+            margin: 4px 0 0;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+        .quick-punch-clock {
+            text-align: right;
+        }
+        .quick-punch-clock .time {
+            font-size: 28px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+        .quick-punch-clock .date {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+        .quick-punch-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .quick-punch-search {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        .quick-punch-search input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .quick-punch-search input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+        .quick-punch-search i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+        .role-filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .role-filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .role-filter-btn:hover {
+            background: #f9fafb;
+        }
+        .role-filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+        .employee-punch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .employee-punch-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        .employee-punch-card:hover {
+            background: #f3f4f6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .employee-punch-card.punched-in {
+            border-left: 4px solid #16a34a;
+        }
+        .employee-punch-card.punched-out {
+            border-left: 4px solid #6b7280;
+            opacity: 0.7;
+        }
+        .employee-punch-card.not-punched {
+            border-left: 4px solid #3b82f6;
+        }
+        .punch-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .punch-card-info h4 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .punch-card-info .role {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        .punch-card-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .punch-card-status.status-in {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .punch-card-status.status-out {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .punch-card-status.status-not {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .punch-card-status.status-late {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .punch-card-times {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+        .punch-card-times .time-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .punch-card-times .time-label {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        .punch-card-times .time-value {
+            color: #111827;
+            font-weight: 600;
+        }
+        .punch-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .punch-card-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .punch-card-btn.btn-in {
+            background: #16a34a;
+            color: white;
+        }
+        .punch-card-btn.btn-in:hover:not(:disabled) {
+            background: #15803d;
+        }
+        .punch-card-btn.btn-out {
+            background: #dc2626;
+            color: white;
+        }
+        .punch-card-btn.btn-out:hover:not(:disabled) {
+            background: #b91c1c;
+        }
+        .punch-card-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .no-employees-found {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+        .no-employees-found i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #d1d5db;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .page-header {
@@ -1070,6 +1307,19 @@
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
+            }
+            .quick-punch-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .quick-punch-clock {
+                text-align: left;
+            }
+            .quick-punch-search {
+                max-width: 100%;
+            }
+            .employee-punch-grid {
+                grid-template-columns: 1fr;
             }
         }
         @media (max-width: 640px) {
@@ -1262,61 +1512,123 @@
                     <!-- ADMIN/PM VIEW -->
                     
                     <!-- Punch In/Out Section -->
-                    <div style="background: white; padding: 24px; border-radius: 10px; border: 1px solid var(--gray-300); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                            <div>
-                                <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--gray-900);">Quick Punch In/Out</h2>
-                                <p style="margin: 4px 0 0; color: var(--gray-600); font-size: 14px;">Record your attendance quickly</p>
+                    <!-- Quick Punch In/Out Section with Employee Cards -->
+                    <div class="quick-punch-section">
+                        <div class="quick-punch-header">
+                            <div class="quick-punch-title">
+                                <h2><i class="fas fa-clock" style="margin-right: 8px; color: var(--accent);"></i>Quick Punch In/Out</h2>
+                                <p>Click on an employee to record their attendance instantly</p>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 28px; font-weight: 700; color: #16a34a;" id="clockTime">--:--:--</div>
-                                <div style="font-size: 12px; color: var(--gray-600);" id="clockDate">Today</div>
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                            <div>
-                                <label style="display: block; font-size: 13px; color: var(--gray-600); font-weight: 600; margin-bottom: 8px;">Select Your Name</label>
-                                <select id="punchEmployee" style="width: 100%; padding: 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 14px;">
-                                    <option value="">-- Choose Employee --</option>
-                                    @foreach ($allEmployees as $emp)
-                                        <option value="{{ $emp->id }}">{{ $emp->f_name }} {{ $emp->l_name }} ({{ $emp->position }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div style="display: flex; gap: 10px; align-items: flex-end;">
-                                <button id="punchInBtn" class="btn" style="flex: 1; background: #16a34a; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;" onclick="performPunchIn()">
-                                    <i class="fas fa-arrow-right"></i> PUNCH IN
-                                </button>
-                                <button id="punchOutBtn" class="btn" style="flex: 1; background: #dc2626; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;" onclick="performPunchOut()">
-                                    <i class="fas fa-arrow-left"></i> PUNCH OUT
-                                </button>
+                            <div class="quick-punch-clock">
+                                <div class="time" id="clockTime">--:--:--</div>
+                                <div class="date" id="clockDate">Today</div>
                             </div>
                         </div>
 
-                        <!-- Punch Status Display -->
-                        <div style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 6px; border-left: 4px solid #3b82f6;">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                                <div>
-                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Status</div>
-                                    <div style="font-size: 16px; font-weight: 700; color: #3b82f6;" id="punchStatus">Not Punched</div>
+                        <!-- Search and Filter -->
+                        <div class="quick-punch-filters">
+                            <div class="quick-punch-search">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="employeeSearchInput" placeholder="Search employee name..." autocomplete="off">
+                            </div>
+                            <div class="role-filter-tabs">
+                                <button class="role-filter-btn active" data-role="all">All</button>
+                                @php
+                                    $roles = $allEmployees->pluck('position')->unique()->filter()->values();
+                                @endphp
+                                @foreach($roles as $role)
+                                    <button class="role-filter-btn" data-role="{{ $role }}">{{ $role }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Employee Cards Grid -->
+                        <div class="employee-punch-grid" id="employeePunchGrid">
+                            @foreach($allEmployees as $emp)
+                                @php
+                                    $today = \Carbon\Carbon::today();
+                                    $todayAttendance = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                        ->whereDate('date', $today)
+                                        ->first();
+                                    $isPunchedIn = $todayAttendance && $todayAttendance->punch_in_time && !$todayAttendance->punch_out_time;
+                                    $isPunchedOut = $todayAttendance && $todayAttendance->punch_out_time;
+                                    $isLate = $todayAttendance && $todayAttendance->is_late;
+                                    $cardClass = $isPunchedOut ? 'punched-out' : ($isPunchedIn ? 'punched-in' : 'not-punched');
+                                    $statusClass = $isPunchedOut ? 'status-out' : ($isPunchedIn ? ($isLate ? 'status-late' : 'status-in') : 'status-not');
+                                    $statusText = $isPunchedOut ? 'Punched Out' : ($isPunchedIn ? ($isLate ? 'Late' : 'On Site') : 'Not Punched');
+                                @endphp
+                                <div class="employee-punch-card {{ $cardClass }}" 
+                                     data-employee-id="{{ $emp->id }}" 
+                                     data-employee-name="{{ strtolower($emp->f_name . ' ' . $emp->l_name) }}"
+                                     data-employee-role="{{ $emp->position }}">
+                                    <div class="punch-card-header">
+                                        <div class="punch-card-info">
+                                            <h4>{{ $emp->f_name }} {{ $emp->l_name }}</h4>
+                                            <div class="role">{{ $emp->position }}</div>
+                                        </div>
+                                        <span class="punch-card-status {{ $statusClass }}" id="status-{{ $emp->id }}">
+                                            @if($isPunchedIn && !$isPunchedOut)
+                                                <i class="fas fa-circle" style="font-size: 6px;"></i>
+                                            @endif
+                                            {{ $statusText }}
+                                        </span>
+                                    </div>
+                                    <div class="punch-card-times">
+                                        <div class="time-item">
+                                            <span class="time-label">In</span>
+                                            <span class="time-value" id="in-time-{{ $emp->id }}">
+                                                {{ $todayAttendance && $todayAttendance->punch_in_time ? $todayAttendance->punch_in_time->format('h:i A') : '—' }}
+                                            </span>
+                                        </div>
+                                        <div class="time-item">
+                                            <span class="time-label">Out</span>
+                                            <span class="time-value" id="out-time-{{ $emp->id }}">
+                                                {{ $todayAttendance && $todayAttendance->punch_out_time ? $todayAttendance->punch_out_time->format('h:i A') : '—' }}
+                                            </span>
+                                        </div>
+                                        @if($todayAttendance && $todayAttendance->is_late)
+                                            <div class="time-item">
+                                                <span class="time-label">Late</span>
+                                                <span class="time-value" style="color: #dc2626;">{{ $todayAttendance->late_minutes }} min</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="punch-card-actions">
+                                        <button class="punch-card-btn btn-in" 
+                                                onclick="cardPunchIn({{ $emp->id }})" 
+                                                id="btn-in-{{ $emp->id }}"
+                                                {{ $isPunchedIn || $isPunchedOut ? 'disabled' : '' }}>
+                                            <i class="fas fa-arrow-right"></i> Punch In
+                                        </button>
+                                        <button class="punch-card-btn btn-out" 
+                                                onclick="cardPunchOut({{ $emp->id }})" 
+                                                id="btn-out-{{ $emp->id }}"
+                                                {{ !$isPunchedIn || $isPunchedOut ? 'disabled' : '' }}>
+                                            <i class="fas fa-arrow-left"></i> Punch Out
+                                        </button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Punch In Time</div>
-                                    <div style="font-size: 16px; font-weight: 700; color: var(--gray-900);" id="punchInDisplay">—</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Punch Out Time</div>
-                                    <div style="font-size: 16px; font-weight: 700; color: var(--gray-900);" id="punchOutDisplay">—</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 12px; color: var(--gray-600); font-weight: 600; margin-bottom: 4px;">Late Status</div>
-                                    <div style="font-size: 16px; font-weight: 700; color: #dc2626;" id="lateStatus">On Time</div>
-                                </div>
+                            @endforeach
+                            <div class="no-employees-found" id="noEmployeesFound" style="display: none;">
+                                <i class="fas fa-search"></i>
+                                <p>No employees found matching your search</p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Hidden select for backward compatibility -->
+                    <select id="punchEmployee" style="display: none;">
+                        <option value="">-- Choose Employee --</option>
+                        @foreach ($allEmployees as $emp)
+                            <option value="{{ $emp->id }}">{{ $emp->f_name }} {{ $emp->l_name }} ({{ $emp->position }})</option>
+                        @endforeach
+                    </select>
+                    <div id="punchStatus" style="display: none;">Not Punched</div>
+                    <div id="punchInDisplay" style="display: none;">—</div>
+                    <div id="punchOutDisplay" style="display: none;">—</div>
+                    <div id="lateStatus" style="display: none;">On Time</div>
+                    <button id="punchInBtn" style="display: none;"></button>
+                    <button id="punchOutBtn" style="display: none;"></button>
 
                     <!-- Projects Tab -->
 
@@ -2406,5 +2718,204 @@
                 notification.style.opacity = '0';
                 setTimeout(() => notification.remove(), 300);
             }, 4000);
+        }
+
+        // ===== EMPLOYEE CARDS PUNCH FUNCTIONALITY =====
+        
+        // Search and filter functionality
+        const searchInput = document.getElementById('employeeSearchInput');
+        const roleFilterBtns = document.querySelectorAll('.role-filter-btn');
+        const employeeCards = document.querySelectorAll('.employee-punch-card');
+        const noEmployeesFound = document.getElementById('noEmployeesFound');
+        
+        let currentSearchTerm = '';
+        let currentRoleFilter = 'all';
+
+        // Search input handler
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                currentSearchTerm = e.target.value.toLowerCase().trim();
+                filterEmployeeCards();
+            });
+        }
+
+        // Role filter button handlers
+        roleFilterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                roleFilterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentRoleFilter = this.dataset.role;
+                filterEmployeeCards();
+            });
+        });
+
+        function filterEmployeeCards() {
+            let visibleCount = 0;
+            
+            employeeCards.forEach(card => {
+                const name = card.dataset.employeeName || '';
+                const role = card.dataset.employeeRole || '';
+                
+                const matchesSearch = currentSearchTerm === '' || name.includes(currentSearchTerm);
+                const matchesRole = currentRoleFilter === 'all' || role === currentRoleFilter;
+                
+                if (matchesSearch && matchesRole) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            if (noEmployeesFound) {
+                noEmployeesFound.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        }
+
+        // Card-based Punch In function
+        function cardPunchIn(employeeId) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const card = document.querySelector(`.employee-punch-card[data-employee-id="${employeeId}"]`);
+            const btnIn = document.getElementById(`btn-in-${employeeId}`);
+            const btnOut = document.getElementById(`btn-out-${employeeId}`);
+            
+            // Disable button while processing
+            if (btnIn) btnIn.disabled = true;
+            
+            fetch(`/punch-in/${employeeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to punch in');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update card UI
+                    updateCardAfterPunchIn(employeeId, data);
+                    showNotification('✓ Punch In Successful!', data.message, 'success');
+                    
+                    // If late, show extra notification
+                    if (data.is_late) {
+                        setTimeout(() => {
+                            showNotification('⚠️ Late Notice', `Employee is ${data.late_minutes} minutes late`, 'warning');
+                        }, 500);
+                    }
+                } else {
+                    if (btnIn) btnIn.disabled = false;
+                    showNotification('Error', data.message || 'Failed to punch in', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Punch in error:', error);
+                if (btnIn) btnIn.disabled = false;
+                showNotification('Error', error.message || 'An error occurred while punching in', 'error');
+            });
+        }
+
+        // Card-based Punch Out function
+        function cardPunchOut(employeeId) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const btnOut = document.getElementById(`btn-out-${employeeId}`);
+            
+            // Disable button while processing
+            if (btnOut) btnOut.disabled = true;
+            
+            fetch(`/punch-out/${employeeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to punch out');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update card UI
+                    updateCardAfterPunchOut(employeeId, data);
+                    showNotification('✓ Punch Out Successful!', `Hours worked: ${data.hours_worked.toFixed(2)} hrs`, 'success');
+                } else {
+                    if (btnOut) btnOut.disabled = false;
+                    showNotification('Error', data.message || 'Failed to punch out', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Punch out error:', error);
+                if (btnOut) btnOut.disabled = false;
+                showNotification('Error', error.message || 'An error occurred while punching out', 'error');
+            });
+        }
+
+        function updateCardAfterPunchIn(employeeId, data) {
+            const card = document.querySelector(`.employee-punch-card[data-employee-id="${employeeId}"]`);
+            const status = document.getElementById(`status-${employeeId}`);
+            const inTime = document.getElementById(`in-time-${employeeId}`);
+            const btnIn = document.getElementById(`btn-in-${employeeId}`);
+            const btnOut = document.getElementById(`btn-out-${employeeId}`);
+            
+            if (card) {
+                card.classList.remove('not-punched', 'punched-out');
+                card.classList.add('punched-in');
+            }
+            
+            if (status) {
+                status.className = 'punch-card-status ' + (data.is_late ? 'status-late' : 'status-in');
+                status.innerHTML = (data.is_late ? '' : '<i class="fas fa-circle" style="font-size: 6px;"></i> ') + (data.is_late ? 'Late' : 'On Site');
+            }
+            
+            if (inTime && data.punch_in_time) {
+                const time = new Date(data.punch_in_time);
+                inTime.textContent = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+            
+            if (btnIn) btnIn.disabled = true;
+            if (btnOut) btnOut.disabled = false;
+        }
+
+        function updateCardAfterPunchOut(employeeId, data) {
+            const card = document.querySelector(`.employee-punch-card[data-employee-id="${employeeId}"]`);
+            const status = document.getElementById(`status-${employeeId}`);
+            const outTime = document.getElementById(`out-time-${employeeId}`);
+            const btnIn = document.getElementById(`btn-in-${employeeId}`);
+            const btnOut = document.getElementById(`btn-out-${employeeId}`);
+            
+            if (card) {
+                card.classList.remove('punched-in', 'not-punched');
+                card.classList.add('punched-out');
+            }
+            
+            if (status) {
+                status.className = 'punch-card-status status-out';
+                status.innerHTML = 'Punched Out';
+            }
+            
+            if (outTime && data.punch_out_time) {
+                const time = new Date(data.punch_out_time);
+                outTime.textContent = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+            
+            if (btnIn) btnIn.disabled = true;
+            if (btnOut) btnOut.disabled = true;
         }
     </script>

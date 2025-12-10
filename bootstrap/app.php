@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Route middleware aliases
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'bundy-clock-auth' => \App\Http\Middleware\BundyClockAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

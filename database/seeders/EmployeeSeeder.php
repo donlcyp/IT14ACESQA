@@ -29,6 +29,7 @@ class EmployeeSeeder extends Seeder
         $ownerUser = User::create([
             'name' => 'Crisber Beriong',
             'email' => 'owner.crisber@example.com',
+            'phone' => '+63 917 123 4567',
             'password' => bcrypt('password123'),
             'role' => 'OWNER'
         ]);
@@ -79,9 +80,16 @@ class EmployeeSeeder extends Seeder
             for ($i = 1; $i <= $count; $i++) {
                 // Create a new user for each employee
                 $email = strtolower(str_replace(' ', '', $position)) . $employeeCounter . '@example.com';
+                
+                // Generate Philippine mobile number format
+                $phoneNumber = '+63 9' . str_pad(rand(10, 99), 2, '0', STR_PAD_LEFT) . ' ' 
+                             . str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT) . ' ' 
+                             . str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
+                
                 $user = User::create([
                     'name' => $faker->firstName() . ' ' . $faker->lastName(),
                     'email' => $email,
+                    'phone' => $phoneNumber,
                     'password' => bcrypt('password123'),
                     'role' => $role
                 ]);

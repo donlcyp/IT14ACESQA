@@ -2,7 +2,10 @@
 // Unified Sidebar toggle behavior - sidebar always hidden by default
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
-    if (!sidebar) {
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    if (!sidebar || !sidebarOverlay) {
+        console.warn('Sidebar or overlay element not found');
         return;
     }
 
@@ -13,11 +16,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function applyState(open) {
         if (open) {
             sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
             if (mainContent) {
                 mainContent.classList.remove('sidebar-closed');
             }
         } else {
             sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
             if (mainContent) {
                 mainContent.classList.add('sidebar-closed');
             }
@@ -35,6 +40,12 @@ document.addEventListener('DOMContentLoaded', function () {
             applyState(!isOpen);
         });
     }
+
+    // Close sidebar when clicking on overlay
+    sidebarOverlay.addEventListener('click', function (e) {
+        e.stopPropagation();
+        applyState(false);
+    });
 
     // Close sidebar when clicking nav links
     navLinks.forEach(function (link) {

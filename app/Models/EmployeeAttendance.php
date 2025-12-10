@@ -12,6 +12,11 @@ class EmployeeAttendance extends Model
 
     protected $table = 'employee_attendance';
 
+    /**
+     * Standard work hours per day (8 hours)
+     */
+    public const STANDARD_HOURS_PER_DAY = 8;
+
     protected $fillable = [
         'employee_id',
         'f_name',
@@ -201,5 +206,63 @@ class EmployeeAttendance extends Model
             'validated_at' => now(),
             'attendance_status' => 'Absent', // Mark as absent if rejected
         ]);
+    }
+
+    /**
+     * Calculate hourly rate from daily rate
+     * Daily rate / standard hours per day (8 hours)
+     */
+    public static function calculateHourlyRate(float $dailyRate): float
+    {
+        return round($dailyRate / self::STANDARD_HOURS_PER_DAY, 2);
+    }
+
+    /**
+     * Calculate labor cost based on actual hours worked
+     * If hours worked is null (not punched out), returns 0
+     * 
+     * @param float $dailyRate The daily rate for the position
+     * @return float The labor cost based on actual hours worked
+     */
+    public function calculateLaborCost(float $dailyRate): float
+    {
+        $hoursWorked = $this->getHoursWorked();
+        
+        if ($hoursWorked === null) {
+            return 0;
+        }
+
+        $hourlyRate = self::calculateHourlyRate($dailyRate);
+        
+        // Cap hours at standard hours per day (no overtime pay calculation here)
+        $billableHours = min($hoursWorked, self::STANDARD_HOURS_PER_DAY);
+        
+        return round($hourlyRate * $billableHours, 2);
+    }
+
+    /**
+     * Calculate labor cost with overtime support
+     * Overtime rate is 1.25x (25% additional)
+     * 
+     * @param float $dailyRate The daily rate for the position
+     * @param float $overtimeMultiplier Overtime rate multiplier (default 1.25)
+     * @return float The labor cost including overtime if applicable
+     */
+    public function calculateLaborCostWithOvertime(float $dailyRate, float $overtimeMultiplier = 1.25): float
+    {
+        $hoursWorked = $this->getHoursWorked();
+        
+        if ($hoursWorked === null) {
+            return 0;
+        }
+
+        $hourlyRate = self::calculateHourlyRate($dailyRate);
+        $regularHours = min($hoursWorked, self::STANDARD_HOURS_PER_DAY);
+        $overtimeHours = max(0, $hoursWorked - self::STANDARD_HOURS_PER_DAY);
+        
+        $regularPay = $hourlyRate * $regularHours;
+        $overtimePay = $hourlyRate * $overtimeMultiplier * $overtimeHours;
+        
+        return round($regularPay + $overtimePay, 2);
     }
 }
