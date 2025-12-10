@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Material;
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use App\Models\EmployeeAttendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -32,7 +32,7 @@ class ProjectsController extends Controller
             ->values();
 
         // Get all employees with their current project assignments
-        $allEmployees = Employee::all()->map(function ($employee) {
+        $allEmployees = EmployeeList::all()->map(function ($employee) {
             $assignedProject = $employee->projects()->first();
             return [
                 'id' => $employee->id,
@@ -54,10 +54,10 @@ class ProjectsController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials', 'purchaseOrders']);
+        $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials']);
 
         // Get all employees with their current project assignments
-        $allEmployees = Employee::all()->map(function ($employee) {
+        $allEmployees = EmployeeList::all()->map(function ($employee) {
             $assignedProject = $employee->projects()->first();
             return [
                 'id' => $employee->id,
@@ -137,9 +137,7 @@ class ProjectsController extends Controller
         }
 
         // Check materials clearance: all materials for the project must be Approved or Failed
-        $materials = Material::whereHas('purchaseOrders', function($query) use ($project) {
-            $query->where('project_id', $project->id);
-        })->get();
+        $materials = Material::where('project_id', $project->id)->get();
 
         $blockers = $materials->where('status', '!=', 'Approved')
             ->where('status', '!=', 'Fail')

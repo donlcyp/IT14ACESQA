@@ -60,14 +60,6 @@ class Material extends Model
     ];
 
     /**
-     * Get the purchase orders for this material.
-     */
-    public function purchaseOrders(): HasMany
-    {
-        return $this->hasMany(PurchaseOrder::class, 'material_id', 'id');
-    }
-
-    /**
      * Get the project record this material belongs to.
      */
     public function projectRecord()

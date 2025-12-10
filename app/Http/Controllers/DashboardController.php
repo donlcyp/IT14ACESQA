@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Material;
 use App\Models\Invoice;
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use App\Models\EmployeeAttendance;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -16,11 +16,11 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $isEmployee = $user && Employee::where('user_id', $user->id)->exists();
+        $isEmployee = $user && EmployeeList::where('user_id', $user->id)->exists();
 
         if ($isEmployee) {
             // EMPLOYEE VIEW - Show only their assigned projects
-            $employee = Employee::where('user_id', $user->id)->firstOrFail();
+            $employee = EmployeeList::where('user_id', $user->id)->firstOrFail();
 
             // Get projects this employee is assigned to
             $assignedProjects = $employee->projects()

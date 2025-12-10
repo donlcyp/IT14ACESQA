@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use App\Models\EmployeeAttendance;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -150,7 +150,7 @@ class ImportBundyClockCSV extends Command
         }
 
         // Find employee
-        $employee = Employee::where('id', $employeeId)
+        $employee = EmployeeList::where('id', $employeeId)
             ->orWhere('employee_code', $employeeId)
             ->first();
 

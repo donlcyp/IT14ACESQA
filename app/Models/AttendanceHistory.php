@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\EmployeeList;
 
 class AttendanceHistory extends Model
 {
@@ -29,7 +30,7 @@ class AttendanceHistory extends Model
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(EmployeeList::class);
     }
 
     public function getFullNameAttribute(): string

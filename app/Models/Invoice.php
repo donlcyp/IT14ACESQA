@@ -44,12 +44,6 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /**
-     * Get the purchase order this invoice is for.
-     */
-    public function purchaseOrder(): BelongsTo
-    {
-        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id', 'purchase_order_id');
-    }
 }
+
 

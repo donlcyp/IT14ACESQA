@@ -276,13 +276,13 @@
             </a>
         @endif
 
-        <!-- EMPLOYEE: My Attendance (for employees who have employee profile) -->
-        @if(auth()->check() && \App\Models\Employee::where('user_id', auth()->user()->id)->exists())
+        <!-- EMPLOYEE: My Attendance (for employees who have employee profile, excluding OWNER) -->
+        @if(auth()->check() && auth()->user()->role !== 'OWNER' && \App\Models\EmployeeList::where('user_id', auth()->user()->id)->exists())
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span>My Attendance</span>
             </a>
-        @elseif(auth()->check())
+        @elseif(auth()->check() && auth()->user()->role !== 'OWNER')
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span>Attendance</span>

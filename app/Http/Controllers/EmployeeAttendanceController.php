@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use App\Models\EmployeeAttendance;
 use App\Models\AttendanceValidation;
 use App\Models\Project;
@@ -14,11 +14,11 @@ class EmployeeAttendanceController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $isEmployee = $user && Employee::where('user_id', $user->id)->exists();
+        $isEmployee = $user && EmployeeList::where('user_id', $user->id)->exists();
 
         if ($isEmployee) {
             // EMPLOYEE VIEW - Show only their own attendance
-            $currentEmployee = Employee::where('user_id', $user->id)->firstOrFail();
+            $currentEmployee = EmployeeList::where('user_id', $user->id)->firstOrFail();
             
             // Get their assigned project
             $assignedProject = $currentEmployee->projects()->first();
@@ -69,7 +69,7 @@ class EmployeeAttendanceController extends Controller
                 });
             
             // Get all employees with their current project assignments and recent attendance
-            $allEmployees = Employee::all()->map(function ($employee) {
+            $allEmployees = EmployeeList::all()->map(function ($employee) {
                 $assignedProject = $employee->projects()->first();
                 $employee->assigned_to_other_project = $assignedProject && $assignedProject->status !== 'Completed';
                 
@@ -107,14 +107,14 @@ class EmployeeAttendanceController extends Controller
             $todayRecords = EmployeeAttendance::whereDate('date', $today->toDateString())->get();
             
             $stats = [
-                'total'   => Employee::count(),
+                'total'   => EmployeeList::count(),
                 'on_site' => $todayRecords->where('attendance_status', 'On Site')->count(),
                 'on_leave'=> $todayRecords->where('attendance_status', 'On Leave')->count(),
                 'absent'  => $todayRecords->where('attendance_status', 'Absent')->count(),
                 'idle'    => $todayRecords->where('attendance_status', 'Idle')->count(),
             ];
 
-            $query = Employee::query();
+            $query = EmployeeList::query();
 
             if ($request->filled('search')) {
                 $search = $request->input('search');
@@ -255,7 +255,7 @@ class EmployeeAttendanceController extends Controller
             $employeeIds = $validated['employee_ids'];
 
             // Check if employees are already assigned to other active projects
-            $assignedToOtherProjects = Employee::whereHas('projects', function ($query) use ($employeeIds, $project) {
+            $assignedToOtherProjects = EmployeeList::whereHas('projects', function ($query) use ($employeeIds, $project) {
                 $query->where('status', '!=', 'Completed')
                       ->where('project_id', '!=', $project->id);
             })
@@ -276,7 +276,7 @@ class EmployeeAttendanceController extends Controller
             // Create attendance records for assigned employees if they don't exist for today
             $today = Carbon::today();
             foreach ($employeeIds as $employeeId) {
-                $employee = Employee::find($employeeId);
+                $employee = EmployeeList::find($employeeId);
                 if ($employee) {
                     EmployeeAttendance::firstOrCreate(
                         [
@@ -318,7 +318,7 @@ class EmployeeAttendanceController extends Controller
                 'attendance_date' => ['required', 'date_format:Y-m-d'],
             ]);
 
-            $employee = Employee::findOrFail($employeeId);
+            $employee = EmployeeList::findOrFail($employeeId);
             
             $status = $validated['status'];
             
@@ -392,7 +392,7 @@ class EmployeeAttendanceController extends Controller
                 ], 403);
             }
 
-            $employee = Employee::findOrFail($employeeId);
+            $employee = EmployeeList::findOrFail($employeeId);
             $today = now()->toDateString();
             
             // Get or create today's attendance record
@@ -487,7 +487,7 @@ class EmployeeAttendanceController extends Controller
                 ], 403);
             }
 
-            $employee = Employee::findOrFail($employeeId);
+            $employee = EmployeeList::findOrFail($employeeId);
             $today = now()->toDateString();
             
             // Get today's attendance record
@@ -549,7 +549,7 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Get the employee profile for this user
-            $employee = Employee::where('user_id', $user->id)->firstOrFail();
+            $employee = EmployeeList::where('user_id', $user->id)->firstOrFail();
             
             $today = now()->toDateString();
             
@@ -655,7 +655,7 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Get the employee profile for this user
-            $employee = Employee::where('user_id', $user->id)->firstOrFail();
+            $employee = EmployeeList::where('user_id', $user->id)->firstOrFail();
             
             $today = now()->toDateString();
             
@@ -718,7 +718,7 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Get the employee profile for this user
-            $employee = Employee::where('user_id', $user->id)->first();
+            $employee = EmployeeList::where('user_id', $user->id)->first();
             
             if (!$employee) {
                 return response()->json([
@@ -780,7 +780,7 @@ class EmployeeAttendanceController extends Controller
                 ], 403);
             }
 
-            $employee = Employee::findOrFail($employeeId);
+            $employee = EmployeeList::findOrFail($employeeId);
             $today = now()->toDateString();
             
             $attendance = EmployeeAttendance::where('employee_id', $employeeId)

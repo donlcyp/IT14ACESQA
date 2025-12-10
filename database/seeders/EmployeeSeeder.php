@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -20,7 +20,7 @@ class EmployeeSeeder extends Seeder
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         
         // Clear existing employees only
-        Employee::truncate();
+        EmployeeList::truncate();
         
         // Re-enable foreign key constraints
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -102,9 +102,9 @@ class EmployeeSeeder extends Seeder
                 }
                 
                 // Check if employee already exists for this user
-                $employee = Employee::where('user_id', $user->id)->first();
+                $employee = EmployeeList::where('user_id', $user->id)->first();
                 if (!$employee) {
-                    Employee::create([
+                    EmployeeList::create([
                         'user_id' => $user->id,
                         'f_name' => $user->name,
                         'l_name' => $faker->lastName(),

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -10,7 +10,7 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Employee::query()->with('user');
+        $query = EmployeeList::query()->with('user');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -31,7 +31,7 @@ class EmployeeController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $positions = Employee::query()
+        $positions = EmployeeList::query()
             ->whereNotNull('position')
             ->where('position', '<>', '')
             ->distinct()
@@ -100,7 +100,7 @@ class EmployeeController extends Controller
             \Log::info('Document uploaded', ['path' => $path]);
         }
 
-        $employee = Employee::updateOrCreate(
+        $employee = EmployeeList::updateOrCreate(
             ['user_id' => $user->id],
             $employeeData
         );
@@ -116,7 +116,7 @@ class EmployeeController extends Controller
 
     protected function generateEmployeeCode(): string
     {
-        $latest = Employee::latest('id')->value('employee_code');
+        $latest = EmployeeList::latest('id')->value('employee_code');
 
         if (!$latest) {
             return 'EMP001';

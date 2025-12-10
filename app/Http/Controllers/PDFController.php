@@ -20,7 +20,6 @@ class PDFController extends Controller
             'updates', 
             'client', 
             'materials', 
-            'purchaseOrders',
             'assignedPM'
         ])->findOrFail($projectId);
 
@@ -138,34 +137,6 @@ class PDFController extends Controller
                 $pdf->Cell(28, 6, '', 1, 0, 'R', true);
                 $pdf->Cell(25, 6, 'TOTAL:', 1, 0, 'R', true);
                 $pdf->Cell(28, 6, 'PHP ' . number_format($totalBOQ, 2), 1, 1, 'R', true);
-                $pdf->Ln(5);
-            }
-            
-            // PURCHASE ORDERS SECTION
-            if ($project->purchaseOrders && $project->purchaseOrders->count() > 0) {
-                $pdf->SetFont('helvetica', 'B', 12);
-                $pdf->SetTextColor(5, 150, 105);
-                $pdf->Cell(0, 8, 'Purchase Orders', 0, 1, 'L');
-                $pdf->SetFont('helvetica', '', 8);
-                $pdf->SetTextColor(0, 0, 0);
-                
-                $pdf->SetFillColor(240, 240, 240);
-                $pdf->SetFont('helvetica', 'B', 8);
-                $pdf->Cell(35, 6, 'PO Number', 1, 0, 'L', true);
-                $pdf->Cell(30, 6, 'Supplier', 1, 0, 'L', true);
-                $pdf->Cell(25, 6, 'Amount', 1, 0, 'R', true);
-                $pdf->Cell(25, 6, 'Status', 1, 0, 'L', true);
-                $pdf->Cell(30, 6, 'Date', 1, 1, 'L', true);
-                
-                $pdf->SetFont('helvetica', '', 7);
-                $pdf->SetFillColor(255, 255, 255);
-                foreach ($project->purchaseOrders as $po) {
-                    $pdf->Cell(35, 6, substr($po->po_number, 0, 15), 1, 0, 'L');
-                    $pdf->Cell(30, 6, substr($po->supplier_name, 0, 20), 1, 0, 'L');
-                    $pdf->Cell(25, 6, 'PHP ' . number_format($po->total_amount, 2), 1, 0, 'R');
-                    $pdf->Cell(25, 6, $po->status, 1, 0, 'L');
-                    $pdf->Cell(30, 6, $po->created_at->format('M d, Y'), 1, 1, 'L');
-                }
                 $pdf->Ln(5);
             }
             

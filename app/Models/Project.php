@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\EmployeeList;
 
 class Project extends Model
 {
@@ -62,14 +63,6 @@ class Project extends Model
     }
 
     /**
-     * Get the purchase orders for this project.
-     */
-    public function purchaseOrders(): HasMany
-    {
-        return $this->hasMany(PurchaseOrder::class, 'project_id', 'id');
-    }
-
-    /**
      * Get the materials for this project.
      */
     public function materials(): HasMany
@@ -98,7 +91,7 @@ class Project extends Model
      */
     public function employees(): BelongsToMany
     {
-        return $this->belongsToMany(Employee::class, 'project_employees', 'project_id', 'employee_id')
+        return $this->belongsToMany(EmployeeList::class, 'project_employees', 'project_id', 'employee_id')
             ->withPivot('role_title', 'salary', 'justification', 'assigned_from', 'assigned_to')
             ->withTimestamps();
     }
@@ -160,13 +153,5 @@ class Project extends Model
         return $materialsTotal > 0 ? $materialsTotal : ($this->used_amount ?? 0);
     }
 
-    /**
-     * Get approved purchase orders count
-     */
-    public function getApprovedOrdersCount(): int
-    {
-        return $this->purchaseOrders()
-            ->whereRaw('LOWER(status) = ?', ['approved'])
-            ->count();
-    }
 }
+

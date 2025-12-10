@@ -1261,8 +1261,6 @@
                                 <div style="font-size: 24px; font-weight: 700; color: #be185d;">
                                     ₱@php
                                         $totalLaborCost = 0;
-                                        // Get rates from database
-                                        $positionDailyRates = \App\Models\PositionDailyRate::getRatesArray();
                                         $defaultRate = 700.00;
                                         
                                         foreach($project->employees as $emp) {
@@ -1277,12 +1275,9 @@
                                                 ->whereNotNull('punch_out_time')
                                                 ->get();
                                             
-                                            $employeePosition = $emp->position ?? 'Construction Worker';
-                                            $dailyRate = $positionDailyRates[$employeePosition] ?? $defaultRate;
-                                            
                                             // Calculate labor cost based on actual hours worked
                                             foreach($attendanceRecords as $attendance) {
-                                                $totalLaborCost += $attendance->calculateLaborCost($dailyRate);
+                                                $totalLaborCost += $attendance->calculateLaborCost($defaultRate);
                                             }
                                         }
                                         echo number_format($totalLaborCost, 2);
@@ -1330,9 +1325,8 @@
                                                     return $att->getHoursWorked() ?? 0;
                                                 });
                                                 
-                                                // Get daily rate from database
-                                                $employeePosition = $employee->position ?? 'Construction Worker';
-                                                $dailyRate = \App\Models\PositionDailyRate::getRateForPosition($employeePosition, 700.00);
+                                                // Use default daily rate
+                                                $dailyRate = 700.00;
                                                 $hourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($dailyRate);
                                                 
                                                 // Calculate labor cost based on actual hours worked

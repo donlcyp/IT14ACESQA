@@ -631,7 +631,7 @@
                                                 </div>
                                                 <div>
                                                     @php
-                                                        $materials = $project->purchaseOrders->pluck('material')->filter();
+                                                        $materials = $project->materials;
                                                         $materialsTotal = $materials->sum('total_cost');
                                                     @endphp
                                                     <div class="report-section-title">Materials Used</div>

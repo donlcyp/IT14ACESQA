@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class EmployeeList extends Model
 {
@@ -42,6 +43,16 @@ class EmployeeList extends Model
     public function projMatManager(): HasMany
     {
         return $this->hasMany(ProjMatManage::class, 'employee_id', 'id');
+    }
+
+    /**
+     * Get the projects this employee is assigned to.
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_employees', 'employee_id', 'project_id')
+            ->withPivot('role_title', 'salary', 'justification', 'assigned_from', 'assigned_to')
+            ->withTimestamps();
     }
 
     public function getFullNameAttribute(): string

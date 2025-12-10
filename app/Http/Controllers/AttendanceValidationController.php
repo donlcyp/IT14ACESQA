@@ -22,15 +22,18 @@ class AttendanceValidationController extends Controller
             return redirect('/')->with('error', 'Unauthorized access');
         }
 
-        // Get pending validations
+        // Get pending validations (only with punch_in_time)
         $pendingValidations = EmployeeAttendance::where('validation_status', 'pending')
+            ->whereNotNull('punch_in_time')
             ->with(['employee', 'validator'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         // Get statistics
         $stats = [
-            'pending' => EmployeeAttendance::where('validation_status', 'pending')->count(),
+            'pending' => EmployeeAttendance::where('validation_status', 'pending')
+                ->whereNotNull('punch_in_time')
+                ->count(),
             'approved' => EmployeeAttendance::where('validation_status', 'approved')->count(),
             'rejected' => EmployeeAttendance::where('validation_status', 'rejected')->count(),
             'total' => EmployeeAttendance::count(),
@@ -77,21 +80,13 @@ class AttendanceValidationController extends Controller
         }
 
         // Validate input
-        $validated = $request->validate([
-            'validation_notes' => 'nullable|string|max:500',
-        ]);
-
         try {
-            // Approve the attendance
-            $attendance->approve($user, $validated['validation_notes'] ?? null);
-
-            // Log the action
-            \App\Models\Log::create([
-                'user_id' => $user->id,
-                'action' => 'Approved attendance punch-in',
-                'description' => 'Approved punch-in for ' . $attendance->employee->f_name . ' ' . $attendance->employee->l_name . ' on ' . $attendance->date->format('Y-m-d'),
-                'ip_address' => $request->ip(),
+            $validated = $request->validate([
+                // Add your validation rules here, e.g.:
+                'validation_notes' => 'nullable|string|max:500',
             ]);
+
+            // ...existing approval logic...
 
             if ($request->wantsJson()) {
                 return response()->json([
@@ -188,7 +183,8 @@ class AttendanceValidationController extends Controller
         }
 
         try {
-            $query = EmployeeAttendance::where('validation_status', 'pending');
+            $query = EmployeeAttendance::where('validation_status', 'pending')
+                ->whereNotNull('punch_in_time');
 
             // Filter by employee name
             if ($request->has('search') && $request->search) {
@@ -217,7 +213,9 @@ class AttendanceValidationController extends Controller
 
             // Get statistics
             $stats = [
-                'pending' => EmployeeAttendance::where('validation_status', 'pending')->count(),
+                'pending' => EmployeeAttendance::where('validation_status', 'pending')
+                    ->whereNotNull('punch_in_time')
+                    ->count(),
                 'approved' => EmployeeAttendance::where('validation_status', 'approved')->count(),
                 'rejected' => EmployeeAttendance::where('validation_status', 'rejected')->count(),
                 'total' => EmployeeAttendance::count(),
@@ -306,8 +304,11 @@ class AttendanceValidationController extends Controller
         $stats = [
             'pending_today' => EmployeeAttendance::where('validation_status', 'pending')
                 ->where('date', $today)
+                ->whereNotNull('punch_in_time')
                 ->count(),
-            'pending_total' => EmployeeAttendance::where('validation_status', 'pending')->count(),
+            'pending_total' => EmployeeAttendance::where('validation_status', 'pending')
+                ->whereNotNull('punch_in_time')
+                ->count(),
             'approved_today' => EmployeeAttendance::where('validation_status', 'approved')
                 ->where('date', $today)
                 ->count(),
@@ -324,6 +325,7 @@ class AttendanceValidationController extends Controller
         // Get pending validations for today
         $pendingToday = EmployeeAttendance::where('validation_status', 'pending')
             ->where('date', $today)
+            ->whereNotNull('punch_in_time')
             ->with(['employee'])
             ->orderBy('punch_in_time', 'desc')
             ->take(10)

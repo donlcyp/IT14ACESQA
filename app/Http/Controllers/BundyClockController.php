@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
+use App\Models\EmployeeList;
 use App\Models\EmployeeAttendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -50,7 +50,7 @@ class BundyClockController extends Controller
             $employeeId = $validated['employee_id'];
 
             // Find employee by ID or badge number
-            $employee = Employee::where('id', $employeeId)
+            $employee = EmployeeList::where('id', $employeeId)
                 ->orWhere('employee_code', $employeeId)
                 ->first();
 
