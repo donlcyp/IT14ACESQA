@@ -271,6 +271,9 @@
         <main class="main-content" id="mainContent">
             <!-- Header -->
             <header class="header">
+                <button class="header-menu" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 

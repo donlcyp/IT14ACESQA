@@ -246,6 +246,10 @@
                 <i class="nav-icon fas fa-peso-sign"></i>
                 <span>Salary Settings</span>
             </a>
+            <a href="{{ route('finance-graphs') }}" class="nav-item {{ request()->routeIs('finance-graphs') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-chart-line"></i>
+                <span>Finance Graphs</span>
+            </a>
         @endif
 
         <!-- PROJECT MANAGER: Projects only -->

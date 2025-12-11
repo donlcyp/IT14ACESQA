@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const headerMenu = document.getElementById('headerMenu');
+    const sidebarToggle = document.getElementById('sidebarToggle');
     const mainContent = document.getElementById('mainContent') || document.querySelector('.main-content');
     const navLinks = sidebar.querySelectorAll('.nav-menu a');
 
@@ -32,9 +33,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Start closed by default
     applyState(false);
 
-    // Only header menu button controls sidebar
+    // Header menu button controls sidebar
     if (headerMenu) {
         headerMenu.addEventListener('click', function (event) {
+            event.preventDefault();
+            const isOpen = sidebar.classList.contains('open');
+            applyState(!isOpen);
+        });
+    }
+
+    // Sidebar toggle button (alternative ID for same functionality)
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function (event) {
             event.preventDefault();
             const isOpen = sidebar.classList.contains('open');
             applyState(!isOpen);
