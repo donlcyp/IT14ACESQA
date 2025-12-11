@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
-use TCPDF;
+use Elibyy\TCPDF\TCPDF;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PDFController extends Controller
@@ -24,7 +24,7 @@ class PDFController extends Controller
         ])->findOrFail($projectId);
 
         try {
-            $pdf = new TCPDF();
+            $pdf = app('tcpdf');
             $pdf->AddPage();
             $pdf->SetFont('helvetica', 'B', 16);
             

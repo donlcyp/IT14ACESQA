@@ -138,8 +138,10 @@ class EmployeeAttendance extends Model
         if (!$this->hasPunchedIn() || !$this->hasPunchedOut()) {
             return null;
         }
-        $diff = $this->punch_out_time->diffInMinutes($this->punch_in_time);
-        return round($diff / 60, 2);
+        // Calculate difference: punch_out - punch_in (positive = worked hours)
+        $diff = $this->punch_in_time->diffInMinutes($this->punch_out_time);
+        $hours = max(0, $diff / 60); // clamp to zero to avoid negative billables
+        return round($hours, 2);
     }
 
     /**
@@ -233,10 +235,10 @@ class EmployeeAttendance extends Model
         }
 
         $hourlyRate = self::calculateHourlyRate($dailyRate);
-        
+
         // Cap hours at standard hours per day (no overtime pay calculation here)
-        $billableHours = min($hoursWorked, self::STANDARD_HOURS_PER_DAY);
-        
+        $billableHours = max(0, min($hoursWorked, self::STANDARD_HOURS_PER_DAY));
+
         return round($hourlyRate * $billableHours, 2);
     }
 
@@ -257,6 +259,7 @@ class EmployeeAttendance extends Model
         }
 
         $hourlyRate = self::calculateHourlyRate($dailyRate);
+        $hoursWorked = max(0, $hoursWorked);
         $regularHours = min($hoursWorked, self::STANDARD_HOURS_PER_DAY);
         $overtimeHours = max(0, $hoursWorked - self::STANDARD_HOURS_PER_DAY);
         

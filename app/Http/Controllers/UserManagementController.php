@@ -57,7 +57,7 @@ class UserManagementController extends Controller
     private function roles(): array
     {
         // Allowed roles in the system
-        $roles = ['OWNER', 'PM', 'QA', 'FM', 'USER'];
+        $roles = ['OWNER', 'PM', 'FM', 'HR', 'QA', 'SS', 'CW'];
 
         // Only allow OWNER if none exists to enforce single owner rule
         if (User::where('role', 'OWNER')->exists()) {

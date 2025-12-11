@@ -1265,12 +1265,11 @@
                                         
                                         foreach($project->employees as $emp) {
                                             // Get attendance records with punch times
+                                            $dateFrom = '2025-12-01';
+                                            $dateTo = '2025-12-31';
+                                            
                                             $attendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
-                                                ->whereBetween('date', [
-                                                    $emp->pivot->assigned_from ?? $project->created_at,
-                                                    $emp->pivot->assigned_to ?? now()
-                                                ])
-                                                ->where('attendance_status', 'Present')
+                                                ->whereBetween('date', [$dateFrom, $dateTo])
                                                 ->whereNotNull('punch_in_time')
                                                 ->whereNotNull('punch_out_time')
                                                 ->get();
@@ -1310,12 +1309,11 @@
                                         @foreach ($project->employees as $employee)
                                             @php
                                                 // Get attendance records with actual hours worked
+                                                $dateFrom = '2025-12-01';
+                                                $dateTo = '2025-12-31';
+                                                
                                                 $empAttendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
-                                                    ->whereBetween('date', [
-                                                        $employee->pivot->assigned_from ?? $project->created_at,
-                                                        $employee->pivot->assigned_to ?? now()
-                                                    ])
-                                                    ->where('attendance_status', 'Present')
+                                                    ->whereBetween('date', [$dateFrom, $dateTo])
                                                     ->whereNotNull('punch_in_time')
                                                     ->whereNotNull('punch_out_time')
                                                     ->get();
@@ -1325,8 +1323,10 @@
                                                     return $att->getHoursWorked() ?? 0;
                                                 });
                                                 
-                                                // Use default daily rate
-                                                $dailyRate = 700.00;
+                                                // Get daily rate based on employee's position
+                                                $position = $employee->position ?? 'Laborer';
+                                                $positionRate = \App\Models\PositionDailyRate::where('position', $position)->first();
+                                                $dailyRate = $positionRate ? $positionRate->daily_rate : 700.00;
                                                 $hourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($dailyRate);
                                                 
                                                 // Calculate labor cost based on actual hours worked
@@ -1371,34 +1371,17 @@
                 <!-- Images Tab -->
                 <div id="images" class="tab-content">
                     <div class="report-section">
-                        <div class="report-title">Upload Documentation Images</div>
+                        <div class="report-title">Upload Documentation</div>
                         <form method="POST" action="{{ route('projects.documents.store', $project->id) }}" enctype="multipart/form-data" style="margin-bottom: 30px;">
                             @csrf
                             <div class="form-group">
-                                <label class="form-label">Image Title</label>
-                                <input type="text" name="title" class="form-input" placeholder="Enter image title" required>
+                                <label class="form-label">File Title</label>
+                                <input type="text" name="title" class="form-input" placeholder="Enter file title" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Upload Image</label>
-                                <div style="padding: 10px 12px; border: 2px dashed var(--gray-400); border-radius: 6px;">
-                                    <input type="file" name="image" style="width: 100%;" accept="image/*" required>
-                                </div>
-                                <small style="color: var(--gray-600); display: block; margin-top: 8px;">
-                                    Accepted formats: JPEG, PNG, JPG, GIF, WebP (Max 5MB)
-                                </small>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <i class="fas fa-cloud-upload-alt"></i> Upload Image
-                            </button>
-                        </form>
-
-                        <div class="report-title">Upload Documentation Files</div>
-                        <form method="POST" action="{{ route('projects.documents.store', $project->id) }}" enctype="multipart/form-data" style="margin-bottom: 30px;">
-                            @csrf
-                            <div class="form-group">
-                                <label class="form-label">Attachments (Optional)</label>
+                                <label class="form-label">Attachments</label>
                                 <div style="padding: 12px; border: 2px dashed var(--gray-400); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" id="dropZone">
-                                    <input type="file" name="attachments[]" id="attachmentInput" style="width: 100%; cursor: pointer;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.zip">
+                                    <input type="file" name="attachments[]" id="attachmentInput" style="width: 100%; cursor: pointer;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.zip">
                                     <small style="color: var(--gray-600); display: block; margin-top: 8px;">
                                         <i class="fas fa-cloud-upload-alt"></i> Drag files here or click to upload<br>
                                         Accepted: PDF, DOC, DOCX, XLS, XLSX, Images, ZIP (Max 50MB total)
@@ -2172,7 +2155,11 @@
         const attachmentPreview = document.getElementById('attachmentPreview');
 
         if (dropZone && attachmentInput) {
-            dropZone.addEventListener('click', () => attachmentInput.click());
+            dropZone.addEventListener('click', (e) => {
+                if (e.target !== attachmentInput) {
+                    attachmentInput.click();
+                }
+            });
 
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropZone.addEventListener(eventName, preventDefaults, false);

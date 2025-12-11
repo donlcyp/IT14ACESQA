@@ -226,7 +226,7 @@
             <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $r }}</option>
           @endforeach
         </select>
-        <div class="help">OWNER has full access (hidden once assigned). PM manages projects. QA handles material checks. FM manages finance. USER is the standard account.</div>
+        <div class="help">OWNER has full access (hidden once assigned). PM = Project Manager. SS = Site Supervisor. FM = Finance Manager. HR = Human Resource/Timekeeper. QA = Quality Assurance Officer. CW = Construction Worker.</div>
         @error('role') <div class="error">{{ $message }}</div> @enderror
       </div>
 

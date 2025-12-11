@@ -68,6 +68,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
         Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'storeAttendance'])->name('employee-attendance.store');
         Route::get('/employee-attendance-history', [App\Http\Controllers\EmployeeAttendanceController::class, 'history'])->name('employee-attendance.history');
+        
+        // Punch In/Out for specific employees (OWNER/PM manual punch for employees)
+        Route::post('/punch-in/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchIn'])->name('punch.in');
+        Route::post('/punch-out/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchOut'])->name('punch.out');
     });
 
     // ===== OWNER ONLY: Additional exclusive access =====
@@ -120,13 +124,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== EMPLOYEE ONLY: Attendance and Punch In/Out =====
-    Route::middleware('auth')->group(function () {
-        // These routes allow any authenticated user with an employee profile to punch in/out
-        Route::get('/my-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('my-attendance');
-        Route::post('/punch-in', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchInEmployee'])->name('punch.in.employee');
-        Route::post('/punch-out', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchOutEmployee'])->name('punch.out.employee');
-        Route::get('/punch-status', [App\Http\Controllers\EmployeeAttendanceController::class, 'getPunchStatusEmployee'])->name('punch.status.employee');
-    });
+    // These routes allow any authenticated user with an employee profile to punch in/out
+    Route::get('/my-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('my-attendance');
+    Route::post('/punch-in', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchInEmployee'])->name('punch.in.employee');
+    Route::post('/punch-out', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchOutEmployee'])->name('punch.out.employee');
+    Route::get('/punch-status', [App\Http\Controllers\EmployeeAttendanceController::class, 'getPunchStatusEmployee'])->name('punch.status.employee');
 
     // API Routes for Project Employee Management (PM and OWNER only)
     Route::post('/api/projects/{project}/employees', [App\Http\Controllers\EmployeeAttendanceController::class, 'assignEmployeesToProject'])

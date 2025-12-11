@@ -549,7 +549,13 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Get the employee profile for this user
-            $employee = EmployeeList::where('user_id', $user->id)->firstOrFail();
+            $employee = EmployeeList::where('user_id', $user->id)->first();
+            if (!$employee) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No employee profile found for this user'
+                ], 404);
+            }
             
             $today = now()->toDateString();
             
@@ -635,8 +641,8 @@ class EmployeeAttendanceController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only employees can punch in. ' . $e->getMessage()
-            ], 403);
+                'message' => 'Error punching in: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -655,14 +661,27 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Get the employee profile for this user
-            $employee = EmployeeList::where('user_id', $user->id)->firstOrFail();
+            $employee = EmployeeList::where('user_id', $user->id)->first();
+            if (!$employee) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No employee profile found for this user'
+                ], 404);
+            }
             
             $today = now()->toDateString();
             
             // Get today's attendance record
             $attendance = EmployeeAttendance::where('employee_id', $employee->id)
                 ->where('date', $today)
-                ->firstOrFail();
+                ->first();
+
+            if (!$attendance) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No attendance record found for today'
+                ], 404);
+            }
 
             // Check if not punched in
             if ($attendance->punch_in_time === null) {
@@ -698,8 +717,8 @@ class EmployeeAttendanceController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Only employees can punch out. ' . $e->getMessage()
-            ], 403);
+                'message' => 'Error punching out: ' . $e->getMessage()
+            ], 500);
         }
     }
 

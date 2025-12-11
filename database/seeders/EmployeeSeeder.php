@@ -73,11 +73,11 @@ class EmployeeSeeder extends Seeder
             $role = match($position) {
                 'Project Manager' => 'PM',
                 'HR/Timekeeper' => 'HR',
-                'Finance Manager' => 'USER',
-                'Quality Assurance Officer' => 'USER',
-                'Site Supervisor' => 'USER',
-                'Construction Worker' => 'USER',
-                default => 'USER'
+                'Finance Manager' => 'FM',
+                'Quality Assurance Officer' => 'QA',
+                'Site Supervisor' => 'SS',
+                'Construction Worker' => 'CW',
+                default => 'CW'
             };
             
             for ($i = 1; $i <= $count; $i++) {
@@ -97,7 +97,8 @@ class EmployeeSeeder extends Seeder
                         'email' => $email,
                         'phone' => $phoneNumber,
                         'password' => bcrypt('password123'),
-                        'role' => $role
+                        'role' => $role,
+                        'user_position' => $position,
                     ]);
                 }
                 

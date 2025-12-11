@@ -82,11 +82,19 @@ class AttendanceValidationController extends Controller
         // Validate input
         try {
             $validated = $request->validate([
-                // Add your validation rules here, e.g.:
                 'validation_notes' => 'nullable|string|max:500',
             ]);
 
-            // ...existing approval logic...
+            // Approve the attendance
+            $attendance->approve($user, $validated['validation_notes'] ?? null);
+
+            // Log the action
+            \App\Models\Log::create([
+                'user_id' => $user->id,
+                'action' => 'Approved attendance punch-in',
+                'description' => 'Approved punch-in for ' . $attendance->employee->f_name . ' ' . $attendance->employee->l_name . ' on ' . $attendance->date->format('Y-m-d'),
+                'ip_address' => $request->ip(),
+            ]);
 
             if ($request->wantsJson()) {
                 return response()->json([

@@ -96,10 +96,43 @@ class User extends Authenticatable
 
     /**
      * Check if user is Employee.
+     * Any role except OWNER is considered an employee
      */
     public function isEmployee(): bool
     {
-        return $this->role === 'EMPLOYEE';
+        return in_array($this->role, ['PM', 'FM', 'HR', 'QA', 'SS', 'CW']);
+    }
+
+    /**
+     * Check if user is a Site Supervisor.
+     */
+    public function isSiteSupervisor(): bool
+    {
+        return $this->role === 'SS';
+    }
+
+    /**
+     * Check if user is a Quality Assurance Officer.
+     */
+    public function isQA(): bool
+    {
+        return $this->role === 'QA';
+    }
+
+    /**
+     * Check if user is a Finance Manager.
+     */
+    public function isFM(): bool
+    {
+        return $this->role === 'FM';
+    }
+
+    /**
+     * Check if user is a Construction Worker.
+     */
+    public function isCW(): bool
+    {
+        return $this->role === 'CW';
     }
 
     /**
