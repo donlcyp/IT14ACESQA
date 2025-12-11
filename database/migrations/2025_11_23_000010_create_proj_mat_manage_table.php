@@ -11,13 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('proj_mat_manage', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
-            $table->foreignId('employee_id')->constrained('employee_list')->cascadeOnDelete();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('proj_mat_manage')) {
+            Schema::create('proj_mat_manage', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('project_id')->nullable();
+                $table->unsignedBigInteger('client_id')->nullable();
+                $table->unsignedBigInteger('employee_id')->nullable();
+                $table->timestamps();
+            });
+
+            // Add foreign keys after table creation
+            Schema::table('proj_mat_manage', function (Blueprint $table) {
+                if (Schema::hasTable('projects')) {
+                    $table->foreign('project_id')->references('id')->on('projects')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('clients')) {
+                    $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
+                }
+                if (Schema::hasTable('employee_list')) {
+                    $table->foreign('employee_id')->references('id')->on('employee_list')->cascadeOnDelete();
+                }
+            });
+        }
     }
 
     /**
