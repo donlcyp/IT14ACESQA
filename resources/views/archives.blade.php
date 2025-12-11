@@ -574,7 +574,7 @@
                             @forelse ($projects as $project)
                                 <tr>
                                     <td><strong>{{ $project->project_name }}</strong></td>
-                                    <td>{{ $project->client_name }}</td>
+                                    <td>{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</td>
                                     <td>{{ $project->lead }}</td>
                                     <td>
                                         @php
@@ -623,7 +623,7 @@
                                                 <div>
                                                     <div class="report-section-title">Project Details</div>
                                                     <div class="muted">Client</div>
-                                                    <div>{{ $project->client_name }}</div>
+                                                    <div>{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</div>
                                                     <div class="muted" style="margin-top:8px;">Lead</div>
                                                     <div>{{ $project->lead }}</div>
                                                     <div class="muted" style="margin-top:8px;">Inspector</div>
@@ -632,7 +632,18 @@
                                                 <div>
                                                     @php
                                                         $materials = $project->materials;
-                                                        $materialsTotal = $materials->sum('total_cost');
+                                                        $materialsTotal = $materials->sum(function($m) {
+                                                            // Try multiple cost field combinations
+                                                            if ($m->total_cost !== null && $m->total_cost > 0) {
+                                                                return $m->total_cost;
+                                                            }
+                                                            $boqCost = (($m->material_cost ?? 0) + ($m->labor_cost ?? 0)) * ($m->quantity ?? 0);
+                                                            if ($boqCost > 0) {
+                                                                return $boqCost;
+                                                            }
+                                                            // Fallback to unit_price * quantity_received for seeded data
+                                                            return ($m->unit_price ?? 0) * ($m->quantity_received ?? 0);
+                                                        });
                                                     @endphp
                                                     <div class="report-section-title">Materials Used</div>
                                                     <table class="report-table">
@@ -645,10 +656,27 @@
                                                         </thead>
                                                         <tbody>
                                                             @forelse($materials as $m)
+                                                                @php
+                                                                    $itemName = $m->item_description ?? $m->material_name ?? 'N/A';
+                                                                    $itemQty = $m->quantity ?? $m->quantity_received ?? 0;
+                                                                    $itemUnit = $m->unit ?? $m->unit_of_measure ?? '';
+                                                                    
+                                                                    // Calculate total with multiple fallback options
+                                                                    if ($m->total_cost !== null && $m->total_cost > 0) {
+                                                                        $itemTotal = $m->total_cost;
+                                                                    } else {
+                                                                        $boqCost = (($m->material_cost ?? 0) + ($m->labor_cost ?? 0)) * $itemQty;
+                                                                        if ($boqCost > 0) {
+                                                                            $itemTotal = $boqCost;
+                                                                        } else {
+                                                                            $itemTotal = ($m->unit_price ?? 0) * ($m->quantity_received ?? $itemQty);
+                                                                        }
+                                                                    }
+                                                                @endphp
                                                                 <tr>
-                                                                    <td>{{ $m->material_name }}</td>
-                                                                    <td>{{ $m->quantity_received }} {{ $m->unit_of_measure }}</td>
-                                                                    <td>₱{{ number_format($m->total_cost, 2) }}</td>
+                                                                    <td>{{ $itemName }}</td>
+                                                                    <td>{{ $itemQty }} {{ $itemUnit }}</td>
+                                                                    <td>₱{{ number_format($itemTotal, 2) }}</td>
                                                                 </tr>
                                                             @empty
                                                                 <tr><td colspan="3" class="muted">No materials recorded.</td></tr>

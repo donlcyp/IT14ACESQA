@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AttendanceValidation;
 use App\Models\EmployeeAttendance;
 use App\Models\EmployeeList;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -15,6 +16,7 @@ class AttendanceValidationController extends Controller
      */
     public function index(Request $request)
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can access this page
@@ -47,6 +49,7 @@ class AttendanceValidationController extends Controller
      */
     public function show(EmployeeAttendance $attendance)
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can view
@@ -69,6 +72,7 @@ class AttendanceValidationController extends Controller
      */
     public function approve(Request $request, EmployeeAttendance $attendance)
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can approve
@@ -89,10 +93,12 @@ class AttendanceValidationController extends Controller
             $attendance->approve($user, $validated['validation_notes'] ?? null);
 
             // Log the action
+            /** @var Carbon $date */
+            $date = $attendance->date;
             \App\Models\Log::create([
                 'user_id' => $user->id,
                 'action' => 'Approved attendance punch-in',
-                'description' => 'Approved punch-in for ' . $attendance->employee->f_name . ' ' . $attendance->employee->l_name . ' on ' . $attendance->date->format('Y-m-d'),
+                'description' => 'Approved punch-in for ' . $attendance->employee->f_name . ' ' . $attendance->employee->l_name . ' on ' . $date->format('Y-m-d'),
                 'ip_address' => $request->ip(),
             ]);
 
@@ -122,6 +128,7 @@ class AttendanceValidationController extends Controller
      */
     public function reject(Request $request, EmployeeAttendance $attendance)
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can reject
@@ -147,10 +154,12 @@ class AttendanceValidationController extends Controller
             );
 
             // Log the action
+            /** @var Carbon $date */
+            $date = $attendance->date;
             \App\Models\Log::create([
                 'user_id' => $user->id,
                 'action' => 'Rejected attendance punch-in',
-                'description' => 'Rejected punch-in for ' . $attendance->employee->f_name . ' ' . $attendance->employee->l_name . ' on ' . $attendance->date->format('Y-m-d') . ' - Reason: ' . $validated['rejection_reason'],
+                'description' => 'Rejected punch-in for ' . $attendance->employee->f_name . ' ' . $attendance->employee->l_name . ' on ' . $date->format('Y-m-d') . ' - Reason: ' . $validated['rejection_reason'],
                 'ip_address' => $request->ip(),
             ]);
 
@@ -180,6 +189,7 @@ class AttendanceValidationController extends Controller
      */
     public function filter(Request $request)
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can filter
@@ -240,6 +250,7 @@ class AttendanceValidationController extends Controller
      */
     public function approved()
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can access
@@ -260,6 +271,7 @@ class AttendanceValidationController extends Controller
      */
     public function rejected()
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can access
@@ -280,6 +292,7 @@ class AttendanceValidationController extends Controller
      */
     public function employeeHistory(EmployeeList $employee)
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can access
@@ -299,6 +312,7 @@ class AttendanceValidationController extends Controller
      */
     public function dashboard()
     {
+        /** @var User $user */
         $user = auth()->user();
         
         // Only HR/Timekeeper can access
