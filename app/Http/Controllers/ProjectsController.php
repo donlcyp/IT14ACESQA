@@ -201,7 +201,7 @@ class ProjectsController extends Controller
             'description'      => ['nullable', 'string', 'max:1000'],
             'location'         => ['nullable', 'string', 'max:255'],
             'industry'         => ['nullable', 'string', 'max:255'],
-            'project_type'     => ['required', 'in:Plumbing Work,Fire Safety'],
+            'project_type'     => ['required', 'in:Plumbing Works,Fire Safety,Fire Detection Alarm System,Gas Line Installation,Air-Conditioning System Installation & Maintenance,Ducting Works'],
             'target_timeline'  => ['nullable', 'date'],
             'allocated_amount' => ['nullable', 'numeric', 'min:0'],
             'client_first_name' => ['required', 'string', 'max:255'],
@@ -507,8 +507,6 @@ class ProjectsController extends Controller
      */
     public function storeMaterial(Request $request, Project $project)
     {
-        \Log::info('storeMaterial called - Raw input:', $request->all());
-        
         $validated = $request->validate([
             'item_description' => 'required|string|max:500',
             'quantity' => 'required|numeric|min:0.01',
@@ -520,8 +518,6 @@ class ProjectsController extends Controller
             'notes' => 'nullable|string|max:1000',
             'status' => 'nullable|in:pending,approved,failed',
         ]);
-
-        \Log::info('storeMaterial validated data:', $validated);
 
         try {
             // Auto-generate item_no (get next number for this project)
@@ -546,8 +542,6 @@ class ProjectsController extends Controller
                 'status' => $validated['status'] ?? 'pending',
             ]);
 
-            \Log::info('Material created:', $material->toArray());
-
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
@@ -558,8 +552,6 @@ class ProjectsController extends Controller
 
             return redirect()->route('projects.show', $project->id)->with('success', 'Material added successfully!');
         } catch (\Exception $e) {
-            \Log::error('storeMaterial error:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,

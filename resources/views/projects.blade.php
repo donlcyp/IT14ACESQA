@@ -1116,8 +1116,12 @@
                                         required
                                     >
                                         <option value="">-- Select Project Type --</option>
-                                        <option value="Plumbing Work" {{ old('project_type') === 'Plumbing Work' ? 'selected' : '' }}>Plumbing Work</option>
+                                        <option value="Plumbing Works" {{ old('project_type') === 'Plumbing Works' ? 'selected' : '' }}>Plumbing Works</option>
                                         <option value="Fire Safety" {{ old('project_type') === 'Fire Safety' ? 'selected' : '' }}>Fire Safety</option>
+                                        <option value="Fire Detection Alarm System" {{ old('project_type') === 'Fire Detection Alarm System' ? 'selected' : '' }}>Fire Detection Alarm System</option>
+                                        <option value="Gas Line Installation" {{ old('project_type') === 'Gas Line Installation' ? 'selected' : '' }}>Gas Line Installation</option>
+                                        <option value="Air-Conditioning System Installation & Maintenance" {{ old('project_type') === 'Air-Conditioning System Installation & Maintenance' ? 'selected' : '' }}>Air-Conditioning System Installation & Maintenance</option>
+                                        <option value="Ducting Works" {{ old('project_type') === 'Ducting Works' ? 'selected' : '' }}>Ducting Works</option>
                                     </select>
                                     @error('project_type')
                                         <p class="projects-form-error">{{ $message }}</p>

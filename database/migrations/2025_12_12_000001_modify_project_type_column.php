@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('projects', function (Blueprint $table) {
-            // Add project_type column if it doesn't exist
-            if (!Schema::hasColumn('projects', 'project_type')) {
-                $table->string('project_type', 100)->nullable()->after('industry');
+            // Modify project_type column to support longer strings
+            if (Schema::hasColumn('projects', 'project_type')) {
+                // Change from ENUM to VARCHAR
+                $table->string('project_type', 100)->nullable()->change();
             }
         });
     }
@@ -26,7 +27,7 @@ return new class extends Migration
     {
         Schema::table('projects', function (Blueprint $table) {
             if (Schema::hasColumn('projects', 'project_type')) {
-                $table->dropColumn('project_type');
+                $table->enum('project_type', ['Plumbing Works', 'Fire Safety', 'Fire Detection Alarm System', 'Gas Line Installation', 'Air-Conditioning System Installation & Maintenance', 'Ducting Works'])->nullable()->change();
             }
         });
     }

@@ -19,23 +19,21 @@ class EmployeeSeeder extends Seeder
         // Disable foreign key constraints temporarily
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         
-        // Clear existing employees only
+        // Clear existing employees and users
         EmployeeList::truncate();
+        User::truncate();
         
         // Re-enable foreign key constraints
         \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // Owner user - skip if already exists
-        $ownerUser = User::where('email', 'owner.crisber@example.com')->first();
-        if (!$ownerUser) {
-            $ownerUser = User::create([
-                'name' => 'Crisber Beriong',
-                'email' => 'owner.crisber@example.com',
-                'phone' => '+63 917 123 4567',
-                'password' => bcrypt('password123'),
-                'role' => 'OWNER'
-            ]);
-        }
+        // Owner user
+        $ownerUser = User::create([
+            'name' => 'Crisber Beriong',
+            'email' => 'owner.crisber@example.com',
+            'phone' => '+63 917 123 4567',
+            'password' => bcrypt('password123'),
+            'role' => 'OWNER'
+        ]);
 
         // Get all users to assign to employees
         $users = User::all();
@@ -82,36 +80,32 @@ class EmployeeSeeder extends Seeder
             
             for ($i = 1; $i <= $count; $i++) {
                 // Create a new user for each employee
-                $email = strtolower(str_replace(' ', '', $position)) . $employeeCounter . '@example.com';
+                // Sanitize position name: remove spaces and special characters (/, -, etc.) for email
+                $sanitizedPosition = strtolower(str_replace(['/', '-', ' '], '', $position));
+                $email = $sanitizedPosition . $employeeCounter . '@example.com';
                 
                 // Generate Philippine mobile number format
                 $phoneNumber = '+63 9' . str_pad(rand(10, 99), 2, '0', STR_PAD_LEFT) . ' ' 
                              . str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT) . ' ' 
                              . str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
                 
-                // Check if user already exists, if not create it
-                $user = User::where('email', $email)->first();
-                if (!$user) {
-                    $user = User::create([
-                        'name' => $faker->firstName() . ' ' . $faker->lastName(),
-                        'email' => $email,
-                        'phone' => $phoneNumber,
-                        'password' => bcrypt('password123'),
-                        'role' => $role,
-                        'user_position' => $position,
-                    ]);
-                }
+                // Create user
+                $user = User::create([
+                    'name' => $faker->firstName() . ' ' . $faker->lastName(),
+                    'email' => $email,
+                    'phone' => $phoneNumber,
+                    'password' => bcrypt('password123'),
+                    'role' => $role,
+                    'user_position' => $position,
+                ]);
                 
-                // Check if employee already exists for this user
-                $employee = EmployeeList::where('user_id', $user->id)->first();
-                if (!$employee) {
-                    EmployeeList::create([
-                        'user_id' => $user->id,
-                        'f_name' => $user->name,
-                        'l_name' => $faker->lastName(),
-                        'position' => $position,
-                    ]);
-                }
+                // Create employee record
+                EmployeeList::create([
+                    'user_id' => $user->id,
+                    'f_name' => $user->name,
+                    'l_name' => $faker->lastName(),
+                    'position' => $position,
+                ]);
                 
                 $employeeCounter++;
             }

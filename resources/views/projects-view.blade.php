@@ -817,7 +817,18 @@
                         <div class="detail-label">Project Type</div>
                         <div class="detail-value">
                             @if($project->project_type)
-                                <span style="background: @if($project->project_type === 'Plumbing Work') #dbeafe @else #fee2e2 @endif; color: @if($project->project_type === 'Plumbing Work') #0369a1 @else #991b1b @endif; padding: 4px 12px; border-radius: 20px; font-size: 13px;">
+                                @php
+                                    $colorMap = [
+                                        'Plumbing Works' => ['#dbeafe', '#0369a1'],
+                                        'Fire Safety' => ['#fee2e2', '#991b1b'],
+                                        'Fire Detection Alarm System' => ['#fce7f3', '#be185d'],
+                                        'Gas Line Installation' => ['#dcfce7', '#166534'],
+                                        'Air-Conditioning System Installation & Maintenance' => ['#f3e8ff', '#6b21a8'],
+                                        'Ducting Works' => ['#fef3c7', '#92400e'],
+                                    ];
+                                    $colors = $colorMap[$project->project_type] ?? ['#f3f4f6', '#6b7280'];
+                                @endphp
+                                <span style="background: {{ $colors[0] }}; color: {{ $colors[1] }}; padding: 4px 12px; border-radius: 20px; font-size: 13px;">
                                     {{ $project->project_type }}
                                 </span>
                             @else
