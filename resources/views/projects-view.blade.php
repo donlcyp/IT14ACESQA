@@ -884,6 +884,29 @@
                             <div class="projects-title">{{ $project->project_name ?? $project->project_code }}</div>
                             <div class="projects-subtitle">Project ID: {{ $project->project_code }}</div>
                         </div>
+                        @php
+                            $currentUser = auth()->user();
+                            $isOwner = $currentUser && $currentUser->role === 'Owner';
+                            $allMaterials = $project->materials ?? collect();
+                            $totalMaterialItems = $allMaterials->count();
+                            $approvedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->status ?? 'pending') === 'approved')->count();
+                            $failedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->status ?? '') === 'fail')->count();
+                            $clearedItems = $approvedMaterialItems + $failedMaterialItems;
+                            $progressPercent = $totalMaterialItems > 0 ? round(($clearedItems / $totalMaterialItems) * 100, 1) : 0;
+                            $canComplete = $progressPercent >= 100 && $project->status !== 'Completed' && $project->pm_confirmed_at;
+                        @endphp
+                        @if($isOwner && $project->status !== 'Completed')
+                            <button type="button" class="btn {{ $canComplete ? 'btn-green' : 'btn-secondary' }}" 
+                                    onclick="{{ $canComplete ? 'openCompleteProjectModal()' : 'showCannotCompleteMessage()' }}"
+                                    style="display: flex; align-items: center; gap: 8px; {{ !$canComplete ? 'opacity: 0.6; cursor: not-allowed;' : '' }}">
+                                <i class="fas fa-check-circle"></i>
+                                Mark as Complete
+                            </button>
+                        @elseif($project->status === 'Completed')
+                            <span style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #dcfce7; color: #166534; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                                <i class="fas fa-check-circle"></i> Project Completed
+                            </span>
+                        @endif
                     </div>
                     <div class="header-divider"></div>
                 </div>
@@ -1548,12 +1571,12 @@
                                             'Construction Worker' => 5,
                                         ];
                                         
-                                        // Collect all employees with PM first
-                                        $allEmployees = [];
+                                        // Collect all employees with PM first (use different variable name to avoid JS conflict)
+                                        $teamWorkersList = [];
                                         
                                         // Add PM if exists
                                         if ($project->assignedPM) {
-                                            $allEmployees[] = [
+                                            $teamWorkersList[] = [
                                                 'employee' => $project->assignedPM,
                                                 'position' => 'Project Manager',
                                                 'is_pm' => true,
@@ -1573,11 +1596,11 @@
                                                 ];
                                             })->sortBy('hierarchy');
                                             
-                                            $allEmployees = array_merge($allEmployees, $otherEmployees->toArray());
+                                            $teamWorkersList = array_merge($teamWorkersList, $otherEmployees->toArray());
                                         }
                                     @endphp
                                     
-                                    @foreach ($allEmployees as $item)
+                                    @foreach ($teamWorkersList as $item)
                                         @php
                                             $employee = $item['employee'];
                                             $position = $item['position'];
@@ -1832,11 +1855,11 @@
                         .report-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--gray-300); font-size: 13px; color: var(--gray-500); line-height: 1.8; }
                         .report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
                         .report-summary-item { padding: 18px; border: 1px solid var(--gray-300); border-radius: 8px; background: #fff; }
-                        .report-summary-label { font-size: 12px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+                        .report-summary-label { font-size: 15px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
                         .report-summary-value { font-size: 18px; font-weight: 700; color: var(--black-1); }
                         .report-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px 32px; margin-top: 24px; margin-bottom: 32px; }
                         .report-detail-item { display: flex; flex-direction: column; }
-                        .report-detail-label { font-size: 12px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; font-weight: 600; }
+                        .report-detail-label { font-size: 15px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; font-weight: 600; }
                         .report-detail-value { font-size: 15px; color: var(--black-1); line-height: 1.6; padding-bottom: 12px; border-bottom: 1px solid var(--gray-200); }
                         .report-notice { padding: 16px 20px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
                         .report-notice i { color: #d97706; margin-top: 2px; font-size: 16px; }
@@ -1963,6 +1986,51 @@
                                 </div>
                             </div>
 
+                            @php
+                                $failedItems = $reportMaterials->filter(fn($m) => strtolower($m->status ?? '') === 'fail');
+                            @endphp
+                            @if($failedItems->count() > 0)
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: #dc2626; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-exclamation-triangle"></i> Failed Items ({{ $failedItems->count() }})
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    @foreach($failedItems as $failedItem)
+                                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <div style="font-weight: 600; color: #991b1b;">{{ $failedItem->item_description ?? 'N/A' }}</div>
+                                            <span style="background: #dc2626; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">FAILED</span>
+                                        </div>
+                                        <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">Item No: {{ $failedItem->item_no ?? 'N/A' }} | Qty: {{ $failedItem->quantity ?? 0 }} {{ $failedItem->unit ?? '' }}</div>
+                                        @php
+                                            $failureReason = null;
+                                            $failureNotes = null;
+                                            if ($failedItem->notes) {
+                                                if (preg_match('/\[FAILED.*?\] Reason: ([^.]+)\./', $failedItem->notes, $matches)) {
+                                                    $failureReason = trim($matches[1]);
+                                                }
+                                                if (preg_match('/Notes: (.+?)(?:\[|$)/s', $failedItem->notes, $notesMatch)) {
+                                                    $failureNotes = trim($notesMatch[1]);
+                                                }
+                                            }
+                                        @endphp
+                                        @if($failureReason)
+                                        <div style="background: white; padding: 12px; border-radius: 6px; margin-top: 8px;">
+                                            <div style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Reason for Failure</div>
+                                            <div style="font-size: 14px; color: #1f2937;">{{ $failureReason }}</div>
+                                            @if($failureNotes)
+                                            <div style="font-size: 12px; color: #6b7280; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;"><strong>Additional Notes:</strong> {{ $failureNotes }}</div>
+                                            @endif
+                                        </div>
+                                        @else
+                                        <div style="font-size: 13px; color: #9ca3af; font-style: italic;">No failure reason recorded</div>
+                                        @endif
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
                             <div class="report-footer">
                                 <strong>Prepared for:</strong> Owner, Project Manager<br>
                                 <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
@@ -2076,6 +2144,9 @@
                                 $reportTotalMaterial = 0;
                                 $reportTotalLabor = 0;
                                 $reportGrandTotal = 0;
+                                $boqApprovedCount = $boqItems->filter(fn($m) => strtolower($m->status ?? 'pending') === 'approved')->count();
+                                $boqFailedCount = $boqItems->filter(fn($m) => strtolower($m->status ?? '') === 'fail')->count();
+                                $boqPendingCount = $boqItems->count() - $boqApprovedCount - $boqFailedCount;
                             @endphp
 
                             <div class="report-summary">
@@ -2092,16 +2163,25 @@
                                     $reportGrandTotalWithVAT = $reportGrandTotal + $reportVAT;
                                 @endphp
                                 <div class="report-summary-item">
-                                    <div class="report-summary-label">Total Material Cost</div>
+                                    <div class="report-summary-label">Total Items</div>
+                                    <div class="report-summary-value">{{ $boqItems->count() }}</div>
+                                    <div style="font-size: 12px; margin-top: 6px; display: flex; gap: 12px;">
+                                        <span style="color: #16a34a;"><i class="fas fa-check-circle"></i> {{ $boqApprovedCount }} Approved</span>
+                                        @if($boqFailedCount > 0)
+                                        <span style="color: #dc2626;"><i class="fas fa-times-circle"></i> {{ $boqFailedCount }} Failed</span>
+                                        @endif
+                                        @if($boqPendingCount > 0)
+                                        <span style="color: #6b7280;"><i class="fas fa-clock"></i> {{ $boqPendingCount }} Pending</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Material Cost</div>
                                     <div class="report-summary-value">₱{{ number_format($reportTotalMaterial, 2) }}</div>
                                 </div>
                                 <div class="report-summary-item">
-                                    <div class="report-summary-label">Total Labor Cost</div>
+                                    <div class="report-summary-label">Labor Cost</div>
                                     <div class="report-summary-value">₱{{ number_format($reportTotalLabor, 2) }}</div>
-                                </div>
-                                <div class="report-summary-item">
-                                    <div class="report-summary-label">Subtotal</div>
-                                    <div class="report-summary-value">₱{{ number_format($reportGrandTotal, 2) }}</div>
                                 </div>
                                 <div class="report-summary-item">
                                     <div class="report-summary-label">Grand Total (w/ 12% VAT)</div>
@@ -2114,12 +2194,13 @@
                                     <tr>
                                         <th style="width: 60px;">Item No.</th>
                                         <th>Item Description</th>
-                                        <th class="text-center" style="width: 70px;">Qty</th>
-                                        <th class="text-center" style="width: 70px;">Unit</th>
-                                        <th class="text-right" style="width: 110px;">Material</th>
-                                        <th class="text-right" style="width: 110px;">Labor</th>
-                                        <th class="text-right" style="width: 110px;">Unit Rate</th>
-                                        <th class="text-right" style="width: 120px;">Total</th>
+                                        <th class="text-center" style="width: 80px;">Status</th>
+                                        <th class="text-center" style="width: 60px;">Qty</th>
+                                        <th class="text-center" style="width: 60px;">Unit</th>
+                                        <th class="text-right" style="width: 100px;">Material</th>
+                                        <th class="text-right" style="width: 100px;">Labor</th>
+                                        <th class="text-right" style="width: 100px;">Unit Rate</th>
+                                        <th class="text-right" style="width: 110px;">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2130,14 +2211,28 @@
                                             $itemUnitRate = $itemMatCost + $itemLabCost;
                                             $itemQty = $item->quantity ?? 0;
                                             $itemTotal = $itemUnitRate * $itemQty;
+                                            $itemStatus = strtolower($item->status ?? 'pending');
+                                            $statusColor = match($itemStatus) {
+                                                'approved' => '#16a34a',
+                                                'fail', 'failed' => '#dc2626',
+                                                default => '#6b7280'
+                                            };
+                                            $statusBg = match($itemStatus) {
+                                                'approved' => '#dcfce7',
+                                                'fail', 'failed' => '#fef2f2',
+                                                default => '#f3f4f6'
+                                            };
                                         @endphp
-                                        <tr>
+                                        <tr style="{{ $itemStatus === 'fail' || $itemStatus === 'failed' ? 'background: #fef2f2;' : '' }}">
                                             <td class="text-center">{{ $item->item_no ?? ($index + 1) }}</td>
                                             <td>
                                                 <div style="white-space: pre-wrap; line-height: 1.5;">{!! nl2br(e($item->item_description)) !!}</div>
                                                 @if($item->category)
                                                     <div style="font-size: 12px; color: var(--gray-500); margin-top: 6px;"><strong>Category:</strong> {{ $item->category }}</div>
                                                 @endif
+                                            </td>
+                                            <td class="text-center">
+                                                <span style="display: inline-block; font-size: 13px; font-weight: 500; color: {{ $statusColor }};">{{ ucfirst($itemStatus === 'fail' ? 'Failed' : $itemStatus) }}</span>
                                             </td>
                                             <td class="text-center">{{ $itemQty }}</td>
                                             <td class="text-center">{{ $item->unit ?? '—' }}</td>
@@ -2148,28 +2243,77 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" style="text-align: center; color: var(--gray-500);">No BOQ items recorded</td>
+                                            <td colspan="9" style="text-align: center; color: var(--gray-500);">No BOQ items recorded</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                                 <tfoot>
                                     <tr style="background: var(--sidebar-bg); font-weight: 600;">
-                                        <td colspan="4" class="text-right">SUBTOTAL:</td>
+                                        <td colspan="5" class="text-right">SUBTOTAL:</td>
                                         <td class="text-right">₱{{ number_format($reportTotalMaterial, 2) }}</td>
                                         <td class="text-right">₱{{ number_format($reportTotalLabor, 2) }}</td>
                                         <td class="text-right"></td>
                                         <td class="text-right">₱{{ number_format($reportGrandTotal, 2) }}</td>
                                     </tr>
                                     <tr style="font-weight: 600;">
-                                        <td colspan="7" class="text-right">VAT 12%:</td>
+                                        <td colspan="8" class="text-right">VAT 12%:</td>
                                         <td class="text-right">₱{{ number_format($reportVAT, 2) }}</td>
                                     </tr>
                                     <tr style="background: var(--sidebar-bg); font-weight: 700; font-size: 15px;">
-                                        <td colspan="7" class="text-right">Grand Total w/ VAT:</td>
+                                        <td colspan="8" class="text-right">Grand Total w/ VAT:</td>
                                         <td class="text-right" style="color: var(--accent);">₱{{ number_format($reportGrandTotalWithVAT, 2) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
+
+                            @php
+                                $boqFailedItems = $boqItems->filter(fn($m) => strtolower($m->status ?? '') === 'fail');
+                            @endphp
+                            @if($boqFailedItems->count() > 0)
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: #dc2626; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-exclamation-triangle"></i> Failed Items Details ({{ $boqFailedItems->count() }})
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    @foreach($boqFailedItems as $boqFailedItem)
+                                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                            <div style="font-weight: 600; color: #991b1b;">{{ $boqFailedItem->item_description ?? 'N/A' }}</div>
+                                            <span style="background: #dc2626; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">FAILED</span>
+                                        </div>
+                                        <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+                                            Item No: {{ $boqFailedItem->item_no ?? 'N/A' }} | 
+                                            Qty: {{ $boqFailedItem->quantity ?? 0 }} {{ $boqFailedItem->unit ?? '' }} |
+                                            Value: ₱{{ number_format((($boqFailedItem->material_cost ?? 0) + ($boqFailedItem->labor_cost ?? 0)) * ($boqFailedItem->quantity ?? 0), 2) }}
+                                        </div>
+                                        @php
+                                            $boqFailureReason = null;
+                                            $boqFailureNotes = null;
+                                            if ($boqFailedItem->notes) {
+                                                if (preg_match('/\\[FAILED.*?\\] Reason: ([^.]+)\\./', $boqFailedItem->notes, $boqMatches)) {
+                                                    $boqFailureReason = trim($boqMatches[1]);
+                                                }
+                                                if (preg_match('/Notes: (.+?)(?:\\[|$)/s', $boqFailedItem->notes, $boqNotesMatch)) {
+                                                    $boqFailureNotes = trim($boqNotesMatch[1]);
+                                                }
+                                            }
+                                        @endphp
+                                        @if($boqFailureReason)
+                                        <div style="background: white; padding: 12px; border-radius: 6px; margin-top: 8px;">
+                                            <div style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Reason for Failure</div>
+                                            <div style="font-size: 14px; color: #1f2937;">{{ $boqFailureReason }}</div>
+                                            @if($boqFailureNotes)
+                                            <div style="font-size: 12px; color: #6b7280; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;"><strong>Additional Notes:</strong> {{ $boqFailureNotes }}</div>
+                                            @endif
+                                        </div>
+                                        @else
+                                        <div style="font-size: 13px; color: #9ca3af; font-style: italic;">No failure reason recorded</div>
+                                        @endif
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
 
                             <div class="report-footer">
                                 <strong>Prepared for:</strong> Finance, Admin<br>
@@ -2473,7 +2617,7 @@
 
         <!-- BOQ Item Modal -->
         <div id="boqModal" class="modal" style="display: none;">
-            <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-content" style="max-width: 750px;">
                 <div class="modal-header">
                     <h2 class="modal-title" id="boqTitle">Add BOQ Item</h2>
                     <button class="modal-close" onclick="closeBOQModal()">
@@ -2486,29 +2630,97 @@
                     <input type="hidden" id="boqIdField" name="material_id" value="">
                     
                     <div style="padding: 20px;">
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Category</label>
-                            <input type="text" id="boqCategory" name="category" placeholder="e.g., COLD & HOT WATER" 
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        <!-- Quick Category Selection -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #6b7280;">Quick Category Selection</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+                                <button type="button" class="category-preset-btn" onclick="selectQuickCategory(this, 'COLD & HOT WATER')">Cold & Hot Water</button>
+                                <button type="button" class="category-preset-btn" onclick="selectQuickCategory(this, 'ELECTRICAL')">Electrical</button>
+                                <button type="button" class="category-preset-btn" onclick="selectQuickCategory(this, 'PLUMBING')">Plumbing</button>
+                                <button type="button" class="category-preset-btn" onclick="selectQuickCategory(this, 'MATERIALS')">Materials</button>
+                                <button type="button" class="category-preset-btn" onclick="selectQuickCategory(this, 'LABOR')">Labor</button>
+                                <button type="button" class="category-preset-btn" onclick="selectQuickCategory(this, 'EQUIPMENT')">Equipment</button>
+                            </div>
+                            <style>
+                                .category-preset-btn {
+                                    padding: 8px 12px;
+                                    border: 1px solid #d1d5db;
+                                    background: #fff;
+                                    border-radius: 6px;
+                                    font-size: 13px;
+                                    font-weight: 500;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    color: #374151;
+                                }
+                                .category-preset-btn:hover {
+                                    border-color: var(--accent);
+                                    background: #eff6ff;
+                                    color: var(--accent);
+                                }
+                                .category-preset-btn.active {
+                                    background: var(--accent);
+                                    color: white;
+                                    border-color: var(--accent);
+                                }
+                            </style>
                         </div>
 
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Item Description * <span style="font-size: 12px; color: #6b7280; font-weight: 400;">(Use line breaks for hierarchy)</span></label>
-                            <textarea id="boqItemDescription" name="item_description" placeholder="Enter item description&#10;Example:&#10;PVC Pipe Schedule 40&#10;  - 50mm diameter&#10;  - per meter" required rows="4"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 15px; white-space: pre-wrap;"></textarea>
-                            <small style="color: #6b7280; display: block; margin-top: 6px;">💡 Tip: Use line breaks and indentation to create a structured format</small>
+                        <!-- Category Input -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Category</label>
+                            <input type="text" id="boqCategory" name="category" placeholder="Or type custom category..." 
+                                style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <!-- Quick Item Description Templates -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; text-transform: uppercase; color: #6b7280;">Quick Item Templates</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                                <button type="button" class="template-btn" onclick="useItemTemplate(this, 'PVC Pipe\n  - Specify diameter\n  - per meter')">PVC Pipe</button>
+                                <button type="button" class="template-btn" onclick="useItemTemplate(this, 'Electrical Wire\n  - Specify gauge\n  - per meter')">Wire</button>
+                                <button type="button" class="template-btn" onclick="useItemTemplate(this, 'Labor - Installation\n  - per unit\n  - hourly rate')">Labor</button>
+                                <button type="button" class="template-btn" onclick="useItemTemplate(this, 'Fittings & Fixtures\n  - Specify type\n  - per piece')">Fittings</button>
+                                <button type="button" class="template-btn" onclick="useItemTemplate(this, 'Cement/Adhesive\n  - Specify type\n  - per bag/liter')">Materials</button>
+                            </div>
+                            <style>
+                                .template-btn {
+                                    padding: 6px 12px;
+                                    border: 1px solid #d1d5db;
+                                    background: #f9fafb;
+                                    border-radius: 6px;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                    color: #374151;
+                                }
+                                .template-btn:hover {
+                                    border-color: var(--accent);
+                                    background: #eff6ff;
+                                    color: var(--accent);
+                                }
+                            </style>
+                        </div>
+
+                        <!-- Item Description -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Item Description * <span style="font-size: 11px; color: #9ca3af; font-weight: 400;">Required</span></label>
+                            <textarea id="boqItemDescription" name="item_description" placeholder="Enter item description&#10;Use line breaks for structure" required rows="4"
+                                style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; box-sizing: border-box; white-space: pre-wrap;"></textarea>
+                        </div>
+
+                        <!-- Quantity & Unit -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                             <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Quantity *</label>
-                                <input type="number" id="boqQuantity" name="quantity" placeholder="0" step="1" min="1" required 
-                                    style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                                <label style="display: block; margin-bottom: 6px; font-weight: 600;">Quantity *</label>
+                                <input type="number" id="boqQuantity" name="quantity" placeholder="0" step="0.01" min="0.01" required 
+                                    style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
                             </div>
                             <div>
-                                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Unit *</label>
+                                <label style="display: block; margin-bottom: 6px; font-weight: 600;">Unit *</label>
                                 <select id="boqUnit" name="unit" required
-                                    style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                                    style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
                                     <option value="">-- Select Unit --</option>
                                     <option value="pcs">Pieces (pcs)</option>
                                     <option value="set">Set</option>
@@ -2548,31 +2760,33 @@
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Material Cost (₱)</label>
-                            <input type="number" id="boqMaterialCost" name="material_cost" placeholder="0.00" step="0.01" 
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
+                        <!-- Cost Inputs -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 6px; font-weight: 600;">Material Cost (₱)</label>
+                                <input type="number" id="boqMaterialCost" name="material_cost" placeholder="0.00" step="0.01" min="0"
+                                    style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box;" onchange="calculateLaborCost()">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #0369a1;">Labor Cost (Auto)</label>
+                                <input type="number" id="boqLaborCost" name="labor_cost" placeholder="0.00" step="0.01" readonly
+                                    style="width: 100%; padding: 10px; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 14px; background: #dbeafe; color: #0369a1; box-sizing: border-box;">
+                            </div>
                         </div>
 
-                        <div style="margin-bottom: 15px; padding: 12px; background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 6px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #0369a1;">Labor Cost (Auto-calculated)</label>
-                            <input type="number" id="boqLaborCost" name="labor_cost" placeholder="0.00" step="0.01" readonly
-                                style="width: 100%; padding: 8px; border: 1px solid #bfdbfe; border-radius: 4px; font-size: 14px; background: #dbeafe; color: #0369a1;">
-                            <small style="color: #0369a1; display: block; margin-top: 6px;">Calculated as: Material Cost ÷ 2</small>
-                        </div>
-
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Notes</label>
-                            <textarea id="boqNotes" name="notes" placeholder="Additional notes or remarks" rows="2"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: 'Inter', sans-serif;"></textarea>
+                        <!-- Notes -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Notes (Optional)</label>
+                            <textarea id="boqNotes" name="notes" placeholder="Additional remarks" rows="2"
+                                style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; box-sizing: border-box;"></textarea>
                         </div>
 
                         <input type="hidden" id="boqStatus" name="status" value="pending">
                     </div>
 
-                    <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeBOQModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Save BOQ Item</button>
+                    <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeBOQModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Save BOQ Item</button>
                     </div>
                 </form>
             </div>
@@ -2831,6 +3045,70 @@
             .failure-reason-option:hover { border-color: #fca5a5; background: #fef2f2; }
             .failure-reason-option:has(input:checked) { border-color: #dc2626; background: #fef2f2; }
         </style>
+
+        <!-- Complete Project Confirmation Modal -->
+        <div id="completeProjectModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 520px;">
+                <div class="modal-header" style="background: #f0fdf4; border-bottom: 2px solid #bbf7d0;">
+                    <h2 class="modal-title" style="color: #166534; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Mark Project as Complete</span>
+                    </h2>
+                    <button class="modal-close" onclick="closeCompleteProjectModal()" style="color: #166534;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="padding: 24px;">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="width: 80px; height: 80px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                            <i class="fas fa-flag-checkered" style="font-size: 36px; color: #16a34a;"></i>
+                        </div>
+                        <h3 style="margin: 0 0 8px 0; font-size: 18px; color: var(--black-1);">Complete This Project?</h3>
+                        <p style="margin: 0; color: var(--gray-600); font-size: 14px; line-height: 1.6;">
+                            You are about to mark <strong>{{ $project->project_name }}</strong> as completed.
+                        </p>
+                    </div>
+
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                        <div style="font-size: 13px; font-weight: 600; color: #166534; margin-bottom: 12px;">
+                            <i class="fas fa-clipboard-check"></i> Project Summary
+                        </div>
+                        <div style="display: grid; gap: 8px; font-size: 13px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--gray-600);">Total BOQ Items:</span>
+                                <span style="font-weight: 600; color: var(--black-1);">{{ $totalMaterialItems ?? 0 }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--gray-600);">Approved Items:</span>
+                                <span style="font-weight: 600; color: #16a34a;">{{ $approvedMaterialItems ?? 0 }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--gray-600);">Failed Items:</span>
+                                <span style="font-weight: 600; color: #dc2626;">{{ $failedMaterialItems ?? 0 }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid #bbf7d0;">
+                                <span style="color: var(--gray-600);">Progress:</span>
+                                <span style="font-weight: 700; color: #166534;">{{ $progressPercent ?? 0 }}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #92400e; display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fas fa-exclamation-triangle" style="margin-top: 2px;"></i>
+                        <span>This action cannot be undone. Make sure all deliverables have been reviewed and approved before proceeding.</span>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-300); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn" style="background: var(--gray-200); color: var(--gray-700); padding: 10px 20px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeCompleteProjectModal()">Cancel</button>
+                    <form action="{{ route('projects.complete', $project->id) }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="btn" style="background: #16a34a; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-check"></i> Yes, Complete Project
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Employee Assignment Modal -->
         <div id="employeeModal" class="modal">
@@ -3324,7 +3602,13 @@
 
         // Debug: Check if employees are loaded
         console.log('All Employees:', allEmployees);
+        console.log('All Employees length:', allEmployees ? allEmployees.length : 0);
         console.log('Project Employees:', projectEmployees);
+        
+        // Validate allEmployees data structure
+        if (allEmployees && allEmployees.length > 0) {
+            console.log('First employee sample:', JSON.stringify(allEmployees[0]));
+        }
 
         function openEmployeeModal() {
             const modal = document.getElementById('employeeModal');
@@ -3357,7 +3641,15 @@
 
             console.log('Loading employees for project:', projectId);
             console.log('Assigned IDs:', assignedEmployeeIds);
-            console.log('Total employees available:', allEmployees.length);
+            console.log('Total employees available:', allEmployees ? allEmployees.length : 0);
+            
+            // Validate allEmployees
+            if (allEmployees && allEmployees.length > 0) {
+                console.log('Sample employee data:', JSON.stringify(allEmployees[0]));
+                // Check what properties are available
+                const sampleEmp = allEmployees[0];
+                console.log('Available properties:', Object.keys(sampleEmp));
+            }
 
             employeeList.innerHTML = '';
 
@@ -3432,6 +3724,12 @@
                 employees.forEach(employee => {
                     const isAssigned = assignedEmployeeIds.includes(employee.id);
                     const isAssignedToOtherProject = employee.assigned_to_other_project && !isAssigned;
+                    
+                    // Safely get employee properties with fallbacks
+                    const empId = employee.id || 'N/A';
+                    const empFirstName = employee.f_name || 'Unknown';
+                    const empLastName = employee.l_name || 'Employee';
+                    const empPosition = employee.position || 'Staff';
 
                     const employeeItem = document.createElement('div');
                     employeeItem.className = 'employee-item';
@@ -3439,15 +3737,15 @@
                     employeeItem.innerHTML = `
                         <input 
                             type="checkbox" 
-                            value="${employee.id}"
+                            value="${empId}"
                             ${isAssigned ? 'checked' : ''}
                             ${isAssignedToOtherProject ? 'disabled' : ''}
                             class="employee-checkbox"
                             style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);"
                         >
                         <div style="flex: 1;">
-                            <div style="font-weight: 500; color: #111827; font-size: 14px;">${employee.f_name} ${employee.l_name}</div>
-                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">EMP${String(employee.id).padStart(3, '0')}</div>
+                            <div style="font-weight: 500; color: #111827; font-size: 14px;">${empFirstName} ${empLastName}</div>
+                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">EMP${String(empId).padStart(3, '0')}</div>
                             ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600; margin-top: 4px;"><i class="fas fa-exclamation-circle"></i> Assigned to other project</div>' : ''}
                         </div>
                     `;
@@ -3487,12 +3785,18 @@
             const checkboxes = document.querySelectorAll('.employee-checkbox:not(:disabled)');
             const selectedEmployeeIds = Array.from(checkboxes)
                 .filter(cb => cb.checked)
-                .map(cb => parseInt(cb.value));
+                .map(cb => {
+                    const value = parseInt(cb.value);
+                    return !isNaN(value) ? value : null;
+                })
+                .filter(id => id !== null); // Remove any non-integer IDs
 
             if (selectedEmployeeIds.length === 0) {
-                showNotification('Please select at least one employee to assign.', 'error');
+                showNotification('Please select at least one valid employee to assign.', 'error');
                 return;
             }
+
+            console.log('Sending employee IDs:', selectedEmployeeIds);
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             
@@ -3568,6 +3872,42 @@
             }
             
             return true;
+        }
+
+        // Quick Category Selection
+        function selectQuickCategory(btn, categoryName) {
+            event.preventDefault();
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.category-preset-btn').forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            // Set the category input value
+            document.getElementById('boqCategory').value = categoryName;
+            
+            // Focus on description field
+            document.getElementById('boqItemDescription').focus();
+        }
+
+        // Use Item Template
+        function useItemTemplate(btn, templateText) {
+            event.preventDefault();
+            
+            // Set the textarea value with template
+            document.getElementById('boqItemDescription').value = templateText;
+            
+            // Focus and select all for easy editing
+            document.getElementById('boqItemDescription').focus();
+            document.getElementById('boqItemDescription').select();
+        }
+
+        // Calculate Labor Cost (50% of material cost)
+        function calculateLaborCost() {
+            const materialCost = parseFloat(document.getElementById('boqMaterialCost').value) || 0;
+            const laborCost = (materialCost / 2).toFixed(2);
+            document.getElementById('boqLaborCost').value = laborCost;
         }
 
         function submitBOQForm(event) {
@@ -4665,6 +5005,39 @@
             } else {
                 updateMaterialStatus(materialId, 'failed', failureReason, failureNotes);
             }
+        }
+
+        // Complete Project Modal Functions
+        function openCompleteProjectModal() {
+            document.getElementById('completeProjectModal').style.display = 'flex';
+        }
+
+        function closeCompleteProjectModal() {
+            document.getElementById('completeProjectModal').style.display = 'none';
+        }
+
+        function showCannotCompleteMessage() {
+            @php
+                $pmRecommended = !empty($project->pm_confirmed_at);
+                $progressComplete = ($progressPercent ?? 0) >= 100;
+            @endphp
+            
+            let message = 'Cannot mark project as complete. ';
+            const issues = [];
+            
+            @if(!$pmRecommended)
+                issues.push('PM recommendation is required');
+            @endif
+            
+            @if(!$progressComplete)
+                issues.push('Progress must be at 100% (all items must be Approved or Failed)');
+            @endif
+            
+            if (issues.length > 0) {
+                message += issues.join('. ') + '.';
+            }
+            
+            showNotification(message, 'error');
         }
 
         // Documentation filter

@@ -99,11 +99,16 @@ class EmployeeSeeder extends Seeder
                     'user_position' => $position,
                 ]);
                 
+                // Extract first and last name from the generated full name
+                $nameParts = explode(' ', $user->name, 2);
+                $firstName = $nameParts[0] ?? $user->name;
+                $lastName = isset($nameParts[1]) ? $nameParts[1] : $faker->lastName();
+                
                 // Create employee record
                 EmployeeList::create([
                     'user_id' => $user->id,
-                    'f_name' => $user->name,
-                    'l_name' => $faker->lastName(),
+                    'f_name' => $firstName,
+                    'l_name' => $lastName,
                     'position' => $position,
                 ]);
                 

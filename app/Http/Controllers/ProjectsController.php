@@ -57,14 +57,14 @@ class ProjectsController extends Controller
         $project->load(['client', 'assignedPM', 'projectRecords.materials', 'employees', 'materials']);
 
         // Get all employees with their current project assignments
-        $allEmployees = EmployeeList::all()->map(function ($employee) {
-            $assignedProject = $employee->projects()->first();
+        $allEmployees = EmployeeList::query()->get()->map(function ($employee) {
+            $assignedProject = $employee->projects()->where('status', '!=', 'Completed')->first();
             return [
-                'id' => $employee->id,
-                'f_name' => $employee->f_name,
-                'l_name' => $employee->l_name,
-                'position' => $employee->position,
-                'assigned_to_other_project' => $assignedProject && $assignedProject->status !== 'Completed'
+                'id' => (int) $employee->id,
+                'f_name' => $employee->f_name ?? '',
+                'l_name' => $employee->l_name ?? '',
+                'position' => $employee->position ?? 'Staff',
+                'assigned_to_other_project' => $assignedProject !== null
             ];
         })->values()->toArray();
         
