@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --gray-500: #667085;
             --gray-300: #d0d5dd;
@@ -22,7 +22,7 @@
             --gray-800: #1f2937;
             --blue-1: var(--accent);
             --blue-600: var(--accent);
-            --green-600: #059669;
+            --green-600: #1e40af;
             --black-1: #111827;
             --sidebar-bg: #f8fafc;
             --header-bg: var(--accent);
@@ -268,7 +268,7 @@
         }
 
         .btn-primary:hover {
-            background: #15803d;
+            background: #1e3a8a;
         }
 
         .btn-secondary {
@@ -380,7 +380,7 @@
 
         <div class="main-content" id="mainContent">
             <!-- Header -->
-            <header class="header" style="background: linear-gradient(135deg, var(--accent), #16a34a); padding: 20px 30px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <header class="header" style="background: linear-gradient(135deg, var(--accent), #1e40af); padding: 20px 30px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
                 <button class="header-menu" id="headerMenu" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 4px;">
                     <i class="fas fa-bars"></i>
                 </button>

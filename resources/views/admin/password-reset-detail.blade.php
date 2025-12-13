@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
             --gray-300: #d0d5dd;
@@ -126,7 +126,7 @@
                         <textarea name="admin_notes" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 80px;" placeholder="Add any notes about this password reset..."></textarea>
                     </div>
 
-                    <button type="submit" style="padding: 10px 20px; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                    <button type="submit" style="padding: 10px 20px; background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
                         <i class="fas fa-check" style="margin-right: 6px;"></i> Resolve & Send Password
                     </button>
                 </div>

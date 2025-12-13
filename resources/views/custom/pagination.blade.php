@@ -59,7 +59,7 @@
                     @if ($page === '...')
                         <span class="page-btn ellipsis" style="color: #9ca3af; padding: 8px 4px; font-size: 14px;">…</span>
                     @elseif ($page == $currentPage)
-                        <span class="page-btn active" style="background: #16a34a; color: white; font-weight: 600; border-radius: 6px; padding: 8px 12px; min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; border: 1px solid #16a34a;">{{ $page }}</span>
+                        <span class="page-btn active" style="background: #1e40af; color: white; font-weight: 600; border-radius: 6px; padding: 8px 12px; min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; border: 1px solid #1e40af;">{{ $page }}</span>
                     @else
                         <a class="page-btn" href="{{ $paginator->url($page) }}" style="color: #374151; text-decoration: none; padding: 8px 12px; border-radius: 6px; border: 1px solid #e5e7eb; background: white; font-size: 14px; min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease;">{{ $page }}</a>
                     @endif

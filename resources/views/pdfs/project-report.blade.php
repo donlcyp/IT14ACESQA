@@ -12,13 +12,13 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #16a34a;
+            border-bottom: 2px solid #1e40af;
             padding-bottom: 15px;
         }
         .company-name {
             font-size: 24px;
             font-weight: bold;
-            color: #16a34a;
+            color: #1e40af;
         }
         .report-title {
             font-size: 20px;

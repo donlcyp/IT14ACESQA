@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
             --header-bg: var(--accent);
@@ -29,7 +29,7 @@
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: var(--accent);
-            --green-600: #059669;
+            --green-600: #1e40af;
 
             --text-lg-medium-font-family: "Inter", sans-serif;
             --text-lg-medium-font-weight: 500;
@@ -90,7 +90,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e40af);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -271,7 +271,7 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: linear-gradient(135deg, var(--accent), #15803d);
+            background: linear-gradient(135deg, var(--accent), #1e3a8a);
             border-radius: 12px 0 0 12px;
         }
 
@@ -443,7 +443,7 @@
         }
 
         .stat-item {
-            background: linear-gradient(135deg, var(--accent), #15803d);
+            background: linear-gradient(135deg, var(--accent), #1e3a8a);
             color: white;
             padding: 15px;
             border-radius: 8px;
@@ -504,7 +504,7 @@
             top: 40px;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, #16a34a, #3b82f6, #9ca3af);
+            background: linear-gradient(to bottom, #1e40af, #3b82f6, #9ca3af);
         }
 
         .timeline-item {
@@ -822,7 +822,7 @@
                                         'Plumbing Works' => ['#dbeafe', '#0369a1'],
                                         'Fire Safety' => ['#fee2e2', '#991b1b'],
                                         'Fire Detection Alarm System' => ['#fce7f3', '#be185d'],
-                                        'Gas Line Installation' => ['#dcfce7', '#166534'],
+                                        'Gas Line Installation' => ['#dbeafe', '#1e40af'],
                                         'Air-Conditioning System Installation & Maintenance' => ['#f3e8ff', '#6b21a8'],
                                         'Ducting Works' => ['#fef3c7', '#92400e'],
                                     ];
@@ -953,8 +953,8 @@
                                 </div>
                             </div>
                             <div style="background: linear-gradient(135deg, #c8e6c9, #a5d6a7); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #1b5e20; opacity: 0.8;">Subtotal</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #1b5e20;">
+                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.8;">Subtotal</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #1e3a8a;">
                                     ₱{{ number_format($grandTotal, 2) }}
                                 </div>
                             </div>
@@ -964,9 +964,9 @@
                                     ₱{{ number_format($vat, 2) }}
                                 </div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 15px; border-radius: 8px; border-left: 4px solid #28a745; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.15);">
-                                <div style="font-size: 12px; color: #155724; opacity: 0.8; font-weight: 600;">Grand Total w/ VAT</div>
-                                <div style="font-size: 28px; font-weight: 700; color: #155724;">
+                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px; border-left: 4px solid #1e40af; box-shadow: 0 4px 6px rgba(30, 64, 175, 0.15);">
+                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.8; font-weight: 600;">Grand Total w/ VAT</div>
+                                <div style="font-size: 28px; font-weight: 700; color: #1e3a8a;">
                                     ₱{{ number_format($grandTotalWithVAT, 2) }}
                                 </div>
                             </div>
@@ -1056,8 +1056,8 @@
                                             <td colspan="4" style="padding: 15px 12px; text-align: right;">SUBTOTAL:</td>
                                             <td style="padding: 15px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalMaterial, 2) }}</td>
                                             <td style="padding: 15px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalLabor, 2) }}</td>
-                                            <td colspan="1" style="padding: 15px 12px; text-align: right; color: #059669;"></td>
-                                            <td style="padding: 15px 12px; text-align: right; background: #c8e6c9; color: #1b5e20;">₱{{ number_format($grandTotal, 2) }}</td>
+                                            <td colspan="1" style="padding: 15px 12px; text-align: right; color: #1e40af;"></td>
+                                            <td style="padding: 15px 12px; text-align: right; background: #bfdbfe; color: #1e3a8a;">₱{{ number_format($grandTotal, 2) }}</td>
                                             <td></td>
                                         </tr>
                                         @php
@@ -1070,10 +1070,10 @@
                                             <td style="padding: 12px 12px; text-align: right; background: #fff3cd; color: #856404;">₱{{ number_format($vat, 2) }}</td>
                                             <td></td>
                                         </tr>
-                                        <tr style="background: #d4edda; font-weight: 700; font-size: 18px; border-top: 2px solid #28a745;">
+                                        <tr style="background: #dbeafe; font-weight: 700; font-size: 18px; border-top: 2px solid #1e40af;">
                                             <td colspan="4" style="padding: 15px 12px; text-align: right;">Grand Total w/ VAT:</td>
-                                            <td colspan="3" style="padding: 15px 12px; text-align: right; color: #155724;"></td>
-                                            <td style="padding: 15px 12px; text-align: right; background: #d4edda; color: #155724;">₱{{ number_format($grandTotalWithVAT, 2) }}</td>
+                                            <td colspan="3" style="padding: 15px 12px; text-align: right; color: #1e3a8a;"></td>
+                                            <td style="padding: 15px 12px; text-align: right; background: #dbeafe; color: #1e3a8a;">₱{{ number_format($grandTotalWithVAT, 2) }}</td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -1126,10 +1126,10 @@
                                 <div style="font-size: 12px; color: #7e22ce; opacity: 0.7; margin-top: 4px;">{{ $materials->count() }} items</div>
                             </div>
                             
-                            <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 18px; border-radius: 8px; border-left: 4px solid #16a34a;">
-                                <div style="font-size: 11px; color: #166534; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Approved</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #16a34a; margin-top: 8px;">₱{{ number_format($approvedExpenses, 2) }}</div>
-                                <div style="font-size: 12px; color: #166534; opacity: 0.7; margin-top: 4px;">{{ $approvedCount }} items ready for payment</div>
+                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 18px; border-radius: 8px; border-left: 4px solid #1e40af;">
+                                <div style="font-size: 11px; color: #1e3a8a; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Approved</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #1e40af; margin-top: 8px;">₱{{ number_format($approvedExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.7; margin-top: 4px;">{{ $approvedCount }} items ready for payment</div>
                             </div>
                             
                             <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 18px; border-radius: 8px; border-left: 4px solid #f59e0b;">
@@ -1159,7 +1159,7 @@
                                     <span style="color: var(--gray-600);">Used: {{ $percentageUsed }}%</span>
                                 </div>
                                 <div style="height: 8px; background: var(--gray-300); border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; background: {{ $percentageUsed > 100 ? '#dc2626' : ($percentageUsed > 80 ? '#f59e0b' : '#16a34a') }}; width: {{ min($percentageUsed, 100) }}%;"></div>
+                                    <div style="height: 100%; background: {{ $percentageUsed > 100 ? '#dc2626' : ($percentageUsed > 80 ? '#f59e0b' : '#1e40af') }}; width: {{ min($percentageUsed, 100) }}%;"></div>
                                 </div>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 13px;">
@@ -1169,11 +1169,11 @@
                                 </div>
                                 <div>
                                     <div style="color: var(--gray-600); margin-bottom: 4px;">Remaining</div>
-                                    <div style="font-size: 18px; font-weight: 700; color: {{ $remaining < 0 ? '#dc2626' : '#059669' }};">₱{{ number_format($remaining, 2) }}</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: {{ $remaining < 0 ? '#dc2626' : '#1e40af' }};">₱{{ number_format($remaining, 2) }}</div>
                                 </div>
                                 <div>
                                     <div style="color: var(--gray-600); margin-bottom: 4px;">Budget Status</div>
-                                    <div style="font-size: 18px; font-weight: 700; color: {{ $percentageUsed > 100 ? '#dc2626' : ($percentageUsed > 80 ? '#f59e0b' : '#059669') }};">
+                                    <div style="font-size: 18px; font-weight: 700; color: {{ $percentageUsed > 100 ? '#dc2626' : ($percentageUsed > 80 ? '#f59e0b' : '#1e40af') }};">
                                         {{ $percentageUsed > 100 ? 'Over Budget' : ($percentageUsed > 80 ? 'Near Limit' : 'On Track') }}
                                     </div>
                                 </div>
@@ -1200,7 +1200,7 @@
                                                 @php
                                                     $itemTotal = ($material->material_cost ?? 0 + $material->labor_cost ?? 0) * ($material->quantity ?? 0);
                                                     $statusColor = match(strtolower($material->status ?? 'pending')) {
-                                                        'approved' => ['#dcfce7', '#166534', '#16a34a'],
+                                                        'approved' => ['#dbeafe', '#1e3a8a', '#1e40af'],
                                                         'pending' => ['#fef3c7', '#92400e', '#f59e0b'],
                                                         'failed' => ['#fee2e2', '#991b1b', '#dc2626'],
                                                         default => ['#f3f4f6', '#374151', '#6b7280']
@@ -1250,8 +1250,8 @@
                                 </div>
                             </div>
                             <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #059669; opacity: 0.8;">Total Days Worked</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #059669;">
+                                <div style="font-size: 12px; color: #1e40af; opacity: 0.8;">Total Days Worked</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #1e40af;">
                                     @php
                                         $totalDaysWorked = 0;
                                         foreach($project->employees as $emp) {
@@ -1419,7 +1419,7 @@
                                             @if($isImage)
                                                 <img src="{{ asset('storage/' . $doc->file_path) }}" alt="{{ $doc->title }}" style="width: 100%; height: 100%; object-fit: cover;">
                                                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
-                                                    <button onclick="viewImage('{{ asset('storage/' . $doc->file_path) }}', '{{ $doc->title }}')" style="background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; color: #16a34a; font-size: 14px;" title="View Image">
+                                                    <button onclick="viewImage('{{ asset('storage/' . $doc->file_path) }}', '{{ $doc->title }}')" style="background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; color: #1e40af; font-size: 14px;" title="View Image">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                 </div>
@@ -1430,7 +1430,7 @@
                                                     @elseif(str_contains($mimeType, 'word') || str_contains($doc->file_name, 'docx') || str_contains($doc->file_name, 'doc'))
                                                         <i class="fas fa-file-word" style="font-size: 48px; color: #2563eb; margin-bottom: 10px;"></i>
                                                     @elseif(str_contains($mimeType, 'excel') || str_contains($mimeType, 'spreadsheet') || str_contains($doc->file_name, 'xlsx') || str_contains($doc->file_name, 'xls'))
-                                                        <i class="fas fa-file-excel" style="font-size: 48px; color: #16a34a; margin-bottom: 10px;"></i>
+                                                        <i class="fas fa-file-excel" style="font-size: 48px; color: #1e40af; margin-bottom: 10px;"></i>
                                                     @elseif(str_contains($mimeType, 'zip') || str_contains($doc->file_name, 'zip'))
                                                         <i class="fas fa-file-archive" style="font-size: 48px; color: #9333ea; margin-bottom: 10px;"></i>
                                                     @else
@@ -1446,7 +1446,7 @@
                                             <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 10px;">{{ number_format($doc->file_size / 1024, 2) }} KB • By {{ $doc->uploader?->name ?? 'Unknown' }}</div>
                                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                                                 @if(!$isImage)
-                                                    <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" style="background: #16a34a; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Open Document">
+                                                    <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" style="background: #1e40af; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Open Document">
                                                         <i class="fas fa-external-link-alt"></i> Open
                                                     </a>
                                                 @endif
@@ -1468,7 +1468,7 @@
                         @else
                             <div class="images-grid">
                                 <div class="image-card">
-                                    <div style="height: 200px; background: linear-gradient(135deg, var(--accent), #15803d); display: flex; align-items: center; justify-content: center; color: white; border-radius: 6px 6px 0 0;">
+                                    <div style="height: 200px; background: linear-gradient(135deg, var(--accent), #1e3a8a); display: flex; align-items: center; justify-content: center; color: white; border-radius: 6px 6px 0 0;">
                                         <i class="fas fa-image fa-3x" style="opacity: 0.3;"></i>
                                     </div>
                                     <div class="image-info">
@@ -1685,7 +1685,7 @@
                                 <i class="fas fa-hourglass-half"></i> Ongoing
                             </button>
                             <button type="button" class="task-filter-btn" data-filter="completed" onclick="filterTasks('completed')"
-                                style="padding: 6px 14px; border: 2px solid #16a34a; background: white; color: #16a34a; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
+                                style="padding: 6px 14px; border: 2px solid #1e40af; background: white; color: #1e40af; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
                                 <i class="fas fa-check-circle"></i> Completed
                             </button>
                         </div>
@@ -1694,7 +1694,7 @@
                             <div class="updates-timeline">
                                 @forelse($project->updates as $update)
                                     <div class="timeline-item task-item" data-status="{{ strtolower($update->status === 'Completed' ? 'completed' : 'ongoing') }}" style="margin-bottom: 15px;">
-                                        <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #16a34a @else #3b82f6 @endif;"></div>
+                                        <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #1e40af @else #3b82f6 @endif;"></div>
                                         <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
                                             <div class="timeline-header">
                                                 <h5 style="margin: 0 0 5px 0; color: #1f2937;">{{ $update->title }}</h5>
@@ -2183,7 +2183,7 @@
 
             ['dragenter', 'dragover'].forEach(eventName => {
                 dropZone.addEventListener(eventName, () => {
-                    dropZone.style.borderColor = '#16a34a';
+                    dropZone.style.borderColor = '#1e40af';
                     dropZone.style.backgroundColor = 'rgba(22, 163, 74, 0.05)';
                 });
             });
@@ -2768,7 +2768,7 @@
                         const statusClass = task.status === 'Completed' 
                             ? '#dcfce7; color: #166534' 
                             : '#bfdbfe; color: #1e40af';
-                        const statusBg = task.status === 'Completed' ? '#16a34a' : '#3b82f6';
+                        const statusBg = task.status === 'Completed' ? '#1e40af' : '#3b82f6';
                         
                         html += `
                             <div class="timeline-item task-item" data-status="${taskStatus}" style="margin-bottom: 15px;">
@@ -2825,7 +2825,7 @@
             document.querySelectorAll('.task-filter-btn').forEach(btn => {
                 btn.style.background = 'white';
                 btn.style.color = btn.getAttribute('data-filter') === 'ongoing' ? '#3b82f6' : 
-                                   btn.getAttribute('data-filter') === 'completed' ? '#16a34a' : 'inherit';
+                                   btn.getAttribute('data-filter') === 'completed' ? '#1e40af' : 'inherit';
             });
             
             // Highlight active filter
@@ -2838,7 +2838,7 @@
                     activeBtn.style.background = '#3b82f6';
                     activeBtn.style.color = 'white';
                 } else if (filter === 'completed') {
-                    activeBtn.style.background = '#16a34a';
+                    activeBtn.style.background = '#1e40af';
                     activeBtn.style.color = 'white';
                 }
             }

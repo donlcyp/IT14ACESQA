@@ -11,7 +11,7 @@
     body.sidebar-open { margin-left: 280px; }
     
     .top-header { 
-      background: linear-gradient(135deg, #16a34a, #15803d); 
+      background: linear-gradient(135deg, #1e40af, #1e3a8a); 
       color: #fff; 
       padding: 16px 24px; 
       display: flex; 
@@ -75,7 +75,7 @@
     }
     
     .title i {
-      color: #16a34a;
+      color: #1e40af;
       font-size: 28px;
     }
     
@@ -105,7 +105,7 @@
     
     input:focus, select:focus {
       outline: none;
-      border-color: #16a34a;
+      border-color: #1e40af;
       box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
     }
     
@@ -149,13 +149,13 @@
     }
     
     .btn-primary { 
-      background: #16a34a; 
+      background: #1e40af; 
       color: #fff;
       min-width: 120px;
     }
     
     .btn-primary:hover {
-      background: #15803d;
+      background: #1e3a8a;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
     }

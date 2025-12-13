@@ -16,9 +16,9 @@
         <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Waiting for approval</div>
     </div>
 
-    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #10b981; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
+    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #0369a1; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
         <div style="font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 6px;">APPROVED</div>
-        <div style="font-size: 24px; font-weight: 700; color: #10b981;">{{ $stats['approved'] }}</div>
+        <div style="font-size: 24px; font-weight: 700; color: #0369a1;">{{ $stats['approved'] }}</div>
         <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Records approved</div>
     </div>
 
@@ -115,7 +115,7 @@
         </div>
     @else
         <div style="padding: 24px; text-align: center; color: #6b7280;">
-            <i class="fas fa-check-circle" style="font-size: 32px; color: #10b981; margin-bottom: 10px; display: block;"></i>
+            <i class="fas fa-check-circle" style="font-size: 32px; color: #0369a1; margin-bottom: 10px; display: block;"></i>
             <h3 style="margin: 8px 0 6px 0; color: #1f2937; font-size: 14px;">All Clear!</h3>
             <p style="font-size: 12px; margin: 0;">No pending validations. All attendance records have been reviewed.</p>
         </div>
@@ -124,9 +124,9 @@
 
 <!-- Quick Stats Links -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px;">
-    <a href="{{ route('attendance-validation.approved') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #10b981; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">
+    <a href="{{ route('attendance-validation.approved') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #0369a1; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">
         <div style="font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 4px;">View Approved Records</div>
-        <div style="font-size: 16px; font-weight: 700; color: #10b981;">{{ $stats['approved'] }} Records</div>
+        <div style="font-size: 16px; font-weight: 700; color: #0369a1;">{{ $stats['approved'] }} Records</div>
         <div style="font-size: 10px; color: #9ca3af; margin-top: 4px;">See all approved punch-ins</div>
     </a>
 

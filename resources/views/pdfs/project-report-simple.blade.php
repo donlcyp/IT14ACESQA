@@ -17,7 +17,7 @@
         }
         
         .header {
-            background-color: #059669;
+            background-color: #1e40af;
             color: white;
             padding: 30px;
             text-align: center;
@@ -40,8 +40,8 @@
             padding: 15px;
             font-size: 18px;
             font-weight: bold;
-            color: #059669;
-            border-left: 4px solid #059669;
+            color: #1e40af;
+            border-left: 4px solid #1e40af;
             margin-bottom: 15px;
         }
         
@@ -106,7 +106,7 @@
         .stat-value {
             font-size: 24px;
             font-weight: bold;
-            color: #059669;
+            color: #1e40af;
             margin-bottom: 5px;
         }
         
@@ -282,7 +282,7 @@
                 @endphp
                 <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; page-break-inside: avoid;">
                     <div style="margin-bottom: 10px;">
-                        <strong style="font-size: 16px; color: #059669;">{{ $doc->title }}</strong>
+                        <strong style="font-size: 16px; color: #1e40af;">{{ $doc->title }}</strong>
                         <p style="font-size: 12px; color: #6b7280; margin-top: 5px;">
                             Type: {{ $fileExt }} | Size: {{ number_format($doc->file_size / 1024, 2) }} KB | Uploaded: {{ $doc->created_at->format('M d, Y H:i') }} by {{ $doc->uploader?->name ?? 'Unknown' }}
                         </p>
@@ -316,7 +316,7 @@
                                         </p>
                                     </div>
                                 @elseif(str_contains($doc->mime_type, 'excel') || str_contains($doc->mime_type, 'spreadsheet') || str_contains($doc->file_name, 'xlsx') || str_contains($doc->file_name, 'xls'))
-                                    <span style="font-size: 32px; color: #16a34a;">📊</span>
+                                    <span style="font-size: 32px; color: #1e40af;">📊</span>
                                     <div>
                                         <strong>Excel Spreadsheet</strong>
                                         <p style="font-size: 12px; color: #6b7280; margin: 3px 0;">

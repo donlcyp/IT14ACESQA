@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
-      --accent: #16a34a;
+      --accent: #1e40af;
       --white: #ffffff;
       --sidebar-bg: #f8fafc;
       --header-bg: var(--accent);
@@ -25,7 +25,7 @@
       --blue-1: var(--accent);
       --blue-600: var(--accent);
       --red-600: var(--accent);
-      --green-600: #059669;
+      --green-600: #1e40af;
 
       --text-lg-medium-font-family: "Inter", sans-serif;
       --text-lg-medium-font-weight: 500;
@@ -115,7 +115,7 @@
 
     /* Header Styles */
     .header {
-      background: linear-gradient(135deg, var(--header-bg), #16a34a);
+      background: linear-gradient(135deg, var(--header-bg), #1e40af);
       padding: 20px 30px;
       display: flex;
       align-items: center;
@@ -210,7 +210,7 @@
     }
 
     .btn-primary:hover {
-      background-color: #15803d;
+      background-color: #1e3a8a;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(22, 163, 74, 0.2);
     }
@@ -467,7 +467,7 @@
 
     .back-link:hover {
       transform: translateX(-5px);
-      color: #15803d;
+      color: #1e3a8a;
     }
 
     /* Responsive */

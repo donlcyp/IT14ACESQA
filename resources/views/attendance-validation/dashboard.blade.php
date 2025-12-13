@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --gray-500: #667085;
             --gray-300: #d0d5dd;
@@ -20,7 +20,7 @@
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: #dc2626;
-            --green-600: #059669;
+            --green-600: #1e40af;
             --black-1: #111827;
             --sidebar-bg: #f8fafc;
             --header-bg: var(--accent);
@@ -67,7 +67,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e40af);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -187,9 +187,9 @@
         <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">All pending validations</div>
     </div>
 
-    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #10b981; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
+    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #0369a1; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
         <div style="font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 6px;">TODAY APPROVED</div>
-        <div style="font-size: 24px; font-weight: 700; color: #10b981;">{{ $stats['approved_today'] }}</div>
+        <div style="font-size: 24px; font-weight: 700; color: #0369a1;">{{ $stats['approved_today'] }}</div>
         <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Approved so far</div>
     </div>
 
@@ -243,7 +243,7 @@
             </div>
         @else
             <div style="padding: 20px; text-align: center; color: #6b7280; font-size: 13px;">
-                <i class="fas fa-check-circle" style="font-size: 24px; color: #10b981; margin-bottom: 6px; display: block;"></i>
+                <i class="fas fa-check-circle" style="font-size: 24px; color: #0369a1; margin-bottom: 6px; display: block;"></i>
                 <p>No pending records for today</p>
             </div>
         @endif
@@ -277,7 +277,7 @@
             </div>
         @else
             <div style="padding: 20px; text-align: center; color: #6b7280; font-size: 13px;">
-                <i class="fas fa-smile" style="font-size: 24px; color: #10b981; margin-bottom: 6px; display: block;"></i>
+                <i class="fas fa-smile" style="font-size: 24px; color: #0369a1; margin-bottom: 6px; display: block;"></i>
                 <p>No late punch-ins pending approval</p>
             </div>
         @endif
@@ -291,9 +291,9 @@
         <div style="font-size: 16px; font-weight: 700; color: #ef4444; margin-top: 3px;">Review All</div>
     </a>
 
-    <a href="{{ route('attendance-validation.approved') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #10b981; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">
+    <a href="{{ route('attendance-validation.approved') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #0369a1; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">
         <div style="font-size: 10px; color: #6b7280; font-weight: 600;">APPROVED</div>
-        <div style="font-size: 16px; font-weight: 700; color: #10b981; margin-top: 3px;">{{ $stats['approved_month'] }} This Month</div>
+        <div style="font-size: 16px; font-weight: 700; color: #0369a1; margin-top: 3px;">{{ $stats['approved_month'] }} This Month</div>
     </a>
 
     <a href="{{ route('attendance-validation.rejected') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #f59e0b; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">

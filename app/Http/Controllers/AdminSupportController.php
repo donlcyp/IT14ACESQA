@@ -180,7 +180,7 @@ class AdminSupportController extends Controller
             <h2>Password Reset Successful</h2>
             <p>Hello {$user->name},</p>
             <p>Your password has been successfully reset by our administrator.</p>
-            <p style='background: #f0f9ff; padding: 12px; border-left: 4px solid #16a34a; border-radius: 4px;'>
+            <p style='background: #f0f9ff; padding: 12px; border-left: 4px solid #1e40af; border-radius: 4px;'>
                 <strong>Your new password:</strong><br/>
                 <code style='font-family: monospace; font-size: 16px;'>{$newPassword}</code>
             </p>
@@ -189,7 +189,7 @@ class AdminSupportController extends Controller
             </p>
             <hr>
             <p>
-                <a href='" . url('/login') . "' style='background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Sign In Now</a>
+                <a href='" . url('/login') . "' style='background-color: #1e40af; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Sign In Now</a>
             </p>
             <hr>
             <p>If you did not request a password reset, please contact us immediately.</p>
@@ -215,7 +215,7 @@ class AdminSupportController extends Controller
             <p>Please try again or contact our support team if you have questions.</p>
             <hr>
             <p>
-                <a href='" . url('/support') . "' style='background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Contact Support</a>
+                <a href='" . url('/support') . "' style='background-color: #1e40af; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Contact Support</a>
             </p>
             <p style='color: #64748b; font-size: 12px;'>Best regards,<br/>AJJ CRISBER Engineering Services</p>
         ";

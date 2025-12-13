@@ -44,7 +44,7 @@
         </div>
     @else
         <div style="padding: 40px; text-align: center; color: #6b7280;">
-            <i class="fas fa-check-circle" style="font-size: 48px; color: #10b981; margin-bottom: 15px; display: block;"></i>
+            <i class="fas fa-check-circle" style="font-size: 48px; color: #0369a1; margin-bottom: 15px; display: block;"></i>
             <h3 style="margin: 15px 0 10px 0; color: #1f2937;">No Rejected Records</h3>
             <p>No attendance records have been rejected yet.</p>
         </div>

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root{
-            --accent:#16a34a; --accent-dark:#15803d; --bg-1:#f5f7fb; --bg-2:#eef2f7; --white:#fff;
+            --accent:#1e40af; --accent-dark:#1e3a8a; --bg-1:#f5f7fb; --bg-2:#eef2f7; --white:#fff;
             --gray-900:#0f172a; --gray-800:#1f2937; --gray-700:#334155; --gray-600:#475569; --gray-500:#64748b; --gray-300:#e5e7eb;
             --brand-red:#e11d48; --btn-dark:#0b1220; --btn-dark-hover:#0f172a;
         }
@@ -19,8 +19,8 @@
         }
         .container{min-height:100vh; display:grid; grid-template-columns: 1fr 1fr; }
         .hero{
-            background: radial-gradient(1000px 600px at 10% 20%, rgba(22,163,74,.25), transparent 60%),
-                        linear-gradient(135deg, #10b981, #16a34a);
+            background: radial-gradient(1000px 600px at 10% 20%, rgba(30,64,175,.25), transparent 60%),
+                        linear-gradient(135deg, #0369a1, #1e40af);
             display:flex; align-items:flex-end; padding:48px; color:#ecfdf5;
         }
         .hero-inner{max-width:520px}

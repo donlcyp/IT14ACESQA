@@ -9,9 +9,10 @@
         href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=Source+Code+Pro:wght@400;500&family=Inter:wght@400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
             --header-bg: var(--accent);
@@ -28,7 +29,7 @@
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: var(--accent);
-            --green-600: #059669;
+            --green-600: #1e40af;
 
             --text-lg-medium-font-family: "Inter", sans-serif;
             --text-lg-medium-font-weight: 500;
@@ -103,7 +104,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e40af);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -221,7 +222,8 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 24px;
+            gap: 12px;
+
         }
 
         .dashboard-card {
@@ -370,6 +372,558 @@
             font-size: 14px;
         }
 
+        /* KPI Cards Styles */
+        .kpi-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(30, 64, 175, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px rgba(30, 64, 175, 0.2);
+        }
+
+        .kpi-card.color-projects {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid rgba(30, 64, 175, 0.2);
+        }
+
+        .kpi-card.color-ongoing {
+            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+            border: 1px solid rgba(30, 64, 175, 0.2);
+        }
+
+        .kpi-card.color-completed {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .kpi-card.color-delayed {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .kpi-card.color-workers {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border: 1px solid rgba(190, 24, 93, 0.2);
+        }
+
+        .kpi-card.color-approvals {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .kpi-card.color-budget {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .kpi-card.color-projects .kpi-icon {
+            background: rgba(30, 64, 175, 0.2);
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-ongoing .kpi-icon {
+            background: rgba(30, 64, 175, 0.2);
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-completed .kpi-icon {
+            background: rgba(16, 185, 129, 0.2);
+            color: #047857;
+        }
+
+        .kpi-card.color-delayed .kpi-icon {
+            background: rgba(220, 38, 38, 0.2);
+            color: #991b1b;
+        }
+
+        .kpi-card.color-workers .kpi-icon {
+            background: rgba(190, 24, 93, 0.2);
+            color: #831843;
+        }
+
+        .kpi-card.color-approvals .kpi-icon {
+            background: rgba(217, 119, 6, 0.2);
+            color: #92400e;
+        }
+
+        .kpi-card.color-budget .kpi-icon {
+            background: rgba(168, 85, 247, 0.2);
+            color: #6b21a8;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
+        }
+
+        .kpi-card.color-projects .kpi-label {
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-ongoing .kpi-label {
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-completed .kpi-label {
+            color: #047857;
+        }
+
+        .kpi-card.color-delayed .kpi-label {
+            color: #991b1b;
+        }
+
+        .kpi-card.color-workers .kpi-label {
+            color: #831843;
+        }
+
+        .kpi-card.color-approvals .kpi-label {
+            color: #92400e;
+        }
+
+        .kpi-card.color-budget .kpi-label {
+            color: #6b21a8;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .kpi-card.color-projects .kpi-value {
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-ongoing .kpi-value {
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-completed .kpi-value {
+            color: #047857;
+        }
+
+        .kpi-card.color-delayed .kpi-value {
+            color: #991b1b;
+        }
+
+        .kpi-card.color-workers .kpi-value {
+            color: #831843;
+        }
+
+        .kpi-card.color-approvals .kpi-value {
+            color: #92400e;
+        }
+
+        .kpi-card.color-budget .kpi-value {
+            color: #6b21a8;
+        }
+
+        .kpi-subtitle {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        .kpi-card.color-projects .kpi-subtitle {
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-ongoing .kpi-subtitle {
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-completed .kpi-subtitle {
+            color: #047857;
+        }
+
+        .kpi-card.color-delayed .kpi-subtitle {
+            color: #991b1b;
+        }
+
+        .kpi-card.color-workers .kpi-subtitle {
+            color: #831843;
+        }
+
+        .kpi-card.color-approvals .kpi-subtitle {
+            color: #92400e;
+        }
+
+        .kpi-card.color-budget .kpi-subtitle {
+            color: #6b21a8;
+        }
+
+        /* Project Card Styles */
+        .project-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
+            border-color: #1e40af;
+        }
+
+        .project-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .project-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a8a;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .project-card-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .project-card-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+            color: #6b7280;
+            padding-top: 8px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .project-card-info-item {
+            flex: 1;
+        }
+
+        .project-card-info-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+
+        .project-card-info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* BOQ Item Card */
+        .boq-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .boq-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .boq-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
+            border-color: #1e40af;
+        }
+
+        .boq-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .boq-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e3a8a;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .boq-card-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .boq-card-project {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .boq-card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 13px;
+            padding-top: 8px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .boq-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .boq-detail-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        .boq-detail-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Finance Card */
+        .finance-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .finance-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .finance-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
+            border-color: #1e40af;
+        }
+
+        .finance-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .finance-card-budget {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .finance-budget-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        .finance-budget-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .finance-progress {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px 0;
+        }
+
+        .finance-progress-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .finance-progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .finance-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af, #60a5fa);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .finance-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .finance-status-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        .finance-status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Attendance Card Styles */
+        .attendance-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .attendance-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .attendance-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
+            border-color: #1e40af;
+        }
+
+        .attendance-card-date {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+
+        .attendance-card-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .attendance-card-detail {
+            font-size: 13px;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .attendance-card-detail-label {
+            font-weight: 600;
+        }
+
+        .attendance-card-detail-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header {
@@ -445,35 +999,91 @@
 
             <!-- Content Area -->
             <section class="content-area">
-                <!-- Summary Statistics -->
-                <div class="summary-card">
-                    <div class="summary-item">
-                        <div class="summary-icon">
-                            <i class="fas fa-users"></i>
+                <!-- KPI Summary Cards -->
+                <div class="kpi-cards-container">
+                    <!-- Total Projects Card -->
+                    <a href="{{ route('projects') }}" class="kpi-card color-projects" title="View all projects">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-label">Total Projects</div>
+                                <div class="kpi-value">{{ number_format($summary['total_projects'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">All projects in system</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
                         </div>
-                        <div class="summary-content">
-                            <span class="summary-label">@if($isEmployee ?? false)My Projects@else Total Projects @endif</span>
-                            <span class="summary-number">{{ number_format($summary['total_projects'] ?? 0) }}</span>
+                    </a>
+
+                    <!-- Ongoing Projects Card -->
+                    <a href="{{ route('projects') }}?status=Ongoing" class="kpi-card color-ongoing" title="View ongoing projects">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-label">Ongoing Projects</div>
+                                <div class="kpi-value">{{ number_format($summary['ongoing_projects'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">Currently in progress</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-spinner"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-icon">
-                            <i class="fas fa-user-check"></i>
+                    </a>
+
+                    <!-- Completed Projects Card -->
+                    <a href="{{ route('projects') }}?status=Completed" class="kpi-card color-completed" title="View completed projects">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-label">Completed Projects</div>
+                                <div class="kpi-value">{{ number_format($summary['complete_projects'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">Successfully finished</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
                         </div>
-                        <div class="summary-content">
-                            <span class="summary-label">Complete Projects</span>
-                            <span class="summary-number">{{ number_format($summary['complete_projects'] ?? 0) }}</span>
+                    </a>
+
+                    <!-- Delayed Projects Card -->
+                    <a href="{{ route('projects') }}?status=Delayed" class="kpi-card color-delayed" title="View delayed projects">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-label">Delayed Projects</div>
+                                <div class="kpi-value">{{ number_format($summary['delayed_projects'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">Behind schedule</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-icon">
-                            <i class="fas fa-user-clock"></i>
+                    </a>
+
+                    <!-- Total Team Workers Card -->
+                    <a href="{{ route('employee') }}" class="kpi-card color-workers" title="View all employees">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-label">Team Workers</div>
+                                <div class="kpi-value">{{ number_format($summary['total_workers'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">Active employees</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
                         </div>
-                        <div class="summary-content">
-                            <span class="summary-label">Ongoing Projects</span>
-                            <span class="summary-number">{{ number_format($summary['ongoing_projects'] ?? 0) }}</span>
+                    </a>
+
+                    <!-- Pending Approvals Card -->
+                    <a href="{{ route('projects') }}" class="kpi-card color-approvals" title="View pending approvals">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-label">Pending Approvals</div>
+                                <div class="kpi-value">{{ number_format($summary['pending_approvals'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">Awaiting review</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <!-- Detailed Insights -->
@@ -488,57 +1098,58 @@
                                 </div>
                             </div>
 
-                            <table class="dashboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Project</th>
-                                        <th>Client</th>
-                                        <th>Status</th>
-                                        <th>Lead</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($assignedProjects as $project)
-                                        @php
-                                            $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
-                                            $statusMap = [
-                                                'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
-                                                'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
-                                                'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
-                                                'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
-                                                'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
-                                                'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
-                                            ];
-                                            $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
-                                            
-                                            // Get client name from relationship or fallback to project fields
-                                            if ($project->client) {
-                                                $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
-                                            } else {
-                                                $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
-                                            }
-                                            
-                                            // Get lead name from PM relationship or fallback to lead field
-                                            $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $project->project_name }}</td>
-                                            <td>{{ $clientName }}</td>
-                                            <td>
-                                                <span class="status-badge {{ $badge['class'] }}">
-                                                    <i class="{{ $badge['icon'] }}"></i>
-                                                    {{ $projectDisplayStatus ?? '—' }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $leadName }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" style="color:#6b7280; padding:12px 0;">You are not assigned to any project.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                            <div class="project-cards-container">
+                                @forelse ($assignedProjects as $project)
+                                    @php
+                                        $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                        $statusMap = [
+                                            'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                            'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                            'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                            'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                            'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
+                                            'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                        ];
+                                        $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                        
+                                        // Get client name from relationship or fallback to project fields
+                                        if ($project->client) {
+                                            $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
+                                        } else {
+                                            $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
+                                        }
+                                        
+                                        // Get lead name from PM relationship or fallback to lead field
+                                        $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
+                                    @endphp
+                                    <a href="{{ route('projects.show', $project->id) }}" class="project-card">
+                                        <div class="project-card-header">
+                                            <div class="project-card-title">{{ $project->project_name ?? $project->project_code }}</div>
+                                            <span class="project-card-status status-badge {{ $badge['class'] }}">
+                                                <i class="{{ $badge['icon'] }}"></i>
+                                                {{ $projectDisplayStatus ?? '—' }}
+                                            </span>
+                                        </div>
+                                        <div class="project-card-info">
+                                            <div class="project-card-info-item">
+                                                <div class="project-card-info-label">Client</div>
+                                                <div class="project-card-info-value">{{ $clientName }}</div>
+                                            </div>
+                                            <div class="project-card-info-item">
+                                                <div class="project-card-info-label">Lead</div>
+                                                <div class="project-card-info-value">{{ $leadName }}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <div class="empty-state-text">You are not assigned to any project</div>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
 
                         <!-- Today's Attendance -->
@@ -551,37 +1162,38 @@
                             </div>
 
                             @if ($todayAttendance)
-                                <div style="padding: 20px;">
-                                    <table class="dashboard-table">
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>Status</strong></td>
-                                                <td>
-                                                    <span class="status-badge {{ strtolower(str_replace(' ', '-', $todayAttendance->attendance_status)) }}">
-                                                        {{ $todayAttendance->attendance_status }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Punch In</strong></td>
-                                                <td>{{ $todayAttendance->punch_in_time ? $todayAttendance->punch_in_time->format('H:i:s') : 'Not yet punched in' }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Punch Out</strong></td>
-                                                <td>{{ $todayAttendance->punch_out_time ? $todayAttendance->punch_out_time->format('H:i:s') : '—' }}</td>
-                                            </tr>
-                                            @if ($todayAttendance->is_late)
-                                                <tr>
-                                                    <td><strong>Late Arrival</strong></td>
-                                                    <td><span style="color: #dc2626; font-weight: 600;">Yes ({{ $todayAttendance->late_minutes }} minutes)</span></td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
+                                <div class="attendance-cards-container" style="grid-template-columns: 1fr;">
+                                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                                        <div class="attendance-card-status" style="background: #dbeafe; color: #1e3a8a;">
+                                            {{ $todayAttendance->attendance_status }}
+                                        </div>
+                                        <div class="attendance-card-detail">
+                                            <span class="attendance-card-detail-label">Status:</span>
+                                            <span class="attendance-card-detail-value">{{ $todayAttendance->attendance_status }}</span>
+                                        </div>
+                                        <div class="attendance-card-detail">
+                                            <span class="attendance-card-detail-label">Punch In:</span>
+                                            <span class="attendance-card-detail-value">{{ $todayAttendance->punch_in_time ? $todayAttendance->punch_in_time->format('H:i:s') : 'Not yet' }}</span>
+                                        </div>
+                                        <div class="attendance-card-detail">
+                                            <span class="attendance-card-detail-label">Punch Out:</span>
+                                            <span class="attendance-card-detail-value">{{ $todayAttendance->punch_out_time ? $todayAttendance->punch_out_time->format('H:i:s') : '—' }}</span>
+                                        </div>
+                                        @if ($todayAttendance->is_late)
+                                            <div class="attendance-card-detail" style="color: #dc2626;">
+                                                <span class="attendance-card-detail-label">Late Arrival:</span>
+                                                <span class="attendance-card-detail-value">{{ $todayAttendance->late_minutes }} min</span>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             @else
-                                <div style="padding: 20px; color: #6b7280;">
-                                    <p>No attendance record for today yet. <a href="{{ $isEmployee ? route('my-attendance') : route('employee-attendance') }}" style="color: #16a34a; text-decoration: none; font-weight: 600;">Punch in now</a></p>
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="empty-state-text">No attendance record for today yet</div>
+                                    <a href="{{ $isEmployee ? route('my-attendance') : route('employee-attendance') }}" style="display: inline-block; margin-top: 12px; color: #1e40af; text-decoration: none; font-weight: 600;">Punch in now</a>
                                 </div>
                             @endif
                         </div>
@@ -599,32 +1211,27 @@
                                 </a>
                             </div>
 
-                            <table class="dashboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Punch In</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($recentAttendance as $record)
-                                        <tr>
-                                            <td>{{ $record->date->format('M d, Y') }}</td>
-                                            <td>
-                                                <span class="status-badge {{ strtolower(str_replace(' ', '-', $record->attendance_status)) }}">
-                                                    {{ $record->attendance_status }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $record->punch_in_time ? $record->punch_in_time->format('H:i') : '—' }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" style="color:#6b7280; padding:12px 0;">No attendance records yet.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                            <div class="attendance-cards-container">
+                                @forelse ($recentAttendance as $record)
+                                    <div class="attendance-card">
+                                        <div class="attendance-card-date">{{ $record->date->format('M d, Y') }}</div>
+                                        <span class="attendance-card-status status-badge {{ strtolower(str_replace(' ', '-', $record->attendance_status)) }}">
+                                            {{ $record->attendance_status }}
+                                        </span>
+                                        <div class="attendance-card-detail">
+                                            <span class="attendance-card-detail-label">Punch In:</span>
+                                            <span class="attendance-card-detail-value">{{ $record->punch_in_time ? $record->punch_in_time->format('H:i') : '—' }}</span>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-history"></i>
+                                        </div>
+                                        <div class="empty-state-text">No attendance records yet</div>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     @else
                         <!-- ADMIN/PM VIEW -->
@@ -640,132 +1247,133 @@
                                 </a>
                             </div>
 
-                            <table class="dashboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Project</th>
-                                        <th>Client</th>
-                                        <th style="text-align: center;">Status</th>
-                                        <th>Lead</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $statusMap = [
-                                            'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
-                                            'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
-                                            'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
-                                            'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
-                                            'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
-                                            'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
-                                        ];
-                                    @endphp
+                            <div class="project-cards-container">
+                                @php
+                                    $statusMap = [
+                                        'Ongoing'    => ['class' => 'success', 'icon' => 'fas fa-check'],
+                                        'Under Review' => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'In Review'  => ['class' => 'warning', 'icon' => 'fas fa-hourglass-half'],
+                                        'Mobilizing' => ['class' => 'info', 'icon' => 'fas fa-bolt'],
+                                        'On Hold'    => ['class' => 'warning', 'icon' => 'fas fa-pause'],
+                                        'Completed'  => ['class' => 'success', 'icon' => 'fas fa-check-circle'],
+                                    ];
+                                @endphp
 
-                                    @forelse ($activeProjects as $project)
-                                        @php
-                                            $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
-                                            $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
-                                            
-                                            // Get client name from relationship or fallback to project fields
-                                            if ($project->client) {
-                                                $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
-                                            } else {
-                                                $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
-                                            }
-                                            
-                                            // Get lead name from PM relationship or fallback to lead field
-                                            $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $project->project_name }}</td>
-                                            <td>{{ $clientName }}</td>
-                                            <td style="text-align: center;">
-                                                <span class="status-badge {{ $badge['class'] }}">
-                                                    <i class="{{ $badge['icon'] }}"></i>
-                                                    {{ $projectDisplayStatus ?? '—' }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $leadName }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" style="color:#6b7280; padding:12px 0;">No active projects yet.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                                @forelse ($activeProjects as $project)
+                                    @php
+                                        $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
+                                        $badge = $statusMap[$projectDisplayStatus] ?? ['class' => 'info', 'icon' => 'fas fa-bolt'];
+                                        
+                                        // Get client name from relationship or fallback to project fields
+                                        if ($project->client) {
+                                            $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
+                                        } else {
+                                            $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
+                                        }
+                                        
+                                        // Get lead name from PM relationship or fallback to lead field
+                                        $leadName = $project->assignedPM?->name ?? $project->lead ?? 'N/A';
+                                    @endphp
+                                    <a href="{{ route('projects.show', $project->id) }}" class="project-card">
+                                        <div class="project-card-header">
+                                            <div class="project-card-title">{{ $project->project_name ?? $project->project_code }}</div>
+                                            <span class="project-card-status status-badge {{ $badge['class'] }}">
+                                                <i class="{{ $badge['icon'] }}"></i>
+                                                {{ $projectDisplayStatus ?? '—' }}
+                                            </span>
+                                        </div>
+                                        <div class="project-card-info">
+                                            <div class="project-card-info-item">
+                                                <div class="project-card-info-label">Client</div>
+                                                <div class="project-card-info-value">{{ $clientName }}</div>
+                                            </div>
+                                            <div class="project-card-info-item">
+                                                <div class="project-card-info-label">Lead</div>
+                                                <div class="project-card-info-value">{{ $leadName }}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <div class="empty-state-text">No active projects yet</div>
+                                    </div>
+                                @endforelse
+                            </div>
                     </div>
 
                     <div class="dashboard-card full">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title">Bill of Quantities (BOQ)</div>
-                                <div class="dashboard-card-subtitle">Recent BOQ items from all projects</div>
+                                <div class="dashboard-card-title">Financial Overview</div>
+                                <div class="dashboard-card-subtitle">Budget and spending analysis</div>
                             </div>
-                            <a class="view-link" href="{{ route('projects') }}">
-                                View all
-                                <i class="fas fa-arrow-right"></i>
+                            <a class="view-link" href="{{ route('finance-graphs') }}" title="View detailed graphs">
+                                <i class="fas fa-chart-bar"></i> Detailed View
                             </a>
                         </div>
 
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th style="text-align: center;">Project</th>
-                                    <th style="text-align: center;">Item Description</th>
-                                    <th style="text-align: center;">Qty</th>
-                                    <th style="text-align: center;">Unit</th>
-                                    <th style="text-align: center;">Material Cost</th>
-                                    <th style="text-align: center;">Labor Cost</th>
-                                    <th style="text-align: center;">Total</th>
-                                    <th style="text-align: center;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($recentProjectRecords as $record)
-                                    @php
-                                        $materialCost = $record->material_cost ?? ($record->unit_rate ?? 0);
-                                        $laborCost = $record->labor_cost ?? 0;
-                                        $unitTotal = $materialCost + $laborCost;
-                                        $itemTotal = $unitTotal * ($record->quantity ?? 0);
-                                    @endphp
-                                    <tr>
-                                        <td style="text-align: center;">
-                                            @if ($record->project)
-                                                <a href="{{ route('projects.show', $record->project->id) }}" style="color: var(--accent); text-decoration: none; font-weight: 500;">
-                                                    {{ $record->project->project_name ?? $record->project->project_code }}
-                                                </a>
-                                            @else
-                                                —
-                                            @endif
-                                        </td>
-                                        <td style="text-align: center;">
-                                            @if ($record->project)
-                                                <a href="{{ route('projects.show', $record->project->id) }}" style="color: #6b7280; text-decoration: none;">
-                                                    {{ $record->item_description ?? $record->material_name ?? '—' }}
-                                                </a>
-                                            @else
-                                                {{ $record->item_description ?? $record->material_name ?? '—' }}
-                                            @endif
-                                        </td>
-                                        <td style="text-align: center;">{{ $record->quantity ?? '—' }}</td>
-                                        <td style="text-align: center;">{{ $record->unit ?? '—' }}</td>
-                                        <td style="text-align: center;">₱{{ number_format($materialCost, 2) }}</td>
-                                        <td style="text-align: center;">₱{{ number_format($laborCost, 2) }}</td>
-                                        <td style="text-align: center; font-weight: 600;">₱{{ number_format($itemTotal, 2) }}</td>
-                                        <td style="text-align: center;">
-                                            <span class="status-badge {{ strtolower($record->status) }}">
-                                                {{ $record->status ?? '—' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" style="color:#6b7280; padding:12px 0;">No BOQ items available.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                        <!-- Finance Summary Stats -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #1e3a8a; font-weight: 600; margin-bottom: 8px;">Total Budget</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #1e3a8a;">₱{{ number_format($summary['total_budget'] ?? 0, 0) }}</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #be185d; font-weight: 600; margin-bottom: 8px;">Total Spent</div>
+                                @php
+                                    $totalSpent = 0;
+                                    foreach($activeProjects as $project) {
+                                        if ($project->materials && $project->materials->count() > 0) {
+                                            foreach ($project->materials as $material) {
+                                                $materialCost = $material->material_cost ?? 0;
+                                                $laborCost = $material->labor_cost ?? 0;
+                                                $quantity = $material->quantity ?? 0;
+                                                $totalSpent += ($materialCost + $laborCost) * $quantity;
+                                            }
+                                        }
+                                    }
+                                @endphp
+                                <div style="font-size: 20px; font-weight: 700; color: #be185d;">₱{{ number_format($totalSpent, 0) }}</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #1e40af; font-weight: 600; margin-bottom: 8px;">Remaining</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #1e40af;">₱{{ number_format(($summary['total_budget'] ?? 0) - $totalSpent, 0) }}</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #92400e; font-weight: 600; margin-bottom: 8px;">Usage</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #92400e;">{{ ($summary['total_budget'] ?? 0) > 0 ? round(($totalSpent / ($summary['total_budget'] ?? 1)) * 100, 1) : 0 }}%</div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <!-- Budget vs Spent Chart -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px;">
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937;">Budget vs Spent</div>
+                                <div style="height: 200px;">
+                                    <canvas id="dashboardBudgetChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Project Distribution Chart -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px;">
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937;">Budget Distribution</div>
+                                <div style="height: 200px;">
+                                    <canvas id="dashboardDistributionChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Project Spending Chart -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px;">
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1f2937;">Spending by Project</div>
+                                <div style="height: 200px;">
+                                    <canvas id="dashboardProjectChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="dashboard-card full">
@@ -779,69 +1387,78 @@
                             </a>
                         </div>
 
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th style="text-align: center;">Project Name</th>
-                                    <th style="text-align: center;">Project Budget</th>
-                                    <th style="text-align: center;">Spent</th>
-                                    <th style="text-align: center;">Remaining Budget</th>
-                                    <th style="text-align: center;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($activeProjects as $project)
-                                    @php
-                                        $projectBudget = $project->allocated_amount ?? 0;
-                                        // Calculate total spent from all materials in this project
-                                        $totalSpent = 0;
-                                        if ($project->materials && $project->materials->count() > 0) {
-                                            foreach ($project->materials as $material) {
-                                                $materialCost = $material->material_cost ?? 0;
-                                                $laborCost = $material->labor_cost ?? 0;
-                                                $quantity = $material->quantity ?? 0;
-                                                $totalSpent += ($materialCost + $laborCost) * $quantity;
-                                            }
+                        <div class="finance-cards-container">
+                            @forelse ($activeProjects as $project)
+                                @php
+                                    $projectBudget = $project->allocated_amount ?? 0;
+                                    // Calculate total spent from all materials in this project
+                                    $totalSpent = 0;
+                                    if ($project->materials && $project->materials->count() > 0) {
+                                        foreach ($project->materials as $material) {
+                                            $materialCost = $material->material_cost ?? 0;
+                                            $laborCost = $material->labor_cost ?? 0;
+                                            $quantity = $material->quantity ?? 0;
+                                            $totalSpent += ($materialCost + $laborCost) * $quantity;
                                         }
-                                        $remainingBudget = $projectBudget - $totalSpent;
-                                        
-                                        // Determine status based on remaining budget
-                                        if ($projectBudget == 0) {
-                                            $budgetStatus = 'info';
-                                            $statusText = 'No Budget';
-                                        } elseif ($remainingBudget < 0) {
-                                            $budgetStatus = 'fail';
-                                            $statusText = 'Over Budget';
-                                        } elseif ($remainingBudget < ($projectBudget * 0.2)) {
-                                            $budgetStatus = 'warning';
-                                            $statusText = 'Critical';
-                                        } else {
-                                            $budgetStatus = 'success';
-                                            $statusText = 'Healthy';
-                                        }
-                                    @endphp
-                                    <tr>
-                                        <td style="text-align: center;">
-                                            <a href="{{ route('projects.show', $project->id) }}" style="color: var(--accent); text-decoration: none; font-weight: 500;">
-                                                {{ $project->project_name ?? $project->project_code }}
-                                            </a>
-                                        </td>
-                                        <td style="text-align: center;">₱{{ number_format($projectBudget, 2) }}</td>
-                                        <td style="text-align: center;">₱{{ number_format($totalSpent, 2) }}</td>
-                                        <td style="text-align: center; font-weight: 600; white-space: nowrap;">₱{{ number_format($remainingBudget, 2) }}</td>
-                                        <td style="text-align: center;">
-                                            <span class="status-badge {{ $budgetStatus }}">
-                                                {{ $statusText }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" style="color:#6b7280; padding:12px 0;">No active projects available.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                    }
+                                    $remainingBudget = $projectBudget - $totalSpent;
+                                    $percentageUsed = $projectBudget > 0 ? round(($totalSpent / $projectBudget) * 100, 1) : 0;
+                                    
+                                    // Determine status based on remaining budget
+                                    if ($projectBudget == 0) {
+                                        $budgetStatus = 'info';
+                                        $statusText = 'No Budget';
+                                        $statusColor = '#d1d5db';
+                                    } elseif ($remainingBudget < 0) {
+                                        $budgetStatus = 'fail';
+                                        $statusText = 'Over Budget';
+                                        $statusColor = '#dc2626';
+                                    } elseif ($remainingBudget < ($projectBudget * 0.2)) {
+                                        $budgetStatus = 'warning';
+                                        $statusText = 'Critical';
+                                        $statusColor = '#f59e0b';
+                                    } else {
+                                        $budgetStatus = 'success';
+                                        $statusText = 'Healthy';
+                                        $statusColor = '#1e40af';
+                                    }
+                                @endphp
+                                <a href="{{ route('projects.show', $project->id) }}" class="finance-card">
+                                    <div class="finance-card-title">
+                                        {{ $project->project_name ?? $project->project_code }}
+                                    </div>
+                                    <div class="finance-card-budget">
+                                        <span class="finance-budget-label">Budget</span>
+                                        <span class="finance-budget-amount">₱{{ number_format($projectBudget, 0) }}</span>
+                                    </div>
+                                    <div class="finance-progress">
+                                        <div class="finance-progress-label">
+                                            Spent: <strong>₱{{ number_format($totalSpent, 0) }}</strong> ({{ $percentageUsed }}%)
+                                        </div>
+                                        <div class="finance-progress-bar">
+                                            <div class="finance-progress-fill" style="width: {{ min($percentageUsed, 100) }}%; background: {{ $statusColor }};"></div>
+                                        </div>
+                                    </div>
+                                    <div class="finance-status">
+                                        <span class="finance-status-label">Remaining</span>
+                                        <span class="finance-status-badge" style="background: {{ $statusColor }}20; color: {{ $statusColor }};">
+                                            {{ $statusText }}
+                                        </span>
+                                    </div>
+                                    <div style="padding-top: 8px; border-top: 1px solid #f3f4f6; font-size: 13px; display: flex; justify-content: space-between;">
+                                        <span style="color: #6b7280;">Remaining Budget:</span>
+                                        <strong style="color: {{ $remainingBudget < 0 ? '#dc2626' : '#1e3a8a' }};">₱{{ number_format($remainingBudget, 0) }}</strong>
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <div class="empty-state-text">No active projects available</div>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                     @endif
                 </div>
@@ -850,6 +1467,138 @@
     </div>
 
     @include('partials.sidebar-js')
+
+    <script>
+        // Chart Colors
+        const chartColors = {
+            primary: '#1e40af',
+            success: '#0369a1',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#3b82f6',
+            light: '#f3f4f6'
+        };
+
+        // Get data from page
+        const projectsData = @json($activeProjects->map(function($p) {
+            $totalSpent = 0;
+            if ($p->materials && $p->materials->count() > 0) {
+                foreach ($p->materials as $material) {
+                    $materialCost = $material->material_cost ?? 0;
+                    $laborCost = $material->labor_cost ?? 0;
+                    $quantity = $material->quantity ?? 0;
+                    $totalSpent += ($materialCost + $laborCost) * $quantity;
+                }
+            }
+            return [
+                'name' => $p->project_name ?? $p->project_code,
+                'budget' => $p->allocated_amount ?? 0,
+                'spent' => $totalSpent
+            ];
+        })->toArray() ?? []);
+
+        const totalBudget = @json($summary['total_budget'] ?? 0);
+        const totalSpent = (() => {
+            let sum = 0;
+            projectsData.forEach(p => sum += p.spent);
+            return sum;
+        })();
+
+        // Chart 1: Budget vs Spent
+        if (document.getElementById('dashboardBudgetChart')) {
+            const budgetCtx = document.getElementById('dashboardBudgetChart').getContext('2d');
+            new Chart(budgetCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Spent', 'Remaining'],
+                    datasets: [{
+                        data: [totalSpent, totalBudget - totalSpent],
+                        backgroundColor: ['#1e40af', '#e5e7eb'],
+                        borderColor: ['#fff', '#fff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Project Distribution
+        if (document.getElementById('dashboardDistributionChart')) {
+            const distributionCtx = document.getElementById('dashboardDistributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: projectsData.map(p => p.name),
+                    datasets: [{
+                        data: projectsData.map(p => p.budget),
+                        backgroundColor: [
+                            '#1e40af',
+                            '#0369a1',
+                            '#3b82f6',
+                            '#f59e0b',
+                            '#ef4444'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 3: Project Spending
+        if (document.getElementById('dashboardProjectChart')) {
+            const projectCtx = document.getElementById('dashboardProjectChart').getContext('2d');
+            new Chart(projectCtx, {
+                type: 'bar',
+                data: {
+                    labels: projectsData.map(p => p.name),
+                    datasets: [
+                        {
+                            label: 'Budget',
+                            data: projectsData.map(p => p.budget),
+                            backgroundColor: '#1e40af'
+                        },
+                        {
+                            label: 'Spent',
+                            data: projectsData.map(p => p.spent),
+                            backgroundColor: '#f59e0b'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

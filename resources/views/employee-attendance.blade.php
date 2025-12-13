@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
 
             --gray-500: #667085;
@@ -25,7 +25,7 @@
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: #dc2626;
-            --green-600: #059669;
+            --green-600: #1e40af;
 
             --black-1: #111827;
             --sidebar-bg: #f8fafc;
@@ -109,7 +109,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e40af);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -226,7 +226,7 @@
         .btn-blue  { background: var(--accent); border-color: var(--accent); color:#fff; }
         .btn-green { background: var(--accent); border-color: var(--accent); color:#fff; }
         .btn-red   { background: var(--accent); border-color: var(--accent); color:#fff; }
-        .btn-blue:hover  { background: #15803d; }
+        .btn-blue:hover  { background: #1e3a8a; }
         .btn-green:hover { background: #15803d; }
         .btn-red:hover   { background: #15803d; }
         .search-box {

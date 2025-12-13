@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('proj_mat_manage', function (Blueprint $table) {
-            $table->string('color')->nullable()->default('#16a34a')->after('employee_id');
+            $table->string('color')->nullable()->default('#1e40af')->after('employee_id');
         });
     }
 

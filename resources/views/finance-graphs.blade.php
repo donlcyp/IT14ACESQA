@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
             --header-bg: var(--accent);
@@ -82,7 +82,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e40af);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -332,7 +332,7 @@
                                 <span id="trendTitle">Monthly Spending Trend</span>
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
-                                <button id="prevPeriodBtn" style="padding: 8px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">← Previous</button>
+                                <button id="prevPeriodBtn" style="padding: 8px 12px; background: #1e40af; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">← Previous</button>
                                 
                                 <select id="filterSelect" style="padding: 8px 12px; border: 1px solid #d0d5dd; border-radius: 4px; cursor: pointer; font-size: 12px;">
                                     <option value="day" selected>Daily</option>
@@ -340,7 +340,7 @@
                                     <option value="year">Yearly</option>
                                 </select>
                                 
-                                <button id="nextPeriodBtn" style="padding: 8px 12px; background: #16a34a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Next →</button>
+                                <button id="nextPeriodBtn" style="padding: 8px 12px; background: #1e40af; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Next →</button>
                             </div>
                         </div>
                         <div class="chart-container">
@@ -381,8 +381,8 @@
     <script>
         // Chart Colors
         const chartColors = {
-            primary: '#16a34a',
-            success: '#10b981',
+            primary: '#1e40af',
+            success: '#0369a1',
             warning: '#f59e0b',
             danger: '#ef4444',
             info: '#3b82f6',

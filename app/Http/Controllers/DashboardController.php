@@ -32,6 +32,14 @@ class DashboardController extends Controller
                 'total_projects' => $assignedProjects->count(),
                 'complete_projects' => $assignedProjects->where('status', 'Completed')->count(),
                 'ongoing_projects' => $assignedProjects->where('status', '!=', 'Completed')->count(),
+                'delayed_projects' => $assignedProjects->filter(function($p) {
+                    return $p->date_ended && ($p->date_ended < $p->date_started || $p->date_ended > now());
+                })->count(),
+                'total_workers' => EmployeeList::count(),
+                'pending_approvals' => Material::where('status', 'pending')->whereHas('project', function($q) {
+                    return $q->whereIn('id', $assignedProjects->pluck('id'));
+                })->count(),
+                'total_budget' => $assignedProjects->sum('allocated_amount'),
             ];
 
             // Get today's attendance record for this employee
@@ -73,6 +81,13 @@ class DashboardController extends Controller
                 'total_projects' => $totalProjects,
                 'complete_projects' => $completeProjects,
                 'ongoing_projects' => $ongoingProjects,
+                'delayed_projects' => Project::where('archived', false)
+                    ->whereNotNull('date_ended')
+                    ->whereRaw('date_ended < date_started OR date_ended > ?', [now()])
+                    ->count(),
+                'total_workers' => EmployeeList::count(),
+                'pending_approvals' => Material::where('status', 'pending')->count(),
+                'total_budget' => Project::where('archived', false)->sum('allocated_amount'),
             ];
 
             // Active projects (latest 5) - all non-archived with client data

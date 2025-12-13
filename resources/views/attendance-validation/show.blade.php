@@ -56,7 +56,7 @@
                         @endif
                     </div>
 
-                    <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; border-left: 3px solid #10b981;">
+                    <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; border-left: 3px solid #0369a1;">
                         <div style="font-size: 11px; color: #065f46; font-weight: 600;">PUNCH OUT</div>
                         @if($attendance->punch_out_time)
                             <div style="font-size: 18px; font-weight: 700; color: #065f46;">{{ $attendance->punch_out_time->format('H:i:s') }}</div>
@@ -118,7 +118,7 @@
     <!-- Action Panel -->
     <div>
         <!-- Approval Form -->
-        <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #10b981;">
+        <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #0369a1;">
             <h3 style="margin-top: 0; color: #1f2937;">Approve Attendance</h3>
             <form method="POST" action="{{ route('attendance-validation.approve', $attendance->id) }}">
                 @csrf
@@ -126,7 +126,7 @@
                     <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Validation Notes (Optional)</label>
                     <textarea name="validation_notes" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; font-family: Arial, sans-serif; resize: vertical; min-height: 80px;" placeholder="Add any notes about this approval..."></textarea>
                 </div>
-                <button type="submit" style="width: 100%; padding: 12px; background: #10b981; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 14px;">
+                <button type="submit" style="width: 100%; padding: 12px; background: #0369a1; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-size: 14px;">
                     <i class="fas fa-check-circle"></i> Approve This Punch-In
                 </button>
             </form>

@@ -264,7 +264,7 @@ class ProjectsController extends Controller
             'client' => $clientName,
             'inspector' => auth()->user()->name ?? 'Unknown',
             'time' => now()->format('H:i:s'),
-            'color' => '#16a34a',
+            'color' => '#1e40af',
         ]);
 
         return redirect()

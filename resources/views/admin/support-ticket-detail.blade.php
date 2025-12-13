@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
             --gray-300: #d0d5dd;
@@ -153,7 +153,7 @@
                             </select>
                         </div>
 
-                        <button type="submit" style="padding: 10px 24px; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
+                        <button type="submit" style="padding: 10px 24px; background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">
                             <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Send Response
                         </button>
                     </form>

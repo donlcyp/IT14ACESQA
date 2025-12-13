@@ -3,7 +3,7 @@
 @section('title', 'Approved Records - AJJ CRISBER Engineering Services')
 
 @section('content')
-<div style="padding: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; margin-bottom: 30px; border-radius: 10px;">
+<div style="padding: 20px; background: linear-gradient(135deg, #0369a1 0%, #1e40af 100%); color: white; margin-bottom: 30px; border-radius: 10px;">
     <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 700;">Approved Attendance Records</h1>
     <p style="margin: 0; font-size: 16px; opacity: 0.9;">All approved punch-in records</p>
 </div>
@@ -40,7 +40,7 @@
         </div>
     @else
         <div style="padding: 40px; text-align: center; color: #6b7280;">
-            <i class="fas fa-check-circle" style="font-size: 48px; color: #10b981; margin-bottom: 15px; display: block;"></i>
+            <i class="fas fa-check-circle" style="font-size: 48px; color: #0369a1; margin-bottom: 15px; display: block;"></i>
             <h3 style="margin: 15px 0 10px 0; color: #1f2937;">No Approved Records</h3>
             <p>No attendance records have been approved yet.</p>
         </div>

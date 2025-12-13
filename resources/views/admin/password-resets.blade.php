@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #16a34a;
+            --accent: #1e40af;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
             --gray-300: #d0d5dd;
@@ -46,8 +46,8 @@
             <h1 style="margin: 0; font-size: 28px; color: var(--gray-900); font-weight: 700;">Password Reset Requests</h1>
             <p style="margin: 4px 0 0; color: var(--gray-600); font-size: 14px;">Manage user password reset requests</p>
         </div>
-        <div style="background: #f0f9ff; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #16a34a;">
-            <div style="font-size: 24px; font-weight: 700; color: #16a34a;">{{ $requests->total() }}</div>
+        <div style="background: #f0f9ff; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #1e40af;">
+            <div style="font-size: 24px; font-weight: 700; color: #1e40af;">{{ $requests->total() }}</div>
             <div style="font-size: 12px; color: #064e3b;">Total Requests</div>
         </div>
     </div>
@@ -55,19 +55,19 @@
     <!-- Filters -->
     <div style="display: flex; gap: 12px; margin-bottom: 20px; background: white; padding: 16px; border-radius: 10px; border: 1px solid var(--gray-300);">
         <a href="{{ route('admin.support.password-resets', ['status' => 'pending']) }}" 
-            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'pending' ? 'background: #16a34a; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
+            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'pending' ? 'background: #1e40af; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
             Pending
         </a>
         <a href="{{ route('admin.support.password-resets', ['status' => 'resolved']) }}" 
-            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'resolved' ? 'background: #16a34a; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
+            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'resolved' ? 'background: #1e40af; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
             Resolved
         </a>
         <a href="{{ route('admin.support.password-resets', ['status' => 'rejected']) }}" 
-            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'rejected' ? 'background: #16a34a; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
+            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'rejected' ? 'background: #1e40af; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
             Rejected
         </a>
         <a href="{{ route('admin.support.password-resets', ['status' => 'all']) }}" 
-            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'all' ? 'background: #16a34a; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
+            style="padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; {{ $status === 'all' ? 'background: #1e40af; color: white;' : 'background: var(--bg-1); color: var(--gray-700);' }}">
             All
         </a>
     </div>
@@ -115,7 +115,7 @@
                             </td>
                             <td style="padding: 12px 16px; text-align: center;">
                                 <a href="{{ route('admin.support.password-reset.show', $request->id) }}" 
-                                   style="padding: 6px 12px; background: #16a34a; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                   style="padding: 6px 12px; background: #1e40af; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600;">
                                     View
                                 </a>
                             </td>

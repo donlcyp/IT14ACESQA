@@ -27,9 +27,9 @@
         <div style="font-size: 32px; font-weight: 700; color: #3b82f6;">{{ $validationHistory->total() }}</div>
     </div>
 
-    <div style="background: white; padding: 20px; border-radius: 10px; border-left: 4px solid #10b981; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <div style="background: white; padding: 20px; border-radius: 10px; border-left: 4px solid #0369a1; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <div style="font-size: 12px; color: #6b7280; font-weight: 600; margin-bottom: 8px;">APPROVED</div>
-        <div style="font-size: 32px; font-weight: 700; color: #10b981;">
+        <div style="font-size: 32px; font-weight: 700; color: #0369a1;">
             @if($validationHistory->total() > 0)
                 {{ $validationHistory->where('validation_status', 'approved')->count() }}
             @else

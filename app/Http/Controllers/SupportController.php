@@ -125,7 +125,7 @@ class SupportController extends Controller
             <p><strong>Request Time:</strong> {$resetRequest->created_at->format('M d, Y H:i A')}</p>
             <hr>
             <p>Please log in to the system to verify this user's identity and provide their password via email.</p>
-            <p><a href='" . url('/admin/support/password-resets') . "' style='background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>View Request in System</a></p>
+            <p><a href='" . url('/admin/support/password-resets') . "' style='background-color: #1e40af; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>View Request in System</a></p>
         ";
 
         $this->sendEmail($adminEmail, $subject, $message);
@@ -180,7 +180,7 @@ class SupportController extends Controller
             <h3>Concern:</h3>
             <p>" . nl2br($ticket->concern) . "</p>
             <hr>
-            <p><a href='" . url('/admin/support-tickets/' . $ticket->id) . "' style='background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>View Ticket</a></p>
+            <p><a href='" . url('/admin/support-tickets/' . $ticket->id) . "' style='background-color: #1e40af; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>View Ticket</a></p>
         ";
 
         $this->sendEmail($adminEmail, $subject, $message);
