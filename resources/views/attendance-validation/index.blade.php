@@ -3,7 +3,7 @@
 @section('title', 'Attendance Validation - AJJ CRISBER Engineering Services')
 
 @section('content')
-<div style="padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
+<div style="padding: 12px 16px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
     <h1 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700;">Attendance Validation</h1>
     <p style="margin: 0; font-size: 13px; opacity: 0.9;">Approve or reject employee punch-in records</p>
 </div>

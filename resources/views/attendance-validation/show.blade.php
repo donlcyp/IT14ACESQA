@@ -3,7 +3,7 @@
 @section('title', 'Attendance Review - AJJ CRISBER Engineering Services')
 
 @section('content')
-<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+<div style="padding: 20px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; margin-bottom: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
     <div>
         <h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 700;">Attendance Review</h1>
         <p style="margin: 0; font-size: 14px; opacity: 0.9;">{{ $attendance->f_name }} {{ $attendance->l_name }} - {{ $attendance->date->format('F d, Y') }}</p>

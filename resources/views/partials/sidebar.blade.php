@@ -77,7 +77,7 @@
         display: none;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
         color: #ffffff;
         font-weight: 700;
         font-size: 24px;

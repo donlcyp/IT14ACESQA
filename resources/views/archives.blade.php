@@ -23,8 +23,8 @@
 
             --blue-1: var(--accent);
             --blue-600: var(--accent);
-            --red-600: var(--accent);
-            --green-600: #1e40af;
+            --red-600: #dc2626;
+            --green-600: #047857;
 
             --purple-600: #7c3aed;
             --black-1: #111827;
@@ -171,9 +171,9 @@
         }
 
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #dbeafe;
+            color: #1e3a8a;
+            border: 1px solid #bfdbfe;
         }
 
         .alert-danger {
@@ -374,7 +374,7 @@
         }
 
         .audit-table.logs thead {
-            background: var(--green-600);
+            background: var(--blue-600);
         }
 
         /* Status badges */
@@ -388,7 +388,7 @@
 
         .status-badge.paid {
             background: transparent;
-            color: #065f46;
+            color: #1e3a8a;
         }
 
         .status-badge.unpaid {

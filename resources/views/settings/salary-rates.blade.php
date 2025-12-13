@@ -22,7 +22,8 @@
             --gray-800: #1f2937;
             --blue-1: var(--accent);
             --blue-600: var(--accent);
-            --green-600: #1e40af;
+            --red-600: #dc2626;
+            --green-600: #047857;
             --black-1: #111827;
             --sidebar-bg: #f8fafc;
             --header-bg: var(--accent);
@@ -106,9 +107,9 @@
         }
 
         .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
+            background: #dbeafe;
+            color: #1e3a8a;
+            border: 1px solid #bfdbfe;
         }
 
         .alert-danger {
@@ -161,13 +162,13 @@
             font-size: 18px;
         }
 
-        .position-icon.pm { background: #dbeafe; color: #1d4ed8; }
-        .position-icon.supervisor { background: #fef3c7; color: #b45309; }
-        .position-icon.finance { background: #dcfce7; color: #166534; }
-        .position-icon.qa { background: #f3e8ff; color: #7c3aed; }
-        .position-icon.hr { background: #fce7f3; color: #be185d; }
-        .position-icon.worker { background: #e0e7ff; color: #4338ca; }
-        .position-icon.default { background: #f3f4f6; color: #6b7280; }
+        .position-icon.pm { color: #1d4ed8; }
+        .position-icon.supervisor { color: #b45309; }
+        .position-icon.finance { color: #166534; }
+        .position-icon.qa { color: #7c3aed; }
+        .position-icon.hr { color: #be185d; }
+        .position-icon.worker { color: #4338ca; }
+        .position-icon.default { color: #6b7280; }
 
         .rate-card-body {
             margin-bottom: 16px;

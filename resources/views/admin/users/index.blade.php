@@ -24,8 +24,8 @@
 
       --blue-1: var(--accent);
       --blue-600: var(--accent);
-      --red-600: var(--accent);
-      --green-600: #1e40af;
+      --red-600: #dc2626;
+      --green-600: #047857;
 
       --text-lg-medium-font-family: "Inter", sans-serif;
       --text-lg-medium-font-weight: 500;
@@ -299,17 +299,14 @@
     }
 
     .badge-role {
-      background-color: #dbeafe;
       color: #0c4a6e;
     }
 
     .badge-verified {
-      background-color: #d1fae5;
       color: #065f46;
     }
 
     .badge-unverified {
-      background-color: #fee2e2;
       color: #7c2d12;
     }
 
@@ -736,7 +733,7 @@
                     <td>{{ optional($user->created_at)->diffForHumans() ?? 'N/A' }}</td>
                     <td>
                       <a href="#" onclick="openViewUserModal({{ json_encode($user) }}); return false;" class="btn-action" title="View user details">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-folder-open"></i>
                       </a>
                     </td>
                   </tr>
@@ -960,6 +957,9 @@
           <i class="fas fa-user"></i>
           User Details
         </div>
+        <button type="button" onclick="closeViewUserModal()" class="modal-close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <div class="modal-body">
@@ -992,9 +992,6 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" onclick="closeViewUserModal()" class="btn btn-secondary">
-          <i class="fas fa-times"></i> Close
-        </button>
       </div>
     </div>
   </div>

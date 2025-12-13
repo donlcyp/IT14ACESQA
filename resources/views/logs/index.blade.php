@@ -24,8 +24,8 @@
 
       --blue-1: var(--accent);
       --blue-600: var(--accent);
-      --red-600: var(--accent);
-      --green-600: #1e40af;
+      --red-600: #dc2626;
+      --green-600: #047857;
 
       --text-lg-medium-font-family: "Inter", sans-serif;
       --text-lg-medium-font-weight: 500;
@@ -568,7 +568,6 @@
                   <th>User</th>
                   <th>Email</th>
                   <th>Action</th>
-                  <th>IP Address</th>
                   <th>Details</th>
                 </tr>
               </thead>
@@ -588,13 +587,6 @@
                           {{ $log->action }}
                         @endif
                       </span>
-                    </td>
-                    <td>
-                      @php
-                        $details = json_decode($log->details, true);
-                        $ip = $details['ip_address'] ?? 'N/A';
-                      @endphp
-                      {{ $ip }}
                     </td>
                     <td>
                       @php

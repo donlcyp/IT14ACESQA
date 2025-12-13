@@ -24,7 +24,7 @@
             --blue-1: var(--accent);
             --blue-600: var(--accent);
             --red-600: #dc2626;
-            --green-600: #1e40af;
+            --green-600: #047857;
 
             --black-1: #111827;
             --sidebar-bg: #f8fafc;

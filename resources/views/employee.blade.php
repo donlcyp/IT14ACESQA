@@ -23,8 +23,8 @@
 
             --blue-1: var(--accent);
             --blue-600: var(--accent);
-            --red-600: var(--accent);
-            --green-600: #1e40af;
+            --red-600: #dc2626;
+            --green-600: #047857;
 
             --black-1: #111827;
             --sidebar-bg: #f8fafc;
@@ -108,7 +108,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e3a8a);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -349,7 +349,7 @@
             border-collapse: collapse;
         }
         .employee-table thead {
-            background: var(--accent);
+            background: var(--blue-600);
             color: #ffffff;
         }
         .employee-table thead th {
@@ -570,6 +570,7 @@
         }
 
         .employee-table thead {
+            background: var(--blue-600);
             color: white;
         }
 
@@ -597,7 +598,7 @@
         }
 
         .employee-table thead {
-            background: var(--green-600);
+            background: var(--blue-600);
         }
         .employee-table thead th:first-child { border-top-left-radius: 8px; }
         .employee-table thead th:last-child { border-top-right-radius: 8px; }
