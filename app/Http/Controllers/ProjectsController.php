@@ -641,6 +641,44 @@ class ProjectsController extends Controller
     }
 
     /**
+     * Bulk delete materials
+     */
+    public function bulkDeleteMaterials(Project $project, Request $request)
+    {
+        $request->validate([
+            'material_ids' => 'required|array',
+            'material_ids.*' => 'required|integer|exists:materials,id'
+        ]);
+
+        try {
+            $materialIds = $request->input('material_ids');
+            
+            // Verify all materials belong to this project
+            $materials = Material::whereIn('id', $materialIds)
+                ->where('project_id', $project->id)
+                ->get();
+            
+            if ($materials->count() !== count($materialIds)) {
+                return redirect()->route('projects.show', $project->id)
+                    ->with('error', 'Some materials do not belong to this project.');
+            }
+            
+            // Delete all materials
+            Material::whereIn('id', $materialIds)
+                ->where('project_id', $project->id)
+                ->delete();
+            
+            $count = count($materialIds);
+            return redirect()->route('projects.show', $project->id)
+                ->with('success', "Successfully deleted {$count} BOQ item(s)!");
+                
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)
+                ->with('error', 'Failed to delete materials: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Get a single material for editing
      */
     public function getMaterial(Project $project, Material $material)

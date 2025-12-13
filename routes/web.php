@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/projects/{project}/materials', [App\Http\Controllers\ProjectsController::class, 'storeMaterial'])->name('projects.materials.store');
         Route::put('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'updateMaterial'])->name('projects.materials.update');
         Route::delete('/projects/{project}/materials/{material}', [App\Http\Controllers\ProjectsController::class, 'deleteMaterial'])->name('projects.materials.delete');
+        Route::post('/projects/{project}/materials/bulk-delete', [App\Http\Controllers\ProjectsController::class, 'bulkDeleteMaterials'])->name('projects.materials.bulk-delete');
 
         // Project Employees
         Route::post('/projects/{project}/employees', [App\Http\Controllers\ProjectsController::class, 'assignEmployee'])->name('projects.employees.assign');

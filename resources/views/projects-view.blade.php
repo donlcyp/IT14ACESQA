@@ -754,8 +754,13 @@
 
 <body>
     <div class="dashboard-container">
-        <main class="main-content" id="mainContent" style="margin-left: 0; width: 100%;">
+        @include('partials.sidebar')
+
+        <main class="main-content sidebar-closed" id="mainContent">
             <header class="header">
+                <button class="header-menu" id="headerMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
@@ -775,47 +780,146 @@
                     <span style="color: var(--gray-700);">Project Details</span>
                 </nav>
 
+                <!-- Flash Messages (Hidden, will be shown via modal) -->
+                @if(session('success'))
+                    <div id="flashSuccessMessage" style="display: none;">{{ session('success') }}</div>
+                @endif
+                @if(session('error'))
+                    <div id="flashErrorMessage" style="display: none;">{{ session('error') }}</div>
+                @endif
+
                 <!-- Project Header -->
+                <style>
+                    .projects-header { margin-bottom: 10px; }
+                    .projects-content { display:flex; align-items:flex-end; justify-content:space-between; }
+                    .projects-title { font-size: 26px; line-height: 1.2; font-weight: 800; color: var(--black-1); margin: 0; }
+                    .projects-subtitle { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
+                    .header-divider { margin-top: 10px; height: 1px; background: var(--gray-300); opacity: 0.6; }
+                    
+                    /* Notification Toast Styling */
+                    @keyframes toastIn {
+                        from { opacity: 0; transform: translateY(-8px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+
+                    @keyframes toastOut {
+                        from { opacity: 1; transform: translateY(0); }
+                        to { opacity: 0; transform: translateY(-8px); }
+                    }
+
+                    .notification-modal-show { animation: toastIn 0.35s ease-out forwards; }
+                    .notification-modal-show .modal-content { animation: toastIn 0.35s ease-out forwards; }
+                    .notification-modal-hide { animation: toastOut 0.2s ease-in forwards; }
+                    .notification-modal-hide .modal-content { animation: toastOut 0.2s ease-in forwards; }
+
+                    #notificationModal {
+                        background: transparent;
+                        align-items: flex-start;
+                        justify-content: flex-end;
+                        padding: 12px;
+                        pointer-events: none;
+                    }
+
+                    #notificationModal .modal-content {
+                        pointer-events: auto;
+                        max-width: 360px;
+                        width: 100%;
+                        margin-top: 12px;
+                        padding: 12px 14px;
+                        border-radius: 12px;
+                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+                        border: 1px solid #e5e7eb;
+                        background: #f8fafc;
+                    }
+
+                    #notificationModal .modal-header {
+                        border: 0 !important;
+                        background: transparent !important;
+                        padding: 0;
+                        margin: 0 0 6px 0;
+                        align-items: flex-start;
+                    }
+
+                    #notificationModal .modal-title {
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #111827;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+
+                    #notificationModal .modal-close {
+                        color: #6b7280;
+                        font-size: 16px;
+                        padding: 4px;
+                    }
+
+                    #notificationModal .modal-close:hover { color: #111827; }
+                    #notificationModal .modal-footer { display: none !important; }
+                    #notificationMessage { font-size: 13px; color: #1f2937; margin: 0; }
+
+                    #notificationModal .modal-content.toast-success { background: #f0fdf4; border-color: #bbf7d0; }
+                    #notificationModal .modal-content.toast-success .modal-title,
+                    #notificationModal .modal-content.toast-success #notificationMessage,
+                    #notificationModal .modal-content.toast-success #notificationIcon { color: #166534; }
+
+                    #notificationModal .modal-content.toast-error { background: #fef2f2; border-color: #fecdd3; }
+                    #notificationModal .modal-content.toast-error .modal-title,
+                    #notificationModal .modal-content.toast-error #notificationMessage,
+                    #notificationModal .modal-content.toast-error #notificationIcon { color: #991b1b; }
+
+                    #notificationModal .modal-content.toast-info { background: #eff6ff; border-color: #bfdbfe; }
+                    #notificationModal .modal-content.toast-info .modal-title,
+                    #notificationModal .modal-content.toast-info #notificationMessage,
+                    #notificationModal .modal-content.toast-info #notificationIcon { color: #1d4ed8; }
+                </style>
                 <div class="projects-header">
                     <div class="projects-content">
                         <div>
                             <div class="projects-title">{{ $project->project_name ?? $project->project_code }}</div>
-                            <div style="font-size: 14px; color: var(--gray-600); margin-top: 5px;">Project ID: {{ $project->project_code }}</div>
+                            <div class="projects-subtitle">Project ID: {{ $project->project_code }}</div>
                         </div>
                     </div>
+                    <div class="header-divider"></div>
                 </div>
 
-                <!-- Project Details -->
-                <div class="project-details">
-                    <div class="detail-card">
-                        <div class="detail-label">Status</div>
-                        <div class="detail-value">
-                            <span style="background: #dbeafe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-size: 13px;">
-                                {{ $project->status }}
-                            </span>
+                <!-- Project Details (Compact Info Grid) -->
+                <style>
+                    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 12px; }
+                    .info-item { padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 8px; background: #fff; }
+                    .info-label { font-size: 12px; color: var(--gray-600); text-transform: uppercase; letter-spacing: .02em; }
+                    .info-value { margin-top: 3px; font-size: 15px; color: var(--black-1); font-weight: 600; }
+                    .badge-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+                    .tabs { margin-top: 14px; border-bottom: 1px solid var(--gray-300); padding-bottom: 6px; }
+                    .tab-button { margin-right: 8px; }
+                </style>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            <span class="badge-pill" style="background: #dbeafe; color: #0369a1;">{{ $project->status }}</span>
                         </div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Client</div>
-                        <div class="detail-value">
-                            {{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}
-                        </div>
+                    <div class="info-item">
+                        <div class="info-label">Client</div>
+                        <div class="info-value">{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Project Manager</div>
-                        <div class="detail-value">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
+                    <div class="info-item">
+                        <div class="info-label">Project Manager</div>
+                        <div class="info-value">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Location</div>
-                        <div class="detail-value">{{ $project->location ?? 'Not specified' }}</div>
+                    <div class="info-item">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{{ $project->location ?? 'Not specified' }}</div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Industry</div>
-                        <div class="detail-value">{{ $project->industry ?? 'Not specified' }}</div>
+                    <div class="info-item">
+                        <div class="info-label">Industry</div>
+                        <div class="info-value">{{ $project->industry ?? 'Not specified' }}</div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Project Type</div>
-                        <div class="detail-value">
+                    <div class="info-item">
+                        <div class="info-label">Project Type</div>
+                        <div class="info-value">
                             @if($project->project_type)
                                 @php
                                     $colorMap = [
@@ -828,25 +932,23 @@
                                     ];
                                     $colors = $colorMap[$project->project_type] ?? ['#f3f4f6', '#6b7280'];
                                 @endphp
-                                <span style="background: {{ $colors[0] }}; color: {{ $colors[1] }}; padding: 4px 12px; border-radius: 20px; font-size: 13px;">
-                                    {{ $project->project_type }}
-                                </span>
+                                <span class="badge-pill" style="background: {{ $colors[0] }}; color: {{ $colors[1] }};">{{ $project->project_type }}</span>
                             @else
                                 <span style="color: var(--gray-500);">Not specified</span>
                             @endif
                         </div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Budget</div>
-                        <div class="detail-value">₱{{ number_format($project->allocated_amount, 2) }}</div>
+                    <div class="info-item">
+                        <div class="info-label">Budget</div>
+                        <div class="info-value">₱{{ number_format($project->allocated_amount, 2) }}</div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Date Started</div>
-                        <div class="detail-value">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started yet' }}</div>
+                    <div class="info-item">
+                        <div class="info-label">Date Started</div>
+                        <div class="info-value">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started yet' }}</div>
                     </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Date Ended</div>
-                        <div class="detail-value">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'Not ended yet' }}</div>
+                    <div class="info-item">
+                        <div class="info-label">Date Ended</div>
+                        <div class="info-value">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'Not ended yet' }}</div>
                     </div>
                 </div>
 
@@ -855,7 +957,7 @@
                     <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
                     <button class="tab-button" onclick="switchTab('boq')">Bill of Quantity</button>
                     <button class="tab-button" onclick="switchTab('finance')">Finance & Transactions</button>
-                    <button class="tab-button" onclick="switchTab('employees')">Employees</button>
+                    <button class="tab-button" onclick="switchTab('employees')">Team Workers</button>
                     <button class="tab-button" onclick="switchTab('images')">Documentation</button>
                     <button class="tab-button" onclick="switchTab('report')">Reports</button>
                 </div>
@@ -922,7 +1024,7 @@
                         <div class="report-title">Bill of Quantity</div>
                         
                         @if ($project->materials && $project->materials->count() > 0)
-                        <!-- BOQ Summary Cards - Below Title -->
+                        <!-- BOQ Summary (Compact Metrics) -->
                         @php
                             $totalMaterial = 0;
                             $totalLabor = 0;
@@ -939,43 +1041,36 @@
                             $vat = $grandTotal * 0.12;
                             $grandTotalWithVAT = $grandTotal + $vat;
                         @endphp
-                        <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Material Cost</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
-                                    ₱{{ number_format($totalMaterial, 2) }}
-                                </div>
+                        <div style="margin-bottom: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                            <div class="info-item" style="border-left: 4px solid #0369a1;">
+                                <div class="info-label" style="color:#0369a1;">Total Material Cost</div>
+                                <div class="info-value" style="color:#0369a1;">₱{{ number_format($totalMaterial, 2) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #6a1b9a; opacity: 0.8;">Total Labor Cost</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #6a1b9a;">
-                                    ₱{{ number_format($totalLabor, 2) }}
-                                </div>
+                            <div class="info-item" style="border-left: 4px solid #6a1b9a;">
+                                <div class="info-label" style="color:#6a1b9a;">Total Labor Cost</div>
+                                <div class="info-value" style="color:#6a1b9a;">₱{{ number_format($totalLabor, 2) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #c8e6c9, #a5d6a7); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.8;">Subtotal</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #1e3a8a;">
-                                    ₱{{ number_format($grandTotal, 2) }}
-                                </div>
+                            <div class="info-item" style="border-left: 4px solid #1e3a8a;">
+                                <div class="info-label" style="color:#1e3a8a;">Subtotal</div>
+                                <div class="info-value" style="color:#1e3a8a;">₱{{ number_format($grandTotal, 2) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #fff3cd, #ffe082); padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
-                                <div style="font-size: 12px; color: #856404; opacity: 0.8;">VAT 12%</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #856404;">
-                                    ₱{{ number_format($vat, 2) }}
-                                </div>
+                            <div class="info-item" style="border-left: 4px solid #f59e0b;">
+                                <div class="info-label" style="color:#856404;">VAT 12%</div>
+                                <div class="info-value" style="color:#856404;">₱{{ number_format($vat, 2) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px; border-left: 4px solid #1e40af; box-shadow: 0 4px 6px rgba(30, 64, 175, 0.15);">
-                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.8; font-weight: 600;">Grand Total w/ VAT</div>
-                                <div style="font-size: 28px; font-weight: 700; color: #1e3a8a;">
-                                    ₱{{ number_format($grandTotalWithVAT, 2) }}
-                                </div>
+                            <div class="info-item" style="border-left: 4px solid #1e40af;">
+                                <div class="info-label" style="color:#1e3a8a;">Grand Total w/ VAT</div>
+                                <div class="info-value" style="color:#1e3a8a; font-size: 18px;">₱{{ number_format($grandTotalWithVAT, 2) }}</div>
                             </div>
                         </div>
                         @endif
                         
-                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
                             <button type="button" class="btn btn-primary" onclick="return openBOQModal();">
                                 <i class="fas fa-plus"></i> Add BOQ Item
+                            </button>
+                            <button type="button" id="deleteSelectedBtn" class="btn" style="background: #dc2626; color: white; display: none;" onclick="confirmBulkDelete()">
+                                <i class="fas fa-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
                             </button>
                             <a href="{{ route('pdf.boq.download', $project->id) }}" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-file-pdf"></i> Download BOQ PDF
@@ -987,15 +1082,18 @@
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 60px;">Item No.</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Qty</th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Unit</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 120px;">Material</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 120px;">Labor</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 100px;">Unit Rate</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 120px;">Total</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1); width: 100px;">Actions</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 50px;">
+                                                <input type="checkbox" id="selectAllBOQ" onchange="toggleAllBOQItems()" style="cursor: pointer; width: 18px; height: 18px;">
+                                            </th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 60px;">Item No.</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1); font-size: 14px;">Item Description</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 80px;">Qty</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 80px;">Unit</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 120px;">Material</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 120px;">Labor</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 100px;">Unit Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 120px;">Total</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 100px;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="boqTableBody">
@@ -1015,9 +1113,12 @@
                                                 $grandTotal += $itemTotal;
                                             @endphp
                                             <tr class="boq-row" style="border-bottom: 1px solid var(--gray-400);">
-                                                <td style="padding: 12px; text-align: center; color: var(--black-1); font-weight: 600;">{{ $material->item_no ?? '—' }}</td>
+                                                <td style="padding: 12px; text-align: center;">
+                                                    <input type="checkbox" class="boq-checkbox" data-material-id="{{ $material->id }}" onchange="updateBOQSelection()" style="cursor: pointer; width: 18px; height: 18px;">
+                                                </td>
+                                                <td style="padding: 12px; text-align: center; color: var(--black-1); font-weight: 600; font-size: 14px;">{{ $material->item_no ?? '—' }}</td>
                                                 <td style="padding: 12px; color: var(--black-1);">
-                                                    <div style="font-weight: 500; white-space: pre-wrap; line-height: 1.6; font-size: 15px;">{{ $material->item_description ?? $material->material_name ?? '—' }}</div>
+                                                    <div style="font-weight: 500; white-space: pre-wrap; line-height: 1.6; font-size: 14px;">{{ $material->item_description ?? $material->material_name ?? '—' }}</div>
                                                     @if($material->category)
                                                         <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px;"><strong>Category:</strong> {{ $material->category }}</div>
                                                     @endif
@@ -1025,12 +1126,12 @@
                                                         <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;"><strong>Notes:</strong> {{ $material->notes }}</div>
                                                     @endif
                                                 </td>
-                                                <td style="padding: 12px; text-align: center; color: var(--gray-700); font-weight: 600;">{{ $material->quantity ?? 0 }}</td>
-                                                <td style="padding: 12px; text-align: center; color: var(--gray-700);">{{ $material->unit ?? '—' }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($materialCost, 2) }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($laborCost, 2) }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($unitTotal, 2) }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--black-1); font-weight: 700; background: #e8f5e9; border-radius: 4px;">₱{{ number_format($itemTotal, 2) }}</td>
+                                                <td style="padding: 12px; text-align: center; color: var(--gray-700); font-weight: 600; font-size: 14px;">{{ $material->quantity ?? 0 }}</td>
+                                                <td style="padding: 12px; text-align: center; color: var(--gray-700); font-size: 14px;">{{ $material->unit ?? '—' }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; font-size: 14px;">₱{{ number_format($materialCost, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; font-size: 14px;">₱{{ number_format($laborCost, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; font-size: 14px;">₱{{ number_format($unitTotal, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--black-1); font-weight: 700; font-size: 14px;">₱{{ number_format($itemTotal, 2) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
                                                         <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="editBOQItem({{ $material->id }})">
@@ -1039,41 +1140,40 @@
                                                         <button class="btn" style="background: #e0e7ff; color: #4f46e5; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="viewBOQTasks('{{ $material->item_description }}', {{ $material->id }})">>
                                                             <i class="fas fa-tasks"></i>
                                                         </button>
-                                                        <form method="POST" action="{{ route('projects.materials.delete', [$project->id, $material->id]) }}" style="display: inline;" onsubmit="return confirmDeleteBOQ();">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
+                                                        <button type="button" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="confirmSingleDelete({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'this item') }}')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
-                                        <tr style="border-top: 2px solid var(--accent); background: var(--sidebar-bg); font-weight: 700; font-size: 16px;">
-                                            <td colspan="4" style="padding: 15px 12px; text-align: right;">SUBTOTAL:</td>
-                                            <td style="padding: 15px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalMaterial, 2) }}</td>
-                                            <td style="padding: 15px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalLabor, 2) }}</td>
-                                            <td colspan="1" style="padding: 15px 12px; text-align: right; color: #1e40af;"></td>
-                                            <td style="padding: 15px 12px; text-align: right; background: #bfdbfe; color: #1e3a8a;">₱{{ number_format($grandTotal, 2) }}</td>
+                                        <tr style="border-top: 2px solid var(--accent); background: var(--sidebar-bg); font-weight: 700; font-size: 14px;">
+                                            <td></td>
+                                            <td colspan="4" style="padding: 14px 12px; text-align: right;">SUBTOTAL:</td>
+                                            <td style="padding: 14px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalMaterial, 2) }}</td>
+                                            <td style="padding: 14px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($totalLabor, 2) }}</td>
+                                            <td colspan="1" style="padding: 14px 12px; text-align: right;"></td>
+                                            <td style="padding: 14px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($grandTotal, 2) }}</td>
                                             <td></td>
                                         </tr>
                                         @php
                                             $vat = $grandTotal * 0.12;
                                             $grandTotalWithVAT = $grandTotal + $vat;
                                         @endphp
-                                        <tr style="background: #fff3cd; font-weight: 700; font-size: 14px; border-top: 1px solid #ffc107;">
+                                        <tr style="font-weight: 700; font-size: 14px; border-top: 1px solid var(--gray-400);">
+                                            <td></td>
                                             <td colspan="4" style="padding: 12px 12px; text-align: right;">VAT 12%:</td>
-                                            <td colspan="3" style="padding: 12px 12px; text-align: right; color: #856404;"></td>
-                                            <td style="padding: 12px 12px; text-align: right; background: #fff3cd; color: #856404;">₱{{ number_format($vat, 2) }}</td>
+                                            <td colspan="3" style="padding: 12px 12px; text-align: right;"></td>
+                                            <td style="padding: 12px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($vat, 2) }}</td>
                                             <td></td>
                                         </tr>
-                                        <tr style="background: #dbeafe; font-weight: 700; font-size: 18px; border-top: 2px solid #1e40af;">
-                                            <td colspan="4" style="padding: 15px 12px; text-align: right;">Grand Total w/ VAT:</td>
-                                            <td colspan="3" style="padding: 15px 12px; text-align: right; color: #1e3a8a;"></td>
-                                            <td style="padding: 15px 12px; text-align: right; background: #dbeafe; color: #1e3a8a;">₱{{ number_format($grandTotalWithVAT, 2) }}</td>
+                                        <tr style="font-weight: 700; font-size: 16px; border-top: 2px solid var(--accent);">
+                                            <td></td>
+                                            <td colspan="4" style="padding: 14px 12px; text-align: right;">Grand Total w/ VAT:</td>
+                                            <td colspan="3" style="padding: 14px 12px; text-align: right;"></td>
+                                            <td style="padding: 14px 12px; text-align: right; color: var(--black-1);">₱{{ number_format($grandTotalWithVAT, 2) }}</td>
                                             <td></td>
                                         </tr>
                                     </tfoot>
@@ -1093,8 +1193,8 @@
                     <div class="report-section">
                         <div class="report-title">Finance & Transactions Summary</div>
                         
-                        <!-- Financial Summary Cards -->
-                        <div style="margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                        <!-- Financial Summary (Compact Metrics) -->
+                        <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
                             @php
                                 $materials = $project->materials ?? collect();
                                 $totalExpenses = $materials->sum(function($m) {
@@ -1120,28 +1220,28 @@
                                 $failedCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'failed'; })->count();
                             @endphp
                             
-                            <div style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); padding: 18px; border-radius: 8px; border-left: 4px solid #a855f7;">
-                                <div style="font-size: 11px; color: #7e22ce; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Total Expenses</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #7e22ce; margin-top: 8px;">₱{{ number_format($totalExpenses, 2) }}</div>
-                                <div style="font-size: 12px; color: #7e22ce; opacity: 0.7; margin-top: 4px;">{{ $materials->count() }} items</div>
+                            <div class="info-item" style="border-left: 4px solid #a855f7;">
+                                <div class="info-label" style="color:#7e22ce;">Total Expenses</div>
+                                <div class="info-value" style="color:#7e22ce;">₱{{ number_format($totalExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #7e22ce; opacity: 0.8;">{{ $materials->count() }} items</div>
                             </div>
                             
-                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 18px; border-radius: 8px; border-left: 4px solid #1e40af;">
-                                <div style="font-size: 11px; color: #1e3a8a; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Approved</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #1e40af; margin-top: 8px;">₱{{ number_format($approvedExpenses, 2) }}</div>
-                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.7; margin-top: 4px;">{{ $approvedCount }} items ready for payment</div>
+                            <div class="info-item" style="border-left: 4px solid #1e40af;">
+                                <div class="info-label" style="color:#1e3a8a;">Approved</div>
+                                <div class="info-value" style="color:#1e40af;">₱{{ number_format($approvedExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #1e3a8a; opacity: 0.8;">{{ $approvedCount }} items ready</div>
                             </div>
                             
-                            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 18px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                                <div style="font-size: 11px; color: #92400e; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Pending</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #f59e0b; margin-top: 8px;">₱{{ number_format($pendingExpenses, 2) }}</div>
-                                <div style="font-size: 12px; color: #92400e; opacity: 0.7; margin-top: 4px;">{{ $pendingCount }} items under review</div>
+                            <div class="info-item" style="border-left: 4px solid #f59e0b;">
+                                <div class="info-label" style="color:#92400e;">Pending</div>
+                                <div class="info-value" style="color:#f59e0b;">₱{{ number_format($pendingExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #92400e; opacity: 0.8;">{{ $pendingCount }} under review</div>
                             </div>
                             
-                            <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); padding: 18px; border-radius: 8px; border-left: 4px solid #dc2626;">
-                                <div style="font-size: 11px; color: #991b1b; opacity: 0.8; font-weight: 600; text-transform: uppercase;">Failed/Returns</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #dc2626; margin-top: 8px;">₱{{ number_format($failedExpenses, 2) }}</div>
-                                <div style="font-size: 12px; color: #991b1b; opacity: 0.7; margin-top: 4px;">{{ $failedCount }} items for return</div>
+                            <div class="info-item" style="border-left: 4px solid #dc2626;">
+                                <div class="info-label" style="color:#991b1b;">Failed/Returns</div>
+                                <div class="info-value" style="color:#dc2626;">₱{{ number_format($failedExpenses, 2) }}</div>
+                                <div style="font-size: 12px; color: #991b1b; opacity: 0.8;">{{ $failedCount }} for return</div>
                             </div>
                         </div>
 
@@ -1182,7 +1282,22 @@
 
                         <!-- Transaction Details Table -->
                         <div>
-                            <div style="font-weight: 600; font-size: 15px; margin-bottom: 15px;">Transaction Details</div>
+                            <div style="font-weight: 600; font-size: 15px; margin-bottom: 8px; display:flex; align-items:center; justify-content:space-between;">
+                                <span>Transaction Details</span>
+                                <style>
+                                    .status-select {
+                                        background: transparent;
+                                        border: 1px solid var(--gray-300);
+                                        border-radius: 6px;
+                                        padding: 6px 10px;
+                                        font-size: 12px;
+                                        color: var(--gray-800);
+                                        min-width: 120px;
+                                        cursor: pointer;
+                                    }
+                                    .status-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+                                </style>
+                            </div>
                             @if ($materials && $materials->count() > 0)
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -1217,9 +1332,11 @@
                                                     <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($material->material_cost ?? 0, 2) }}</td>
                                                     <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f9fafb;">₱{{ number_format($itemTotal, 2) }}</td>
                                                     <td style="padding: 12px; text-align: center;">
-                                                        <span style="background: {{ $statusColor[0] }}; color: {{ $statusColor[2] }}; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase;">
-                                                            {{ ucfirst($material->status ?? 'pending') }}
-                                                        </span>
+                                                        <select class="status-select" data-material-id="{{ $material->id }}" onchange="updateMaterialStatus(this.dataset.materialId, this.value)">
+                                                            <option value="pending" {{ strtolower($material->status ?? 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                            <option value="approved" {{ strtolower($material->status ?? 'pending') === 'approved' ? 'selected' : '' }}>Approved</option>
+                                                            <option value="failed" {{ strtolower($material->status ?? 'pending') === 'failed' ? 'selected' : '' }}>Failed</option>
+                                                        </select>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -1236,22 +1353,20 @@
                     </div>
                 </div>
 
-                <!-- Employees Tab -->
+                <!-- Team Workers Tab -->
                 <div id="employees" class="tab-content">
                     <div class="report-section">
-                        <div class="report-title">Project Employees</div>
+                        <div class="report-title">Team Workers</div>
 
-                        <!-- Employees Summary Cards -->
-                        <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #0369a1; opacity: 0.8;">Total Employees</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #0369a1;">
-                                    {{ $project->employees->count() }}
-                                </div>
+                        <!-- Team Summary (Compact Metrics) -->
+                        <div style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                            <div class="info-item" style="border-left: 4px solid #0369a1;">
+                                <div class="info-label" style="color:#0369a1;">Total Workers</div>
+                                <div class="info-value" style="color:#0369a1;">{{ $project->employees->count() + 1 }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #1e40af; opacity: 0.8;">Total Days Worked</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #1e40af;">
+                            <div class="info-item" style="border-left: 4px solid #1e40af;">
+                                <div class="info-label" style="color:#1e40af;">Total Days Worked</div>
+                                <div class="info-value" style="color:#1e40af;">
                                     @php
                                         $totalDaysWorked = 0;
                                         foreach($project->employees as $emp) {
@@ -1267,9 +1382,9 @@
                                     @endphp
                                 </div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #be185d; opacity: 0.8;">Total Labor Cost</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #be185d;">
+                            <div class="info-item" style="border-left: 4px solid #be185d;">
+                                <div class="info-label" style="color:#be185d;">Total Labor Cost</div>
+                                <div class="info-value" style="color:#be185d;">
                                     ₱@php
                                         $totalLaborCost = 0;
                                         $defaultRate = 700.00;
@@ -1298,25 +1413,40 @@
 
                         <div style="display: flex; gap: 12px; margin-bottom: 20px;">
                             <button class="btn btn-primary" onclick="openEmployeeModal()">
-                                <i class="fas fa-plus"></i> Add Employee
+                                <i class="fas fa-plus"></i> Add Team Worker
                             </button>
                         </div>
 
-                        @if ($project->employees && $project->employees->count() > 0)
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Employee</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Hours Worked</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Hourly Rate</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Labor Cost</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
+                                        <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Worker</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
+                                        <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Days</th>
+                                        <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Hours Worked</th>
+                                        <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Hourly Rate</th>
+                                        <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1);">Labor Cost</th>
+                                        <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($project->assignedPM)
+                                        <tr style="border-bottom: 1px solid var(--gray-400); background: #f0fdf4;">
+                                            <td style="padding: 12px; color: var(--black-1); font-weight: 600;">{{ $project->assignedPM->name }}</td>
+                                            <td style="padding: 12px; color: var(--gray-700);">
+                                                <span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                                    <i class="fas fa-crown"></i> Project Manager
+                                                </span>
+                                            </td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
+                                            <td style="padding: 12px; color: var(--gray-700); font-style: italic; font-size: 12px;">Auto-assigned</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                    @endif
+                                    @if ($project->employees && $project->employees->count() > 0)
                                         @foreach ($project->employees as $employee)
                                             @php
                                                 // Get attendance records with actual hours worked
@@ -1352,7 +1482,7 @@
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700);">{{ $daysWorked }}</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ number_format($totalHoursWorked, 2) }} hrs</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($hourlyRate, 2) }}/hr</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f0f9ff; border-radius: 4px;">₱{{ number_format($laborCost, 2) }}</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($laborCost, 2) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <form method="POST" action="{{ route('projects.employees.remove', [$project->id, $employee->id]) }}" style="display: inline;" onsubmit="return confirm('Remove this employee?');">
                                                         @csrf
@@ -1371,7 +1501,7 @@
                         @else
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
                                 <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
-                                <p>No employees assigned to this project yet.</p>
+                                <p>No team workers assigned yet. Click "Add Team Worker" to begin.</p>
                             </div>
                         @endif
                     </div>
@@ -1629,15 +1759,7 @@
                                 style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: var(--text-md-normal-font-family);"></textarea>
                         </div>
 
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Status</label>
-                            <select id="boqStatus" name="status" 
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="failed">Failed</option>
-                            </select>
-                        </div>
+                        <input type="hidden" id="boqStatus" name="status" value="pending">
                     </div>
 
                     <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
@@ -1785,11 +1907,56 @@
             </div>
         </div>
 
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteConfirmModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header" style="background: #fee2e2; border-bottom: 2px solid #dc2626;">
+                    <h2 class="modal-title" style="color: #991b1b; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="deleteModalTitle">Confirm Delete</span>
+                    </h2>
+                    <button class="modal-close" onclick="closeDeleteModal()" style="color: #991b1b;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="padding: 25px 20px;">
+                    <p id="deleteModalMessage" style="color: var(--gray-700); font-size: 15px; line-height: 1.6; margin: 0;"></p>
+                    <div id="deleteItemsList" style="margin-top: 15px; padding: 12px; background: var(--sidebar-bg); border-radius: 6px; max-height: 200px; overflow-y: auto; display: none;">
+                        <!-- Will be populated with items to delete -->
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="closeDeleteModal()">Cancel</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn" style="background: #dc2626; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="executeDelete()">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Notification Modal -->
+        <div id="notificationModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div id="notificationHeader" class="modal-header">
+                    <h2 class="modal-title">
+                        <i id="notificationIcon" class="fas"></i>
+                        <span id="notificationTitle">Notification</span>
+                    </h2>
+                    <button class="modal-close" onclick="closeNotificationModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 0;">
+                    <p id="notificationMessage"></p>
+                </div>
+            </div>
+        </div>
+
         <!-- Employee Assignment Modal -->
         <div id="employeeModal" class="modal">
-            <div class="modal-content">
+            <div class="modal-content" style="max-width: 800px;">
                 <div class="modal-header">
-                    <h2 class="modal-title">Manage Employees - {{ $project->project_name }}</h2>
+                    <h2 class="modal-title">Add Team Workers - {{ $project->project_name }}</h2>
                     <button class="modal-close" onclick="closeEmployeeModal()">
                         <i class="fas fa-times"></i>
                     </button>
@@ -1802,16 +1969,16 @@
                         </div>
                         <div class="info-banner-content">
                             <h4 style="margin: 0;">Project Completed</h4>
-                            <p style="margin: 0;">This project has been marked as completed. You can still reassign employees.</p>
+                            <p style="margin: 0;">This project has been marked as completed. You can still reassign team workers.</p>
                         </div>
                     </div>
 
-                    <p style="color: #6b7280; margin-bottom: 16px;">
-                        Select employees to assign to this project. Only employees not assigned to other active projects are available.
+                    <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> Select team workers by role. Only workers not assigned to other active projects are available.
                     </p>
 
-                    <div class="employee-list" id="employeeList">
-                        <!-- Populated by JavaScript -->
+                    <div id="employeeList" style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Populated by JavaScript with role groups -->
                     </div>
                 </div>
 
@@ -1825,7 +1992,15 @@
         </div>
     </div>
 
+    @include('partials.sidebar-js')
+
     <script>
+        // Prevent infinite reload loops when showing notifications
+        let skipNotificationReload = sessionStorage.getItem('notificationReloaded') === '1';
+        if (skipNotificationReload) {
+            sessionStorage.removeItem('notificationReloaded');
+        }
+
         function switchTab(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -2317,31 +2492,115 @@
                 return;
             }
 
+            // Filter out Project Managers and group employees by position
+            const employeesByRole = {};
             allEmployees.forEach(employee => {
-                const isAssigned = assignedEmployeeIds.includes(employee.id);
-                const isAssignedToOtherProject = employee.assigned_to_other_project && !isAssigned;
+                const position = employee.position || 'Other';
+                
+                // Skip Project Managers entirely
+                if (position.toLowerCase().includes('project manager') || position.toLowerCase().includes('manager')) {
+                    return;
+                }
+                
+                if (!employeesByRole[position]) {
+                    employeesByRole[position] = [];
+                }
+                employeesByRole[position].push(employee);
+            });
 
-                const employeeItem = document.createElement('div');
-                employeeItem.className = 'employee-item';
-                employeeItem.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+            // Check if any non-manager employees exist
+            if (Object.keys(employeesByRole).length === 0) {
+                employeeList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                        <i class="fas fa-hard-hat" style="font-size: 32px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                        <p style="margin: 0;">No team workers available.</p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #6b7280;">Only project managers found. Create workers with other positions.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort positions alphabetically
+            const sortedPositions = Object.keys(employeesByRole).sort();
+
+            sortedPositions.forEach((position, index) => {
+                const employees = employeesByRole[position];
+                
+                // Create role group container
+                const roleGroup = document.createElement('div');
+                roleGroup.style.cssText = 'border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white;';
+                
+                // Role header
+                const roleHeader = document.createElement('div');
+                roleHeader.style.cssText = 'background: #f9fafb; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between;';
+                roleHeader.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-user-hard-hat" style="color: var(--accent); font-size: 16px;"></i>
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #111827;">${position}</h3>
+                        <span style="background: #e5e7eb; color: #6b7280; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${employees.length} available</span>
+                    </div>
+                    <button type="button" onclick="toggleRoleGroup(this)" style="background: none; border: none; color: #6b7280; cursor: pointer; font-size: 18px; padding: 0; transition: transform 0.2s;">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                `;
+                
+                // Role body (employee list)
+                const roleBody = document.createElement('div');
+                roleBody.className = 'role-body';
+                roleBody.style.cssText = 'padding: 8px; display: grid; gap: 8px;';
+                
+                employees.forEach(employee => {
+                    const isAssigned = assignedEmployeeIds.includes(employee.id);
+                    const isAssignedToOtherProject = employee.assigned_to_other_project && !isAssigned;
+
+                    const employeeItem = document.createElement('div');
+                    employeeItem.className = 'employee-item';
+                    employeeItem.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: #fafafa; transition: all 0.2s;';
+                    employeeItem.innerHTML = `
                         <input 
                             type="checkbox" 
                             value="${employee.id}"
                             ${isAssigned ? 'checked' : ''}
                             ${isAssignedToOtherProject ? 'disabled' : ''}
                             class="employee-checkbox"
+                            style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent);"
                         >
-                        <div class="employee-info">
-                            <div class="employee-name">${employee.f_name} ${employee.l_name}</div>
-                            <div class="employee-code">EMP${String(employee.id).padStart(3, '0')}</div>
-                            <div class="employee-position">${employee.position || 'No Position'}</div>
-                            ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600;">Assigned to other active project</div>' : ''}
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500; color: #111827; font-size: 14px;">${employee.f_name} ${employee.l_name}</div>
+                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">EMP${String(employee.id).padStart(3, '0')}</div>
+                            ${isAssignedToOtherProject ? '<div style="color: #dc2626; font-size: 11px; font-weight: 600; margin-top: 4px;"><i class="fas fa-exclamation-circle"></i> Assigned to other project</div>' : ''}
                         </div>
-                    </div>
-                `;
-                employeeList.appendChild(employeeItem);
+                    `;
+                    
+                    // Hover effect
+                    employeeItem.addEventListener('mouseenter', function() {
+                        if (!isAssignedToOtherProject) this.style.background = '#f3f4f6';
+                    });
+                    employeeItem.addEventListener('mouseleave', function() {
+                        this.style.background = '#fafafa';
+                    });
+                    
+                    roleBody.appendChild(employeeItem);
+                });
+                
+                roleGroup.appendChild(roleHeader);
+                roleGroup.appendChild(roleBody);
+                employeeList.appendChild(roleGroup);
             });
+        }
+
+        // Toggle role group visibility
+        function toggleRoleGroup(button) {
+            const roleBody = button.closest('div').nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (roleBody.style.display === 'none') {
+                roleBody.style.display = 'grid';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                roleBody.style.display = 'none';
+                icon.style.transform = 'rotate(-90deg)';
+            }
         }
 
         function saveEmployeeAssignments() {
@@ -2351,14 +2610,14 @@
                 .map(cb => parseInt(cb.value));
 
             if (selectedEmployeeIds.length === 0) {
-                alert('Please select at least one employee to assign.');
+                showNotification('Please select at least one employee to assign.', 'error');
                 return;
             }
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             
             if (!csrfToken) {
-                alert('CSRF token not found. Please refresh the page and try again.');
+                showNotification('CSRF token not found. Please refresh the page and try again.', 'error');
                 console.error('CSRF token missing');
                 return;
             }
@@ -2392,16 +2651,16 @@
             })
             .then(data => {
                 if (data.success) {
-                    alert('Employees assigned successfully!');
+                    showNotification('Employees assigned successfully!', 'success');
                     closeEmployeeModal();
-                    location.reload();
+                    setTimeout(() => location.reload(), 2000);
                 } else {
-                    alert('Error: ' + (data.message || 'Failed to assign employees'));
+                    showNotification('Error: ' + (data.message || 'Failed to assign employees'), 'error');
                 }
             })
             .catch(error => {
                 console.error('Full error:', error);
-                alert('An error occurred: ' + error.message);
+                showNotification('An error occurred: ' + error.message, 'error');
             });
         }
 
@@ -2411,19 +2670,19 @@
             const unit = document.getElementById('boqUnit').value.trim();
             
             if (!itemDescription) {
-                alert('Please enter an item description');
+                showNotification('Please enter an item description', 'error');
                 document.getElementById('boqItemDescription').focus();
                 return false;
             }
             
             if (quantity <= 0) {
-                alert('Please enter a valid quantity (greater than 0)');
+                showNotification('Please enter a valid quantity (greater than 0)', 'error');
                 document.getElementById('boqQuantity').focus();
                 return false;
             }
             
             if (!unit) {
-                alert('Please select a unit');
+                showNotification('Please select a unit', 'error');
                 document.getElementById('boqUnit').focus();
                 return false;
             }
@@ -2461,7 +2720,6 @@
             const laborCost = document.getElementById('boqLaborCost').value.trim();
             const category = document.getElementById('boqCategory').value.trim();
             const notes = document.getElementById('boqNotes').value.trim();
-            const status = document.getElementById('boqStatus').value.trim();
             
             // Add to FormData
             formData.append('item_description', itemDescription);
@@ -2472,7 +2730,6 @@
             formData.append('labor_cost', laborCost);
             formData.append('category', category);
             formData.append('notes', notes);
-            formData.append('status', status);
             
             const form = document.getElementById('boqForm');
             const url = form.action;
@@ -2525,23 +2782,24 @@
             .then(data => {
                 console.log('Success response:', data);
                 if (data.success) {
-                    alert(data.message || 'Material added successfully!');
                     closeBOQModal();
                     
                     // Store current tab in localStorage before reload
                     localStorage.setItem('activeTab', 'boq');
                     
-                    // Reload the page to refresh materials list
+                    // Show success notification and reload
+                    showNotification(data.message || 'Material added successfully!', 'success');
+                    
                     setTimeout(() => {
                         location.reload();
-                    }, 500);
+                    }, 2000);
                 } else {
-                    alert('Error: ' + (data.message || 'Failed to save BOQ item'));
+                    showNotification('Error: ' + (data.message || 'Failed to save BOQ item'), 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error: ' + (error.message || 'Failed to save BOQ item'));
+                showNotification('Error: ' + (error.message || 'Failed to save BOQ item'), 'error');
             });
             
             return false;
@@ -2561,19 +2819,19 @@
                 
                 if (!modal) {
                     console.error('BOQ modal element not found');
-                    alert('Error: BOQ modal not found. Please refresh the page.');
+                    showNotification('Error: BOQ modal not found. Please refresh the page.', 'error');
                     return false;
                 }
                 
                 if (!form) {
                     console.error('BOQ form element not found');
-                    alert('Error: BOQ form not found. Please refresh the page.');
+                    showNotification('Error: BOQ form not found. Please refresh the page.', 'error');
                     return false;
                 }
                 
                 if (!title) {
                     console.error('BOQ title element not found');
-                    alert('Error: BOQ title not found. Please refresh the page.');
+                    showNotification('Error: BOQ title not found. Please refresh the page.', 'error');
                     return false;
                 }
                 
@@ -2603,7 +2861,7 @@
                 return false;
             } catch (error) {
                 console.error('Error in openBOQModal:', error);
-                alert('Error opening modal: ' + error.message);
+                showNotification('Error opening modal: ' + error.message, 'error');
                 return false;
             }
         }
@@ -2615,6 +2873,187 @@
             }
         }
 
+        // BOQ Selection and Bulk Delete Functions
+        function updateBOQSelection() {
+            const checkboxes = document.querySelectorAll('.boq-checkbox');
+            const checkedBoxes = document.querySelectorAll('.boq-checkbox:checked');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const selectedCount = document.getElementById('selectedCount');
+            const selectAllCheckbox = document.getElementById('selectAllBOQ');
+            
+            // Update count and button visibility
+            if (selectedCount) {
+                selectedCount.textContent = checkedBoxes.length;
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.style.display = checkedBoxes.length > 0 ? 'inline-flex' : 'none';
+            }
+            
+            // Update select all checkbox state
+            if (selectAllCheckbox && checkboxes.length > 0) {
+                selectAllCheckbox.checked = checkedBoxes.length === checkboxes.length;
+                selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < checkboxes.length;
+            }
+        }
+
+        function toggleAllBOQItems() {
+            const selectAllCheckbox = document.getElementById('selectAllBOQ');
+            const checkboxes = document.querySelectorAll('.boq-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            
+            updateBOQSelection();
+        }
+
+        function confirmSingleDelete(materialId, itemDescription) {
+            const modal = document.getElementById('deleteConfirmModal');
+            const modalTitle = document.getElementById('deleteModalTitle');
+            const modalMessage = document.getElementById('deleteModalMessage');
+            const deleteItemsList = document.getElementById('deleteItemsList');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            if (modalTitle) modalTitle.textContent = 'Delete BOQ Item';
+            if (modalMessage) modalMessage.innerHTML = `Are you sure you want to delete <strong>"${itemDescription}"</strong>?<br><br>This action cannot be undone.`;
+            if (deleteItemsList) deleteItemsList.style.display = 'none';
+            
+            // Set up delete action
+            if (confirmBtn) {
+                confirmBtn.onclick = function() {
+                    executeSingleDelete(materialId);
+                };
+            }
+            
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function confirmBulkDelete() {
+            const checkedBoxes = document.querySelectorAll('.boq-checkbox:checked');
+            
+            if (checkedBoxes.length === 0) {
+                return;
+            }
+            
+            const modal = document.getElementById('deleteConfirmModal');
+            const modalTitle = document.getElementById('deleteModalTitle');
+            const modalMessage = document.getElementById('deleteModalMessage');
+            const deleteItemsList = document.getElementById('deleteItemsList');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            if (modalTitle) modalTitle.textContent = 'Delete Multiple BOQ Items';
+            if (modalMessage) {
+                modalMessage.innerHTML = `Are you sure you want to delete <strong>${checkedBoxes.length} item(s)</strong>?<br><br>This action cannot be undone.`;
+            }
+            
+            // Show list of items to be deleted
+            if (deleteItemsList) {
+                deleteItemsList.style.display = 'block';
+                deleteItemsList.innerHTML = '<div style="font-weight: 600; margin-bottom: 8px; color: var(--gray-700);">Items to be deleted:</div>';
+                
+                checkedBoxes.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const itemDescription = row.querySelector('td:nth-child(3) div')?.textContent || 'Unknown item';
+                    const itemNo = row.querySelector('td:nth-child(2)')?.textContent || '—';
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.style.cssText = 'padding: 6px 10px; margin-bottom: 4px; background: white; border-left: 3px solid #dc2626; border-radius: 4px; font-size: 13px;';
+                    itemDiv.innerHTML = `<strong>#${itemNo}</strong> - ${itemDescription.substring(0, 60)}${itemDescription.length > 60 ? '...' : ''}`;
+                    deleteItemsList.appendChild(itemDiv);
+                });
+            }
+            
+            // Set up bulk delete action
+            if (confirmBtn) {
+                confirmBtn.onclick = function() {
+                    executeBulkDelete();
+                };
+            }
+            
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteConfirmModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function executeDelete() {
+            // This will be set dynamically by confirmSingleDelete or confirmBulkDelete
+            // Should not be called directly
+        }
+
+        function executeSingleDelete(materialId) {
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/projects/{{ $project->id }}/materials/${materialId}`;
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+            
+            // Add DELETE method
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+            
+            // Store active tab before submission
+            localStorage.setItem('activeTab', 'boq');
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function executeBulkDelete() {
+            const checkedBoxes = document.querySelectorAll('.boq-checkbox:checked');
+            const materialIds = Array.from(checkedBoxes).map(cb => cb.dataset.materialId);
+            
+            if (materialIds.length === 0) {
+                closeDeleteModal();
+                return;
+            }
+            
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/projects/{{ $project->id }}/materials/bulk-delete`;
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+            
+            // Add material IDs
+            materialIds.forEach(id => {
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'material_ids[]';
+                idInput.value = id;
+                form.appendChild(idInput);
+            });
+            
+            // Store active tab before submission
+            localStorage.setItem('activeTab', 'boq');
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
         function confirmDeleteBOQ() {
             if (confirm('Delete this item?')) {
                 localStorage.setItem('activeTab', 'boq');
@@ -2622,6 +3061,126 @@
             }
             return false;
         }
+
+        // Notification Modal Functions
+        function showNotification(message, type = 'success') {
+            const modal = document.getElementById('notificationModal');
+            const header = document.getElementById('notificationHeader');
+            const icon = document.getElementById('notificationIcon');
+            const title = document.getElementById('notificationTitle');
+            const messageEl = document.getElementById('notificationMessage');
+            const content = modal ? modal.querySelector('.modal-content') : null;
+            
+            // Reset inline styles to let CSS drive the look
+            if (header) {
+                header.style.background = 'transparent';
+                header.style.borderColor = 'transparent';
+                header.style.color = 'inherit';
+            }
+            if (icon) {
+                icon.removeAttribute('style');
+            }
+            if (title) {
+                title.removeAttribute('style');
+            }
+            if (content) {
+                content.classList.remove('toast-success', 'toast-error', 'toast-info');
+            }
+
+            let toastClass = 'toast-info';
+            let iconClass = 'fas fa-info-circle';
+            let titleText = 'Info';
+
+            if (type === 'success') {
+                toastClass = 'toast-success';
+                iconClass = 'fas fa-check-circle';
+                titleText = 'Success';
+            } else if (type === 'error') {
+                toastClass = 'toast-error';
+                iconClass = 'fas fa-exclamation-circle';
+                titleText = 'Error';
+            }
+            
+            if (content) content.classList.add(toastClass);
+            if (icon) icon.className = iconClass;
+            if (title) title.textContent = titleText;
+            
+            if (messageEl) messageEl.textContent = message;
+            
+            if (modal) {
+                // Remove any existing animation classes
+                modal.classList.remove('notification-modal-hide', 'notification-modal-show');
+                
+                // Show modal and trigger fade-in animation
+                modal.style.display = 'flex';
+                modal.style.opacity = '0';
+                
+                // Force reflow to ensure animation plays
+                void modal.offsetWidth;
+                
+                // Add animation class
+                modal.classList.add('notification-modal-show');
+
+                // Trigger a single reload shortly after showing the toast
+                if (!skipNotificationReload) {
+                    skipNotificationReload = true;
+                    setTimeout(() => {
+                        sessionStorage.setItem('notificationReloaded', '1');
+                        location.reload();
+                    }, 400);
+                } else {
+                    // Reset the guard so future notifications can reload after this pass
+                    skipNotificationReload = false;
+                }
+            }
+        }
+
+        function closeNotificationModal() {
+            const modal = document.getElementById('notificationModal');
+            if (modal) {
+                // Remove show class and add hide class
+                modal.classList.remove('notification-modal-show');
+                modal.classList.add('notification-modal-hide');
+                
+                // Wait for animation to complete before hiding
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    modal.classList.remove('notification-modal-hide');
+                }, 220);
+            }
+        }
+
+        // Apply status select coloring
+        function setStatusSelectColor(selectEl) {
+            if (!selectEl) return;
+            const val = (selectEl.value || '').toLowerCase();
+            let color = '#1f2937';
+            if (val === 'pending') color = '#d97706';
+            else if (val === 'approved') color = '#16a34a';
+            else if (val === 'failed') color = '#dc2626';
+            selectEl.style.color = color;
+        }
+
+        function initStatusSelectColors() {
+            document.querySelectorAll('.status-select').forEach(sel => {
+                setStatusSelectColor(sel);
+                sel.addEventListener('change', () => setStatusSelectColor(sel));
+            });
+        }
+
+        // Check for flash messages on page load and init status colors
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMsg = document.getElementById('flashSuccessMessage');
+            const errorMsg = document.getElementById('flashErrorMessage');
+            
+            if (successMsg) {
+                showNotification(successMsg.textContent, 'success');
+            } else if (errorMsg) {
+                showNotification(errorMsg.textContent, 'error');
+            }
+
+            initStatusSelectColors();
+        });
 
         function editBOQItem(materialId) {
             const modal = document.getElementById('boqModal');
@@ -2654,7 +3213,6 @@
                     document.getElementById('boqMaterialCost').value = data.material_cost || '';
                     document.getElementById('boqLaborCost').value = data.labor_cost || '';
                     document.getElementById('boqNotes').value = data.notes || '';
-                    document.getElementById('boqStatus').value = data.status || 'pending';
                     document.getElementById('boqIdField').value = materialId;
                     
                     // Update form action and method
@@ -2677,7 +3235,7 @@
                 })
                 .catch(error => {
                     console.error('Error fetching BOQ item:', error);
-                    alert(`Error loading BOQ item data: ${error.message}\n\nURL: ${url}`);
+                    showNotification(`Error loading BOQ item data: ${error.message}`, 'error');
                 });
         }
 
@@ -2716,7 +3274,7 @@
             const details = document.getElementById('boqItemDetails');
             
             if (!modal) {
-                alert('Tasks modal not found');
+                showNotification('Tasks modal not found', 'error');
                 return;
             }
             
@@ -2858,7 +3416,7 @@
         function openAddTaskModal() {
             const modal = document.getElementById('addTaskModal');
             if (!modal) {
-                alert('Add task modal not found');
+                showNotification('Add task modal not found', 'error');
                 return;
             }
 
@@ -2890,13 +3448,13 @@
             const boqItemName = document.getElementById('currentBOQItemName').value;
             
             if (!title) {
-                alert('Please enter a task title');
+                showNotification('Please enter a task title', 'error');
                 document.getElementById('taskTitle').focus();
                 return false;
             }
             
             if (!description) {
-                alert('Please enter a task description');
+                showNotification('Please enter a task description', 'error');
                 document.getElementById('taskDescription').focus();
                 return false;
             }
@@ -2905,7 +3463,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             
             if (!csrfToken) {
-                alert('CSRF token not found. Please refresh the page.');
+                showNotification('CSRF token not found. Please refresh the page.', 'error');
                 return false;
             }
             
@@ -2942,7 +3500,7 @@
             })
             .then(data => {
                 if (data.success) {
-                    alert('Task added successfully for: ' + boqItemName);
+                    showNotification('Task added successfully for: ' + boqItemName, 'success');
                     closeAddTaskModal();
                     
                     // Reload only the tasks list for this item
@@ -2950,15 +3508,83 @@
                         loadTasksForItem(currentBOQItem.id);
                     }
                 } else {
-                    alert('Error: ' + (data.message || 'Failed to add task'));
+                    showNotification('Error: ' + (data.message || 'Failed to add task'), 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
+                showNotification('An error occurred: ' + error.message, 'error');
             });
             
             return false;
+        }
+
+        // Update material status from Finance & Transactions table
+        function updateMaterialStatus(materialId, newStatus) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!csrfToken) {
+                showNotification('CSRF token not found. Please refresh and try again.', 'error');
+                return;
+            }
+
+            // First, fetch the existing material data
+            fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load material data');
+                return response.json();
+            })
+            .then(material => {
+                // Now send the update with all required fields
+                const formData = new FormData();
+                formData.append('_method', 'PUT');
+                formData.append('_token', csrfToken);
+                formData.append('item_description', material.item_description || '');
+                formData.append('quantity', material.quantity || 1);
+                formData.append('unit', material.unit || '');
+                formData.append('material_cost', material.material_cost || 0);
+                formData.append('labor_cost', material.labor_cost || 0);
+                formData.append('category', material.category || '');
+                formData.append('notes', material.notes || '');
+                formData.append('status', newStatus);
+
+                return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type') || '';
+                if (!response.ok) {
+                    if (contentType.includes('application/json')) {
+                        return response.json().then(err => { throw new Error(err.message || 'Failed to update status'); });
+                    }
+                    return response.text().then(text => { throw new Error(text || 'Failed to update status'); });
+                }
+                if (contentType.includes('application/json')) {
+                    return response.json();
+                }
+                return { success: true };
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('Status updated successfully', 'success');
+                } else {
+                    showNotification(data.message || 'Failed to update status', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Status update error:', error);
+                showNotification(error.message || 'Failed to update status', 'error');
+            });
         }
 
     </script>

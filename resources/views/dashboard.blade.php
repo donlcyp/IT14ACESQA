@@ -481,11 +481,12 @@
         }
 
         .kpi-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.7;
+            letter-spacing: 0.8px;
+            opacity: 0.65;
+            margin-bottom: 4px;
         }
 
         .kpi-card.color-projects .kpi-label {
@@ -517,9 +518,11 @@
         }
 
         .kpi-value {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1;
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 8px 0;
+            letter-spacing: -0.5px;
         }
 
         .kpi-card.color-projects .kpi-value {
@@ -551,9 +554,11 @@
         }
 
         .kpi-subtitle {
-            font-size: 11px;
-            opacity: 0.6;
-            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.55;
+            margin-top: 6px;
+            line-height: 1.4;
         }
 
         .kpi-card.color-projects .kpi-subtitle {
