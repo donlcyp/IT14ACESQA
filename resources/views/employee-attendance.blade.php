@@ -155,7 +155,10 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            padding: 30px;
+            padding: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
             background: linear-gradient(135deg, #f7fafc, #edf2f7);
             border-left: 1px solid #e2e8f0;
             border-right: 1px solid #e2e8f0;
@@ -166,38 +169,51 @@
         .employee-header {
             background: white;
             border-radius: 12px;
-            padding: 16px 16px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
+            padding: 20px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 16px;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .employee-header:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         }
 
         .employee-title {
             color: var(--black-1);
             font-family: var(--text-headline-small-bold-font-family);
-            font-size: 20px;
-            font-weight: var(--text-headline-small-bold-font-weight);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .toolbar {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             margin-left: auto;
         }
         .att-toolbar {
             background: white;
             border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 14px;
-            box-shadow: var(--shadow-md);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             justify-content: space-between;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .att-toolbar:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         }
         .att-left {
             display: flex;
@@ -236,11 +252,18 @@
         }
         .search-box input {
             width: 100%;
-            padding: 10px 14px 10px 36px;
-            border: 1px solid #e5e7eb;
+            padding: 11px 14px 11px 36px;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
             outline: none;
             background-color: #fff;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
         }
         .search-box .fa-search {
             position: absolute;
