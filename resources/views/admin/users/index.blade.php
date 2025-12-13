@@ -56,7 +56,7 @@
     }
 
     body {
-      font-family: var(--text-md-normal-font-family);
+      font-family: 'Inter', sans-serif;
       background-color: var(--main-bg);
       color: var(--gray-700);
       transition: margin-left 0.3s ease;

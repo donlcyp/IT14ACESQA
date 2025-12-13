@@ -59,8 +59,12 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        html, body, input, select, textarea, button {
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
-            font-family: var(--text-md-normal-font-family);
+            font-family: 'Inter', sans-serif;
             background-color: var(--main-bg);
             color: var(--gray-700);
         }
@@ -1579,42 +1583,36 @@
                                             $position = $item['position'];
                                             $isPM = $item['is_pm'];
                                             $hierarchy = $item['hierarchy'];
-                                        @endphp
-                                        
-                                        @if (!$isPM)
-                                            @php
-                                                // Get attendance records with actual hours worked
-                                                $dateFrom = '2025-12-01';
-                                                $dateTo = '2025-12-31';
-                                                
-                                                $empAttendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
-                                                    ->whereBetween('date', [$dateFrom, $dateTo])
-                                                    ->whereNotNull('punch_in_time')
-                                                    ->whereNotNull('punch_out_time')
-                                                    ->get();
-                                                
-                                                $daysWorked = $empAttendanceRecords->count();
-                                                $totalHoursWorked = $empAttendanceRecords->sum(function($att) {
-                                                    return $att->getHoursWorked() ?? 0;
-                                                });
-                                                
-                                                // Get daily rate based on employee's position
-                                                $positionRate = \App\Models\PositionDailyRate::where('position', $position)->first();
-                                                $dailyRate = $positionRate ? $positionRate->daily_rate : 700.00;
-                                                $hourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($dailyRate);
-                                                
-                                                // Calculate labor cost based on actual hours worked
-                                                $laborCost = 0;
-                                                foreach($empAttendanceRecords as $att) {
-                                                    $laborCost += $att->calculateLaborCost($dailyRate);
-                                                }
-                                            @endphp
-                                        @endif
-                                        
-                                        @php
+                                            
+                                            // Get attendance records with actual hours worked (for all workers including PM)
+                                            $dateFrom = '2025-12-01';
+                                            $dateTo = '2025-12-31';
+                                            
+                                            $empAttendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $employee->id)
+                                                ->whereBetween('date', [$dateFrom, $dateTo])
+                                                ->whereNotNull('punch_in_time')
+                                                ->whereNotNull('punch_out_time')
+                                                ->get();
+                                            
+                                            $daysWorked = $empAttendanceRecords->count();
+                                            $totalHoursWorked = $empAttendanceRecords->sum(function($att) {
+                                                return $att->getHoursWorked() ?? 0;
+                                            });
+                                            
+                                            // Get daily rate based on employee's position
+                                            $positionRate = \App\Models\PositionDailyRate::where('position', $position)->first();
+                                            $dailyRate = $positionRate ? $positionRate->daily_rate : 700.00;
+                                            $hourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($dailyRate);
+                                            
+                                            // Calculate labor cost based on actual hours worked
+                                            $laborCost = 0;
+                                            foreach($empAttendanceRecords as $att) {
+                                                $laborCost += $att->calculateLaborCost($dailyRate);
+                                            }
+                                            
                                             // Define icon for hierarchy
                                             $hierarchyIcon = [
-                                                1 => 'fa-crown', // Project Manager
+                                                1 => 'fa-briefcase', // Project Manager
                                                 2 => 'fa-hard-hat', // Site Supervisor
                                                 3 => 'fa-clipboard-check', // QA Officer
                                                 4 => 'fa-clock', // HR/Timekeeper
@@ -1648,21 +1646,17 @@
                                                     ];
                                                     $textColor = $positionTextColors[$position] ?? '#374151';
                                                 @endphp
-                                                <span style="background: none; color: {{ $textColor }}; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                                <span style="background: none; color: {{ $textColor }}; padding: 4px 8px; border-radius: 6px; font-size: 15px; font-weight: 600;">
                                                     <i class="fas {{ $icon }}"></i> {{ $position }}
                                                 </span>
                                             </td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">{{ $daysWorked }}</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ number_format($totalHoursWorked, 2) }} hrs</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($hourlyRate, 2) }}/hr</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($laborCost, 2) }}</td>
                                             @if ($isPM)
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
                                                 <td style="padding: 12px; color: var(--gray-700); font-style: italic; font-size: 12px;">Auto-assigned</td>
                                             @else
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">{{ $daysWorked }}</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ number_format($totalHoursWorked, 2) }} hrs</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($hourlyRate, 2) }}/hr</td>
-                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($laborCost, 2) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <form method="POST" action="{{ route('projects.employees.remove', [$project->id, $employee->id]) }}" style="display: inline;" onsubmit="return confirm('Remove this employee?');">
                                                         @csrf
@@ -1807,65 +1801,672 @@
 
                 <!-- Reports Tab -->
                 <div id="report" class="tab-content">
-                    <div class="report-section">
-                        <div class="report-title">Project Summary Report</div>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-value">{{ $project->employees->count() }}</div>
-                                <div class="stat-label">Assigned Employees</div>
+                    <!-- Reports Page - Formal, Printable System Outputs -->
+                    <style>
+                        .report-container { background: #fff; padding: 20px 24px 20px 24px; margin: 0 -24px; }
+                        .report-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px 0; margin-left: -24px; margin-right: -24px; padding: 20px 24px 20px 24px; border-bottom: 1px solid var(--gray-300); }
+                        .report-nav-btn { padding: 12px 20px; border: 1px solid var(--gray-300); background: #fff; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--gray-700); transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+                        .report-nav-btn:hover { background: var(--sidebar-bg); border-color: var(--accent); }
+                        .report-nav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+                        .report-nav-btn i { font-size: 14px; }
+                        .report-panel { display: none; padding: 8px 0; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+                        .report-panel.active { display: block; }
+                        .report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+                        .report-header-title { font-size: 20px; font-weight: 700; color: var(--black-1); margin: 0; }
+                        .report-header-subtitle { font-size: 13px; color: var(--gray-600); margin-top: 6px; }
+                        .report-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+                        .report-action-btn { padding: 10px 16px; border: 1px solid var(--gray-300); background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--gray-700); transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+                        .report-action-btn:hover { background: var(--sidebar-bg); }
+                        .report-action-btn.pdf { color: #dc2626; border-color: #fecaca; }
+                        .report-action-btn.pdf:hover { background: #fef2f2; }
+                        .report-action-btn.excel { color: #166534; border-color: #bbf7d0; }
+                        .report-action-btn.excel:hover { background: #f0fdf4; }
+                        .report-action-btn.print { color: var(--accent); border-color: #bfdbfe; }
+                        .report-action-btn.print:hover { background: #eff6ff; }
+                        .report-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+                        .report-table th { background: var(--sidebar-bg); padding: 14px 16px; text-align: left; font-weight: 600; color: var(--black-1); border-bottom: 2px solid var(--gray-300); }
+                        .report-table td { padding: 14px 16px; border-bottom: 1px solid var(--gray-300); color: var(--gray-700); line-height: 1.5; }
+                        .report-table tr:hover { background: #fafafa; }
+                        .report-table .text-right { text-align: right; }
+                        .report-table .text-center { text-align: center; }
+                        .report-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--gray-300); font-size: 13px; color: var(--gray-500); line-height: 1.8; }
+                        .report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+                        .report-summary-item { padding: 18px; border: 1px solid var(--gray-300); border-radius: 8px; background: #fff; }
+                        .report-summary-label { font-size: 12px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+                        .report-summary-value { font-size: 18px; font-weight: 700; color: var(--black-1); }
+                        .report-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px 32px; margin-top: 24px; margin-bottom: 32px; }
+                        .report-detail-item { display: flex; flex-direction: column; }
+                        .report-detail-label { font-size: 12px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; font-weight: 600; }
+                        .report-detail-value { font-size: 15px; color: var(--black-1); line-height: 1.6; padding-bottom: 12px; border-bottom: 1px solid var(--gray-200); }
+                        .report-notice { padding: 16px 20px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 12px; }
+                        .report-notice i { color: #d97706; margin-top: 2px; font-size: 16px; }
+                        .report-notice-text { font-size: 14px; color: #92400e; line-height: 1.5; }
+                        .report-locked { padding: 50px 40px; text-align: center; background: var(--sidebar-bg); border-radius: 10px; }
+                        .report-locked i { font-size: 52px; color: var(--gray-400); margin-bottom: 16px; }
+                        .report-locked-title { font-size: 18px; font-weight: 600; color: var(--gray-700); margin-bottom: 10px; }
+                        .report-locked-text { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+                        @media print {
+                            .report-nav, .report-actions, .sidebar, .header, .tabs { display: none !important; }
+                            .report-panel { display: block !important; }
+                            .main-content { margin: 0 !important; }
+                            .report-table { font-size: 12px; }
+                        }
+                    </style>
+
+                    <div class="report-container">
+                        <!-- Report Navigation -->
+                        <div class="report-nav">
+                            <button class="report-nav-btn active" onclick="switchReport('status')">
+                                <i class="fas fa-chart-line"></i> Project Status
+                            </button>
+                            <button class="report-nav-btn" onclick="switchReport('accomplishment')">
+                                <i class="fas fa-check-double"></i> Accomplishment
+                            </button>
+                            <button class="report-nav-btn" onclick="switchReport('boq')">
+                                <i class="fas fa-file-invoice-dollar"></i> BOQ / Cost
+                            </button>
+                            <button class="report-nav-btn" onclick="switchReport('timeline')">
+                                <i class="fas fa-calendar-alt"></i> Timeline / Schedule
+                            </button>
+                            <button class="report-nav-btn" onclick="switchReport('labor')">
+                                <i class="fas fa-users"></i> Team Workers / Labor
+                            </button>
+                            <button class="report-nav-btn" onclick="switchReport('activity')">
+                                <i class="fas fa-history"></i> Activity Log
+                            </button>
+                        </div>
+
+                        <!-- 1. Project Status Report -->
+                        <div id="report-status" class="report-panel active">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Project Status Report</h3>
+                                    <p class="report-header-subtitle">Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <a href="{{ route('pdf.project.download', $project->id) }}" class="report-action-btn pdf">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </a>
+                                    <a href="{{ route('csv.project.download', $project->id) }}" class="report-action-btn excel">
+                                        <i class="fas fa-file-excel"></i> Export Excel
+                                    </a>
+                                </div>
                             </div>
+
                             @php
-                                $effectiveUsedAmount = $project->getEffectiveUsedAmount();
-                                $budgetUtilized = $project->allocated_amount > 0 ? round(($effectiveUsedAmount / $project->allocated_amount) * 100, 2) : 0;
+                                $startDate = $project->date_started ? \Carbon\Carbon::parse($project->date_started) : null;
+                                $targetDate = $project->target_timeline ? \Carbon\Carbon::parse($project->target_timeline) : null;
+                                $endDate = $project->date_ended ? \Carbon\Carbon::parse($project->date_ended) : null;
+                                $isDelayed = $targetDate && now()->gt($targetDate) && $project->status !== 'Completed';
+                                
+                                // Calculate progress (based on approved BOQ items - same as Overview)
+                                $reportMaterials = $project->materials ?? collect();
+                                $totalItems = $reportMaterials->count();
+                                $approvedItems = $reportMaterials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'approved'; })->count();
+                                $progress = $totalItems > 0 ? round(($approvedItems / $totalItems) * 100, 1) : 0;
                             @endphp
-                            <div class="stat-item">
-                                <div class="stat-value">₱{{ number_format($effectiveUsedAmount, 2) }}</div>
-                                <div class="stat-label">Amount Used</div>
+
+                            <div class="report-summary">
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Current Status</div>
+                                    <div class="report-summary-value" style="color: {{ $project->status === 'Completed' ? '#166534' : ($project->status === 'Ongoing' ? '#0369a1' : '#374151') }};">{{ $project->status }}</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Progress</div>
+                                    <div class="report-summary-value">{{ $progress }}%</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Delay Status</div>
+                                    <div class="report-summary-value" style="color: {{ $isDelayed ? '#dc2626' : '#166534' }};">{{ $isDelayed ? 'Yes' : 'No' }}</div>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-value">{{ $budgetUtilized }}%</div>
-                                <div class="stat-label">Budget Utilized</div>
+
+                            <div class="report-details-grid">
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Project Name</div>
+                                    <div class="report-detail-value">{{ $project->project_name ?? $project->project_code }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Project Code</div>
+                                    <div class="report-detail-value">{{ $project->project_code }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Client</div>
+                                    <div class="report-detail-value">{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) ?: 'Not specified' }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Project Manager</div>
+                                    <div class="report-detail-value">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Start Date</div>
+                                    <div class="report-detail-value">{{ $startDate ? $startDate->format('F d, Y') : 'Not set' }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Target Date</div>
+                                    <div class="report-detail-value">{{ $targetDate ? $targetDate->format('F d, Y') : 'Not set' }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Current Status</div>
+                                    <div class="report-detail-value">{{ $project->status }}</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Progress</div>
+                                    <div class="report-detail-value">{{ $progress }}% ({{ $approvedItems }} of {{ $totalItems }} BOQ items approved)</div>
+                                </div>
+                                <div class="report-detail-item">
+                                    <div class="report-detail-label">Delay</div>
+                                    <div class="report-detail-value" style="color: {{ $isDelayed ? '#dc2626' : '#166534' }};">{{ $isDelayed ? 'Yes - Project is behind schedule' : 'No - On track' }}</div>
+                                </div>
+                            </div>
+
+                            <div class="report-footer">
+                                <strong>Prepared for:</strong> Owner, Project Manager<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
                             </div>
                         </div>
-                    </div>
 
-                    <div class="report-section">
-                        <div class="report-title">Project Timeline</div>
-                        <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px;">
-                            <p style="margin-bottom: 10px;"><strong>Start Date:</strong> {{ $project->date_started?->format('M d, Y') ?? 'Not set' }}</p>
-                            <p style="margin-bottom: 10px;"><strong>End Date:</strong> {{ $project->date_ended?->format('M d, Y') ?? 'Not set' }}</p>
-                            <p style="margin-bottom: 10px;"><strong>Target Timeline:</strong> {{ $project->target_timeline?->format('M d, Y') ?? 'Not set' }}</p>
-                            <p><strong>Created:</strong> {{ $project->created_at->format('M d, Y H:i') }}</p>
+                        <!-- 2. Accomplishment Report -->
+                        <div id="report-accomplishment" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Accomplishment Report</h3>
+                                    <p class="report-header-subtitle">Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                @if($project->status === 'Completed')
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <a href="{{ route('pdf.project.download', $project->id) }}" class="report-action-btn pdf">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </a>
+                                    <a href="{{ route('csv.project.download', $project->id) }}" class="report-action-btn excel">
+                                        <i class="fas fa-file-excel"></i> Export Excel
+                                    </a>
+                                </div>
+                                @endif
+                            </div>
+
+                            @if($project->status !== 'Completed')
+                                <div class="report-locked">
+                                    <i class="fas fa-lock"></i>
+                                    <div class="report-locked-title">Report Not Available</div>
+                                    <div class="report-locked-text">The Accomplishment Report is only available after project completion.<br>Current Status: <strong>{{ $project->status }}</strong></div>
+                                </div>
+                            @else
+                                <div class="report-notice">
+                                    <i class="fas fa-check-circle" style="color: #166534;"></i>
+                                    <div class="report-notice-text" style="color: #166534;">Project completed on {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('F d, Y') : 'N/A' }}</div>
+                                </div>
+
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 30%;">Field</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Project Name</strong></td>
+                                            <td>{{ $project->project_name ?? $project->project_code }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <h4 style="margin: 24px 0 12px; font-size: 15px; color: var(--black-1);">Tasks Completed</h4>
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Task</th>
+                                            <th>Date Completed</th>
+                                            <th>Remarks</th>
+                                            <th>Updated By</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($project->updates->where('status', 'Completed') as $update)
+                                            <tr>
+                                                <td>{{ $update->title }}</td>
+                                                <td>{{ $update->updated_at->format('M d, Y') }}</td>
+                                                <td>{{ $update->description ?? '-' }}</td>
+                                                <td>{{ $update->updatedBy?->name ?? 'System' }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" style="text-align: center; color: var(--gray-500);">No completed tasks recorded</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+
+                                <div class="report-footer">
+                                    <strong>Approved By:</strong> {{ $project->assignedPM?->name ?? 'Project Manager' }}<br>
+                                    <strong>Completion Date:</strong> {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('F d, Y') : 'N/A' }}
+                                </div>
+                            @endif
                         </div>
-                    </div>
 
-                    <div class="report-section">
-                        <div class="report-title">Download Report</div>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            @if ($project->status === 'Completed')
-                                <div style="width: 100%; padding: 12px 16px; background: #dbeafe; border-left: 4px solid #1e40af; border-radius: 6px; margin-bottom: 12px;">
-                                    <div style="display: flex; align-items: center; gap: 8px; color: #1e3a8a; font-weight: 600;">
-                                        <i class="fas fa-check-circle"></i>
-                                        Project Complete - Download final report
+                        <!-- 3. BOQ / Cost Report -->
+                        <div id="report-boq" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Bill of Quantities / Cost Report</h3>
+                                    <p class="report-header-subtitle">Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <a href="{{ route('pdf.boq.download', $project->id) }}" class="report-action-btn pdf">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </a>
+                                    <a href="{{ route('csv.project.download', $project->id) }}" class="report-action-btn excel">
+                                        <i class="fas fa-file-excel"></i> Export Excel
+                                    </a>
+                                </div>
+                            </div>
+
+                            @php
+                                $boqItems = $project->materials ?? collect();
+                                $reportTotalMaterial = 0;
+                                $reportTotalLabor = 0;
+                                $reportGrandTotal = 0;
+                            @endphp
+
+                            <div class="report-summary">
+                                @php
+                                    foreach($boqItems as $item) {
+                                        $matCost = $item->material_cost ?? 0;
+                                        $labCost = $item->labor_cost ?? 0;
+                                        $qty = $item->quantity ?? 0;
+                                        $reportTotalMaterial += $matCost * $qty;
+                                        $reportTotalLabor += $labCost * $qty;
+                                        $reportGrandTotal += ($matCost + $labCost) * $qty;
+                                    }
+                                    $reportVAT = $reportGrandTotal * 0.12;
+                                    $reportGrandTotalWithVAT = $reportGrandTotal + $reportVAT;
+                                @endphp
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Total Material Cost</div>
+                                    <div class="report-summary-value">₱{{ number_format($reportTotalMaterial, 2) }}</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Total Labor Cost</div>
+                                    <div class="report-summary-value">₱{{ number_format($reportTotalLabor, 2) }}</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Subtotal</div>
+                                    <div class="report-summary-value">₱{{ number_format($reportGrandTotal, 2) }}</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Grand Total (w/ 12% VAT)</div>
+                                    <div class="report-summary-value" style="color: var(--accent);">₱{{ number_format($reportGrandTotalWithVAT, 2) }}</div>
+                                </div>
+                            </div>
+
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">Item No.</th>
+                                        <th>Item Description</th>
+                                        <th class="text-center" style="width: 70px;">Qty</th>
+                                        <th class="text-center" style="width: 70px;">Unit</th>
+                                        <th class="text-right" style="width: 110px;">Material</th>
+                                        <th class="text-right" style="width: 110px;">Labor</th>
+                                        <th class="text-right" style="width: 110px;">Unit Rate</th>
+                                        <th class="text-right" style="width: 120px;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($boqItems as $index => $item)
+                                        @php
+                                            $itemMatCost = $item->material_cost ?? 0;
+                                            $itemLabCost = $item->labor_cost ?? 0;
+                                            $itemUnitRate = $itemMatCost + $itemLabCost;
+                                            $itemQty = $item->quantity ?? 0;
+                                            $itemTotal = $itemUnitRate * $itemQty;
+                                        @endphp
+                                        <tr>
+                                            <td class="text-center">{{ $item->item_no ?? ($index + 1) }}</td>
+                                            <td>
+                                                <div style="white-space: pre-wrap; line-height: 1.5;">{!! nl2br(e($item->item_description)) !!}</div>
+                                                @if($item->category)
+                                                    <div style="font-size: 12px; color: var(--gray-500); margin-top: 6px;"><strong>Category:</strong> {{ $item->category }}</div>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">{{ $itemQty }}</td>
+                                            <td class="text-center">{{ $item->unit ?? '—' }}</td>
+                                            <td class="text-right">₱{{ number_format($itemMatCost, 2) }}</td>
+                                            <td class="text-right">₱{{ number_format($itemLabCost, 2) }}</td>
+                                            <td class="text-right">₱{{ number_format($itemUnitRate, 2) }}</td>
+                                            <td class="text-right" style="font-weight: 600;">₱{{ number_format($itemTotal, 2) }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" style="text-align: center; color: var(--gray-500);">No BOQ items recorded</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background: var(--sidebar-bg); font-weight: 600;">
+                                        <td colspan="4" class="text-right">SUBTOTAL:</td>
+                                        <td class="text-right">₱{{ number_format($reportTotalMaterial, 2) }}</td>
+                                        <td class="text-right">₱{{ number_format($reportTotalLabor, 2) }}</td>
+                                        <td class="text-right"></td>
+                                        <td class="text-right">₱{{ number_format($reportGrandTotal, 2) }}</td>
+                                    </tr>
+                                    <tr style="font-weight: 600;">
+                                        <td colspan="7" class="text-right">VAT 12%:</td>
+                                        <td class="text-right">₱{{ number_format($reportVAT, 2) }}</td>
+                                    </tr>
+                                    <tr style="background: var(--sidebar-bg); font-weight: 700; font-size: 15px;">
+                                        <td colspan="7" class="text-right">Grand Total w/ VAT:</td>
+                                        <td class="text-right" style="color: var(--accent);">₱{{ number_format($reportGrandTotalWithVAT, 2) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <div class="report-footer">
+                                <strong>Prepared for:</strong> Finance, Admin<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
+                            </div>
+                        </div>
+
+                        <!-- 4. Timeline / Schedule Report -->
+                        <div id="report-timeline" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Timeline / Schedule Report</h3>
+                                    <p class="report-header-subtitle">Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <a href="{{ route('pdf.project.download', $project->id) }}" class="report-action-btn pdf">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </a>
+                                </div>
+                            </div>
+
+                            @php
+                                $plannedStart = $project->date_started ? \Carbon\Carbon::parse($project->date_started) : null;
+                                $plannedEnd = $project->target_timeline ? \Carbon\Carbon::parse($project->target_timeline) : null;
+                                $actualEnd = $project->date_ended ? \Carbon\Carbon::parse($project->date_ended) : null;
+                                
+                                $varianceDays = 0;
+                                if ($plannedEnd && $actualEnd) {
+                                    $varianceDays = $plannedEnd->diffInDays($actualEnd, false);
+                                } elseif ($plannedEnd && $project->status !== 'Completed') {
+                                    $varianceDays = $plannedEnd->diffInDays(now(), false);
+                                }
+                            @endphp
+
+                            <div class="report-summary">
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Planned Duration</div>
+                                    <div class="report-summary-value">{{ $plannedStart && $plannedEnd ? $plannedStart->diffInDays($plannedEnd) : '-' }} days</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Actual Duration</div>
+                                    <div class="report-summary-value">{{ $plannedStart && $actualEnd ? $plannedStart->diffInDays($actualEnd) : ($plannedStart ? $plannedStart->diffInDays(now()) : '-') }} days</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Variance</div>
+                                    <div class="report-summary-value" style="color: {{ $varianceDays > 0 ? '#dc2626' : '#166534' }};">
+                                        {{ $varianceDays > 0 ? '+' : '' }}{{ $varianceDays }} days
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35%;">Milestone</th>
+                                        <th>Planned Date</th>
+                                        <th>Actual Date</th>
+                                        <th>Variance (Days)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Project Start</strong></td>
+                                        <td>{{ $plannedStart ? $plannedStart->format('M d, Y') : 'Not set' }}</td>
+                                        <td>{{ $plannedStart ? $plannedStart->format('M d, Y') : '-' }}</td>
+                                        <td style="color: #166534;">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Project Completion</strong></td>
+                                        <td>{{ $plannedEnd ? $plannedEnd->format('M d, Y') : 'Not set' }}</td>
+                                        <td>{{ $actualEnd ? $actualEnd->format('M d, Y') : ($project->status === 'Completed' ? '-' : 'In Progress') }}</td>
+                                        <td style="color: {{ $varianceDays > 0 ? '#dc2626' : '#166534' }};">
+                                            {{ $varianceDays > 0 ? '+' : '' }}{{ $varianceDays }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            @if($varianceDays > 0)
+                                <div class="report-notice" style="margin-top: 20px;">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div class="report-notice-text">
+                                        <strong>Delay Analysis:</strong> This project is {{ abs($varianceDays) }} day(s) behind the planned schedule.
                                     </div>
                                 </div>
                             @endif
-                            <a href="{{ route('pdf.project.download', $project->id) }}" class="btn btn-primary">
-                                <i class="fas fa-file-pdf"></i> Download PDF Report
-                            </a>
-                            <a href="{{ route('pdf.boq.download', $project->id) }}" class="btn btn-primary">
-                                <i class="fas fa-list"></i> Download BOQ
-                            </a>
-                            <a href="{{ route('csv.project.download', $project->id) }}" class="btn btn-secondary">
-                                <i class="fas fa-file-csv"></i> Download CSV Report
-                            </a>
-                            @if ($project->status === 'Completed')
-                                <a href="{{ route('reports.download', $project->id) }}" class="btn btn-primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #059669;">
-                                    <i class="fas fa-download"></i> Download Project Report
-                                </a>
-                            @endif
+
+                            <div class="report-footer">
+                                <strong>Used for:</strong> Delay Analysis<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
+                            </div>
+                        </div>
+
+                        <!-- 5. Team Workers / Labor Report -->
+                        <div id="report-labor" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Team Workers / Labor Report</h3>
+                                    <p class="report-header-subtitle">Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <a href="{{ route('pdf.project.download', $project->id) }}" class="report-action-btn pdf">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </a>
+                                    <a href="{{ route('csv.project.download', $project->id) }}" class="report-action-btn excel">
+                                        <i class="fas fa-file-excel"></i> Export Excel
+                                    </a>
+                                </div>
+                            </div>
+
+                            @php
+                                $laborReportTotal = 0;
+                                $dateFrom = '2025-12-01';
+                                $dateTo = '2025-12-31';
+                            @endphp
+
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Worker Name</th>
+                                        <th>Role</th>
+                                        <th class="text-center">Work Days</th>
+                                        <th class="text-right">Total Hours</th>
+                                        <th class="text-right">Hourly Rate</th>
+                                        <th class="text-right">Labor Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if($project->assignedPM)
+                                        @php
+                                            $pmAttRecords = \App\Models\EmployeeAttendance::where('employee_id', $project->assignedPM->id)
+                                                ->whereBetween('date', [$dateFrom, $dateTo])
+                                                ->whereNotNull('punch_in_time')
+                                                ->whereNotNull('punch_out_time')
+                                                ->get();
+                                            $pmDays = $pmAttRecords->count();
+                                            $pmHours = $pmAttRecords->sum(fn($a) => $a->getHoursWorked() ?? 0);
+                                            $pmPosRate = \App\Models\PositionDailyRate::where('position', 'Project Manager')->first();
+                                            $pmDaily = $pmPosRate ? $pmPosRate->daily_rate : 700.00;
+                                            $pmHourly = \App\Models\EmployeeAttendance::calculateHourlyRate($pmDaily);
+                                            $pmLabor = 0;
+                                            foreach($pmAttRecords as $att) { $pmLabor += $att->calculateLaborCost($pmDaily); }
+                                            $laborReportTotal += $pmLabor;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $project->assignedPM->name }}</td>
+                                            <td>Project Manager</td>
+                                            <td class="text-center">{{ $pmDays }}</td>
+                                            <td class="text-right">{{ number_format($pmHours, 2) }} hrs</td>
+                                            <td class="text-right">₱{{ number_format($pmHourly, 2) }}/hr</td>
+                                            <td class="text-right">₱{{ number_format($pmLabor, 2) }}</td>
+                                        </tr>
+                                    @endif
+                                    @forelse($project->employees as $emp)
+                                        @php
+                                            $empAttRecords = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                                ->whereBetween('date', [$dateFrom, $dateTo])
+                                                ->whereNotNull('punch_in_time')
+                                                ->whereNotNull('punch_out_time')
+                                                ->get();
+                                            $empDays = $empAttRecords->count();
+                                            $empHours = $empAttRecords->sum(fn($a) => $a->getHoursWorked() ?? 0);
+                                            $empPosition = $emp->position ?? 'Construction Worker';
+                                            $empPosRate = \App\Models\PositionDailyRate::where('position', $empPosition)->first();
+                                            $empDaily = $empPosRate ? $empPosRate->daily_rate : 700.00;
+                                            $empHourly = \App\Models\EmployeeAttendance::calculateHourlyRate($empDaily);
+                                            $empLabor = 0;
+                                            foreach($empAttRecords as $att) { $empLabor += $att->calculateLaborCost($empDaily); }
+                                            $laborReportTotal += $empLabor;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $emp->full_name ?? ($emp->f_name . ' ' . $emp->l_name) }}</td>
+                                            <td>{{ $empPosition }}</td>
+                                            <td class="text-center">{{ $empDays }}</td>
+                                            <td class="text-right">{{ number_format($empHours, 2) }} hrs</td>
+                                            <td class="text-right">₱{{ number_format($empHourly, 2) }}/hr</td>
+                                            <td class="text-right">₱{{ number_format($empLabor, 2) }}</td>
+                                        </tr>
+                                    @empty
+                                        @if(!$project->assignedPM)
+                                            <tr>
+                                                <td colspan="6" style="text-align: center; color: var(--gray-500);">No team workers assigned</td>
+                                            </tr>
+                                        @endif
+                                    @endforelse
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background: var(--sidebar-bg); font-weight: 700;">
+                                        <td colspan="5" class="text-right">Total Labor Cost:</td>
+                                        <td class="text-right">₱{{ number_format($laborReportTotal, 2) }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <div class="report-footer">
+                                <strong>Report Period:</strong> {{ \Carbon\Carbon::parse($dateFrom)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($dateTo)->format('M d, Y') }}<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
+                            </div>
+                        </div>
+
+                        <!-- 6. Activity / Transaction Report -->
+                        <div id="report-activity" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Activity / Transaction Report</h3>
+                                    <p class="report-header-subtitle">Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                    <a href="{{ route('pdf.project.download', $project->id) }}" class="report-action-btn pdf">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </a>
+                                </div>
+                            </div>
+
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 18%;">Date & Time</th>
+                                        <th style="width: 15%;">User</th>
+                                        <th style="width: 25%;">Action Performed</th>
+                                        <th style="width: 15%;">Affected Module</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $activities = collect();
+                                        
+                                        // Add project updates as activities
+                                        if ($project->updates) {
+                                            foreach ($project->updates as $update) {
+                                                $activities->push([
+                                                    'date' => $update->created_at,
+                                                    'user' => $update->updatedBy?->name ?? 'System',
+                                                    'action' => 'Task ' . ($update->status === 'Completed' ? 'completed' : 'updated') . ': ' . $update->title,
+                                                    'module' => 'Tasks',
+                                                    'remarks' => $update->description ?? '-'
+                                                ]);
+                                            }
+                                        }
+                                        
+                                        // Add project creation
+                                        $activities->push([
+                                            'date' => $project->created_at,
+                                            'user' => 'System',
+                                            'action' => 'Project created',
+                                            'module' => 'Project',
+                                            'remarks' => 'Initial project setup'
+                                        ]);
+                                        
+                                        // Sort by date descending
+                                        $activities = $activities->sortByDesc('date')->take(50);
+                                    @endphp
+                                    
+                                    @forelse($activities as $activity)
+                                        <tr>
+                                            <td>{{ $activity['date']->format('M d, Y h:i A') }}</td>
+                                            <td>{{ $activity['user'] }}</td>
+                                            <td>{{ $activity['action'] }}</td>
+                                            <td>{{ $activity['module'] }}</td>
+                                            <td>{{ Str::limit($activity['remarks'], 50) }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" style="text-align: center; color: var(--gray-500);">No activity records found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+
+                            <div class="report-footer">
+                                <strong>Note:</strong> This report shows human-readable activity logs. Last 50 entries displayed.<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
+                            </div>
                         </div>
                     </div>
+
+                    <script>
+                        function switchReport(reportId) {
+                            // Update nav buttons
+                            document.querySelectorAll('.report-nav-btn').forEach(btn => btn.classList.remove('active'));
+                            document.querySelector(`[onclick="switchReport('${reportId}')"]`).classList.add('active');
+                            
+                            // Update panels
+                            document.querySelectorAll('.report-panel').forEach(panel => panel.classList.remove('active'));
+                            document.getElementById('report-' + reportId).classList.add('active');
+                        }
+                    </script>
                 </div>
             </section>
         </main>
@@ -1963,7 +2564,7 @@
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Notes</label>
                             <textarea id="boqNotes" name="notes" placeholder="Additional notes or remarks" rows="2"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: var(--text-md-normal-font-family);"></textarea>
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: 'Inter', sans-serif;"></textarea>
                         </div>
 
                         <input type="hidden" id="boqStatus" name="status" value="pending">
@@ -2084,7 +2685,7 @@
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description *</label>
                             <textarea id="taskDescription" name="description" placeholder="Enter task description" required rows="3"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: var(--text-md-normal-font-family);"></textarea>
+                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: 'Inter', sans-serif;"></textarea>
                         </div>
 
                         <div style="margin-bottom: 15px;">
@@ -2158,6 +2759,78 @@
                 </div>
             </div>
         </div>
+
+        <!-- Failure Reason Modal for Finance & Transactions -->
+        <div id="failureReasonModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 550px;">
+                <div class="modal-header" style="background: #fef2f2; border-bottom: 2px solid #fecaca;">
+                    <h2 class="modal-title" style="color: #991b1b; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Reason for Failure</span>
+                    </h2>
+                    <button class="modal-close" onclick="closeFailureReasonModal()" style="color: #991b1b;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="padding: 24px;">
+                    <input type="hidden" id="failureMaterialId" value="">
+                    
+                    <p style="color: var(--gray-600); font-size: 14px; margin-bottom: 20px;">
+                        Please select the reason for marking this item as failed and provide additional details if necessary.
+                    </p>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--black-1);">Failure Reason *</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Defective/Damaged Materials" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Defective/Damaged Materials</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Wrong Specifications" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Wrong Specifications</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Incomplete Delivery" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Incomplete Delivery</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Quality Issue" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Quality Issue</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Budget Exceeded" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Budget Exceeded</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Supplier Issue" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Supplier Issue</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" class="failure-reason-option">
+                                <input type="radio" name="failureReason" value="Other" style="width: 18px; height: 18px;">
+                                <span style="color: var(--gray-700);">Other</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--black-1);">Additional Notes</label>
+                        <textarea id="failureNotes" rows="3" placeholder="Provide additional details about the failure..." 
+                            style="width: 100%; padding: 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-300); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn" style="background: var(--gray-200); color: var(--gray-700); padding: 10px 20px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeFailureReasonModal()">Cancel</button>
+                    <button type="button" class="btn" style="background: #dc2626; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="submitFailureReason()">
+                        <i class="fas fa-check"></i> Confirm Failure
+                    </button>
+                </div>
+            </div>
+        </div>
+        <style>
+            .failure-reason-option:hover { border-color: #fca5a5; background: #fef2f2; }
+            .failure-reason-option:has(input:checked) { border-color: #dc2626; background: #fef2f2; }
+        </style>
 
         <!-- Employee Assignment Modal -->
         <div id="employeeModal" class="modal">
@@ -3767,6 +4440,27 @@
                 return;
             }
 
+            // If status is failed, show failure reason modal for bulk
+            if (newStatus === 'failed') {
+                openBulkFailureReasonModal(checked.map(cb => cb.dataset.materialId));
+                return;
+            }
+
+            executeBulkStatusUpdate(newStatus, checked);
+        }
+
+        // Store bulk material IDs for failure reason modal
+        let bulkFailureMaterialIds = [];
+
+        function openBulkFailureReasonModal(materialIds) {
+            bulkFailureMaterialIds = materialIds;
+            document.getElementById('failureMaterialId').value = 'bulk';
+            document.getElementById('failureNotes').value = '';
+            document.querySelectorAll('input[name="failureReason"]').forEach(r => r.checked = false);
+            document.getElementById('failureReasonModal').style.display = 'flex';
+        }
+
+        function executeBulkStatusUpdate(newStatus, checked, failureReason = '', failureNotes = '') {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             if (!csrfToken) {
                 showNotification('CSRF token missing. Refresh and try again.', 'error');
@@ -3783,6 +4477,14 @@
                     return response.json();
                 })
                 .then(material => {
+                    // Build notes with failure reason if applicable
+                    let updatedNotes = material.notes || '';
+                    if (newStatus === 'failed' && failureReason) {
+                        const timestamp = new Date().toLocaleString();
+                        const failureInfo = `[FAILED - ${timestamp}] Reason: ${failureReason}${failureNotes ? '. Notes: ' + failureNotes : ''}`;
+                        updatedNotes = failureInfo + (updatedNotes ? '\n\n' + updatedNotes : '');
+                    }
+
                     const formData = new FormData();
                     formData.append('_method', 'PUT');
                     formData.append('_token', csrfToken);
@@ -3792,7 +4494,7 @@
                     formData.append('material_cost', material.material_cost || 0);
                     formData.append('labor_cost', material.labor_cost || 0);
                     formData.append('category', material.category || '');
-                    formData.append('notes', material.notes || '');
+                    formData.append('notes', updatedNotes);
                     formData.append('status', newStatus);
 
                     return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
@@ -3805,28 +4507,34 @@
 
             Promise.allSettled(updates).then(results => {
                 const completed = results.filter(r => r.status === 'fulfilled').length;
-                const failed = results.length - completed;
+                const failedCount = results.length - completed;
 
                 // Update UI selections and status colors
                 checked.forEach(cb => {
-                    cb.checked = false;
-                    const row = cb.closest('tr');
-                    const select = row?.querySelector('.status-select');
-                    if (select) {
-                        select.value = newStatus;
-                        setStatusSelectColor(select);
+                    if (cb.checked !== undefined) cb.checked = false;
+                    const materialId = cb.dataset?.materialId;
+                    if (materialId) {
+                        const checkbox = document.querySelector(`.transaction-checkbox[data-material-id="${materialId}"]`);
+                        if (checkbox) checkbox.checked = false;
+                        const row = checkbox?.closest('tr');
+                        const select = row?.querySelector('.status-select');
+                        if (select) {
+                            select.value = newStatus;
+                            setStatusSelectColor(select);
+                        }
                     }
                 });
 
                 const selectAll = document.getElementById('selectAllTransactions');
+                const bulkStatusSelect = document.getElementById('bulkStatusSelect');
                 if (selectAll) selectAll.checked = false;
-                if (statusSelect) statusSelect.value = '';
+                if (bulkStatusSelect) bulkStatusSelect.value = '';
                 updateTransactionSelectionCount();
 
-                if (failed === 0) {
+                if (failedCount === 0) {
                     showNotification(`Updated ${completed} transaction(s).`, 'success', true);
                 } else {
-                    showNotification(`Updated ${completed} transaction(s); ${failed} failed.`, 'error');
+                    showNotification(`Updated ${completed} transaction(s); ${failedCount} failed.`, 'error');
                 }
             }).catch(error => {
                 console.error('Bulk update error:', error);
@@ -3835,7 +4543,13 @@
         }
 
         // Update material status from Finance & Transactions table
-        function updateMaterialStatus(materialId, newStatus) {
+        function updateMaterialStatus(materialId, newStatus, failureReason = '', failureNotes = '') {
+            // If status is failed and no reason provided, show the modal
+            if (newStatus === 'failed' && !failureReason) {
+                openFailureReasonModal(materialId);
+                return;
+            }
+
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             if (!csrfToken) {
                 showNotification('CSRF token not found. Please refresh and try again.', 'error');
@@ -3854,6 +4568,14 @@
                 return response.json();
             })
             .then(material => {
+                // Build notes with failure reason if applicable
+                let updatedNotes = material.notes || '';
+                if (newStatus === 'failed' && failureReason) {
+                    const timestamp = new Date().toLocaleString();
+                    const failureInfo = `[FAILED - ${timestamp}] Reason: ${failureReason}${failureNotes ? '. Notes: ' + failureNotes : ''}`;
+                    updatedNotes = failureInfo + (updatedNotes ? '\n\n' + updatedNotes : '');
+                }
+
                 // Now send the update with all required fields
                 const formData = new FormData();
                 formData.append('_method', 'PUT');
@@ -3864,7 +4586,7 @@
                 formData.append('material_cost', material.material_cost || 0);
                 formData.append('labor_cost', material.labor_cost || 0);
                 formData.append('category', material.category || '');
-                formData.append('notes', material.notes || '');
+                formData.append('notes', updatedNotes);
                 formData.append('status', newStatus);
 
                 return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
@@ -3900,6 +4622,49 @@
                 console.error('Status update error:', error);
                 showNotification(error.message || 'Failed to update status', 'error');
             });
+        }
+
+        // Failure Reason Modal Functions
+        function openFailureReasonModal(materialId) {
+            document.getElementById('failureMaterialId').value = materialId;
+            document.getElementById('failureNotes').value = '';
+            document.querySelectorAll('input[name="failureReason"]').forEach(r => r.checked = false);
+            document.getElementById('failureReasonModal').style.display = 'flex';
+        }
+
+        function closeFailureReasonModal() {
+            document.getElementById('failureReasonModal').style.display = 'none';
+            // Reset the select dropdown to previous value
+            const materialId = document.getElementById('failureMaterialId').value;
+            const select = document.querySelector(`select[data-material-id="${materialId}"]`);
+            if (select) {
+                // Reset to pending if they cancel
+                select.value = 'pending';
+            }
+        }
+
+        function submitFailureReason() {
+            const materialId = document.getElementById('failureMaterialId').value;
+            const failureReason = document.querySelector('input[name="failureReason"]:checked')?.value;
+            const failureNotes = document.getElementById('failureNotes').value.trim();
+
+            if (!failureReason) {
+                showNotification('Please select a failure reason', 'error');
+                return;
+            }
+
+            document.getElementById('failureReasonModal').style.display = 'none';
+
+            // Check if this is a bulk update
+            if (materialId === 'bulk' && bulkFailureMaterialIds.length > 0) {
+                const checked = bulkFailureMaterialIds.map(id => {
+                    return { dataset: { materialId: id } };
+                });
+                executeBulkStatusUpdate('failed', checked, failureReason, failureNotes);
+                bulkFailureMaterialIds = [];
+            } else {
+                updateMaterialStatus(materialId, 'failed', failureReason, failureNotes);
+            }
         }
 
         // Documentation filter

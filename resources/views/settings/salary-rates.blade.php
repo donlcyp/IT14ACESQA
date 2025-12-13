@@ -40,7 +40,7 @@
         }
 
         body {
-            font-family: var(--text-md-normal-font-family);
+            font-family: 'Inter', sans-serif;
             background-color: var(--main-bg);
             overflow-x: hidden;
         }

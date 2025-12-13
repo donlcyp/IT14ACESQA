@@ -59,7 +59,7 @@
         }
 
         body {
-            font-family: var(--text-md-normal-font-family);
+            font-family: 'Inter', sans-serif;
             background-color: var(--main-bg);
             overflow-x: hidden;
         }
@@ -665,7 +665,7 @@
         .employee-table tbody td {
             padding: 12px 16px;
             color: var(--black-1);
-            font-family: var(--text-md-normal-font-family);
+            font-family: 'Inter', sans-serif;
             font-size: var(--text-md-normal-font-size);
         }
 

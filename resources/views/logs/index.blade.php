@@ -56,7 +56,7 @@
     }
 
     body {
-      font-family: var(--text-md-normal-font-family);
+      font-family: 'Inter', sans-serif;
       background-color: var(--main-bg);
       color: var(--gray-700);
       transition: margin-left 0.3s ease;
@@ -261,7 +261,7 @@
       padding: 10px 12px;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
-      font-family: var(--text-md-normal-font-family);
+      font-family: 'Inter', sans-serif;
       font-size: 14px;
       transition: border-color 0.3s ease;
     }
