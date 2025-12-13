@@ -884,9 +884,8 @@
                     <div class="header-divider"></div>
                 </div>
 
-                <!-- Project Details (Compact Info Grid) -->
+                <!-- Tabs (Styles) -->
                 <style>
-                    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 12px; }
                     .info-item { padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 8px; background: #fff; }
                     .info-label { font-size: 12px; color: var(--gray-600); text-transform: uppercase; letter-spacing: .02em; }
                     .info-value { margin-top: 3px; font-size: 15px; color: var(--black-1); font-weight: 600; }
@@ -894,63 +893,6 @@
                     .tabs { margin-top: 14px; border-bottom: 1px solid var(--gray-300); padding-bottom: 6px; }
                     .tab-button { margin-right: 8px; }
                 </style>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">Status</div>
-                        <div class="info-value">
-                            <span class="badge-pill" style="background: #dbeafe; color: #0369a1;">{{ $project->status }}</span>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Client</div>
-                        <div class="info-value">{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Project Manager</div>
-                        <div class="info-value">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Location</div>
-                        <div class="info-value">{{ $project->location ?? 'Not specified' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Industry</div>
-                        <div class="info-value">{{ $project->industry ?? 'Not specified' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Project Type</div>
-                        <div class="info-value">
-                            @if($project->project_type)
-                                @php
-                                    $colorMap = [
-                                        'Plumbing Works' => ['#dbeafe', '#0369a1'],
-                                        'Fire Safety' => ['#fee2e2', '#991b1b'],
-                                        'Fire Detection Alarm System' => ['#fce7f3', '#be185d'],
-                                        'Gas Line Installation' => ['#dbeafe', '#1e40af'],
-                                        'Air-Conditioning System Installation & Maintenance' => ['#f3e8ff', '#6b21a8'],
-                                        'Ducting Works' => ['#fef3c7', '#92400e'],
-                                    ];
-                                    $colors = $colorMap[$project->project_type] ?? ['#f3f4f6', '#6b7280'];
-                                @endphp
-                                <span class="badge-pill" style="background: {{ $colors[0] }}; color: {{ $colors[1] }};">{{ $project->project_type }}</span>
-                            @else
-                                <span style="color: var(--gray-500);">Not specified</span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Budget</div>
-                        <div class="info-value">₱{{ number_format($project->allocated_amount, 2) }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Date Started</div>
-                        <div class="info-value">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started yet' }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Date Ended</div>
-                        <div class="info-value">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'Not ended yet' }}</div>
-                    </div>
-                </div>
 
                 <!-- Tabs -->
                 <div class="tabs">
@@ -964,57 +906,238 @@
 
                 <!-- Overview Tab -->
                 <div id="overview" class="tab-content active">
+                    <!-- Project Identification & Metadata -->
                     <div class="report-section">
-                        <div class="report-title">Project Information</div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                            <div>
-                                <div class="detail-label">Description</div>
-                                <div class="detail-value" style="font-size: 14px; color: var(--gray-700); font-weight: normal;">
-                                    {{ $project->description ?? 'No description provided' }}
+                        <div class="report-title">Project Identification</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                            <div class="info-item">
+                                <div class="info-label">Project Title</div>
+                                <div class="info-value" style="font-size: 16px;">{{ $project->project_name ?? $project->project_code }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Project ID</div>
+                                <div class="info-value">{{ $project->project_code }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Client/Stakeholder</div>
+                                <div class="info-value">{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Project Manager</div>
+                                <div class="info-value">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Project Type</div>
+                                <div class="info-value">{{ $project->project_type ?? 'Not specified' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Location/Site</div>
+                                <div class="info-value">{{ $project->location ?? 'Not specified' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status and Performance Metrics (Mini-Dashboard) -->
+                    <div class="report-section">
+                        <div class="report-title">Performance Dashboard</div>
+                        
+                        @php
+                            // Calculate project metrics
+                            $materials = $project->materials ?? collect();
+                            $totalExpenses = $materials->sum(function($m) {
+                                return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
+                            });
+                            $allocatedBudget = $project->allocated_amount ?? 0;
+                            $budgetUtilized = $allocatedBudget > 0 ? round(($totalExpenses / $allocatedBudget) * 100, 1) : 0;
+                            
+                            // Calculate progress (based on approved BOQ items)
+                            $totalItems = $materials->count();
+                            $approvedItems = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'approved'; })->count();
+                            $progressPercentage = $totalItems > 0 ? round(($approvedItems / $totalItems) * 100, 1) : 0;
+                            
+                            // Project health indicator (Green/Yellow/Red)
+                            $healthScore = 'green';
+                            if ($budgetUtilized > 90 || $progressPercentage < 50) {
+                                $healthScore = 'red';
+                            } elseif ($budgetUtilized > 75 || $progressPercentage < 75) {
+                                $healthScore = 'yellow';
+                            }
+                            
+                            $healthColor = match($healthScore) {
+                                'green' => '#16a34a',
+                                'yellow' => '#f59e0b',
+                                'red' => '#dc2626',
+                                default => '#6b7280'
+                            };
+                            
+                            $healthBg = match($healthScore) {
+                                'green' => '#dcfce7',
+                                'yellow' => '#fef3c7',
+                                'red' => '#fee2e2',
+                                default => '#f3f4f6'
+                            };
+                            
+                            // Calculate man-hours
+                            $totalManHours = 0;
+                            foreach($project->employees as $emp) {
+                                $dateFrom = '2025-12-01';
+                                $dateTo = '2025-12-31';
+                                $attendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $emp->id)
+                                    ->whereBetween('date', [$dateFrom, $dateTo])
+                                    ->whereNotNull('punch_in_time')
+                                    ->whereNotNull('punch_out_time')
+                                    ->get();
+                                $totalManHours += $attendanceRecords->sum(function($att) { return $att->getHoursWorked() ?? 0; });
+                            }
+                            
+                            // Count overdue tasks (using project updates as tasks)
+                            $overdueCount = $project->updates ? $project->updates->filter(function($update) {
+                                return strtolower($update->status ?? '') !== 'completed';
+                            })->count() : 0;
+                        @endphp
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                            <div class="info-item" style="border-left: 4px solid {{ $healthColor }};">
+                                <div class="info-label">Project Health</div>
+                                <div class="info-value" style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: {{ $healthColor }}; display: inline-block; box-shadow: 0 0 0 3px {{ $healthBg }};"></span>
+                                    <span style="color: {{ $healthColor }};">{{ ucfirst($healthScore) }}</span>
                                 </div>
                             </div>
-                            <div>
-                                <div class="detail-label">Target Timeline</div>
-                                <div class="detail-value">
-                                    {{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'Not set' }}
+                            
+                            <div class="info-item" style="border-left: 4px solid #0369a1;">
+                                <div class="info-label">Current Status</div>
+                                <div class="info-value" style="color: #0369a1;">{{ $project->status }}</div>
+                            </div>
+                            
+                            <div class="info-item" style="border-left: 4px solid #7c3aed;">
+                                <div class="info-label">Progress</div>
+                                <div class="info-value" style="color: #7c3aed;">{{ $progressPercentage }}% Complete</div>
+                                <div style="margin-top: 8px; height: 6px; background: #e9d5ff; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; background: #7c3aed; width: {{ $progressPercentage }}%; transition: width 0.3s;"></div>
                                 </div>
                             </div>
-                            <div>
-                                <div class="detail-label">Created On</div>
-                                <div class="detail-value">
-                                    {{ $project->created_at->format('M d, Y') }}
+                            
+                            <div class="info-item" style="border-left: 4px solid #be185d;">
+                                <div class="info-label">Budget Utilized</div>
+                                <div class="info-value" style="color: #be185d;">{{ $budgetUtilized }}% Spent</div>
+                                <div style="margin-top: 8px; height: 6px; background: #fce7f3; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; background: {{ $budgetUtilized > 90 ? '#dc2626' : '#be185d' }}; width: {{ min($budgetUtilized, 100) }}%; transition: width 0.3s;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item" style="border-left: 4px solid #16a34a;">
+                                <div class="info-label">Total Man-Hours</div>
+                                <div class="info-value" style="color: #16a34a;">{{ number_format($totalManHours, 1) }} hrs</div>
+                            </div>
+                            
+                            <div class="info-item" style="border-left: 4px solid {{ $overdueCount > 0 ? '#dc2626' : '#6b7280' }};">
+                                <div class="info-label">Pending Tasks</div>
+                                <div class="info-value" style="color: {{ $overdueCount > 0 ? '#dc2626' : '#6b7280' }};">{{ $overdueCount }} Active</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Section -->
+                        <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                            <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--black-1);">Timeline</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                                <div>
+                                    <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Start Date</div>
+                                    <div style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started' }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Target Completion</div>
+                                    <div style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'Not set' }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Actual/Expected End</div>
+                                    <div style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'In progress' }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Key Deliverables and Milestones -->
                     <div class="report-section">
-                        <div class="report-title">Project Team</div>
-                        @if ($project->employees && $project->employees->count() > 0)
-                            <div style="overflow-x: auto;">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Employee</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Position</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($project->employees as $employee)
-                                            <tr style="border-bottom: 1px solid var(--gray-400);">
-                                                <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                        <div class="report-title">Key Deliverables & Financial Summary</div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                            <!-- BOQ Summary Card -->
+                            <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i class="fas fa-file-invoice" style="color: #7c3aed; font-size: 20px;"></i>
+                                    <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--black-1);">Bill of Quantity</h3>
+                                </div>
+                                <div style="display: grid; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Total Items:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: var(--black-1);">{{ $totalItems }}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Approved:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: #16a34a;">{{ $approvedItems }}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Grand Total:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: #7c3aed;">₱{{ number_format($totalExpenses, 2) }}</span>
+                                    </div>
+                                </div>
                             </div>
-                        @else
-                            <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
-                                <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
-                                <p>No employees assigned to this project yet.</p>
+                            
+                            <!-- Budget Card -->
+                            <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i class="fas fa-wallet" style="color: #be185d; font-size: 20px;"></i>
+                                    <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--black-1);">Budget Status</h3>
+                                </div>
+                                <div style="display: grid; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Allocated:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: var(--black-1);">₱{{ number_format($allocatedBudget, 2) }}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Spent:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: #dc2626;">₱{{ number_format($totalExpenses, 2) }}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Remaining:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: {{ $allocatedBudget - $totalExpenses < 0 ? '#dc2626' : '#16a34a' }};">₱{{ number_format(max(0, $allocatedBudget - $totalExpenses), 2) }}</span>
+                                    </div>
+                                </div>
                             </div>
-                        @endif
+                            
+                            <!-- Team Card -->
+                            <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i class="fas fa-users" style="color: #0369a1; font-size: 20px;"></i>
+                                    <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--black-1);">Team Summary</h3>
+                                </div>
+                                <div style="display: grid; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Total Workers:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: var(--black-1);">{{ $project->employees->count() + 1 }}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Project Manager:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: #0369a1;">{{ $project->assignedPM?->name ?? 'N/A' }}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="font-size: 13px; color: var(--gray-600);">Total Hours:</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: #16a34a;">{{ number_format($totalManHours, 1) }} hrs</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Description -->
+                    <div class="report-section">
+                        <div class="report-title">Project Description</div>
+                        <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                            <p style="margin: 0; font-size: 14px; color: var(--gray-700); line-height: 1.6;">
+                                {{ $project->description ?? 'No description provided for this project.' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -1022,48 +1145,6 @@
                 <div id="boq" class="tab-content">
                     <div class="report-section">
                         <div class="report-title">Bill of Quantity</div>
-                        
-                        @if ($project->materials && $project->materials->count() > 0)
-                        <!-- BOQ Summary (Compact Metrics) -->
-                        @php
-                            $totalMaterial = 0;
-                            $totalLabor = 0;
-                            $grandTotal = 0;
-                            foreach ($project->materials as $material) {
-                                $materialCost = $material->material_cost ?? 0;
-                                $laborCost = $material->labor_cost ?? 0;
-                                $unitTotal = $materialCost + $laborCost;
-                                $itemTotal = $unitTotal * ($material->quantity ?? 0);
-                                $totalMaterial += $materialCost * ($material->quantity ?? 0);
-                                $totalLabor += $laborCost * ($material->quantity ?? 0);
-                                $grandTotal += $itemTotal;
-                            }
-                            $vat = $grandTotal * 0.12;
-                            $grandTotalWithVAT = $grandTotal + $vat;
-                        @endphp
-                        <div style="margin-bottom: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                            <div class="info-item" style="border-left: 4px solid #0369a1;">
-                                <div class="info-label" style="color:#0369a1;">Total Material Cost</div>
-                                <div class="info-value" style="color:#0369a1;">₱{{ number_format($totalMaterial, 2) }}</div>
-                            </div>
-                            <div class="info-item" style="border-left: 4px solid #6a1b9a;">
-                                <div class="info-label" style="color:#6a1b9a;">Total Labor Cost</div>
-                                <div class="info-value" style="color:#6a1b9a;">₱{{ number_format($totalLabor, 2) }}</div>
-                            </div>
-                            <div class="info-item" style="border-left: 4px solid #1e3a8a;">
-                                <div class="info-label" style="color:#1e3a8a;">Subtotal</div>
-                                <div class="info-value" style="color:#1e3a8a;">₱{{ number_format($grandTotal, 2) }}</div>
-                            </div>
-                            <div class="info-item" style="border-left: 4px solid #f59e0b;">
-                                <div class="info-label" style="color:#856404;">VAT 12%</div>
-                                <div class="info-value" style="color:#856404;">₱{{ number_format($vat, 2) }}</div>
-                            </div>
-                            <div class="info-item" style="border-left: 4px solid #1e40af;">
-                                <div class="info-label" style="color:#1e3a8a;">Grand Total w/ VAT</div>
-                                <div class="info-value" style="color:#1e3a8a; font-size: 18px;">₱{{ number_format($grandTotalWithVAT, 2) }}</div>
-                            </div>
-                        </div>
-                        @endif
                         
                         <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
                             <button type="button" class="btn btn-primary" onclick="return openBOQModal();">
@@ -1085,15 +1166,15 @@
                                             <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 50px;">
                                                 <input type="checkbox" id="selectAllBOQ" onchange="toggleAllBOQItems()" style="cursor: pointer; width: 18px; height: 18px;">
                                             </th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 60px;">Item No.</th>
-                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1); font-size: 14px;">Item Description</th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 80px;">Qty</th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 80px;">Unit</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 120px;">Material</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 120px;">Labor</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 100px;">Unit Rate</th>
-                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 14px; width: 120px;">Total</th>
-                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 14px; width: 100px;">Actions</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 16px; width: 60px;">Item No.</th>
+                                            <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1); font-size: 16px;">Item Description</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 16px; width: 80px;">Qty</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 16px; width: 80px;">Unit</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 16px; width: 120px;">Material</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 16px; width: 120px;">Labor</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 16px; width: 100px;">Unit Rate</th>
+                                            <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); font-size: 16px; width: 120px;">Total</th>
+                                            <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); font-size: 16px; width: 100px;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="boqTableBody">
@@ -1298,11 +1379,30 @@
                                     .status-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
                                 </style>
                             </div>
+
+                            <!-- Bulk Status Update Controls -->
+                            @if ($materials && $materials->count() > 0)
+                            <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+                                <select id="bulkStatusSelect" style="padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 13px; min-width: 160px;">
+                                    <option value="">-- Change Status To --</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="failed">Failed</option>
+                                </select>
+                                <button type="button" id="applyBulkStatusBtn" class="btn btn-primary" style="display: none;" onclick="applyBulkTransactionStatus()">
+                                    <i class="fas fa-check"></i> Apply to Selected (<span id="selectedTransactionCount">0</span>)
+                                </button>
+                            </div>
+                            @endif
+
                             @if ($materials && $materials->count() > 0)
                                 <div style="overflow-x: auto;">
-                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 17px;">
                                         <thead>
                                             <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
+                                                <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 50px;">
+                                                    <input type="checkbox" id="selectAllTransactions" onchange="toggleAllTransactions()" style="cursor: pointer; width: 18px; height: 18px;">
+                                                </th>
                                                 <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
                                                 <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Qty</th>
                                                 <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 100px;">Unit Rate</th>
@@ -1310,7 +1410,7 @@
                                                 <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 100px;">Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="transactionTableBody">
                                             @foreach ($materials as $material)
                                                 @php
                                                     $itemTotal = ($material->material_cost ?? 0 + $material->labor_cost ?? 0) * ($material->quantity ?? 0);
@@ -1321,7 +1421,10 @@
                                                         default => ['#f3f4f6', '#374151', '#6b7280']
                                                     };
                                                 @endphp
-                                                <tr style="border-bottom: 1px solid var(--gray-400);">
+                                                <tr style="border-bottom: 1px solid var(--gray-400);" data-transaction-id="{{ $material->id }}">
+                                                    <td style="padding: 12px; text-align: center;">
+                                                        <input type="checkbox" class="transaction-checkbox" data-material-id="{{ $material->id }}" onchange="updateTransactionSelectionCount()" style="cursor: pointer; width: 18px; height: 18px;">
+                                                    </td>
                                                     <td style="padding: 12px; color: var(--black-1);">
                                                         <div style="font-weight: 500; white-space: pre-wrap; line-height: 1.6; font-size: 15px;">{{ $material->item_description ?? 'N/A' }}</div>
                                                         @if($material->category)
@@ -1432,17 +1535,40 @@
                                 </thead>
                                 <tbody>
                                     @if ($project->assignedPM)
-                                        <tr style="border-bottom: 1px solid var(--gray-400); background: #f0fdf4;">
-                                            <td style="padding: 12px; color: var(--black-1); font-weight: 600;">{{ $project->assignedPM->name }}</td>
-                                            <td style="padding: 12px; color: var(--gray-700);">
-                                                <span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                                                    <i class="fas fa-crown"></i> Project Manager
-                                                </span>
-                                            </td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
+                                        @php
+                                            // Calculate PM attendance data
+                                            $dateFrom = '2025-12-01';
+                                            $dateTo = '2025-12-31';
+                                            
+                                            $pmAttendanceRecords = \App\Models\EmployeeAttendance::where('employee_id', $project->assignedPM->id)
+                                                ->whereBetween('date', [$dateFrom, $dateTo])
+                                                ->whereNotNull('punch_in_time')
+                                                ->whereNotNull('punch_out_time')
+                                                ->get();
+                                            
+                                            $pmDaysWorked = $pmAttendanceRecords->count();
+                                            $pmTotalHoursWorked = $pmAttendanceRecords->sum(function($att) {
+                                                return $att->getHoursWorked() ?? 0;
+                                            });
+                                            
+                                            // Get daily rate for Project Manager position
+                                            $pmPositionRate = \App\Models\PositionDailyRate::where('position', 'Project Manager')->first();
+                                            $pmDailyRate = $pmPositionRate ? $pmPositionRate->daily_rate : 700.00;
+                                            $pmHourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($pmDailyRate);
+                                            
+                                            // Calculate labor cost
+                                            $pmLaborCost = 0;
+                                            foreach($pmAttendanceRecords as $att) {
+                                                $pmLaborCost += $att->calculateLaborCost($pmDailyRate);
+                                            }
+                                        @endphp
+                                        <tr style="border-bottom: 1px solid var(--gray-400);">
+                                            <td style="padding: 12px; color: var(--black-1);">{{ $project->assignedPM->name }}</td>
+                                            <td style="padding: 12px; color: var(--gray-700);">Project Manager</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">{{ $pmDaysWorked }}</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ number_format($pmTotalHoursWorked, 2) }} hrs</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($pmHourlyRate, 2) }}/hr</td>
+                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">₱{{ number_format($pmLaborCost, 2) }}</td>
                                             <td style="padding: 12px; color: var(--gray-700); font-style: italic; font-size: 12px;">Auto-assigned</td>
                                         </tr>
                                     @endif
@@ -1536,20 +1662,33 @@
                         </form>
 
                         <div class="report-title">Documentation Gallery</div>
+
                         @if($project->documents && $project->documents->count() > 0)
-                            <div class="images-grid">
+                            <!-- Filter Controls -->
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
+                                <span style="font-size: 13px; color: var(--gray-600);">Filter by type:</span>
+                                <button type="button" class="btn" style="background: var(--sidebar-bg); color: var(--black-1); padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('all')">All</button>
+                                <button type="button" class="btn" style="background: #dbeafe; color: #1e3a8a; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('image')">Images</button>
+                                <button type="button" class="btn" style="background: #fee2e2; color: #b91c1c; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('pdf')">PDF</button>
+                                <button type="button" class="btn" style="background: #e0f2fe; color: #0369a1; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('excel')">XLS/XLSX</button>
+                                <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('other')">Other</button>
+                            </div>
+
+                            <div class="images-grid" id="documentationGrid">
                                 @foreach($project->documents as $doc)
                                     @php
-                                        $isImage = in_array(strtolower(pathinfo($doc->file_name, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                        $ext = strtolower(pathinfo($doc->file_name, PATHINFO_EXTENSION));
+                                        $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
                                         $mimeType = $doc->mime_type ?? '';
-                                        $fileExt = strtoupper(pathinfo($doc->file_name, PATHINFO_EXTENSION));
+                                        $fileExt = strtoupper($ext);
+                                        $docType = $isImage ? 'image' : (in_array($ext, ['pdf']) ? 'pdf' : (in_array($ext, ['xls','xlsx']) ? 'excel' : 'other'));
                                     @endphp
-                                    <div class="image-card">
+                                    <div class="image-card" data-doc-type="{{ $docType }}">
                                         <div style="height: 200px; background: var(--gray-200); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-radius: 6px 6px 0 0;">
                                             @if($isImage)
                                                 <img src="{{ asset('storage/' . $doc->file_path) }}" alt="{{ $doc->title }}" style="width: 100%; height: 100%; object-fit: cover;">
                                                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
-                                                    <button onclick="viewImage('{{ asset('storage/' . $doc->file_path) }}', '{{ $doc->title }}')" style="background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; color: #1e40af; font-size: 14px;" title="View Image">
+                                                    <button onclick="viewImage('{{ asset('storage/' . $doc->file_path) }}', '{{ $doc->title }}')" style="background: rgba(255,255,255,0.9); border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; color: #1e40af; font-size: 14px;" title="View Image">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                 </div>
@@ -1576,17 +1715,17 @@
                                             <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 10px;">{{ number_format($doc->file_size / 1024, 2) }} KB • By {{ $doc->uploader?->name ?? 'Unknown' }}</div>
                                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                                                 @if(!$isImage)
-                                                    <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" style="background: #1e40af; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Open Document">
+                                                    <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" style="background: #1e40af; color: white; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Open Document">
                                                         <i class="fas fa-external-link-alt"></i> Open
                                                     </a>
                                                 @endif
-                                                <a href="{{ asset('storage/' . $doc->file_path) }}" download style="background: #0969a2; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Download">
+                                                <a href="{{ asset('storage/' . $doc->file_path) }}" download style="background: #0969a2; color: white; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; flex: 1; justify-content: center;" title="Download">
                                                     <i class="fas fa-download"></i> Download
                                                 </a>
                                                 <form method="POST" action="{{ route('projects.documents.delete', [$project->id, $doc->id]) }}" style="display: inline; flex: 1;" onsubmit="return confirm('Are you sure you want to delete this document?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" style="background: #dc2626; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Delete">
+                                                    <button type="submit" style="background: #dc2626; color: white; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 13px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Delete">
                                                         <i class="fas fa-trash"></i> Delete
                                                     </button>
                                                 </form>
@@ -3519,6 +3658,114 @@
             return false;
         }
 
+        // Bulk status helpers for Finance & Transactions
+        function toggleAllTransactions() {
+            const selectAll = document.getElementById('selectAllTransactions');
+            const checkboxes = document.querySelectorAll('.transaction-checkbox');
+            checkboxes.forEach(cb => { cb.checked = selectAll.checked; });
+            updateTransactionSelectionCount();
+        }
+
+        function updateTransactionSelectionCount() {
+            const selected = document.querySelectorAll('.transaction-checkbox:checked').length;
+            const statusSelect = document.getElementById('bulkStatusSelect');
+            const applyBtn = document.getElementById('applyBulkStatusBtn');
+            const countSpan = document.getElementById('selectedTransactionCount');
+
+            if (countSpan) countSpan.textContent = selected;
+            if (applyBtn && statusSelect) {
+                applyBtn.style.display = (selected > 0 && statusSelect.value) ? 'inline-flex' : 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusSelect = document.getElementById('bulkStatusSelect');
+            if (statusSelect) {
+                statusSelect.addEventListener('change', updateTransactionSelectionCount);
+            }
+        });
+
+        function applyBulkTransactionStatus() {
+            const statusSelect = document.getElementById('bulkStatusSelect');
+            const newStatus = statusSelect?.value;
+            const checked = Array.from(document.querySelectorAll('.transaction-checkbox:checked'));
+
+            if (!newStatus) {
+                showNotification('Please choose a status to apply.', 'info');
+                return;
+            }
+            if (checked.length === 0) {
+                showNotification('Please select at least one transaction.', 'info');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!csrfToken) {
+                showNotification('CSRF token missing. Refresh and try again.', 'error');
+                return;
+            }
+
+            const updates = checked.map(cb => {
+                const materialId = cb.dataset.materialId;
+                return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load material data');
+                    return response.json();
+                })
+                .then(material => {
+                    const formData = new FormData();
+                    formData.append('_method', 'PUT');
+                    formData.append('_token', csrfToken);
+                    formData.append('item_description', material.item_description || '');
+                    formData.append('quantity', material.quantity || 1);
+                    formData.append('unit', material.unit || '');
+                    formData.append('material_cost', material.material_cost || 0);
+                    formData.append('labor_cost', material.labor_cost || 0);
+                    formData.append('category', material.category || '');
+                    formData.append('notes', material.notes || '');
+                    formData.append('status', newStatus);
+
+                    return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                        body: formData
+                    });
+                });
+            });
+
+            Promise.allSettled(updates).then(results => {
+                const completed = results.filter(r => r.status === 'fulfilled').length;
+                const failed = results.length - completed;
+
+                // Update UI selections and status colors
+                checked.forEach(cb => {
+                    cb.checked = false;
+                    const row = cb.closest('tr');
+                    const select = row?.querySelector('.status-select');
+                    if (select) {
+                        select.value = newStatus;
+                        setStatusSelectColor(select);
+                    }
+                });
+
+                const selectAll = document.getElementById('selectAllTransactions');
+                if (selectAll) selectAll.checked = false;
+                if (statusSelect) statusSelect.value = '';
+                updateTransactionSelectionCount();
+
+                if (failed === 0) {
+                    showNotification(`Updated ${completed} transaction(s).`, 'success', true);
+                } else {
+                    showNotification(`Updated ${completed} transaction(s); ${failed} failed.`, 'error');
+                }
+            }).catch(error => {
+                console.error('Bulk update error:', error);
+                showNotification('Bulk update failed. Please try again.', 'error');
+            });
+        }
+
         // Update material status from Finance & Transactions table
         function updateMaterialStatus(materialId, newStatus) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -3584,6 +3831,19 @@
             .catch(error => {
                 console.error('Status update error:', error);
                 showNotification(error.message || 'Failed to update status', 'error');
+            });
+        }
+
+        // Documentation filter
+        function filterDocuments(type) {
+            const cards = document.querySelectorAll('#documentationGrid .image-card');
+            cards.forEach(card => {
+                const docType = card.getAttribute('data-doc-type') || 'other';
+                if (type === 'all' || docType === type) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
             });
         }
 
