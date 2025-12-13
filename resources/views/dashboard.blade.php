@@ -139,6 +139,17 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+                gap: 16px;
+            }
+            
+            .header-menu {
+                display: block;
+            }
+        }
+
         .header-title {
             color: white;
             font-family: "Zen Dots", sans-serif;
@@ -146,12 +157,35 @@
             font-weight: 400;
             flex: 1;
         }
+        
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 18px;
+            }
+        }
 
         /* Content Area */
         .content-area {
             flex: 1;
-            padding: 30px;
-            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            padding: 40px;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        @media (max-width: 1280px) {
+            .content-area {
+                max-width: 100%;
+                padding: 32px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px;
+            }
         }
 
         /* Summary Statistics Card */
@@ -159,11 +193,17 @@
             background: white;
             border-radius: 12px;
             padding: 24px;
-            box-shadow: var(--shadow-md);
-            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 28px;
             display: flex;
             gap: 40px;
             align-items: center;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .summary-item {
@@ -171,8 +211,21 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 0 20px;
+            padding: 0 16px;
             position: relative;
+            min-width: 160px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .summary-item:hover {
+            background-color: rgba(30, 64, 175, 0.05);
+            padding-left: 20px;
+        }
+
+        .summary-item:active {
+            padding-left: 16px;
         }
 
         .summary-item:not(:last-child)::after {
@@ -182,26 +235,75 @@
             top: 50%;
             transform: translateY(-50%);
             width: 1px;
-            height: 60px;
+            height: 50px;
             background-color: #e5e7eb;
+        }
+        
+        @media (max-width: 1024px) {
+            .summary-card {
+                gap: 32px;
+                flex-wrap: wrap;
+            }
+            
+            .summary-item {
+                flex: 0 1 calc(50% - 16px);
+                padding: 0 16px;
+            }
+            
+            .summary-item:not(:last-child)::after {
+                height: 40px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .summary-card {
+                gap: 16px;
+                padding: 20px;
+            }
+            
+            .summary-item {
+                flex: 1;
+                padding: 12px 0;
+            }
+            
+            .summary-item:not(:last-child)::after {
+                display: none;
+            }
         }
 
         .summary-icon {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             background-color: var(--blue-600);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 22px;
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+        }
+
+        .summary-item:hover .summary-icon {
+            transform: scale(1.12);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.35);
+        }
+
+        .summary-item:active .summary-icon {
+            transform: scale(1.05);
         }
 
         .summary-content {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .summary-item:hover .summary-content {
+            gap: 6px;
         }
 
         .summary-label {
@@ -214,27 +316,41 @@
         .summary-number {
             color: var(--black-1);
             font-family: var(--text-headline-small-bold-font-family);
-            font-size: 24px;
-            font-weight: var(--text-headline-small-bold-font-weight);
+            font-size: 28px;
+            font-weight: 700;
             line-height: 1.2;
+            letter-spacing: -0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .summary-item:hover .summary-number {
+            font-size: 30px;
+            color: #1e40af;
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 12px;
-
+            gap: 24px;
+            margin-top: 8px;
         }
 
         .dashboard-card {
             background: white;
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
             color: var(--gray-700);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 26px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dashboard-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            border-color: #d1d5db;
         }
 
         .dashboard-card.full {
@@ -248,24 +364,76 @@
         .dashboard-card.third {
             grid-column: span 4;
         }
+        
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                gap: 20px;
+            }
+            
+            .dashboard-card {
+                padding: 24px;
+                gap: 20px;
+            }
+            
+            .dashboard-card.half {
+                grid-column: span 12;
+            }
+            
+            .dashboard-card.third {
+                grid-column: span 6;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                gap: 16px;
+            }
+            
+            .dashboard-card {
+                padding: 20px;
+                gap: 16px;
+            }
+            
+            .dashboard-card.half,
+            .dashboard-card.third {
+                grid-column: span 12;
+            }
+        }
 
         .dashboard-card-header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: 16px;
+            gap: 20px;
         }
 
         .dashboard-card-title {
             font-family: var(--text-headline-small-bold-font-family);
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--gray-800);
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            letter-spacing: -0.5px;
         }
 
         .dashboard-card-subtitle {
-            font-size: 14px;
-            color: var(--gray-500);
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-card-header {
+                gap: 16px;
+            }
+            
+            .dashboard-card-title {
+                font-size: 18px;
+            }
+            
+            .dashboard-card-subtitle {
+                font-size: 12px;
+            }
         }
 
         .dashboard-table {
@@ -359,45 +527,197 @@
 
 
         .view-link {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 700;
             color: var(--blue-600);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .view-link:hover {
+            color: #1e3a8a;
+            background-color: rgba(30, 64, 175, 0.08);
+            transform: translateX(2px);
+        }
+
+        .view-link:active {
+            transform: translateX(0);
+        }
+
+        .view-link:focus {
+            outline: 2px solid #1e40af;
+            outline-offset: 2px;
         }
 
         .view-link i {
             font-size: 14px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .view-link:hover i {
+            transform: translateX(3px);
         }
 
         /* KPI Cards Styles */
         .kpi-cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            padding: 0;
+            width: 100%;
+        }
+        
+        /* Reorder: Total Projects (1), Ongoing Projects (2), Team Workers (4 -> 3) */
+        .kpi-card:nth-child(4) {
+            grid-column: 1 / span 1;
+            grid-row: 2;
+            order: 3;
+        }
+
+        .kpi-card:nth-child(5) {
+            grid-column: 2 / span 1;
+            grid-row: 2;
+            order: 4;
+        }
+
+        .kpi-card:nth-child(3) {
+            grid-column: 3 / span 1;
+            grid-row: 1;
+            order: 2;
+        }
+
+        @media (max-width: 1600px) {
+            .kpi-cards-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 18px;
+                margin-bottom: 28px;
+            }
+            
+            .kpi-card:nth-child(4) {
+                grid-column: 1 / span 1;
+                grid-row: 2;
+            }
+
+            .kpi-card:nth-child(5) {
+                grid-column: 2 / span 1;
+                grid-row: 2;
+            }
+
+            .kpi-card:nth-child(3) {
+                grid-column: 3 / span 1;
+                grid-row: 1;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .kpi-cards-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            
+            .kpi-card:nth-child(4) {
+                grid-column: 1 / span 1;
+                grid-row: 2;
+            }
+
+            .kpi-card:nth-child(5) {
+                grid-column: 2 / span 1;
+                grid-row: 2;
+            }
+
+            .kpi-card:nth-child(3) {
+                grid-column: 1 / span 1;
+                grid-row: 3;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .kpi-cards-container {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                margin-bottom: 20px;
+            }
+            
+            .kpi-card:nth-child(4) {
+                grid-column: 1;
+                grid-row: 3;
+            }
+
+            .kpi-card:nth-child(5) {
+                grid-column: 1;
+                grid-row: 5;
+            }
+
+            .kpi-card:nth-child(3) {
+                grid-column: 1;
+                grid-row: 4;
+            }
         }
 
         .kpi-card {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.1);
-            transition: all 0.3s ease;
+            padding: 22px;
+            box-shadow: 0 1px 3px rgba(30, 64, 175, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
-            border: 1px solid rgba(30, 64, 175, 0.2);
+            border: 1px solid rgba(30, 64, 175, 0.15);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            position: relative;
+            overflow: hidden;
+            min-height: auto;
+            justify-content: flex-start;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
 
         .kpi-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 12px rgba(30, 64, 175, 0.2);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            border-color: rgba(30, 64, 175, 0.3);
+        }
+
+        .kpi-card:hover::before {
+            left: 100%;
+        }
+
+        .kpi-card:active {
+            transform: translateY(-2px);
+        }
+
+        .kpi-card:focus {
+            outline: 3px solid #1e40af;
+            outline-offset: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .kpi-card {
+                padding: 18px;
+                min-height: auto;
+                gap: 10px;
+            }
         }
 
         .kpi-card.color-projects {
@@ -406,87 +726,90 @@
         }
 
         .kpi-card.color-ongoing {
-            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-completed {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .kpi-card.color-delayed {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border: 1px solid rgba(220, 38, 38, 0.2);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-workers {
-            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
-            border: 1px solid rgba(190, 24, 93, 0.2);
-        }
-
-        .kpi-card.color-approvals {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 1px solid rgba(217, 119, 6, 0.2);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-budget {
-            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid rgba(30, 64, 175, 0.2);
+        }
+
+        .kpi-card.color-delayed {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.25);
+        }
+
+        .kpi-card:hover .kpi-icon {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.35);
+        }
+
+        .kpi-card:active .kpi-icon {
+            transform: scale(0.98);
         }
 
         .kpi-card.color-projects .kpi-icon {
-            background: rgba(30, 64, 175, 0.2);
-            color: #1e3a8a;
+            background: #1e40af;
+            color: white;
         }
 
         .kpi-card.color-ongoing .kpi-icon {
-            background: rgba(30, 64, 175, 0.2);
-            color: #1e3a8a;
+            background: #1e40af;
+            color: white;
         }
 
         .kpi-card.color-completed .kpi-icon {
-            background: rgba(16, 185, 129, 0.2);
-            color: #047857;
-        }
-
-        .kpi-card.color-delayed .kpi-icon {
-            background: rgba(220, 38, 38, 0.2);
-            color: #991b1b;
+            background: #1e40af;
+            color: white;
         }
 
         .kpi-card.color-workers .kpi-icon {
-            background: rgba(190, 24, 93, 0.2);
-            color: #831843;
-        }
-
-        .kpi-card.color-approvals .kpi-icon {
-            background: rgba(217, 119, 6, 0.2);
-            color: #92400e;
+            background: #1e40af;
+            color: white;
         }
 
         .kpi-card.color-budget .kpi-icon {
-            background: rgba(168, 85, 247, 0.2);
-            color: #6b21a8;
+            background: #1e40af;
+            color: white;
+        }
+
+        .kpi-card.color-delayed .kpi-icon {
+            background: #1e40af;
+            color: white;
         }
 
         .kpi-label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            opacity: 0.65;
-            margin-bottom: 4px;
+            letter-spacing: 0.7px;
+            opacity: 0.75;
+            margin-bottom: 1px;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-projects .kpi-label {
@@ -498,31 +821,28 @@
         }
 
         .kpi-card.color-completed .kpi-label {
-            color: #047857;
-        }
-
-        .kpi-card.color-delayed .kpi-label {
-            color: #991b1b;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-workers .kpi-label {
-            color: #831843;
-        }
-
-        .kpi-card.color-approvals .kpi-label {
-            color: #92400e;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-budget .kpi-label {
-            color: #6b21a8;
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-delayed .kpi-label {
+            color: #1e3a8a;
         }
 
         .kpi-value {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 800;
-            line-height: 1.1;
-            margin: 8px 0;
-            letter-spacing: -0.5px;
+            line-height: 1;
+            margin: 1px 0;
+            letter-spacing: -0.7px;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-projects .kpi-value {
@@ -534,31 +854,28 @@
         }
 
         .kpi-card.color-completed .kpi-value {
-            color: #047857;
-        }
-
-        .kpi-card.color-delayed .kpi-value {
-            color: #991b1b;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-workers .kpi-value {
-            color: #831843;
-        }
-
-        .kpi-card.color-approvals .kpi-value {
-            color: #92400e;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-budget .kpi-value {
-            color: #6b21a8;
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-delayed .kpi-value {
+            color: #1e3a8a;
         }
 
         .kpi-subtitle {
-            font-size: 12px;
-            font-weight: 400;
-            opacity: 0.55;
-            margin-top: 6px;
-            line-height: 1.4;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.7;
+            margin-top: 1px;
+            line-height: 1.3;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-projects .kpi-subtitle {
@@ -570,50 +887,101 @@
         }
 
         .kpi-card.color-completed .kpi-subtitle {
-            color: #047857;
-        }
-
-        .kpi-card.color-delayed .kpi-subtitle {
-            color: #991b1b;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-workers .kpi-subtitle {
-            color: #831843;
-        }
-
-        .kpi-card.color-approvals .kpi-subtitle {
-            color: #92400e;
+            color: #1e3a8a;
         }
 
         .kpi-card.color-budget .kpi-subtitle {
-            color: #6b21a8;
+            color: #1e3a8a;
+        }
+
+        .kpi-card.color-delayed .kpi-subtitle {
+            color: #1e3a8a;
         }
 
         /* Project Card Styles */
         .project-cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 28px;
+        }
+        
+        @media (min-width: 1400px) {
+            .project-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .project-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 24px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .project-cards-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
         }
 
         .project-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 26px;
             border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(30, 64, 175, 0.05));
+            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
 
         .project-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
-            border-color: #1e40af;
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            border-color: #dbeafe;
+        }
+
+        .project-card:hover::after {
+            bottom: 0;
+        }
+
+        .project-card:active {
+            transform: translateY(-2px);
+        }
+
+        .project-card:focus {
+            outline: 3px solid #1e40af;
+            outline-offset: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .project-card {
+                padding: 20px;
+                gap: 16px;
+            }
         }
 
         .project-card-header {
@@ -621,77 +989,161 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 12px;
+            min-height: 48px;
         }
 
         .project-card-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             color: #1e3a8a;
             flex: 1;
             word-break: break-word;
+            letter-spacing: -0.3px;
+            line-height: 1.4;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-card-title {
+            color: #1e40af;
+            font-size: 17.5px;
         }
 
         .project-card-status {
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-card:hover .project-card-status {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         }
 
         .project-card-info {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
+            gap: 16px;
             font-size: 13px;
             color: #6b7280;
-            padding-top: 8px;
+            padding-top: 14px;
             border-top: 1px solid #f3f4f6;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-card-info {
+            border-top-color: #e5e7eb;
+            color: #374151;
         }
 
         .project-card-info-item {
             flex: 1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-card-info-item {
+            opacity: 0.95;
         }
 
         .project-card-info-label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
             color: #9ca3af;
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-card-info-label {
+            color: #6b7280;
         }
 
         .project-card-info-value {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             color: #1f2937;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-card-info-value {
+            color: #1e40af;
         }
 
         /* BOQ Item Card */
         .boq-cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
+        }
+        
+        @media (min-width: 1400px) {
+            .boq-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .boq-cards-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
         }
 
         .boq-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .boq-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .boq-card:hover::before {
+            transform: scaleX(1);
         }
 
         .boq-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
-            border-color: #1e40af;
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border-color: #dbeafe;
+        }
+
+        .boq-card:focus {
+            outline: 3px solid #1e40af;
+            outline-offset: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .boq-card {
+                padding: 16px;
+                gap: 10px;
+            }
         }
 
         .boq-card-header {
@@ -702,7 +1154,7 @@
         }
 
         .boq-card-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: #1e3a8a;
             flex: 1;
@@ -754,14 +1206,27 @@
         /* Finance Card */
         .finance-cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
+        }
+        
+        @media (min-width: 1400px) {
+            .finance-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .finance-cards-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
         }
 
         .finance-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             border: 1px solid #e5e7eb;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -769,17 +1234,30 @@
             color: inherit;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .finance-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
-            border-color: #1e40af;
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border-color: #d1d5db;
+        }
+
+        .finance-card:focus {
+            outline: 2px solid #1e40af;
+            outline-offset: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .finance-card {
+                padding: 16px;
+                gap: 10px;
+            }
         }
 
         .finance-card-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             color: #1e3a8a;
         }
@@ -857,8 +1335,21 @@
         /* Attendance Card Styles */
         .attendance-cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
+        }
+        
+        @media (min-width: 1400px) {
+            .attendance-cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .attendance-cards-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
         }
 
         .attendance-card {
@@ -870,12 +1361,19 @@
             text-decoration: none;
             color: inherit;
             transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .attendance-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(30, 64, 175, 0.15);
-            border-color: #1e40af;
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border-color: #d1d5db;
+        }
+        
+        @media (max-width: 768px) {
+            .attendance-card {
+                padding: 16px;
+            }
         }
 
         .attendance-card-date {
@@ -1048,20 +1546,6 @@
                         </div>
                     </a>
 
-                    <!-- Delayed Projects Card -->
-                    <a href="{{ route('projects') }}?status=Delayed" class="kpi-card color-delayed" title="View delayed projects">
-                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
-                            <div>
-                                <div class="kpi-label">Delayed Projects</div>
-                                <div class="kpi-value">{{ number_format($summary['delayed_projects'] ?? 0) }}</div>
-                                <div class="kpi-subtitle">Behind schedule</div>
-                            </div>
-                            <div class="kpi-icon">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                        </div>
-                    </a>
-
                     <!-- Total Team Workers Card -->
                     <a href="{{ route('employee') }}" class="kpi-card color-workers" title="View all employees">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
@@ -1076,16 +1560,16 @@
                         </div>
                     </a>
 
-                    <!-- Pending Approvals Card -->
-                    <a href="{{ route('projects') }}" class="kpi-card color-approvals" title="View pending approvals">
+                    <!-- Delayed Projects Card -->
+                    <a href="{{ route('projects') }}" class="kpi-card color-delayed" title="View delayed projects">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div>
-                                <div class="kpi-label">Pending Approvals</div>
-                                <div class="kpi-value">{{ number_format($summary['pending_approvals'] ?? 0) }}</div>
-                                <div class="kpi-subtitle">Awaiting review</div>
+                                <div class="kpi-label">Delayed Projects</div>
+                                <div class="kpi-value">{{ number_format($summary['delayed_projects'] ?? 0) }}</div>
+                                <div class="kpi-subtitle">Behind schedule</div>
                             </div>
                             <div class="kpi-icon">
-                                <i class="fas fa-hourglass-half"></i>
+                                <i class="fas fa-clock"></i>
                             </div>
                         </div>
                     </a>
@@ -1093,7 +1577,7 @@
 
                 <!-- Detailed Insights -->
                 <div class="dashboard-grid">
-                    @if ($isEmployee ?? false)
+                    @if (isset($isEmployee) && $isEmployee)
                         <!-- EMPLOYEE VIEW -->
                         <div class="dashboard-card full">
                             <div class="dashboard-card-header">
@@ -1104,7 +1588,7 @@
                             </div>
 
                             <div class="project-cards-container">
-                                @forelse ($assignedProjects as $project)
+                                @forelse ($assignedProjects ?? collect() as $project)
                                     @php
                                         $projectDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
                                         $statusMap = [
@@ -1322,12 +1806,12 @@
 
                         <!-- Finance Summary Stats -->
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
-                            <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="background: transparent; padding: 15px; border-radius: 8px; text-align: center;">
                                 <div style="font-size: 12px; color: #1e3a8a; font-weight: 600; margin-bottom: 8px;">Total Budget</div>
                                 <div style="font-size: 20px; font-weight: 700; color: #1e3a8a;">₱{{ number_format($summary['total_budget'] ?? 0, 0) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); padding: 15px; border-radius: 8px; text-align: center;">
-                                <div style="font-size: 12px; color: #be185d; font-weight: 600; margin-bottom: 8px;">Total Spent</div>
+                            <div style="background: transparent; padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #1e3a8a; font-weight: 600; margin-bottom: 8px;">Total Spent</div>
                                 @php
                                     $totalSpent = 0;
                                     foreach($activeProjects as $project) {
@@ -1341,15 +1825,15 @@
                                         }
                                     }
                                 @endphp
-                                <div style="font-size: 20px; font-weight: 700; color: #be185d;">₱{{ number_format($totalSpent, 0) }}</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #1e3a8a;">₱{{ number_format($totalSpent, 0) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 15px; border-radius: 8px; text-align: center;">
-                                <div style="font-size: 12px; color: #1e40af; font-weight: 600; margin-bottom: 8px;">Remaining</div>
-                                <div style="font-size: 20px; font-weight: 700; color: #1e40af;">₱{{ number_format(($summary['total_budget'] ?? 0) - $totalSpent, 0) }}</div>
+                            <div style="background: transparent; padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #1e3a8a; font-weight: 600; margin-bottom: 8px;">Remaining</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #1e3a8a;">₱{{ number_format(($summary['total_budget'] ?? 0) - $totalSpent, 0) }}</div>
                             </div>
-                            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 15px; border-radius: 8px; text-align: center;">
-                                <div style="font-size: 12px; color: #92400e; font-weight: 600; margin-bottom: 8px;">Usage</div>
-                                <div style="font-size: 20px; font-weight: 700; color: #92400e;">{{ ($summary['total_budget'] ?? 0) > 0 ? round(($totalSpent / ($summary['total_budget'] ?? 1)) * 100, 1) : 0 }}%</div>
+                            <div style="background: transparent; padding: 15px; border-radius: 8px; text-align: center;">
+                                <div style="font-size: 12px; color: #1e3a8a; font-weight: 600; margin-bottom: 8px;">Usage</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #1e3a8a;">{{ ($summary['total_budget'] ?? 0) > 0 ? round(($totalSpent / ($summary['total_budget'] ?? 1)) * 100, 1) : 0 }}%</div>
                             </div>
                         </div>
 

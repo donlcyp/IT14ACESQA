@@ -16,11 +16,26 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $isEmployee = $user && EmployeeList::where('user_id', $user->id)->exists();
+        
+        // Check if user is an employee (but NOT a project manager)
+        $employeeRecord = $user ? EmployeeList::where('user_id', $user->id)->first() : null;
+        $isPM = $user ? Project::where('assigned_pm_id', $user->id)->exists() : false;
+        
+        // If user is a PM, show PM dashboard. Otherwise check if they're an employee
+        $isEmployee = $employeeRecord && !$isPM;
+
+        // Initialize all variables that will be passed to the view
+        $summary = [];
+        $assignedProjects = collect();
+        $todayAttendance = null;
+        $recentAttendance = collect();
+        $activeProjects = collect();
+        $recentProjectRecords = collect();
+        $projectsToReturn = collect();
 
         if ($isEmployee) {
             // EMPLOYEE VIEW - Show only their assigned projects
-            $employee = EmployeeList::where('user_id', $user->id)->firstOrFail();
+            $employee = $employeeRecord;
 
             // Get projects this employee is assigned to
             $assignedProjects = $employee->projects()
@@ -36,7 +51,7 @@ class DashboardController extends Controller
                     return $p->date_ended && ($p->date_ended < $p->date_started || $p->date_ended > now());
                 })->count(),
                 'total_workers' => EmployeeList::count(),
-                'pending_approvals' => Material::where('status', 'pending')->whereHas('project', function($q) {
+                'pending_approvals' => Material::where('status', 'pending')->whereHas('project', function($q) use ($assignedProjects) {
                     return $q->whereIn('id', $assignedProjects->pluck('id'));
                 })->count(),
                 'total_budget' => $assignedProjects->sum('allocated_amount'),
@@ -59,6 +74,9 @@ class DashboardController extends Controller
                 'assignedProjects',
                 'todayAttendance',
                 'recentAttendance',
+                'activeProjects',
+                'recentProjectRecords',
+                'projectsToReturn',
                 'isEmployee'
             ));
         } else {
@@ -115,6 +133,9 @@ class DashboardController extends Controller
                 'activeProjects',
                 'recentProjectRecords',
                 'projectsToReturn',
+                'assignedProjects',
+                'todayAttendance',
+                'recentAttendance',
                 'isEmployee'
             ));
         }

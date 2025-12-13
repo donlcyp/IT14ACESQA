@@ -127,7 +127,10 @@
 
         .content-area {
             flex: 1;
-            padding: 30px;
+            padding: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
             background: linear-gradient(135deg, #f7fafc, #edf2f7);
         }
 
@@ -135,43 +138,59 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
         .page-title {
             font-family: var(--text-headline-small-bold-font-family);
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
             color: var(--gray-800);
+            letter-spacing: -0.5px;
         }
 
         .back-link {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--accent);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            transition: color 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
         }
 
         .back-link:hover {
-            text-decoration: underline;
+            color: #1e3a8a;
+            background-color: rgba(30, 64, 175, 0.05);
+        }
+        
+        .back-link:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
         }
 
         .graphs-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 24px;
+            gap: 28px;
         }
 
         .graph-card {
             background: white;
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-md);
+            padding: 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             grid-column: span 12;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .graph-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         }
 
         .graph-card.half {
@@ -204,7 +223,7 @@
         }
 
         .stat-box {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            background: white;
             border-left: 4px solid var(--accent);
             padding: 16px;
             border-radius: 8px;

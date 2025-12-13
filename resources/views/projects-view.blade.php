@@ -898,7 +898,7 @@
                     <div class="info-item">
                         <div class="info-label">Status</div>
                         <div class="info-value">
-                            <span class="badge-pill" style="background: #dbeafe; color: #0369a1;">{{ $project->status }}</span>
+                            <span class="badge-pill" style="background: none; color: #0369a1;">{{ $project->status }}</span>
                         </div>
                     </div>
                     <div class="info-item">
@@ -907,7 +907,17 @@
                     </div>
                     <div class="info-item">
                         <div class="info-label">Project Manager</div>
-                        <div class="info-value">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
+                        <div class="info-value">
+                            @if ($project->assignedPM)
+                                @if ($project->assignedPM->name && !empty(trim($project->assignedPM->name)))
+                                    {{ $project->assignedPM->name }}
+                                @else
+                                    Unassigned
+                                @endif
+                            @else
+                                Unassigned
+                            @endif
+                        </div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Location</div>
@@ -932,7 +942,7 @@
                                     ];
                                     $colors = $colorMap[$project->project_type] ?? ['#f3f4f6', '#6b7280'];
                                 @endphp
-                                <span class="badge-pill" style="background: {{ $colors[0] }}; color: {{ $colors[1] }};">{{ $project->project_type }}</span>
+                                <span class="badge-pill" style="background: none; color: {{ $colors[1] }};">{{ $project->project_type }}</span>
                             @else
                                 <span style="color: var(--gray-500);">Not specified</span>
                             @endif
@@ -1431,23 +1441,54 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($project->assignedPM)
-                                        <tr style="border-bottom: 1px solid var(--gray-400); background: #f0fdf4;">
-                                            <td style="padding: 12px; color: var(--black-1); font-weight: 600;">{{ $project->assignedPM->name }}</td>
-                                            <td style="padding: 12px; color: var(--gray-700);">
-                                                <span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                                                    <i class="fas fa-crown"></i> Project Manager
-                                                </span>
-                                            </td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
-                                            <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
-                                            <td style="padding: 12px; color: var(--gray-700); font-style: italic; font-size: 12px;">Auto-assigned</td>
-                                        </tr>
-                                    @endif
-                                    @if ($project->employees && $project->employees->count() > 0)
-                                        @foreach ($project->employees as $employee)
+                                    @php
+                                        // Define position hierarchy
+                                        $positionHierarchy = [
+                                            'Project Manager' => 1,
+                                            'Site Supervisor' => 2,
+                                            'Quality Assurance Officer' => 3,
+                                            'HR/Timekeeper' => 4,
+                                            'Construction Worker' => 5,
+                                        ];
+                                        
+                                        // Collect all employees with PM first
+                                        $allEmployees = [];
+                                        
+                                        // Add PM if exists
+                                        if ($project->assignedPM) {
+                                            $allEmployees[] = [
+                                                'employee' => $project->assignedPM,
+                                                'position' => 'Project Manager',
+                                                'is_pm' => true,
+                                                'hierarchy' => 1
+                                            ];
+                                        }
+                                        
+                                        // Add other employees sorted by hierarchy
+                                        if ($project->employees && $project->employees->count() > 0) {
+                                            $otherEmployees = $project->employees->map(function($emp) use ($positionHierarchy) {
+                                                $position = $emp->position ?? 'Construction Worker';
+                                                return [
+                                                    'employee' => $emp,
+                                                    'position' => $position,
+                                                    'is_pm' => false,
+                                                    'hierarchy' => $positionHierarchy[$position] ?? 5
+                                                ];
+                                            })->sortBy('hierarchy');
+                                            
+                                            $allEmployees = array_merge($allEmployees, $otherEmployees->toArray());
+                                        }
+                                    @endphp
+                                    
+                                    @foreach ($allEmployees as $item)
+                                        @php
+                                            $employee = $item['employee'];
+                                            $position = $item['position'];
+                                            $isPM = $item['is_pm'];
+                                            $hierarchy = $item['hierarchy'];
+                                        @endphp
+                                        
+                                        @if (!$isPM)
                                             @php
                                                 // Get attendance records with actual hours worked
                                                 $dateFrom = '2025-12-01';
@@ -1465,7 +1506,6 @@
                                                 });
                                                 
                                                 // Get daily rate based on employee's position
-                                                $position = $employee->position ?? 'Laborer';
                                                 $positionRate = \App\Models\PositionDailyRate::where('position', $position)->first();
                                                 $dailyRate = $positionRate ? $positionRate->daily_rate : 700.00;
                                                 $hourlyRate = \App\Models\EmployeeAttendance::calculateHourlyRate($dailyRate);
@@ -1476,9 +1516,56 @@
                                                     $laborCost += $att->calculateLaborCost($dailyRate);
                                                 }
                                             @endphp
-                                            <tr style="border-bottom: 1px solid var(--gray-400);">
-                                                <td style="padding: 12px; color: var(--black-1);">{{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}</td>
-                                                <td style="padding: 12px; color: var(--gray-700);">{{ $employee->position ?? 'N/A' }}</td>
+                                        @endif
+                                        
+                                        @php
+                                            // Define icon for hierarchy
+                                            $hierarchyIcon = [
+                                                1 => 'fa-crown', // Project Manager
+                                                2 => 'fa-hard-hat', // Site Supervisor
+                                                3 => 'fa-clipboard-check', // QA Officer
+                                                4 => 'fa-clock', // HR/Timekeeper
+                                                5 => 'fa-user-tie', // Construction Worker
+                                            ];
+                                            $icon = $hierarchyIcon[$hierarchy] ?? 'fa-user';
+                                        @endphp
+                                        
+                                        <tr style="border-bottom: 1px solid var(--gray-400);">
+                                            <td style="padding: 12px; color: var(--black-1); font-weight: 600;">
+                                                @if ($isPM)
+                                                    @if ($employee->name && !empty(trim($employee->name)))
+                                                        {{ $employee->name }}
+                                                    @elseif ($employee->f_name && $employee->l_name)
+                                                        {{ $employee->f_name . ' ' . $employee->l_name }}
+                                                    @else
+                                                        Unassigned
+                                                    @endif
+                                                @else
+                                                    {{ $employee->full_name ?? ($employee->f_name . ' ' . $employee->l_name) }}
+                                                @endif
+                                            </td>
+                                            <td style="padding: 12px; color: var(--gray-700);">
+                                                @php
+                                                    $positionTextColors = [
+                                                        'Project Manager' => '#166534',
+                                                        'Site Supervisor' => '#0369a1',
+                                                        'Quality Assurance Officer' => '#6b21a8',
+                                                        'HR/Timekeeper' => '#92400e',
+                                                        'Construction Worker' => '#374151',
+                                                    ];
+                                                    $textColor = $positionTextColors[$position] ?? '#374151';
+                                                @endphp
+                                                <span style="background: none; color: {{ $textColor }}; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                                    <i class="fas {{ $icon }}"></i> {{ $position }}
+                                                </span>
+                                            </td>
+                                            @if ($isPM)
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700);">—</td>
+                                                <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">—</td>
+                                                <td style="padding: 12px; color: var(--gray-700); font-style: italic; font-size: 12px;">Auto-assigned</td>
+                                            @else
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700);">{{ $daysWorked }}</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600;">{{ number_format($totalHoursWorked, 2) }} hrs</td>
                                                 <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($hourlyRate, 2) }}/hr</td>
@@ -1492,13 +1579,14 @@
                                                         </button>
                                                     </form>
                                                 </td>
-                                            </tr>
-                                        @endforeach
+                                            @endif
+                                        </tr>
+                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>
 
-                        @else
+                        @if (!($project->assignedPM || ($project->employees && $project->employees->count() > 0)))
                             <div style="padding: 20px; background: var(--sidebar-bg); border-radius: 6px; text-align: center; color: var(--gray-600);">
                                 <i class="fas fa-users" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
                                 <p>No team workers assigned yet. Click "Add Team Worker" to begin.</p>
@@ -1648,6 +1736,14 @@
                     <div class="report-section">
                         <div class="report-title">Download Report</div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            @if ($project->status === 'Completed')
+                                <div style="width: 100%; padding: 12px 16px; background: #dbeafe; border-left: 4px solid #1e40af; border-radius: 6px; margin-bottom: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 8px; color: #1e3a8a; font-weight: 600;">
+                                        <i class="fas fa-check-circle"></i>
+                                        Project Complete - Download final report
+                                    </div>
+                                </div>
+                            @endif
                             <a href="{{ route('pdf.project.download', $project->id) }}" class="btn btn-primary">
                                 <i class="fas fa-file-pdf"></i> Download PDF Report
                             </a>
@@ -1657,6 +1753,11 @@
                             <a href="{{ route('csv.project.download', $project->id) }}" class="btn btn-secondary">
                                 <i class="fas fa-file-csv"></i> Download CSV Report
                             </a>
+                            @if ($project->status === 'Completed')
+                                <a href="{{ route('reports.download', $project->id) }}" class="btn btn-primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #059669;">
+                                    <i class="fas fa-download"></i> Download Project Report
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
