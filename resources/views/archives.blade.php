@@ -315,19 +315,21 @@
             background: white; 
             border: 1px solid #e5e7eb; 
             color: #111827; 
-            padding: 6px 10px; 
+            padding: 6px 12px; 
             border-radius: 6px; 
             cursor: pointer; 
             font-size: 12px;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             white-space: nowrap;
             transition: all 0.2s ease;
         }
         .toggle-btn:hover {
-            background: #f3f4f6;
-            border-color: #d1d5db;
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
         }
 
         /* Tables */
@@ -736,7 +738,24 @@
         function toggleReport(id){
             const row = document.getElementById(id);
             if(!row) return;
-            row.style.display = row.style.display === 'none' ? '' : 'none';
+            
+            const isVisible = row.style.display === 'none';
+            row.style.display = isVisible ? '' : 'none';
+            
+            // Find the button that triggered this
+            const button = event.target.closest('.toggle-btn');
+            if (button) {
+                // Add visual feedback
+                if (isVisible) {
+                    button.style.background = '#3b82f6';
+                    button.style.borderColor = '#3b82f6';
+                    button.style.color = 'white';
+                } else {
+                    button.style.background = 'white';
+                    button.style.borderColor = '#e5e7eb';
+                    button.style.color = '#111827';
+                }
+            }
         }
     </script>
 </body>

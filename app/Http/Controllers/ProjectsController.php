@@ -301,11 +301,18 @@ class ProjectsController extends Controller
             'industry' => ['nullable', 'string', 'max:255'],
             'target_timeline' => ['nullable', 'date'],
             'date_started' => ['nullable', 'date'],
-            'date_ended' => ['nullable', 'date'],
+            'date_ended' => ['nullable', 'date', 'after_or_equal:date_started'],
             'allocated_amount' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'in:Ongoing,Completed'],
             'assigned_pm_id' => ['nullable', 'exists:users,id'],
+        ], [
+            'date_ended.after_or_equal' => 'Date Ended must be on or after Date Started.',
         ]);
+
+        // Check if project status is locked (already Completed)
+        if ($project->status === 'Completed' && $validated['status'] !== 'Completed') {
+            return redirect()->back()->with('error', 'Project status is locked. Completed projects cannot be changed to Ongoing.');
+        }
 
         $project->update([
             'project_name' => $validated['project_name'],
@@ -328,18 +335,15 @@ class ProjectsController extends Controller
      */
     public function storeDocument(Request $request, Project $project)
     {
-        // Handle both single image upload and multiple file uploads
-        $isImageUpload = $request->hasFile('image');
-        $isFileUpload = $request->hasFile('attachments');
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,zip|max:51200', // 50MB per file
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+        ]);
 
-        if ($isImageUpload) {
-            // Single image upload
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
-            ]);
-
-            try {
+        try {
+            // Handle single image upload
+            if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
                 $filePath = $file->storeAs('projects/' . $project->id, $fileName, 'public');
@@ -355,16 +359,10 @@ class ProjectsController extends Controller
                 ]);
 
                 return redirect()->route('projects.show', $project->id)->with('success', 'Image uploaded successfully!');
-            } catch (\Exception $e) {
-                return redirect()->route('projects.show', $project->id)->with('error', 'Failed to upload image: ' . $e->getMessage());
             }
-        } elseif ($isFileUpload) {
-            // Multiple file upload
-            $validated = $request->validate([
-                'attachments.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png,gif,zip|max:51200', // 50MB per file
-            ]);
 
-            try {
+            // Handle multiple file upload
+            if ($request->hasFile('attachments')) {
                 $files = $request->file('attachments');
                 $uploadedCount = 0;
 
@@ -374,7 +372,7 @@ class ProjectsController extends Controller
 
                     \App\Models\ProjectDocument::create([
                         'project_id' => $project->id,
-                        'title' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
+                        'title' => $validated['title'] . ' (' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . ')',
                         'file_path' => $filePath,
                         'file_name' => $fileName,
                         'mime_type' => $file->getMimeType(),
@@ -386,12 +384,34 @@ class ProjectsController extends Controller
                 }
 
                 return redirect()->route('projects.show', $project->id)->with('success', "Successfully uploaded {$uploadedCount} file(s)!");
-            } catch (\Exception $e) {
-                return redirect()->route('projects.show', $project->id)->with('error', 'Failed to upload files: ' . $e->getMessage());
             }
-        } else {
-            return redirect()->route('projects.show', $project->id)->with('error', 'No files selected for upload.');
+
+            return redirect()->route('projects.show', $project->id)->with('error', 'Please upload at least one file.');
+        } catch (\Exception $e) {
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to save documentation: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get a project document details (for viewing text content)
+     */
+    public function getDocument(Project $project, \App\Models\ProjectDocument $document)
+    {
+        if ($document->project_id !== $project->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        return response()->json([
+            'id' => $document->id,
+            'title' => $document->title,
+            'content' => $document->content,
+            'file_path' => $document->file_path ? asset('storage/' . $document->file_path) : null,
+            'file_name' => $document->file_name,
+            'mime_type' => $document->mime_type,
+            'file_size' => $document->file_size,
+            'uploader' => $document->uploader?->name ?? 'Unknown',
+            'created_at' => $document->created_at,
+        ]);
     }
 
     /**
@@ -503,6 +523,52 @@ class ProjectsController extends Controller
     }
 
     /**
+     * Update a project update (task status change)
+     */
+    public function updateUpdate(Request $request, Project $project, \App\Models\ProjectUpdate $update)
+    {
+        if ($update->project_id !== $project->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Prevent changing status from Completed
+        if ($update->status === 'Completed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot change status of a completed task'
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:Ongoing,Completed,On Hold,Cancelled,In Progress',
+        ]);
+
+        try {
+            $update->update([
+                'status' => $validated['status'],
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Task status updated successfully!'
+                ]);
+            }
+
+            return redirect()->route('projects.show', $project->id)->with('success', 'Task status updated successfully!');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update task: ' . $e->getMessage()
+                ], 422);
+            }
+
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to update task: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Store a material for the project
      */
     public function storeMaterial(Request $request, Project $project)
@@ -585,6 +651,22 @@ class ProjectsController extends Controller
         ]);
 
         try {
+            // Check if current status is locked (approved or failed)
+            $currentStatus = strtolower($material->status ?? 'pending');
+            if (($currentStatus === 'approved' || $currentStatus === 'failed') && isset($validated['status'])) {
+                $newStatus = strtolower($validated['status']);
+                if ($newStatus !== $currentStatus) {
+                    if ($request->expectsJson() || $request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'This transaction status is locked and cannot be changed.'
+                        ], 403);
+                    }
+                    return redirect()->route('projects.show', $project->id)
+                        ->with('error', 'This transaction status is locked and cannot be changed.');
+                }
+            }
+
             // Auto-calculate labor cost: Half of material cost
             $materialCost = $validated['material_cost'] ?? 0;
             $laborCost = $materialCost / 2;

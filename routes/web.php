@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
 
         // Project Updates
         Route::post('/projects/{project}/updates', [App\Http\Controllers\ProjectsController::class, 'storeUpdate'])->name('projects.updates.store');
+        Route::put('/projects/{project}/updates/{update}', [App\Http\Controllers\ProjectsController::class, 'updateUpdate'])->name('projects.updates.update');
         Route::get('/projects/{project}/tasks', [App\Http\Controllers\ProjectsController::class, 'getTasksByMaterial'])->name('projects.tasks.get');
 
         // Project Materials

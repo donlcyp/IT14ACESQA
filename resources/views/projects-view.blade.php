@@ -1174,9 +1174,15 @@
                         <div class="report-title">Bill of Quantity</div>
                         
                         <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
-                            <button type="button" class="btn btn-primary" onclick="return openBOQModal();">
-                                <i class="fas fa-plus"></i> Add BOQ Item
-                            </button>
+                            @if($project->status !== 'Completed')
+                                <button type="button" class="btn btn-primary" onclick="return openBOQModal();">
+                                    <i class="fas fa-plus"></i> Add BOQ Item
+                                </button>
+                            @else
+                                <div style="padding: 10px 16px; background-color: #e5e7eb; color: #6b7280; border-radius: 6px; font-size: 14px; font-weight: 500;">
+                                    <i class="fas fa-lock"></i> Project Completed - No additions allowed
+                                </div>
+                            @endif
                             <button type="button" id="deleteSelectedBtn" class="btn" style="background: #dc2626; color: white; display: none;" onclick="confirmBulkDelete()">
                                 <i class="fas fa-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
                             </button>
@@ -1242,15 +1248,19 @@
                                                 <td style="padding: 12px; text-align: right; color: var(--black-1); font-weight: 700; font-size: 14px;">₱{{ number_format($itemTotal, 2) }}</td>
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-                                                        <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="editBOQItem({{ $material->id }})">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button class="btn" style="background: #e0e7ff; color: #4f46e5; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="viewBOQTasks('{{ $material->item_description }}', {{ $material->id }})">>
+                                                        @if($project->status !== 'Completed')
+                                                            <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="editBOQItem({{ $material->id }})">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        @endif
+                                                        <button class="btn" style="background: #e0e7ff; color: #4f46e5; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="viewBOQTasks({{ json_encode($material->item_description ?? '') }}, {{ $material->id }})">
                                                             <i class="fas fa-tasks"></i>
                                                         </button>
-                                                        <button type="button" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="confirmSingleDelete({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'this item') }}')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
+                                                        @if($project->status !== 'Completed')
+                                                            <button type="button" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="confirmSingleDelete({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'this item') }}')">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -1404,6 +1414,15 @@
                                         cursor: pointer;
                                     }
                                     .status-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+                                    .status-select:disabled {
+                                        background-color: #f3f4f6;
+                                        color: #9ca3af;
+                                        cursor: not-allowed;
+                                        border-color: #d1d5db;
+                                    }
+                                    .status-select:disabled:hover {
+                                        background-color: #f3f4f6;
+                                    }
                                 </style>
                             </div>
 
@@ -1462,7 +1481,7 @@
                                                     <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($material->material_cost ?? 0, 2) }}</td>
                                                     <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f9fafb;">₱{{ number_format($itemTotal, 2) }}</td>
                                                     <td style="padding: 12px; text-align: center;">
-                                                        <select class="status-select" data-material-id="{{ $material->id }}" onchange="updateMaterialStatus(this.dataset.materialId, this.value)">
+                                                        <select class="status-select" data-material-id="{{ $material->id }}" onchange="updateMaterialStatus(this.dataset.materialId, this.value)" {{ in_array(strtolower($material->status ?? 'pending'), ['approved', 'failed']) ? 'disabled' : '' }}>
                                                             <option value="pending" {{ strtolower($material->status ?? 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
                                                             <option value="approved" {{ strtolower($material->status ?? 'pending') === 'approved' ? 'selected' : '' }}>Approved</option>
                                                             <option value="failed" {{ strtolower($material->status ?? 'pending') === 'failed' ? 'selected' : '' }}>Failed</option>
@@ -1542,9 +1561,15 @@
                         </div>
 
                         <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-                            <button class="btn btn-primary" onclick="openEmployeeModal()">
-                                <i class="fas fa-plus"></i> Add Team Worker
-                            </button>
+                            @if($project->status !== 'Completed')
+                                <button class="btn btn-primary" onclick="openEmployeeModal()">
+                                    <i class="fas fa-plus"></i> Add Team Worker
+                                </button>
+                            @else
+                                <div style="padding: 10px 16px; background-color: #e5e7eb; color: #6b7280; border-radius: 6px; font-size: 14px; font-weight: 500;">
+                                    <i class="fas fa-lock"></i> Project Completed - No additions allowed
+                                </div>
+                            @endif
                         </div>
 
                         <div style="overflow-x: auto;">
@@ -1710,28 +1735,37 @@
                 <!-- Images Tab -->
                 <div id="images" class="tab-content">
                     <div class="report-section">
-                        <div class="report-title">Upload Documentation</div>
-                        <form method="POST" action="{{ route('projects.documents.store', $project->id) }}" enctype="multipart/form-data" style="margin-bottom: 30px;">
-                            @csrf
-                            <div class="form-group">
-                                <label class="form-label">File Title</label>
-                                <input type="text" name="title" class="form-input" placeholder="Enter file title" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Attachments</label>
-                                <div style="padding: 12px; border: 2px dashed var(--gray-400); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" id="dropZone">
-                                    <input type="file" name="attachments[]" id="attachmentInput" style="width: 100%; cursor: pointer;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.zip">
-                                    <small style="color: var(--gray-600); display: block; margin-top: 8px;">
-                                        <i class="fas fa-cloud-upload-alt"></i> Drag files here or click to upload<br>
-                                        Accepted: PDF, DOC, DOCX, XLS, XLSX, Images, ZIP (Max 50MB total)
-                                    </small>
+                        @if($project->status !== 'Completed')
+                            <div class="report-title">Upload Documentation</div>
+                            <form method="POST" action="{{ route('projects.documents.store', $project->id) }}" enctype="multipart/form-data" style="margin-bottom: 30px;">
+                                @csrf
+                                <div class="form-group">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" name="title" class="form-input" placeholder="Enter documentation title (e.g., Daily Activities - Dec 14)" required>
                                 </div>
-                                <div id="attachmentPreview" style="margin-top: 12px;"></div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Attachments <span style="font-size: 12px; color: #6b7280;">(Optional - Files)</span></label>
+                                    <div style="padding: 12px; border: 2px dashed var(--gray-400); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" id="dropZone">
+                                        <input type="file" name="attachments[]" id="attachmentInput" style="width: 100%; cursor: pointer;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.zip">
+                                        <small style="color: var(--gray-600); display: block; margin-top: 8px;">
+                                            <i class="fas fa-cloud-upload-alt"></i> Drag files here or click to upload<br>
+                                            Accepted: PDF, DOC, DOCX, XLS, XLSX, Images, ZIP (Max 50MB total)
+                                        </small>
+                                    </div>
+                                    <div id="attachmentPreview" style="margin-top: 12px;"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Documentation
+                                </button>
+                            </form>
+                        @else
+                            <div style="padding: 20px; background-color: #f3f4f6; border-radius: 6px; margin-bottom: 30px; border-left: 4px solid #dc2626;">
+                                <div style="color: #6b7280; font-size: 14px;">
+                                    <i class="fas fa-lock" style="color: #dc2626;"></i> <strong>Project Completed</strong> - Documentation uploads are no longer allowed
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-upload"></i> Upload Files
-                            </button>
-                        </form>
+                        @endif
 
                         <div class="report-title">Documentation Gallery</div>
 
@@ -2810,9 +2844,15 @@
                     </div>
 
                     <div style="margin-bottom: 20px;">
-                        <button type="button" class="btn btn-primary" onclick="openAddTaskModal()" style="width: 100%; padding: 10px 16px;">
-                            <i class="fas fa-plus"></i> Add Task for This Item
-                        </button>
+                        @if($project->status !== 'Completed')
+                            <button type="button" class="btn btn-primary" onclick="openAddTaskModal()" style="width: 100%; padding: 10px 16px;">
+                                <i class="fas fa-plus"></i> Add Task for This Item
+                            </button>
+                        @else
+                            <div style="width: 100%; padding: 10px 16px; background-color: #e5e7eb; color: #6b7280; border-radius: 6px; font-size: 14px; font-weight: 500; text-align: center;">
+                                <i class="fas fa-lock"></i> Project Completed - No additions allowed
+                            </div>
+                        @endif
                     </div>
 
                     <div>
@@ -2840,15 +2880,18 @@
                                     <div class="timeline-item task-item" data-status="{{ strtolower($update->status === 'Completed' ? 'completed' : 'ongoing') }}" style="margin-bottom: 15px;">
                                         <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #1e40af @else #3b82f6 @endif;"></div>
                                         <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
-                                            <div class="timeline-header">
-                                                <h5 style="margin: 0 0 5px 0; color: #1f2937;">{{ $update->title }}</h5>
-                                                <span class="timeline-status" style="background-color: @if($update->status === 'Completed') #dcfce7; color: #166534; @else #bfdbfe; color: #1e40af; @endif; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                                                    @if($update->status === 'Completed')
-                                                        <i class="fas fa-check-circle"></i> Complete
-                                                    @else
+                                            <div class="timeline-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                                <div style="flex: 1;">
+                                                    <h5 style="margin: 0 0 5px 0; color: #1f2937;">{{ $update->title }}</h5>
+                                                </div>
+                                                <select onchange="updateTaskStatus({{ $update->id }}, this.value)" @if($update->status === 'Completed') disabled @endif style="background-color: @if($update->status === 'Completed') #dcfce7; color: #166534; @else #bfdbfe; color: #1e40af; @endif; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: @if($update->status === 'Completed') not-allowed; opacity: 0.6; @else pointer; @endif font-weight: 600;">
+                                                    <option value="ongoing" @if($update->status !== 'Completed') selected @endif>
                                                         <i class="fas fa-hourglass-half"></i> Ongoing
-                                                    @endif
-                                                </span>
+                                                    </option>
+                                                    <option value="completed" @if($update->status === 'Completed') selected @endif>
+                                                        <i class="fas fa-check-circle"></i> Completed
+                                                    </option>
+                                                </select>
                                             </div>
                                             <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">{{ $update->description }}</p>
                                             <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
@@ -2867,10 +2910,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end;">
-                    <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeBOQTasksModal()">Close</button>
-                </div>
             </div>
         </div>
 
@@ -2888,6 +2927,7 @@
                     @csrf
                     <input type="hidden" id="currentBOQItemId" name="material_id" value="">
                     <input type="hidden" id="currentBOQItemName" name="boq_item_name" value="">
+                    <input type="hidden" name="status" value="Ongoing">
                     
                     <div style="padding: 20px;">
                         <div style="margin-bottom: 15px;">
@@ -2900,18 +2940,6 @@
                             <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description *</label>
                             <textarea id="taskDescription" name="description" placeholder="Enter task description" required rows="3"
                                 style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: 'Inter', sans-serif;"></textarea>
-                        </div>
-
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Status</label>
-                            <select id="taskStatus" name="status" 
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
-                                <option value="Ongoing">Ongoing</option>
-                                <option value="Completed">Completed</option>
-                                <option value="On Hold">On Hold</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="In Progress">In Progress</option>
-                            </select>
                         </div>
 
                         <div style="margin-bottom: 15px; padding: 12px; background: #f0f9ff; border-left: 4px solid #0369a1; border-radius: 4px;">
@@ -4489,30 +4517,49 @@
         };
 
         function viewBOQTasks(itemDescription, materialId) {
-            const modal = document.getElementById('boqTasksModal');
-            const title = document.getElementById('boqTasksTitle');
-            const details = document.getElementById('boqItemDetails');
-            
-            if (!modal) {
-                showNotification('Tasks modal not found', 'error');
-                return;
+            try {
+                const modal = document.getElementById('boqTasksModal');
+                const title = document.getElementById('boqTasksTitle');
+                const details = document.getElementById('boqItemDetails');
+                
+                if (!modal) {
+                    showNotification('Tasks modal not found', 'error');
+                    console.error('boqTasksModal element not found');
+                    return;
+                }
+                
+                if (!title) {
+                    showNotification('Modal title element not found', 'error');
+                    console.error('boqTasksTitle element not found');
+                    return;
+                }
+                
+                if (!details) {
+                    showNotification('Modal details element not found', 'error');
+                    console.error('boqItemDetails element not found');
+                    return;
+                }
+                
+                // Store current BOQ item for task creation
+                currentBOQItem.id = materialId;
+                currentBOQItem.description = itemDescription;
+                
+                title.textContent = 'Tasks for: ' + (itemDescription || 'Unknown Item');
+                details.innerHTML = `
+                    <strong>Item Description:</strong><br>
+                    ${itemDescription || 'N/A'}<br><br>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                        <i class="fas fa-info-circle"></i> View all project tasks related to this BOQ item
+                    </div>
+                `;
+                
+                loadTasksForItem(materialId);
+                modal.style.display = 'flex';
+                console.log('BOQ Tasks modal opened for item:', itemDescription, 'ID:', materialId);
+            } catch (error) {
+                console.error('Error in viewBOQTasks:', error);
+                showNotification('Error opening tasks modal: ' + error.message, 'error');
             }
-            
-            // Store current BOQ item for task creation
-            currentBOQItem.id = materialId;
-            currentBOQItem.description = itemDescription;
-            
-            title.textContent = 'Tasks for: ' + itemDescription;
-            details.innerHTML = `
-                <strong>Item Description:</strong><br>
-                ${itemDescription}<br><br>
-                <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-                    <i class="fas fa-info-circle"></i> View all project tasks related to this BOQ item
-                </div>
-            `;
-            
-            loadTasksForItem(materialId);
-            modal.style.display = 'flex';
         }
 
         function closeBOQTasksModal() {
@@ -4525,6 +4572,15 @@
         function loadTasksForItem(materialId) {
             const tasksList = document.getElementById('boqTasksList');
             
+            if (!tasksList) {
+                console.error('boqTasksList element not found');
+                showNotification('Tasks list container not found', 'error');
+                return;
+            }
+            
+            // Show loading state
+            tasksList.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading tasks...</div>';
+            
             // Filter the tasks based on material_id
             fetch(`/projects/{{ $project->id }}/tasks?material_id=${materialId}`, {
                 method: 'GET',
@@ -4534,29 +4590,37 @@
                 }
             })
             .then(response => {
-                if (!response.ok) throw new Error('Failed to load tasks');
+                console.log('Tasks fetch response status:', response.status);
+                if (!response.ok) throw new Error('Failed to load tasks (HTTP ' + response.status + ')');
                 return response.json();
             })
             .then(data => {
+                console.log('Tasks data received:', data);
                 if (data.tasks && data.tasks.length > 0) {
                     let html = '<div class="updates-timeline">';
                     
                     data.tasks.forEach(task => {
                         const taskStatus = task.status === 'Completed' ? 'completed' : 'ongoing';
-                        const statusClass = task.status === 'Completed' 
-                            ? '#dcfce7; color: #166534' 
-                            : '#bfdbfe; color: #1e40af';
                         const statusBg = task.status === 'Completed' ? '#1e40af' : '#3b82f6';
+                        const statusBgColor = task.status === 'Completed' ? '#dcfce7' : '#bfdbfe';
+                        const statusTextColor = task.status === 'Completed' ? '#166534' : '#1e40af';
                         
                         html += `
                             <div class="timeline-item task-item" data-status="${taskStatus}" style="margin-bottom: 15px;">
                                 <div class="timeline-marker" style="background-color: ${statusBg};"></div>
                                 <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
-                                    <div class="timeline-header">
-                                        <h5 style="margin: 0 0 5px 0; color: #1f2937;">${task.title}</h5>
-                                        <span class="timeline-status" style="background-color: ${statusClass}; display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                                            ${task.status === 'Completed' ? '<i class="fas fa-check-circle"></i> Complete' : '<i class="fas fa-hourglass-half"></i> Ongoing'}
-                                        </span>
+                                    <div class="timeline-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div style="flex: 1;">
+                                            <h5 style="margin: 0 0 5px 0; color: #1f2937;">${task.title}</h5>
+                                        </div>
+                                        <select onchange="updateTaskStatus(${task.id}, this.value)" ${task.status === 'Completed' ? 'disabled' : ''} style="background-color: ${statusBgColor}; color: ${statusTextColor}; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: ${task.status === 'Completed' ? 'not-allowed; opacity: 0.6;' : 'pointer;'} font-weight: 600; margin-left: 10px;">
+                                            <option value="ongoing" ${task.status !== 'Completed' ? 'selected' : ''}>
+                                                Ongoing
+                                            </option>
+                                            <option value="completed" ${task.status === 'Completed' ? 'selected' : ''}>
+                                                Completed
+                                            </option>
+                                        </select>
                                     </div>
                                     <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">${task.description}</p>
                                     <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
@@ -4633,6 +4697,54 @@
             });
         }
 
+        function updateTaskStatus(taskId, newStatus) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!csrfToken) {
+                showNotification('CSRF token not found', 'error');
+                return;
+            }
+
+            // Get the select element to check current status
+            const selectElement = event.target;
+            const currentStatus = selectElement.options[selectElement.selectedIndex === 1 ? 0 : 1].value;
+            
+            // Prevent changes from Completed status
+            if (selectElement.disabled) {
+                showNotification('This task is completed and cannot be changed', 'error');
+                return;
+            }
+
+            const statusValue = newStatus === 'completed' ? 'Completed' : 'Ongoing';
+
+            fetch(`/projects/{{ $project->id }}/updates/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    _token: csrfToken,
+                    status: statusValue
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to update task status');
+                return response.json();
+            })
+            .then(data => {
+                showNotification('Task status updated successfully', 'success');
+                // Reload the tasks list to reflect the change
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            })
+            .catch(error => {
+                console.error('Error updating task status:', error);
+                showNotification('Failed to update task status', 'error');
+            });
+        }
+
         function openAddTaskModal() {
             const modal = document.getElementById('addTaskModal');
             if (!modal) {
@@ -4647,7 +4759,6 @@
             
             // Reset form
             document.getElementById('addTaskForm').reset();
-            document.getElementById('taskStatus').value = 'Ongoing';
             
             modal.style.display = 'flex';
         }
@@ -4664,7 +4775,6 @@
             
             const title = document.getElementById('taskTitle').value.trim();
             const description = document.getElementById('taskDescription').value.trim();
-            const status = document.getElementById('taskStatus').value;
             const boqItemName = document.getElementById('currentBOQItemName').value;
             
             if (!title) {
@@ -4686,7 +4796,6 @@
                 showNotification('CSRF token not found. Please refresh the page.', 'error');
                 return false;
             }
-            
             const formData = new FormData(form);
             
             fetch(form.action, {
@@ -4699,32 +4808,32 @@
                 body: formData
             })
             .then(response => {
-                const contentType = response.headers.get('content-type');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
                 
                 if (!response.ok) {
-                    if (contentType && contentType.includes('application/json')) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || `Server error: ${response.status}`);
-                        });
-                    } else {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
+                    return response.text().then(text => {
+                        try {
+                            const json = JSON.parse(text);
+                            throw new Error(json.message || `Server error: ${response.status}`);
+                        } catch (e) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                    });
                 }
                 
-                if (contentType && contentType.includes('application/json')) {
-                    return response.json();
-                } else {
-                    // If response is not JSON, assume success
-                    return { success: true, message: 'Task added successfully' };
-                }
+                return response.json();
             })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
-                    showNotification('Task added successfully for: ' + boqItemName, 'success');
-                    closeAddTaskModal();
+                    showNotification('Task added successfully!', 'success');
+                    // Clear the form but keep modal open
+                    document.getElementById('addTaskForm').reset();
+                    document.getElementById('taskTitle').focus();
                     
                     // Reload only the tasks list for this item
-                    if (currentBOQItem.id) {
+                    if (currentBOQItem && currentBOQItem.id) {
                         loadTasksForItem(currentBOQItem.id);
                     }
                 } else {
@@ -4780,13 +4889,46 @@
                 return;
             }
 
-            // If status is failed, show failure reason modal for bulk
-            if (newStatus === 'failed') {
-                openBulkFailureReasonModal(checked.map(cb => cb.dataset.materialId));
-                return;
-            }
+            // Check if any selected items have locked statuses
+            const materialIds = checked.map(cb => cb.dataset.materialId);
+            let hasLockedStatus = false;
+            let lockedItemsDescription = '';
 
-            executeBulkStatusUpdate(newStatus, checked);
+            // Fetch all material data to check for locked statuses
+            Promise.all(materialIds.map(id => 
+                fetch(`/projects/{{ $project->id }}/materials/${id}`, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(r => r.json())
+                .catch(e => null)
+            )).then(materials => {
+                materials.forEach((material, index) => {
+                    if (material) {
+                        const currentStatus = (material.status || 'pending').toLowerCase();
+                        if (currentStatus === 'approved' || currentStatus === 'failed') {
+                            hasLockedStatus = true;
+                            if (lockedItemsDescription.length < 200) {
+                                lockedItemsDescription += (lockedItemsDescription ? ', ' : '') + (material.item_description?.substring(0, 50) || 'Item ' + (index + 1));
+                            }
+                        }
+                    }
+                });
+
+                if (hasLockedStatus) {
+                    const message = `Cannot change status: The following item(s) have locked statuses (Approved/Failed) and cannot be modified:\n${lockedItemsDescription}${lockedItemsDescription.length >= 200 ? '...' : ''}`;
+                    showNotification(message, 'error');
+                    return;
+                }
+
+                // If all items are free to update, proceed
+                // If status is failed, show failure reason modal for bulk
+                if (newStatus === 'failed') {
+                    openBulkFailureReasonModal(checked.map(cb => cb.dataset.materialId));
+                    return;
+                }
+
+                executeBulkStatusUpdate(newStatus, checked);
+            });
         }
 
         // Store bulk material IDs for failure reason modal
@@ -4908,6 +5050,18 @@
                 return response.json();
             })
             .then(material => {
+                // Check if status is locked (Approved or Failed)
+                const currentStatus = (material.status || 'pending').toLowerCase();
+                if (currentStatus === 'approved' || currentStatus === 'failed') {
+                    const message = `Cannot change status: This transaction has been marked as "${currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}" and cannot be modified.`;
+                    showNotification(message, 'error');
+                    // Reset the dropdown to the current status
+                    const select = document.querySelector(`[data-material-id="${materialId}"]`);
+                    if (select) {
+                        select.value = currentStatus;
+                    }
+                    return;
+                }
                 // Build notes with failure reason if applicable
                 let updatedNotes = material.notes || '';
                 if (newStatus === 'failed' && failureReason) {
@@ -5040,16 +5194,98 @@
             showNotification(message, 'error');
         }
 
-        // Documentation filter
-        function filterDocuments(type) {
-            const cards = document.querySelectorAll('#documentationGrid .image-card');
-            cards.forEach(card => {
-                const docType = card.getAttribute('data-doc-type') || 'other';
-                if (type === 'all' || docType === type) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
+        // View text content in modal
+        function viewTextContent(docId) {
+            fetch(`/projects/{{ $project->id }}/documents/${docId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load document');
+                return response.json();
+            })
+            .then(doc => {
+                const modal = document.createElement('div');
+                modal.id = 'textContentModal';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    background: white;
+                    border-radius: 8px;
+                    padding: 32px;
+                    max-width: 600px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                `;
+
+                const title = document.createElement('h3');
+                title.style.cssText = 'margin: 0 0 16px 0; color: #1f2937; font-size: 20px;';
+                title.textContent = doc.title;
+
+                const meta = document.createElement('div');
+                meta.style.cssText = 'font-size: 12px; color: #6b7280; margin-bottom: 20px;';
+                meta.innerHTML = `By ${doc.uploader} • ${new Date(doc.created_at).toLocaleString()}`;
+
+                const textContent = document.createElement('div');
+                textContent.style.cssText = `
+                    background: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 6px;
+                    padding: 16px;
+                    line-height: 1.6;
+                    color: #374151;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                `;
+                textContent.textContent = doc.content;
+
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = 'Close';
+                closeBtn.style.cssText = `
+                    background: #6b7280;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 10px 20px;
+                    margin-top: 20px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    width: 100%;
+                `;
+                closeBtn.onclick = () => {
+                    modal.remove();
+                };
+
+                content.appendChild(title);
+                content.appendChild(meta);
+                content.appendChild(textContent);
+                content.appendChild(closeBtn);
+                modal.appendChild(content);
+                document.body.appendChild(modal);
+
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+            })
+            .catch(error => {
+                console.error('Error loading document:', error);
+                showNotification('Failed to load document content', 'error');
             });
         }
 

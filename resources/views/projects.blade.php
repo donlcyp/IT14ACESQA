@@ -831,6 +831,82 @@
                 padding: 8px 6px;
             }
         }
+
+        /* Error Modal Styles */
+        .error-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .error-modal.active {
+            display: flex;
+        }
+
+        .error-modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        .error-modal-icon {
+            font-size: 48px;
+            color: #dc2626;
+            margin-bottom: 16px;
+        }
+
+        .error-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .error-modal-message {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .error-modal-button {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .error-modal-button:hover {
+            background-color: #991b1b;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -1355,6 +1431,9 @@
                                         <option value="Ongoing">Ongoing</option>
                                         <option value="Completed">Completed</option>
                                     </select>
+                                    <div id="statusLockedMessage" style="display: none; color: #dc2626; font-size: 12px; margin-top: 6px;">
+                                        <i class="fas fa-lock"></i> This project status is locked and cannot be changed.
+                                    </div>
                                 </div>
 
                                 <div class="projects-form-group">
@@ -1558,6 +1637,29 @@
                     if (editProjectStatus) editProjectStatus.value = data.status || 'Ongoing';
                     if (editAssignedPmId) editAssignedPmId.value = data.assigned_pm_id || '';
 
+                    // Disable status dropdown if project is Completed
+                    if (editProjectStatus && data.status === 'Completed') {
+                        editProjectStatus.disabled = true;
+                        editProjectStatus.style.opacity = '0.6';
+                        editProjectStatus.style.backgroundColor = '#f3f4f6';
+                        editProjectStatus.style.cursor = 'not-allowed';
+                        const statusLockedMsg = document.getElementById('statusLockedMessage');
+                        if (statusLockedMsg) {
+                            statusLockedMsg.style.display = 'block';
+                        }
+                    } else {
+                        if (editProjectStatus) {
+                            editProjectStatus.disabled = false;
+                            editProjectStatus.style.opacity = '1';
+                            editProjectStatus.style.backgroundColor = '';
+                            editProjectStatus.style.cursor = 'pointer';
+                        }
+                        const statusLockedMsg = document.getElementById('statusLockedMessage');
+                        if (statusLockedMsg) {
+                            statusLockedMsg.style.display = 'none';
+                        }
+                    }
+
                     if (editProjectModal) {
                         editProjectModal.classList.add('active');
                         editProjectModal.setAttribute('aria-hidden', 'false');
@@ -1622,6 +1724,33 @@
                 archiveModal.addEventListener('click', function (event) {
                     if (event.target === archiveModal) {
                         closeArchiveModal();
+                    }
+                });
+            }
+
+            // Add form submission validation for edit form
+            if (editProjectForm) {
+                editProjectForm.addEventListener('submit', function (event) {
+                    const statusSelect = document.getElementById('editProjectStatus');
+                    if (statusSelect && statusSelect.disabled) {
+                        event.preventDefault();
+                        showErrorModal('Project status is locked. Completed projects cannot be edited.', 'Project Locked');
+                        return false;
+                    }
+
+                    // Validate date conflict
+                    const dateStarted = editDateStarted.value;
+                    const dateEnded = editDateEnded.value;
+
+                    if (dateStarted && dateEnded) {
+                        const startDate = new Date(dateStarted);
+                        const endDate = new Date(dateEnded);
+
+                        if (startDate > endDate) {
+                            event.preventDefault();
+                            showErrorModal('Date Started cannot be after Date Ended. Please select valid dates.', 'Invalid Dates');
+                            return false;
+                        }
                     }
                 });
             }
@@ -1751,7 +1880,47 @@
                 alert('An error occurred: ' + error.message);
             });
         }
+
+        // Error Modal Functions
+        function showErrorModal(message, title = 'Error') {
+            const errorModal = document.getElementById('errorModal');
+            const errorTitle = document.getElementById('errorModalTitle');
+            const errorMessage = document.getElementById('errorModalMessage');
+            
+            if (errorModal && errorTitle && errorMessage) {
+                errorTitle.textContent = title;
+                errorMessage.textContent = message;
+                errorModal.classList.add('active');
+            }
+        }
+
+        function closeErrorModal() {
+            const errorModal = document.getElementById('errorModal');
+            if (errorModal) {
+                errorModal.classList.remove('active');
+            }
+        }
+
+        // Close error modal when clicking outside of it
+        document.addEventListener('click', function(event) {
+            const errorModal = document.getElementById('errorModal');
+            if (errorModal && event.target === errorModal) {
+                closeErrorModal();
+            }
+        });
     </script>
+
+    <!-- Error Modal -->
+    <div class="error-modal" id="errorModal" role="alertdialog" aria-modal="true">
+        <div class="error-modal-content">
+            <div class="error-modal-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="error-modal-title" id="errorModalTitle">Error</div>
+            <div class="error-modal-message" id="errorModalMessage">An error occurred</div>
+            <button class="error-modal-button" onclick="closeErrorModal()">OK</button>
+        </div>
+    </div>
 </body>
 
 </html>

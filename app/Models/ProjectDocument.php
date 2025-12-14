@@ -13,6 +13,7 @@ class ProjectDocument extends Model
     protected $fillable = [
         'project_id',
         'title',
+        'content',
         'file_path',
         'file_name',
         'mime_type',
