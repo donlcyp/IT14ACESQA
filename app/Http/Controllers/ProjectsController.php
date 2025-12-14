@@ -809,4 +809,200 @@ class ProjectsController extends Controller
             return redirect()->route('projects.show', $project->id)->with('error', 'Failed to remove employee: ' . $e->getMessage());
         }
     }
+
+    /**
+     * QA Inspection - Submit inspection for a BOQ item
+     * Only QA role can perform this action
+     */
+    public function submitQAInspection(Request $request, Project $project, Material $material)
+    {
+        $user = auth()->user();
+        
+        // Only QA role can submit inspections
+        if (!$user || $user->role !== 'QA') {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Only Quality Assurance Officers can perform inspections.'], 403);
+            }
+            abort(403, 'Only Quality Assurance Officers can perform inspections.');
+        }
+
+        $validated = $request->validate([
+            'qa_status' => 'required|in:passed,failed,requires_recheck',
+            'qa_rating' => 'nullable|integer|min:1|max:5',
+            'qa_remarks' => 'nullable|string|max:1000',
+            'qa_checklist' => 'nullable|array',
+        ]);
+
+        try {
+            $material->update([
+                'qa_status' => $validated['qa_status'],
+                'qa_rating' => $validated['qa_rating'] ?? null,
+                'qa_remarks' => $validated['qa_remarks'] ?? null,
+                'qa_checklist' => $validated['qa_checklist'] ?? null,
+                'qa_inspected_by' => $user->id,
+                'qa_inspected_at' => now(),
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'QA inspection submitted successfully!',
+                    'data' => $material->fresh()
+                ]);
+            }
+
+            return redirect()->route('projects.show', $project->id)->with('success', 'QA inspection submitted successfully!');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to submit inspection: ' . $e->getMessage()], 422);
+            }
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to submit inspection: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * QA Bulk Inspection - Submit inspections for multiple BOQ items
+     * Only QA role can perform this action
+     */
+    public function bulkQAInspection(Request $request, Project $project)
+    {
+        $user = auth()->user();
+        
+        if (!$user || $user->role !== 'QA') {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Only Quality Assurance Officers can perform inspections.'], 403);
+            }
+            abort(403, 'Only Quality Assurance Officers can perform inspections.');
+        }
+
+        $validated = $request->validate([
+            'material_ids' => 'required|array|min:1',
+            'material_ids.*' => 'integer|exists:materials,id',
+            'qa_status' => 'required|in:passed,failed,requires_recheck',
+            'qa_remarks' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $updatedCount = Material::whereIn('id', $validated['material_ids'])
+                ->where('project_id', $project->id)
+                ->update([
+                    'qa_status' => $validated['qa_status'],
+                    'qa_remarks' => $validated['qa_remarks'] ?? null,
+                    'qa_inspected_by' => $user->id,
+                    'qa_inspected_at' => now(),
+                ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "QA inspection submitted for {$updatedCount} items!",
+                ]);
+            }
+
+            return redirect()->route('projects.show', $project->id)->with('success', "QA inspection submitted for {$updatedCount} items!");
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to submit bulk inspection: ' . $e->getMessage()], 422);
+            }
+            return redirect()->route('projects.show', $project->id)->with('error', 'Failed to submit bulk inspection: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Approve or Reject Material Replacement Request
+     * Only OWNER, PM, FM roles can perform this action
+     */
+    public function processReplacementRequest(Request $request, Material $material)
+    {
+        $user = auth()->user();
+        
+        if (!$user || !in_array($user->role, ['OWNER', 'PM', 'FM'])) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Only Owner, Project Manager, or Finance Manager can process replacement requests.'], 403);
+            }
+            abort(403, 'Unauthorized');
+        }
+
+        if (!$material->replacement_requested) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'This material has no pending replacement request.'], 422);
+            }
+            return back()->with('error', 'This material has no pending replacement request.');
+        }
+
+        // Prevent re-processing already processed requests
+        if ($material->replacement_status === 'approved' || $material->replacement_status === 'rejected') {
+            $status = $material->replacement_status === 'approved' ? 'approved' : 'rejected';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => "This replacement request has already been {$status}. No further action is needed."], 422);
+            }
+            return back()->with('error', "This replacement request has already been {$status}.");
+        }
+
+        $validated = $request->validate([
+            'action' => 'required|in:approve,reject',
+            'replacement_notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $updateData = [
+                'replacement_status' => $validated['action'] === 'approve' ? 'approved' : 'rejected',
+                'replacement_approved_at' => now(),
+                'replacement_approved_by' => $user->id,
+                'replacement_notes' => $validated['replacement_notes'] ?? null,
+            ];
+
+            // If approved, reset qa_status to requires_recheck and clear needs_replacement flag
+            if ($validated['action'] === 'approve') {
+                $updateData['qa_status'] = 'requires_recheck';
+                $updateData['needs_replacement'] = false;  // Clear the replacement flag so it can be re-inspected normally
+            }
+
+            $material->update($updateData);
+
+            $action = $validated['action'] === 'approve' ? 'approved' : 'rejected';
+            $message = "Replacement request has been {$action} successfully.";
+            if ($validated['action'] === 'approve') {
+                $message .= " Material status reset to 'Requires Recheck' for reinspection.";
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'data' => $material->fresh()
+                ]);
+            }
+
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Failed to process replacement request: ' . $e->getMessage()], 422);
+            }
+            return back()->with('error', 'Failed to process replacement request: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get all pending replacement requests for a project
+     */
+    public function getPendingReplacements(Project $project)
+    {
+        $user = auth()->user();
+        
+        if (!$user || !in_array($user->role, ['OWNER', 'PM', 'FM'])) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $pendingReplacements = $project->materials()
+            ->where('replacement_requested', true)
+            ->where('replacement_status', 'pending')
+            ->with(['replacementRequester', 'qaInspector'])
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $pendingReplacements
+        ]);
+    }
 }

@@ -280,6 +280,14 @@
             </a>
         @endif
 
+        <!-- QA: Materials Inspection (QA Role Only) -->
+        @if(auth()->check() && auth()->user()->role === 'QA')
+            <a href="{{ route('qa.materials') }}" class="nav-item {{ request()->routeIs('qa.materials') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-clipboard-check"></i>
+                <span>QA Materials</span>
+            </a>
+        @endif
+
         <!-- EMPLOYEE: My Attendance (for employees who have employee profile, excluding OWNER) -->
         @if(auth()->check() && auth()->user()->role !== 'OWNER' && \App\Models\EmployeeList::where('user_id', auth()->user()->id)->exists())
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">

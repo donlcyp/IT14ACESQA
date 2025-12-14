@@ -65,8 +65,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/archives', [App\Http\Controllers\ProjectsController::class, 'archives'])->name('archives');
         Route::post('/projects/{project}/archive', [App\Http\Controllers\ProjectsController::class, 'archive'])->name('projects.archive');
         Route::put('/projects/{project}/unarchive', [App\Http\Controllers\ProjectsController::class, 'unarchive'])->name('projects.unarchive');
+    });
 
-        // Employee & Attendance (OWNER & PM only)
+    // ===== SHARED ROUTES: OWNER, PM & FM (Replacement Approvals) =====
+    Route::middleware('role:OWNER,PM,FM')->group(function () {
+        // Material Replacement Request Processing
+        Route::post('/materials/{material}/replacement/process', [App\Http\Controllers\ProjectsController::class, 'processReplacementRequest'])->name('materials.replacement.process');
+        Route::get('/projects/{project}/replacements/pending', [App\Http\Controllers\ProjectsController::class, 'getPendingReplacements'])->name('projects.replacements.pending');
+    });
+
+    // ===== Employee & Attendance (OWNER & PM only) =====
+    Route::middleware('role:OWNER,PM')->group(function () {
         Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');
         Route::post('/employee-attendance/{employee}', [App\Http\Controllers\EmployeeAttendanceController::class, 'storeAttendance'])->name('employee-attendance.store');
         Route::get('/employee-attendance-history', [App\Http\Controllers\EmployeeAttendanceController::class, 'history'])->name('employee-attendance.history');
@@ -131,6 +140,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/punch-in', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchInEmployee'])->name('punch.in.employee');
     Route::post('/punch-out', [App\Http\Controllers\EmployeeAttendanceController::class, 'punchOutEmployee'])->name('punch.out.employee');
     Route::get('/punch-status', [App\Http\Controllers\EmployeeAttendanceController::class, 'getPunchStatusEmployee'])->name('punch.status.employee');
+
+    // ===== QA ROLE ONLY: Quality Assurance Inspections =====
+    Route::middleware('role:QA')->group(function () {
+        Route::get('/qa-materials', [App\Http\Controllers\DashboardController::class, 'qaMaterials'])->name('qa.materials');
+        Route::post('/qa-materials/{material}/decision', [App\Http\Controllers\DashboardController::class, 'submitQADecision'])->name('qa.materials.decision');
+        Route::post('/qa-materials/{material}/request-replacement', [App\Http\Controllers\DashboardController::class, 'requestReplacement'])->name('qa.materials.request-replacement');
+        Route::get('/qa-materials/{material}/details', [App\Http\Controllers\DashboardController::class, 'getMaterialDetails'])->name('qa.materials.details');
+    });
 
     // API Routes for Project Employee Management (PM and OWNER only)
     Route::post('/api/projects/{project}/employees', [App\Http\Controllers\EmployeeAttendanceController::class, 'assignEmployeesToProject'])

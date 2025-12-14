@@ -928,6 +928,11 @@
                     <button class="tab-button" onclick="switchTab('finance')">Finance & Transactions</button>
                     <button class="tab-button" onclick="switchTab('employees')">Team Workers</button>
                     <button class="tab-button" onclick="switchTab('images')">Documentation</button>
+                    @if(auth()->user()->role === 'QA')
+                    <button class="tab-button" onclick="switchTab('qa-inspections')">
+                        <i class="fas fa-clipboard-check"></i> QA Inspections
+                    </button>
+                    @endif
                     <button class="tab-button" onclick="switchTab('report')">Reports</button>
                 </div>
 
@@ -1426,29 +1431,11 @@
                                 </style>
                             </div>
 
-                            <!-- Bulk Status Update Controls -->
-                            @if ($materials && $materials->count() > 0)
-                            <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
-                                <select id="bulkStatusSelect" style="padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 13px; min-width: 160px;">
-                                    <option value="">-- Change Status To --</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="failed">Failed</option>
-                                </select>
-                                <button type="button" id="applyBulkStatusBtn" class="btn btn-primary" style="display: none;" onclick="applyBulkTransactionStatus()">
-                                    <i class="fas fa-check"></i> Apply to Selected (<span id="selectedTransactionCount">0</span>)
-                                </button>
-                            </div>
-                            @endif
-
                             @if ($materials && $materials->count() > 0)
                                 <div style="overflow-x: auto;">
                                     <table style="width: 100%; border-collapse: collapse; font-size: 17px;">
                                         <thead>
                                             <tr style="border-bottom: 2px solid var(--accent); background: var(--sidebar-bg);">
-                                                <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 50px;">
-                                                    <input type="checkbox" id="selectAllTransactions" onchange="toggleAllTransactions()" style="cursor: pointer; width: 18px; height: 18px;">
-                                                </th>
                                                 <th style="padding: 12px; text-align: left; font-weight: 600; color: var(--black-1);">Item Description</th>
                                                 <th style="padding: 12px; text-align: center; font-weight: 600; color: var(--black-1); width: 80px;">Qty</th>
                                                 <th style="padding: 12px; text-align: right; font-weight: 600; color: var(--black-1); width: 100px;">Unit Rate</th>
@@ -1468,9 +1455,6 @@
                                                     };
                                                 @endphp
                                                 <tr style="border-bottom: 1px solid var(--gray-400);" data-transaction-id="{{ $material->id }}">
-                                                    <td style="padding: 12px; text-align: center;">
-                                                        <input type="checkbox" class="transaction-checkbox" data-material-id="{{ $material->id }}" onchange="updateTransactionSelectionCount()" style="cursor: pointer; width: 18px; height: 18px;">
-                                                    </td>
                                                     <td style="padding: 12px; color: var(--black-1);">
                                                         <div style="font-weight: 500; white-space: pre-wrap; line-height: 1.6; font-size: 15px;">{{ $material->item_description ?? 'N/A' }}</div>
                                                         @if($material->category)
@@ -1481,11 +1465,24 @@
                                                     <td style="padding: 12px; text-align: right; color: var(--gray-700);">₱{{ number_format($material->material_cost ?? 0, 2) }}</td>
                                                     <td style="padding: 12px; text-align: right; color: var(--gray-700); font-weight: 600; background: #f9fafb;">₱{{ number_format($itemTotal, 2) }}</td>
                                                     <td style="padding: 12px; text-align: center;">
-                                                        <select class="status-select" data-material-id="{{ $material->id }}" onchange="updateMaterialStatus(this.dataset.materialId, this.value)" {{ in_array(strtolower($material->status ?? 'pending'), ['approved', 'failed']) ? 'disabled' : '' }}>
-                                                            <option value="pending" {{ strtolower($material->status ?? 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                                            <option value="approved" {{ strtolower($material->status ?? 'pending') === 'approved' ? 'selected' : '' }}>Approved</option>
-                                                            <option value="failed" {{ strtolower($material->status ?? 'pending') === 'failed' ? 'selected' : '' }}>Failed</option>
-                                                        </select>
+                                                        @php
+                                                            $qaStatus = $material->qa_status ?? 'pending';
+                                                            $statusText = match($qaStatus) {
+                                                                'passed' => 'Passed',
+                                                                'failed' => 'Failed',
+                                                                'requires_recheck' => 'Recheck',
+                                                                default => 'Pending'
+                                                            };
+                                                            $badgeClass = match($qaStatus) {
+                                                                'passed' => ['color' => '#065f46'],
+                                                                'failed' => ['color' => '#991b1b'],
+                                                                'requires_recheck' => ['color' => '#3730a3'],
+                                                                default => ['color' => '#93a116ff']
+                                                            };
+                                                        @endphp
+                                                        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; color: {{ $badgeClass['color'] }};">
+                                                            {{ $statusText }}
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -1709,7 +1706,7 @@
                                                     <form method="POST" action="{{ route('projects.employees.remove', [$project->id, $employee->id]) }}" style="display: inline;" onsubmit="return confirm('Remove this employee?');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" style="background: #fee2e2; color: #991b1b; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                                        <button type="submit" style="color: #991b1b; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
                                                             <i class="fas fa-trash"></i> Remove
                                                         </button>
                                                     </form>
@@ -1856,6 +1853,217 @@
                     </div>
                 </div>
 
+                <!-- QA Inspections Tab (QA Role Only) -->
+                @if(auth()->user()->role === 'QA')
+                <div id="qa-inspections" class="tab-content">
+                    <style>
+                        .qa-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+                        .qa-title { font-size: 20px; font-weight: 700; color: var(--black-1); margin: 0; display: flex; align-items: center; gap: 10px; }
+                        .qa-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+                        .qa-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+                        .qa-summary-card { padding: 18px; border: 1px solid var(--gray-300); border-radius: 10px; background: #fff; text-align: center; }
+                        .qa-summary-card.pending { border-left: 4px solid #f59e0b; }
+                        .qa-summary-card.passed { border-left: 4px solid #10b981; }
+                        .qa-summary-card.failed { border-left: 4px solid #ef4444; }
+                        .qa-summary-card.recheck { border-left: 4px solid #6366f1; }
+                        .qa-summary-value { font-size: 28px; font-weight: 700; color: var(--black-1); }
+                        .qa-summary-label { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
+                        .qa-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 16px; }
+                        .qa-table th { background: var(--sidebar-bg); padding: 14px 12px; text-align: left; font-weight: 600; color: var(--black-1); border-bottom: 2px solid var(--gray-300); }
+                        .qa-table td { padding: 14px 12px; border-bottom: 1px solid var(--gray-300); color: var(--gray-700); vertical-align: middle; }
+                        .qa-table tr:hover { background: #fafafa; }
+                        .qa-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+                        .qa-status-badge.pending { background: #fef3c7; color: #92400e; }
+                        .qa-status-badge.passed { background: #d1fae5; color: #065f46; }
+                        .qa-status-badge.failed { color: #991b1b; }
+                        .qa-status-badge.requires_recheck { background: #e0e7ff; color: #3730a3; }
+                        .qa-inspect-btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+                        .qa-inspect-btn:hover { background: #1e3a8a; transform: translateY(-1px); }
+                        .qa-bulk-actions { display: none; padding: 16px; background: var(--sidebar-bg); border-radius: 8px; margin-bottom: 20px; align-items: center; gap: 16px; flex-wrap: wrap; }
+                        .qa-bulk-actions.show { display: flex; }
+                        .qa-rating { display: flex; gap: 4px; }
+                        .qa-rating-star { color: #fbbf24; font-size: 14px; }
+                        .qa-rating-star.empty { color: #d1d5db; }
+                    </style>
+
+                    <div class="qa-header">
+                        <h2 class="qa-title">
+                            <i class="fas fa-clipboard-check" style="color: var(--accent);"></i>
+                            Quality Assurance Inspections
+                        </h2>
+                        <div class="qa-actions">
+                            <button type="button" class="btn btn-primary" onclick="openBulkQAModal()">
+                                <i class="fas fa-check-double"></i> Bulk Inspection
+                            </button>
+                        </div>
+                    </div>
+
+                    @php
+                        $pendingCount = $project->materials->whereNull('qa_status')->count() + $project->materials->where('qa_status', 'pending')->count();
+                        $passedCount = $project->materials->where('qa_status', 'passed')->count();
+                        $failedCount = $project->materials->where('qa_status', 'failed')->count();
+                        $recheckCount = $project->materials->where('qa_status', 'requires_recheck')->count();
+                        $totalItems = $project->materials->count();
+                    @endphp
+
+                    <!-- QA Summary Cards -->
+                    <div class="qa-summary">
+                        <div class="qa-summary-card pending">
+                            <div class="qa-summary-value">{{ $pendingCount }}</div>
+                            <div class="qa-summary-label">Pending Inspection</div>
+                        </div>
+                        <div class="qa-summary-card passed">
+                            <div class="qa-summary-value">{{ $passedCount }}</div>
+                            <div class="qa-summary-label">Passed</div>
+                        </div>
+                        <div class="qa-summary-card failed">
+                            <div class="qa-summary-value">{{ $failedCount }}</div>
+                            <div class="qa-summary-label">Failed</div>
+                        </div>
+                        <div class="qa-summary-card recheck">
+                            <div class="qa-summary-value">{{ $recheckCount }}</div>
+                            <div class="qa-summary-label">Requires Recheck</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    @if($totalItems > 0)
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: var(--black-1);">Inspection Progress</span>
+                            <span style="font-size: 14px; color: var(--gray-600);">{{ $passedCount + $failedCount + $recheckCount }} / {{ $totalItems }} items inspected</span>
+                        </div>
+                        <div style="width: 100%; height: 12px; background: var(--gray-300); border-radius: 6px; overflow: hidden; display: flex;">
+                            @if($passedCount > 0)
+                            <div style="width: {{ ($passedCount / $totalItems) * 100 }}%; background: #10b981; height: 100%;"></div>
+                            @endif
+                            @if($failedCount > 0)
+                            <div style="width: {{ ($failedCount / $totalItems) * 100 }}%; background: #ef4444; height: 100%;"></div>
+                            @endif
+                            @if($recheckCount > 0)
+                            <div style="width: {{ ($recheckCount / $totalItems) * 100 }}%; background: #6366f1; height: 100%;"></div>
+                            @endif
+                        </div>
+                        <div style="display: flex; gap: 20px; margin-top: 8px; font-size: 12px;">
+                            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #10b981; border-radius: 2px;"></span> Passed</span>
+                            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #ef4444; border-radius: 2px;"></span> Failed</span>
+                            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #6366f1; border-radius: 2px;"></span> Recheck</span>
+                            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #d1d5db; border-radius: 2px;"></span> Pending</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Bulk Actions Bar -->
+                    <div id="qaBulkActions" class="qa-bulk-actions">
+                        <span id="qaSelectedCount" style="font-weight: 600; color: var(--black-1);">0 items selected</span>
+                        <button type="button" class="btn" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;" onclick="bulkQAAction('passed')">
+                            <i class="fas fa-check"></i> Mark Passed
+                        </button>
+                        <button type="button" class="btn" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;" onclick="bulkQAAction('failed')">
+                            <i class="fas fa-times"></i> Mark Failed
+                        </button>
+                        <button type="button" class="btn" style="background: #6366f1; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;" onclick="bulkQAAction('requires_recheck')">
+                            <i class="fas fa-redo"></i> Mark Recheck
+                        </button>
+                    </div>
+
+                    <!-- QA Items Table -->
+                    @if($project->materials->count() > 0)
+                    <div style="overflow-x: auto; border: 1px solid var(--gray-300); border-radius: 8px;">
+                        <table class="qa-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px; text-align: center;">
+                                        <input type="checkbox" id="selectAllQA" onchange="toggleAllQAItems()" style="cursor: pointer; width: 18px; height: 18px;">
+                                    </th>
+                                    <th style="width: 80px;">Item #</th>
+                                    <th>Item Description</th>
+                                    <th style="width: 120px; text-align: center;">QA Status</th>
+                                    <th style="width: 100px; text-align: center;">Rating</th>
+                                    <th style="width: 200px;">Remarks</th>
+                                    <th style="width: 140px;">Inspected</th>
+                                    <th style="width: 120px; text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($project->materials as $material)
+                                <tr data-material-id="{{ $material->id }}">
+                                    <td style="text-align: center;">
+                                        <input type="checkbox" class="qa-checkbox" data-material-id="{{ $material->id }}" onchange="updateQASelection()" style="cursor: pointer; width: 18px; height: 18px;">
+                                    </td>
+                                    <td style="font-weight: 600;">{{ $material->item_no ?? '—' }}</td>
+                                    <td>
+                                        <div style="font-weight: 500;">{{ Str::limit($material->item_description ?? $material->material_name ?? 'Unnamed Item', 60) }}</div>
+                                        @if($material->category)
+                                        <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">{{ $material->category }}</div>
+                                        @endif
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @php
+                                            $qaStatus = $material->qa_status ?? 'pending';
+                                        @endphp
+                                        <span class="qa-status-badge {{ $qaStatus }}">
+                                            @if($qaStatus === 'passed')
+                                                <i class="fas fa-check-circle"></i> Passed
+                                            @elseif($qaStatus === 'failed')
+                                                <i class="fas fa-times-circle"></i> Failed
+                                            @elseif($qaStatus === 'requires_recheck')
+                                                <i class="fas fa-redo"></i> Recheck
+                                            @else
+                                                <i class="fas fa-clock"></i> Pending
+                                            @endif
+                                        </span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @if($material->qa_rating)
+                                        <div class="qa-rating">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <i class="fas fa-star qa-rating-star {{ $i <= $material->qa_rating ? '' : 'empty' }}"></i>
+                                            @endfor
+                                        </div>
+                                        @else
+                                        <span style="color: var(--gray-500); font-size: 12px;">Not rated</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($material->qa_remarks)
+                                        <div style="font-size: 13px; color: var(--gray-700);">{{ Str::limit($material->qa_remarks, 50) }}</div>
+                                        @else
+                                        <span style="color: var(--gray-500); font-size: 12px;">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($material->qa_inspected_at)
+                                        <div style="font-size: 12px; color: var(--gray-700);">
+                                            {{ \Carbon\Carbon::parse($material->qa_inspected_at)->format('M d, Y') }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--gray-500);">
+                                            by {{ $material->qaInspector?->name ?? 'Unknown' }}
+                                        </div>
+                                        @else
+                                        <span style="color: var(--gray-500); font-size: 12px;">Not inspected</span>
+                                        @endif
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <button type="button" class="qa-inspect-btn" onclick="openQAInspectModal({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'Item') }}', '{{ $material->qa_status ?? 'pending' }}', {{ $material->qa_rating ?? 0 }}, '{{ addslashes($material->qa_remarks ?? '') }}')">
+                                            <i class="fas fa-clipboard-check"></i> Inspect
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
+                    <div style="text-align: center; padding: 60px 20px; background: var(--sidebar-bg); border-radius: 12px;">
+                        <i class="fas fa-clipboard-list" style="font-size: 48px; color: var(--gray-400); margin-bottom: 16px;"></i>
+                        <h3 style="color: var(--gray-700); margin-bottom: 8px;">No BOQ Items to Inspect</h3>
+                        <p style="color: var(--gray-600);">BOQ items need to be added before QA inspection can begin.</p>
+                    </div>
+                    @endif
+                </div>
+                @endif
+
                 <!-- Reports Tab -->
                 <div id="report" class="tab-content">
                     <!-- Reports Page - Formal, Printable System Outputs -->
@@ -1931,6 +2139,20 @@
                             <button class="report-nav-btn" onclick="switchReport('activity')">
                                 <i class="fas fa-history"></i> Activity Log
                             </button>
+                            @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
+                            <button class="report-nav-btn" onclick="switchReport('qa-failed')">
+                                <i class="fas fa-exclamation-triangle"></i> QA Failed Items
+                            </button>
+                            <button class="report-nav-btn" onclick="switchReport('replacements')">
+                                <i class="fas fa-exchange-alt"></i> Replacement Requests
+                                @php
+                                    $pendingReplacementsCount = $project->materials->where('replacement_requested', true)->where('replacement_status', 'pending')->count();
+                                @endphp
+                                @if($pendingReplacementsCount > 0)
+                                <span style="background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 6px;">{{ $pendingReplacementsCount }}</span>
+                                @endif
+                            </button>
+                            @endif
                         </div>
 
                         <!-- 1. Project Status Report -->
@@ -2632,6 +2854,265 @@
                                 <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
                             </div>
                         </div>
+
+                        <!-- 7. QA Failed Items Report (PM/FM/OWNER Only) -->
+                        @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
+                        <div id="report-qa-failed" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">QA Failed Items Report</h3>
+                                    <p class="report-header-subtitle">Materials requiring replacement • Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                            </div>
+
+                            @php
+                                $failedMaterials = $project->materials->where('qa_status', 'failed');
+                                $needsReplacementMaterials = $project->materials->where('needs_replacement', true);
+                            @endphp
+
+                            <!-- Summary Stats -->
+                            <div class="report-summary" style="margin-bottom: 24px;">
+                                <div class="report-summary-item" style="border-left: 4px solid #ef4444;">
+                                    <div class="report-summary-label">Failed Items</div>
+                                    <div class="report-summary-value" style="color: #ef4444;">{{ $failedMaterials->count() }}</div>
+                                </div>
+                                <div class="report-summary-item" style="border-left: 4px solid #f59e0b;">
+                                    <div class="report-summary-label">Needs Replacement</div>
+                                    <div class="report-summary-value" style="color: #f59e0b;">{{ $needsReplacementMaterials->count() }}</div>
+                                </div>
+                                <div class="report-summary-item" style="border-left: 4px solid #10b981;">
+                                    <div class="report-summary-label">Passed Items</div>
+                                    <div class="report-summary-value" style="color: #10b981;">{{ $project->materials->where('qa_status', 'passed')->count() }}</div>
+                                </div>
+                            </div>
+
+                            @if($failedMaterials->count() > 0 || $needsReplacementMaterials->count() > 0)
+                            <!-- Failed Items Table -->
+                            <div style="margin-bottom: 24px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                                    Failed Materials Requiring Replacement
+                                </h4>
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item #</th>
+                                            <th>Material Description</th>
+                                            <th>Category</th>
+                                            <th>Quantity</th>
+                                            <th>Failure Reason</th>
+                                            <th>QA Remarks</th>
+                                            <th>Inspected By</th>
+                                            <th>Inspection Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($failedMaterials as $material)
+                                        <tr style="background: #fef2f2;">
+                                            <td style="font-weight: 600;">{{ $material->item_no ?? '—' }}</td>
+                                            <td>{{ $material->item_description ?? $material->material_name ?? 'Unnamed' }}</td>
+                                            <td>{{ $material->category ?? '—' }}</td>
+                                            <td class="text-center">{{ $material->quantity ?? 0 }} {{ $material->unit ?? 'pcs' }}</td>
+                                            <td>
+                                                <span style="color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 14px; font-weight: 600;">
+                                                    {{ $material->failure_reason ?? 'Not specified' }}
+                                                </span>
+                                            </td>
+                                            <td style="max-width: 200px;">{{ $material->qa_remarks ?? '—' }}</td>
+                                            <td>{{ $material->qaInspector->name ?? 'Unknown' }}</td>
+                                            <td>{{ $material->qa_inspected_at ? $material->qa_inspected_at->format('M d, Y') : '—' }}</td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="8" style="text-align: center; color: var(--gray-500); padding: 30px;">
+                                                <i class="fas fa-check-circle" style="font-size: 24px; color: #10b981; margin-bottom: 8px; display: block;"></i>
+                                                No failed materials
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            @else
+                            <div style="text-align: center; padding: 60px 20px; background: #f0fdf4; border-radius: 12px; border: 1px solid #86efac;">
+                                <i class="fas fa-check-circle" style="font-size: 48px; color: #10b981; margin-bottom: 16px;"></i>
+                                <h3 style="color: #065f46; margin-bottom: 8px;">All Materials Passed QA</h3>
+                                <p style="color: #047857;">No failed items requiring replacement in this project.</p>
+                            </div>
+                            @endif
+
+                            <div class="report-footer">
+                                <strong>Important:</strong> Failed materials should be coordinated with suppliers for replacement or refund.<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
+                            </div>
+                        </div>
+
+                        <!-- 8. Replacement Requests Report (PM/FM/OWNER Only) -->
+                        <div id="report-replacements" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Material Replacement Requests</h3>
+                                    <p class="report-header-subtitle">Manage replacement requests from QA • Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                            </div>
+
+                            @php
+                                $pendingReplacements = $project->materials->where('replacement_requested', true)->where('replacement_status', 'pending');
+                                $approvedReplacements = $project->materials->where('replacement_requested', true)->where('replacement_status', 'approved');
+                                $rejectedReplacements = $project->materials->where('replacement_requested', true)->where('replacement_status', 'rejected');
+                            @endphp
+
+                            <!-- Summary Stats -->
+                            <div class="report-summary" style="margin-bottom: 24px;">
+                                <div class="report-summary-item" style="border-left: 4px solid #f59e0b;">
+                                    <div class="report-summary-label">Pending Requests</div>
+                                    <div class="report-summary-value" style="color: #f59e0b;">{{ $pendingReplacements->count() }}</div>
+                                </div>
+                                <div class="report-summary-item" style="border-left: 4px solid #10b981;">
+                                    <div class="report-summary-label">Approved</div>
+                                    <div class="report-summary-value" style="color: #10b981;">{{ $approvedReplacements->count() }}</div>
+                                </div>
+                                <div class="report-summary-item" style="border-left: 4px solid #ef4444;">
+                                    <div class="report-summary-label">Rejected</div>
+                                    <div class="report-summary-value" style="color: #ef4444;">{{ $rejectedReplacements->count() }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Pending Replacement Requests -->
+                            @if($pendingReplacements->count() > 0)
+                            <div style="margin-bottom: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-clock" style="color: #f59e0b;"></i>
+                                    Pending Approval ({{ $pendingReplacements->count() }})
+                                </h4>
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Category</th>
+                                            <th>Qty / Unit</th>
+                                            <th>Failure Reason</th>
+                                            <th>Replacement Reason</th>
+                                            <th>Requested By</th>
+                                            <th>Date</th>
+                                            <th style="text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($pendingReplacements as $material)
+                                        <tr style="background: #fffbeb;" id="replacement-row-{{ $material->id }}">
+                                            <td style="font-weight: 600;">{{ $material->item_description ?? $material->material_name ?? 'Unnamed' }}</td>
+                                            <td>{{ $material->category ?? '—' }}</td>
+                                            <td class="text-center">{{ $material->quantity ?? 0 }} {{ $material->unit ?? 'pcs' }}</td>
+                                            <td>
+                                                <span style="color: #991b1b; font-weight: 500;">{{ $material->failure_reason ?? 'Not specified' }}</span>
+                                            </td>
+                                            <td style="max-width: 200px; font-size: 13px;">{{ $material->replacement_reason ?? '—' }}</td>
+                                            <td>{{ $material->replacementRequester->name ?? 'Unknown' }}</td>
+                                            <td>{{ $material->replacement_requested_at ? $material->replacement_requested_at->format('M d, Y') : '—' }}</td>
+                                            <td style="text-align: center;">
+                                                <div style="display: flex; gap: 6px; justify-content: center;">
+                                                    <button type="button" class="btn btn-success btn-sm" onclick="openReplacementActionModal({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'Material') }}', 'approve')" style="padding: 6px 12px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="openReplacementActionModal({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'Material') }}', 'reject')" style="padding: 6px 12px; font-size: 12px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endif
+
+                            <!-- Approved Replacements -->
+                            @if($approvedReplacements->count() > 0)
+                            <div style="margin-bottom: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                                    Approved Replacements ({{ $approvedReplacements->count() }})
+                                </h4>
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Category</th>
+                                            <th>Qty / Unit</th>
+                                            <th>Original Failure</th>
+                                            <th>Approval Notes</th>
+                                            <th>Approved By</th>
+                                            <th>Approval Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($approvedReplacements as $material)
+                                        <tr style="background: #f0fdf4;">
+                                            <td style="font-weight: 600;">{{ $material->item_description ?? $material->material_name ?? 'Unnamed' }}</td>
+                                            <td>{{ $material->category ?? '—' }}</td>
+                                            <td class="text-center">{{ $material->quantity ?? 0 }} {{ $material->unit ?? 'pcs' }}</td>
+                                            <td>{{ $material->failure_reason ?? 'Not specified' }}</td>
+                                            <td style="max-width: 200px;">{{ $material->replacement_notes ?? '—' }}</td>
+                                            <td>{{ $material->replacementApprover->name ?? 'Unknown' }}</td>
+                                            <td>{{ $material->replacement_approved_at ? $material->replacement_approved_at->format('M d, Y h:i A') : '—' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endif
+
+                            <!-- Rejected Replacements -->
+                            @if($rejectedReplacements->count() > 0)
+                            <div style="margin-bottom: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                                    Rejected Requests ({{ $rejectedReplacements->count() }})
+                                </h4>
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Category</th>
+                                            <th>Qty / Unit</th>
+                                            <th>Original Request Reason</th>
+                                            <th>Rejection Reason</th>
+                                            <th>Rejected By</th>
+                                            <th>Rejection Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($rejectedReplacements as $material)
+                                        <tr style="background: #fef2f2;">
+                                            <td style="font-weight: 600;">{{ $material->item_description ?? $material->material_name ?? 'Unnamed' }}</td>
+                                            <td>{{ $material->category ?? '—' }}</td>
+                                            <td class="text-center">{{ $material->quantity ?? 0 }} {{ $material->unit ?? 'pcs' }}</td>
+                                            <td style="max-width: 180px;">{{ $material->replacement_reason ?? '—' }}</td>
+                                            <td style="max-width: 180px;">{{ $material->replacement_notes ?? 'No reason provided' }}</td>
+                                            <td>{{ $material->replacementApprover->name ?? 'Unknown' }}</td>
+                                            <td>{{ $material->replacement_approved_at ? $material->replacement_approved_at->format('M d, Y h:i A') : '—' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endif
+
+                            @if($pendingReplacements->count() === 0 && $approvedReplacements->count() === 0 && $rejectedReplacements->count() === 0)
+                            <div style="text-align: center; padding: 60px 20px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                                <i class="fas fa-inbox" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></i>
+                                <h3 style="color: #374151; margin-bottom: 8px;">No Replacement Requests</h3>
+                                <p style="color: #6b7280;">No materials have been flagged for replacement in this project yet.</p>
+                            </div>
+                            @endif
+
+                            <div class="report-footer">
+                                <strong>Note:</strong> Approved replacements should be coordinated with procurement for new material acquisition.<br>
+                                <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                     <script>
@@ -2648,6 +3129,168 @@
                 </div>
             </section>
         </main>
+
+        <!-- Replacement Action Modal (Approve/Reject) -->
+        @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
+        <div id="replacementActionModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header" id="replacementActionHeader" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <h2 class="modal-title" id="replacementActionTitle" style="color: white;">
+                        <i class="fas fa-check-circle"></i> Approve Replacement
+                    </h2>
+                    <button class="modal-close" onclick="closeReplacementActionModal()" style="color: white;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="replacementActionForm" onsubmit="return submitReplacementAction(event)">
+                    <div style="padding: 20px;">
+                        <div id="replacementActionInfo" style="background: #f3f4f6; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                            <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; margin-bottom: 4px;">Material</div>
+                            <div id="replacementActionMaterialName" style="font-weight: 600; color: #1f2937; font-size: 14px;"></div>
+                        </div>
+
+                        <input type="hidden" id="replacementActionMaterialId" value="">
+                        <input type="hidden" id="replacementActionType" value="">
+
+                        <div class="form-group">
+                            <label class="form-label" id="replacementNotesLabel">Approval Notes (Optional)</label>
+                            <textarea id="replacementActionNotes" name="replacement_notes" class="form-textarea" rows="3" placeholder="Add any notes regarding this decision..."></textarea>
+                        </div>
+
+                        <div id="replacementActionWarning" style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; margin-top: 12px; display: none;">
+                            <div style="display: flex; align-items: flex-start; gap: 10px;">
+                                <i class="fas fa-exclamation-triangle" style="color: #f59e0b; margin-top: 2px;"></i>
+                                <div style="font-size: 12px; color: #92400e; line-height: 1.5;">
+                                    Rejecting this request will notify the QA officer who submitted it. Please provide a reason for the rejection.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeReplacementActionModal()">Cancel</button>
+                        <button type="submit" class="btn" id="replacementActionSubmitBtn" style="background: #10b981; color: white;">
+                            <i class="fas fa-check"></i> Approve Replacement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            let currentReplacementMaterialId = null;
+            let currentReplacementAction = null;
+
+            function openReplacementActionModal(materialId, materialName, action) {
+                currentReplacementMaterialId = materialId;
+                currentReplacementAction = action;
+                
+                document.getElementById('replacementActionMaterialId').value = materialId;
+                document.getElementById('replacementActionType').value = action;
+                document.getElementById('replacementActionMaterialName').textContent = materialName;
+                document.getElementById('replacementActionNotes').value = '';
+
+                const header = document.getElementById('replacementActionHeader');
+                const title = document.getElementById('replacementActionTitle');
+                const submitBtn = document.getElementById('replacementActionSubmitBtn');
+                const notesLabel = document.getElementById('replacementNotesLabel');
+                const warning = document.getElementById('replacementActionWarning');
+                const infoBox = document.getElementById('replacementActionInfo');
+
+                if (action === 'approve') {
+                    header.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    title.innerHTML = '<i class="fas fa-check-circle"></i> Approve Replacement';
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Approve Replacement';
+                    submitBtn.style.background = '#10b981';
+                    notesLabel.textContent = 'Approval Notes (Optional)';
+                    warning.style.display = 'none';
+                    infoBox.style.background = '#dcfce7';
+                    infoBox.style.borderColor = '#86efac';
+                } else {
+                    header.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    title.innerHTML = '<i class="fas fa-times-circle"></i> Reject Replacement';
+                    submitBtn.innerHTML = '<i class="fas fa-times"></i> Reject Request';
+                    submitBtn.style.background = '#ef4444';
+                    notesLabel.textContent = 'Rejection Reason';
+                    warning.style.display = 'block';
+                    infoBox.style.background = '#fee2e2';
+                    infoBox.style.borderColor = '#fecaca';
+                }
+
+                document.getElementById('replacementActionModal').style.display = 'flex';
+            }
+
+            function closeReplacementActionModal() {
+                document.getElementById('replacementActionModal').style.display = 'none';
+                currentReplacementMaterialId = null;
+                currentReplacementAction = null;
+            }
+
+            function submitReplacementAction(event) {
+                event.preventDefault();
+
+                const materialId = document.getElementById('replacementActionMaterialId').value;
+                const action = document.getElementById('replacementActionType').value;
+                const notes = document.getElementById('replacementActionNotes').value;
+
+                const submitBtn = document.getElementById('replacementActionSubmitBtn');
+                const originalText = submitBtn.innerHTML;
+                
+                // Disable button and form immediately to prevent double submissions
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                submitBtn.disabled = true;
+                document.getElementById('replacementActionForm').style.opacity = '0.6';
+                document.getElementById('replacementActionForm').style.pointerEvents = 'none';
+
+                fetch(`/materials/${materialId}/replacement/process`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        replacement_notes: notes
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    document.getElementById('replacementActionForm').style.opacity = '1';
+                    document.getElementById('replacementActionForm').style.pointerEvents = 'auto';
+
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        closeReplacementActionModal();
+                        // Update the row or reload after delay
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification(data.message || 'Failed to process request', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    document.getElementById('replacementActionForm').style.opacity = '1';
+                    document.getElementById('replacementActionForm').style.pointerEvents = 'auto';
+                    showNotification('An error occurred while processing the request', 'error');
+                });
+
+                return false;
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('replacementActionModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeReplacementActionModal();
+                }
+            });
+        </script>
+        @endif
 
         <!-- BOQ Item Modal -->
         <div id="boqModal" class="modal" style="display: none;">
@@ -2825,6 +3468,137 @@
                 </form>
             </div>
         </div>
+
+        <!-- QA Inspection Modal (QA Role Only) -->
+        @if(auth()->user()->role === 'QA')
+        <div id="qaInspectModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 550px;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white;">
+                    <h2 class="modal-title" style="color: white;">
+                        <i class="fas fa-clipboard-check"></i> QA Inspection
+                    </h2>
+                    <button class="modal-close" onclick="closeQAInspectModal()" style="color: white;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="qaInspectForm" onsubmit="return submitQAInspection(event)">
+                    @csrf
+                    <input type="hidden" id="qaInspectMaterialId" name="material_id" value="">
+                    
+                    <div style="padding: 24px;">
+                        <!-- Item Being Inspected -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                            <div style="font-size: 12px; color: #64748b; text-transform: uppercase; margin-bottom: 6px;">Inspecting Item</div>
+                            <div id="qaInspectItemName" style="font-weight: 600; color: #1e293b; font-size: 15px;"></div>
+                        </div>
+
+                        <!-- QA Status Selection -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #374151;">Inspection Result <span style="color: #ef4444;">*</span></label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                <label class="qa-status-option" style="display: flex; flex-direction: column; align-items: center; padding: 16px 12px; border: 2px solid #d1d5db; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: white;">
+                                    <input type="radio" name="qa_status" value="passed" style="display: none;" onchange="selectQAStatus(this)">
+                                    <i class="fas fa-check-circle" style="font-size: 28px; color: #10b981; margin-bottom: 8px;"></i>
+                                    <span style="font-weight: 600; color: #065f46;">Passed</span>
+                                </label>
+                                <label class="qa-status-option" style="display: flex; flex-direction: column; align-items: center; padding: 16px 12px; border: 2px solid #d1d5db; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: white;">
+                                    <input type="radio" name="qa_status" value="failed" style="display: none;" onchange="selectQAStatus(this)">
+                                    <i class="fas fa-times-circle" style="font-size: 28px; color: #ef4444; margin-bottom: 8px;"></i>
+                                    <span style="font-weight: 600; color: #991b1b;">Failed</span>
+                                </label>
+                                <label class="qa-status-option" style="display: flex; flex-direction: column; align-items: center; padding: 16px 12px; border: 2px solid #d1d5db; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: white;">
+                                    <input type="radio" name="qa_status" value="requires_recheck" style="display: none;" onchange="selectQAStatus(this)">
+                                    <i class="fas fa-redo" style="font-size: 28px; color: #6366f1; margin-bottom: 8px;"></i>
+                                    <span style="font-weight: 600; color: #3730a3;">Recheck</span>
+                                </label>
+                            </div>
+                            <style>
+                                .qa-status-option:hover { border-color: var(--accent); background: #f0f9ff; }
+                                .qa-status-option.selected { border-color: var(--accent); background: #eff6ff; box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+                            </style>
+                        </div>
+
+                        <!-- Quality Rating -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #374151;">Quality Rating (Optional)</label>
+                            <div id="qaRatingStars" style="display: flex; gap: 8px; align-items: center;">
+                                @for($i = 1; $i <= 5; $i++)
+                                <button type="button" class="qa-rating-btn" data-rating="{{ $i }}" onclick="setQARating({{ $i }})" style="background: none; border: none; cursor: pointer; padding: 4px;">
+                                    <i class="fas fa-star" style="font-size: 28px; color: #d1d5db; transition: color 0.2s;"></i>
+                                </button>
+                                @endfor
+                                <span id="qaRatingText" style="margin-left: 10px; font-size: 14px; color: #64748b;">Not rated</span>
+                            </div>
+                            <input type="hidden" id="qaRatingValue" name="qa_rating" value="">
+                        </div>
+
+                        <!-- Remarks -->
+                        <div style="margin-bottom: 10px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">Inspection Remarks</label>
+                            <textarea id="qaRemarks" name="qa_remarks" rows="3" placeholder="Enter any observations, issues, or notes about this item..." style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; resize: vertical; font-family: inherit; box-sizing: border-box;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
+                        <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeQAInspectModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-clipboard-check"></i> Submit Inspection
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- QA Bulk Inspection Modal -->
+        <div id="qaBulkModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white;">
+                    <h2 class="modal-title" style="color: white;">
+                        <i class="fas fa-check-double"></i> Bulk QA Inspection
+                    </h2>
+                    <button class="modal-close" onclick="closeBulkQAModal()" style="color: white;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="qaBulkForm" onsubmit="return submitBulkQAInspection(event)">
+                    @csrf
+                    <div style="padding: 24px;">
+                        <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-info-circle" style="color: #92400e; font-size: 20px;"></i>
+                            <div>
+                                <div style="font-weight: 600; color: #92400e;">Bulk Inspection</div>
+                                <div style="font-size: 13px; color: #a16207;">Select items in the table below, then choose a status to apply to all selected items.</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #374151;">Apply Status to Selected Items</label>
+                            <select id="bulkQAStatus" name="qa_status" required style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: white;">
+                                <option value="">-- Select Status --</option>
+                                <option value="passed">✓ Passed</option>
+                                <option value="failed">✗ Failed</option>
+                                <option value="requires_recheck">↻ Requires Recheck</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">Remarks (Applied to all)</label>
+                            <textarea id="bulkQARemarks" name="qa_remarks" rows="2" placeholder="Optional remarks for all selected items..." style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; resize: vertical; font-family: inherit; box-sizing: border-box;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
+                        <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeBulkQAModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                            <i class="fas fa-check-double"></i> Apply to Selected
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
 
         <!-- BOQ Tasks Modal -->
         <div id="boqTasksModal" class="modal" style="display: none;">
@@ -4398,25 +5172,7 @@
             }
         }
 
-        // Apply status select coloring
-        function setStatusSelectColor(selectEl) {
-            if (!selectEl) return;
-            const val = (selectEl.value || '').toLowerCase();
-            let color = '#1f2937';
-            if (val === 'pending') color = '#d97706';
-            else if (val === 'approved') color = '#16a34a';
-            else if (val === 'failed') color = '#dc2626';
-            selectEl.style.color = color;
-        }
-
-        function initStatusSelectColors() {
-            document.querySelectorAll('.status-select').forEach(sel => {
-                setStatusSelectColor(sel);
-                sel.addEventListener('change', () => setStatusSelectColor(sel));
-            });
-        }
-
-        // Check for flash messages on page load and init status colors
+        // Check for flash messages on page load
         document.addEventListener('DOMContentLoaded', function() {
             const successMsg = document.getElementById('flashSuccessMessage');
             const errorMsg = document.getElementById('flashErrorMessage');
@@ -4426,8 +5182,6 @@
             } else if (errorMsg) {
                 showNotification(errorMsg.textContent, 'error');
             }
-
-            initStatusSelectColors();
         });
 
         function editBOQItem(materialId) {
@@ -4849,318 +5603,6 @@
         }
 
         // Bulk status helpers for Finance & Transactions
-        function toggleAllTransactions() {
-            const selectAll = document.getElementById('selectAllTransactions');
-            const checkboxes = document.querySelectorAll('.transaction-checkbox');
-            checkboxes.forEach(cb => { cb.checked = selectAll.checked; });
-            updateTransactionSelectionCount();
-        }
-
-        function updateTransactionSelectionCount() {
-            const selected = document.querySelectorAll('.transaction-checkbox:checked').length;
-            const statusSelect = document.getElementById('bulkStatusSelect');
-            const applyBtn = document.getElementById('applyBulkStatusBtn');
-            const countSpan = document.getElementById('selectedTransactionCount');
-
-            if (countSpan) countSpan.textContent = selected;
-            if (applyBtn && statusSelect) {
-                applyBtn.style.display = (selected > 0 && statusSelect.value) ? 'inline-flex' : 'none';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const statusSelect = document.getElementById('bulkStatusSelect');
-            if (statusSelect) {
-                statusSelect.addEventListener('change', updateTransactionSelectionCount);
-            }
-        });
-
-        function applyBulkTransactionStatus() {
-            const statusSelect = document.getElementById('bulkStatusSelect');
-            const newStatus = statusSelect?.value;
-            const checked = Array.from(document.querySelectorAll('.transaction-checkbox:checked'));
-
-            if (!newStatus) {
-                showNotification('Please choose a status to apply.', 'info');
-                return;
-            }
-            if (checked.length === 0) {
-                showNotification('Please select at least one transaction.', 'info');
-                return;
-            }
-
-            // Check if any selected items have locked statuses
-            const materialIds = checked.map(cb => cb.dataset.materialId);
-            let hasLockedStatus = false;
-            let lockedItemsDescription = '';
-
-            // Fetch all material data to check for locked statuses
-            Promise.all(materialIds.map(id => 
-                fetch(`/projects/{{ $project->id }}/materials/${id}`, {
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(r => r.json())
-                .catch(e => null)
-            )).then(materials => {
-                materials.forEach((material, index) => {
-                    if (material) {
-                        const currentStatus = (material.status || 'pending').toLowerCase();
-                        if (currentStatus === 'approved' || currentStatus === 'failed') {
-                            hasLockedStatus = true;
-                            if (lockedItemsDescription.length < 200) {
-                                lockedItemsDescription += (lockedItemsDescription ? ', ' : '') + (material.item_description?.substring(0, 50) || 'Item ' + (index + 1));
-                            }
-                        }
-                    }
-                });
-
-                if (hasLockedStatus) {
-                    const message = `Cannot change status: The following item(s) have locked statuses (Approved/Failed) and cannot be modified:\n${lockedItemsDescription}${lockedItemsDescription.length >= 200 ? '...' : ''}`;
-                    showNotification(message, 'error');
-                    return;
-                }
-
-                // If all items are free to update, proceed
-                // If status is failed, show failure reason modal for bulk
-                if (newStatus === 'failed') {
-                    openBulkFailureReasonModal(checked.map(cb => cb.dataset.materialId));
-                    return;
-                }
-
-                executeBulkStatusUpdate(newStatus, checked);
-            });
-        }
-
-        // Store bulk material IDs for failure reason modal
-        let bulkFailureMaterialIds = [];
-
-        function openBulkFailureReasonModal(materialIds) {
-            bulkFailureMaterialIds = materialIds;
-            document.getElementById('failureMaterialId').value = 'bulk';
-            document.getElementById('failureNotes').value = '';
-            document.querySelectorAll('input[name="failureReason"]').forEach(r => r.checked = false);
-            document.getElementById('failureReasonModal').style.display = 'flex';
-        }
-
-        function executeBulkStatusUpdate(newStatus, checked, failureReason = '', failureNotes = '') {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (!csrfToken) {
-                showNotification('CSRF token missing. Refresh and try again.', 'error');
-                return;
-            }
-
-            const updates = checked.map(cb => {
-                const materialId = cb.dataset.materialId;
-                return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Failed to load material data');
-                    return response.json();
-                })
-                .then(material => {
-                    // Build notes with failure reason if applicable
-                    let updatedNotes = material.notes || '';
-                    if (newStatus === 'failed' && failureReason) {
-                        const timestamp = new Date().toLocaleString();
-                        const failureInfo = `[FAILED - ${timestamp}] Reason: ${failureReason}${failureNotes ? '. Notes: ' + failureNotes : ''}`;
-                        updatedNotes = failureInfo + (updatedNotes ? '\n\n' + updatedNotes : '');
-                    }
-
-                    const formData = new FormData();
-                    formData.append('_method', 'PUT');
-                    formData.append('_token', csrfToken);
-                    formData.append('item_description', material.item_description || '');
-                    formData.append('quantity', material.quantity || 1);
-                    formData.append('unit', material.unit || '');
-                    formData.append('material_cost', material.material_cost || 0);
-                    formData.append('labor_cost', material.labor_cost || 0);
-                    formData.append('category', material.category || '');
-                    formData.append('notes', updatedNotes);
-                    formData.append('status', newStatus);
-
-                    return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
-                        method: 'POST',
-                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                        body: formData
-                    });
-                });
-            });
-
-            Promise.allSettled(updates).then(results => {
-                const completed = results.filter(r => r.status === 'fulfilled').length;
-                const failedCount = results.length - completed;
-
-                // Update UI selections and status colors
-                checked.forEach(cb => {
-                    if (cb.checked !== undefined) cb.checked = false;
-                    const materialId = cb.dataset?.materialId;
-                    if (materialId) {
-                        const checkbox = document.querySelector(`.transaction-checkbox[data-material-id="${materialId}"]`);
-                        if (checkbox) checkbox.checked = false;
-                        const row = checkbox?.closest('tr');
-                        const select = row?.querySelector('.status-select');
-                        if (select) {
-                            select.value = newStatus;
-                            setStatusSelectColor(select);
-                        }
-                    }
-                });
-
-                const selectAll = document.getElementById('selectAllTransactions');
-                const bulkStatusSelect = document.getElementById('bulkStatusSelect');
-                if (selectAll) selectAll.checked = false;
-                if (bulkStatusSelect) bulkStatusSelect.value = '';
-                updateTransactionSelectionCount();
-
-                if (failedCount === 0) {
-                    showNotification(`Updated ${completed} transaction(s).`, 'success', true);
-                } else {
-                    showNotification(`Updated ${completed} transaction(s); ${failedCount} failed.`, 'error');
-                }
-            }).catch(error => {
-                console.error('Bulk update error:', error);
-                showNotification('Bulk update failed. Please try again.', 'error');
-            });
-        }
-
-        // Update material status from Finance & Transactions table
-        function updateMaterialStatus(materialId, newStatus, failureReason = '', failureNotes = '') {
-            // If status is failed and no reason provided, show the modal
-            if (newStatus === 'failed' && !failureReason) {
-                openFailureReasonModal(materialId);
-                return;
-            }
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (!csrfToken) {
-                showNotification('CSRF token not found. Please refresh and try again.', 'error');
-                return;
-            }
-
-            // First, fetch the existing material data
-            fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to load material data');
-                return response.json();
-            })
-            .then(material => {
-                // Check if status is locked (Approved or Failed)
-                const currentStatus = (material.status || 'pending').toLowerCase();
-                if (currentStatus === 'approved' || currentStatus === 'failed') {
-                    const message = `Cannot change status: This transaction has been marked as "${currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}" and cannot be modified.`;
-                    showNotification(message, 'error');
-                    // Reset the dropdown to the current status
-                    const select = document.querySelector(`[data-material-id="${materialId}"]`);
-                    if (select) {
-                        select.value = currentStatus;
-                    }
-                    return;
-                }
-                // Build notes with failure reason if applicable
-                let updatedNotes = material.notes || '';
-                if (newStatus === 'failed' && failureReason) {
-                    const timestamp = new Date().toLocaleString();
-                    const failureInfo = `[FAILED - ${timestamp}] Reason: ${failureReason}${failureNotes ? '. Notes: ' + failureNotes : ''}`;
-                    updatedNotes = failureInfo + (updatedNotes ? '\n\n' + updatedNotes : '');
-                }
-
-                // Now send the update with all required fields
-                const formData = new FormData();
-                formData.append('_method', 'PUT');
-                formData.append('_token', csrfToken);
-                formData.append('item_description', material.item_description || '');
-                formData.append('quantity', material.quantity || 1);
-                formData.append('unit', material.unit || '');
-                formData.append('material_cost', material.material_cost || 0);
-                formData.append('labor_cost', material.labor_cost || 0);
-                formData.append('category', material.category || '');
-                formData.append('notes', updatedNotes);
-                formData.append('status', newStatus);
-
-                return fetch(`/projects/{{ $project->id }}/materials/${materialId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                });
-            })
-            .then(response => {
-                const contentType = response.headers.get('content-type') || '';
-                if (!response.ok) {
-                    if (contentType.includes('application/json')) {
-                        return response.json().then(err => { throw new Error(err.message || 'Failed to update status'); });
-                    }
-                    return response.text().then(text => { throw new Error(text || 'Failed to update status'); });
-                }
-                if (contentType.includes('application/json')) {
-                    return response.json();
-                }
-                return { success: true };
-            })
-            .then(data => {
-                if (data.success) {
-                    showNotification('Status updated successfully', 'success');
-                } else {
-                    showNotification(data.message || 'Failed to update status', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Status update error:', error);
-                showNotification(error.message || 'Failed to update status', 'error');
-            });
-        }
-
-        // Failure Reason Modal Functions
-        function openFailureReasonModal(materialId) {
-            document.getElementById('failureMaterialId').value = materialId;
-            document.getElementById('failureNotes').value = '';
-            document.querySelectorAll('input[name="failureReason"]').forEach(r => r.checked = false);
-            document.getElementById('failureReasonModal').style.display = 'flex';
-        }
-
-        function closeFailureReasonModal() {
-            document.getElementById('failureReasonModal').style.display = 'none';
-            // Reset the select dropdown to previous value
-            const materialId = document.getElementById('failureMaterialId').value;
-            const select = document.querySelector(`select[data-material-id="${materialId}"]`);
-            if (select) {
-                // Reset to pending if they cancel
-                select.value = 'pending';
-            }
-        }
-
-        function submitFailureReason() {
-            const materialId = document.getElementById('failureMaterialId').value;
-            const failureReason = document.querySelector('input[name="failureReason"]:checked')?.value;
-            const failureNotes = document.getElementById('failureNotes').value.trim();
-
-            if (!failureReason) {
-                showNotification('Please select a failure reason', 'error');
-                return;
-            }
-
-            document.getElementById('failureReasonModal').style.display = 'none';
-
-            // Check if this is a bulk update
-            if (materialId === 'bulk' && bulkFailureMaterialIds.length > 0) {
-                const checked = bulkFailureMaterialIds.map(id => {
-                    return { dataset: { materialId: id } };
-                });
-                executeBulkStatusUpdate('failed', checked, failureReason, failureNotes);
-                bulkFailureMaterialIds = [];
-            } else {
-                updateMaterialStatus(materialId, 'failed', failureReason, failureNotes);
-            }
-        }
-
         // Complete Project Modal Functions
         function openCompleteProjectModal() {
             document.getElementById('completeProjectModal').style.display = 'flex';
@@ -5286,6 +5728,228 @@
             .catch(error => {
                 console.error('Error loading document:', error);
                 showNotification('Failed to load document content', 'error');
+            });
+        }
+
+        // ============================================
+        // QA INSPECTION FUNCTIONS (QA Role Only)
+        // ============================================
+        
+        let selectedQAItems = [];
+        let currentQARating = 0;
+
+        function openQAInspectModal(materialId, itemName, currentStatus, currentRating, currentRemarks) {
+            const modal = document.getElementById('qaInspectModal');
+            if (!modal) return;
+
+            document.getElementById('qaInspectMaterialId').value = materialId;
+            document.getElementById('qaInspectItemName').textContent = itemName;
+            document.getElementById('qaRemarks').value = currentRemarks || '';
+            
+            // Reset status selection
+            document.querySelectorAll('.qa-status-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('input[name="qa_status"]').forEach(input => input.checked = false);
+            
+            // Set current status if exists
+            if (currentStatus && currentStatus !== 'pending') {
+                const statusInput = document.querySelector(`input[name="qa_status"][value="${currentStatus}"]`);
+                if (statusInput) {
+                    statusInput.checked = true;
+                    statusInput.closest('.qa-status-option').classList.add('selected');
+                }
+            }
+            
+            // Set rating
+            currentQARating = currentRating || 0;
+            setQARating(currentQARating, false);
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeQAInspectModal() {
+            const modal = document.getElementById('qaInspectModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function selectQAStatus(input) {
+            document.querySelectorAll('.qa-status-option').forEach(opt => opt.classList.remove('selected'));
+            input.closest('.qa-status-option').classList.add('selected');
+        }
+
+        function setQARating(rating, submit = false) {
+            currentQARating = rating;
+            document.getElementById('qaRatingValue').value = rating || '';
+            
+            const ratingTexts = ['Not rated', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            document.getElementById('qaRatingText').textContent = ratingTexts[rating] || ratingTexts[0];
+            
+            document.querySelectorAll('.qa-rating-btn i').forEach((star, index) => {
+                if (index < rating) {
+                    star.style.color = '#fbbf24';
+                } else {
+                    star.style.color = '#d1d5db';
+                }
+            });
+        }
+
+        function submitQAInspection(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('qaInspectForm');
+            const materialId = document.getElementById('qaInspectMaterialId').value;
+            const status = form.querySelector('input[name="qa_status"]:checked');
+            
+            if (!status) {
+                showNotification('Please select an inspection result (Passed, Failed, or Recheck)', 'error');
+                return false;
+            }
+            
+            const formData = {
+                qa_status: status.value,
+                qa_rating: document.getElementById('qaRatingValue').value || null,
+                qa_remarks: document.getElementById('qaRemarks').value || null
+            };
+            
+            fetch(`/projects/{{ $project->id }}/materials/${materialId}/qa-inspect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'QA inspection submitted successfully!', 'success');
+                    closeQAInspectModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to submit inspection', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while submitting inspection', 'error');
+            });
+            
+            return false;
+        }
+
+        // QA Selection Functions
+        function toggleAllQAItems() {
+            const selectAll = document.getElementById('selectAllQA');
+            const checkboxes = document.querySelectorAll('.qa-checkbox');
+            
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateQASelection();
+        }
+
+        function updateQASelection() {
+            const checkboxes = document.querySelectorAll('.qa-checkbox:checked');
+            selectedQAItems = Array.from(checkboxes).map(cb => parseInt(cb.dataset.materialId));
+            
+            const bulkActions = document.getElementById('qaBulkActions');
+            const selectedCount = document.getElementById('qaSelectedCount');
+            
+            if (bulkActions) {
+                bulkActions.classList.toggle('show', selectedQAItems.length > 0);
+            }
+            
+            if (selectedCount) {
+                selectedCount.textContent = `${selectedQAItems.length} item${selectedQAItems.length !== 1 ? 's' : ''} selected`;
+            }
+            
+            // Update select all checkbox state
+            const selectAll = document.getElementById('selectAllQA');
+            const allCheckboxes = document.querySelectorAll('.qa-checkbox');
+            if (selectAll && allCheckboxes.length > 0) {
+                selectAll.checked = checkboxes.length === allCheckboxes.length;
+                selectAll.indeterminate = checkboxes.length > 0 && checkboxes.length < allCheckboxes.length;
+            }
+        }
+
+        function bulkQAAction(status) {
+            if (selectedQAItems.length === 0) {
+                showNotification('Please select at least one item', 'error');
+                return;
+            }
+            
+            const statusLabels = {
+                'passed': 'PASSED',
+                'failed': 'FAILED',
+                'requires_recheck': 'REQUIRES RECHECK'
+            };
+            
+            if (!confirm(`Mark ${selectedQAItems.length} item(s) as ${statusLabels[status]}?`)) {
+                return;
+            }
+            
+            submitBulkQA(status, '');
+        }
+
+        function openBulkQAModal() {
+            const modal = document.getElementById('qaBulkModal');
+            if (modal) {
+                document.getElementById('bulkQAStatus').value = '';
+                document.getElementById('bulkQARemarks').value = '';
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeBulkQAModal() {
+            const modal = document.getElementById('qaBulkModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function submitBulkQAInspection(event) {
+            event.preventDefault();
+            
+            if (selectedQAItems.length === 0) {
+                showNotification('Please select items from the table first', 'error');
+                return false;
+            }
+            
+            const status = document.getElementById('bulkQAStatus').value;
+            const remarks = document.getElementById('bulkQARemarks').value;
+            
+            if (!status) {
+                showNotification('Please select a status to apply', 'error');
+                return false;
+            }
+            
+            submitBulkQA(status, remarks);
+            return false;
+        }
+
+        function submitBulkQA(status, remarks) {
+            fetch(`/projects/{{ $project->id }}/qa-bulk-inspect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    material_ids: selectedQAItems,
+                    qa_status: status,
+                    qa_remarks: remarks || null
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'Bulk inspection submitted successfully!', 'success');
+                    closeBulkQAModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to submit bulk inspection', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred during bulk inspection', 'error');
             });
         }
 

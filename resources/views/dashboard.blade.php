@@ -1502,6 +1502,299 @@
 
             <!-- Content Area -->
             <section class="content-area">
+                @if(isset($isQA) && $isQA)
+                <!-- ========== QA DASHBOARD ========== -->
+                <style>
+                    .qa-kpi-card {
+                        background: white;
+                        border-radius: 12px;
+                        padding: 20px;
+                        border: 1px solid var(--gray-300);
+                        transition: all 0.2s;
+                        text-decoration: none;
+                        display: block;
+                    }
+                    .qa-kpi-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                        border-color: var(--accent);
+                    }
+                    .qa-kpi-card .kpi-icon {
+                        width: 48px;
+                        height: 48px;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 20px;
+                    }
+                    .qa-kpi-card.pending .kpi-icon { background: #fef3c7; color: #92400e; }
+                    .qa-kpi-card.approved .kpi-icon { background: #d1fae5; color: #065f46; }
+                    .qa-kpi-card.failed .kpi-icon { background: #fee2e2; color: #991b1b; }
+                    .qa-kpi-card.replacement .kpi-icon { background: #fce7f3; color: #9d174d; }
+                    .qa-kpi-card.projects .kpi-icon { background: #dbeafe; color: #1e40af; }
+                    .qa-kpi-card .kpi-value {
+                        font-size: 32px;
+                        font-weight: 700;
+                        color: var(--black-1);
+                        margin: 8px 0 4px 0;
+                    }
+                    .qa-kpi-card .kpi-label {
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--gray-600);
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                    }
+                    .qa-kpi-card .kpi-subtitle {
+                        font-size: 12px;
+                        color: var(--gray-500);
+                    }
+                    .qa-section-title {
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: var(--black-1);
+                        margin-bottom: 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .qa-section-title i {
+                        color: var(--accent);
+                    }
+                    .qa-recent-card {
+                        background: white;
+                        border-radius: 12px;
+                        border: 1px solid var(--gray-300);
+                        overflow: hidden;
+                    }
+                    .qa-recent-header {
+                        padding: 16px 20px;
+                        border-bottom: 1px solid var(--gray-300);
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .qa-recent-title {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: var(--black-1);
+                    }
+                    .qa-recent-list {
+                        padding: 0;
+                    }
+                    .qa-recent-item {
+                        padding: 14px 20px;
+                        border-bottom: 1px solid var(--gray-300);
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .qa-recent-item:last-child {
+                        border-bottom: none;
+                    }
+                    .qa-recent-item:hover {
+                        background: #fafafa;
+                    }
+                    .qa-item-name {
+                        font-weight: 500;
+                        color: var(--black-1);
+                        margin-bottom: 4px;
+                    }
+                    .qa-item-project {
+                        font-size: 12px;
+                        color: var(--gray-600);
+                    }
+                    .qa-view-all {
+                        font-size: 13px;
+                        color: var(--accent);
+                        text-decoration: none;
+                        font-weight: 500;
+                    }
+                    .qa-view-all:hover {
+                        text-decoration: underline;
+                    }
+                    .qa-status-badge {
+                        padding: 4px 10px;
+                        border-radius: 12px;
+                        font-size: 11px;
+                        font-weight: 600;
+                    }
+                    .qa-status-badge.pending { background: #fef3c7; color: #92400e; }
+                    .qa-status-badge.failed { background: #fee2e2; color: #991b1b; }
+                </style>
+
+                <!-- QA Dashboard Header -->
+                <div style="margin-bottom: 24px;">
+                    <h2 style="font-size: 24px; font-weight: 700; color: var(--black-1); margin-bottom: 4px;">
+                        <i class="fas fa-clipboard-check" style="color: var(--accent); margin-right: 8px;"></i>
+                        Quality Assurance Dashboard
+                    </h2>
+                    <p style="color: var(--gray-600);">Monitor and inspect materials from your assigned projects</p>
+                </div>
+
+                <!-- QA KPI Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <a href="{{ route('qa.materials') }}?status=pending" class="qa-kpi-card pending">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="kpi-label">Pending Inspection</div>
+                                <div class="kpi-value">{{ $qaSummary['pending_count'] ?? 0 }}</div>
+                                <div class="kpi-subtitle">Awaiting QA review</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('qa.materials') }}?status=approved" class="qa-kpi-card approved">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="kpi-label">Approved Materials</div>
+                                <div class="kpi-value">{{ $qaSummary['approved_count'] ?? 0 }}</div>
+                                <div class="kpi-subtitle">Passed inspection</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('qa.materials') }}?status=failed" class="qa-kpi-card failed">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="kpi-label">Failed Materials</div>
+                                <div class="kpi-value">{{ $qaSummary['failed_count'] ?? 0 }}</div>
+                                <div class="kpi-subtitle">Did not pass QA</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('qa.materials') }}?status=replacement" class="qa-kpi-card replacement">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="kpi-label">Needs Replacement</div>
+                                <div class="kpi-value">{{ $qaSummary['replacement_count'] ?? 0 }}</div>
+                                <div class="kpi-subtitle">Pending replacement</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('qa.materials') }}" class="qa-kpi-card projects">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="kpi-label">Assigned Projects</div>
+                                <div class="kpi-value">{{ $qaSummary['assigned_projects'] ?? 0 }}</div>
+                                <div class="kpi-subtitle">Projects you monitor</div>
+                            </div>
+                            <div class="kpi-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Recent Items Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                    <!-- Recent Pending Materials -->
+                    <div class="qa-recent-card">
+                        <div class="qa-recent-header">
+                            <span class="qa-recent-title">
+                                <i class="fas fa-clock" style="color: #f59e0b; margin-right: 8px;"></i>
+                                Recent Pending Materials
+                            </span>
+                            <a href="{{ route('qa.materials') }}?status=pending" class="qa-view-all">View All →</a>
+                        </div>
+                        <div class="qa-recent-list">
+                            @forelse($recentPending ?? collect() as $material)
+                            <div class="qa-recent-item">
+                                <div>
+                                    <div class="qa-item-name">{{ Str::limit($material->item_description ?? $material->material_name ?? 'Unnamed', 40) }}</div>
+                                    <div class="qa-item-project">{{ $material->project->project_name ?? 'Unknown Project' }}</div>
+                                </div>
+                                <span class="qa-status-badge pending">Pending</span>
+                            </div>
+                            @empty
+                            <div style="padding: 30px; text-align: center; color: var(--gray-500);">
+                                <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                                No pending materials
+                            </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Recent Failed Materials -->
+                    <div class="qa-recent-card">
+                        <div class="qa-recent-header">
+                            <span class="qa-recent-title">
+                                <i class="fas fa-times-circle" style="color: #ef4444; margin-right: 8px;"></i>
+                                Recent Failed Materials
+                            </span>
+                            <a href="{{ route('qa.materials') }}?status=failed" class="qa-view-all">View All →</a>
+                        </div>
+                        <div class="qa-recent-list">
+                            @forelse($recentFailed ?? collect() as $material)
+                            <div class="qa-recent-item">
+                                <div>
+                                    <div class="qa-item-name">{{ Str::limit($material->item_description ?? $material->material_name ?? 'Unnamed', 40) }}</div>
+                                    <div class="qa-item-project">
+                                        {{ $material->project->project_name ?? 'Unknown Project' }}
+                                        @if($material->failure_reason)
+                                        <span style="color: #991b1b;"> • {{ Str::limit($material->failure_reason, 25) }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <span class="qa-status-badge failed">Failed</span>
+                            </div>
+                            @empty
+                            <div style="padding: 30px; text-align: center; color: var(--gray-500);">
+                                <i class="fas fa-thumbs-up" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                                No failed materials
+                            </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigned Projects Section -->
+                @if(isset($assignedProjects) && $assignedProjects->count() > 0)
+                <div style="margin-top: 32px;">
+                    <h3 class="qa-section-title">
+                        <i class="fas fa-project-diagram"></i>
+                        My Assigned Projects
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                        @foreach($assignedProjects as $project)
+                        <a href="{{ route('projects.show', $project->id) }}" style="text-decoration: none;">
+                            <div style="background: white; border: 1px solid var(--gray-300); border-radius: 12px; padding: 20px; transition: all 0.2s;">
+                                <div style="font-weight: 600; color: var(--black-1); margin-bottom: 8px;">{{ $project->project_name ?? $project->project_code }}</div>
+                                <div style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px;">
+                                    Client: {{ $project->client->company_name ?? 'N/A' }}
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: {{ $project->status === 'Completed' ? '#d1fae5' : '#dbeafe' }}; color: {{ $project->status === 'Completed' ? '#065f46' : '#1e40af' }};">
+                                        {{ $project->status ?? 'Ongoing' }}
+                                    </span>
+                                    <span style="font-size: 12px; color: var(--gray-500);">
+                                        {{ $project->materials->count() ?? 0 }} materials
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                @else
+                <!-- ========== REGULAR DASHBOARD (Non-QA Users) ========== -->
                 <!-- KPI Summary Cards -->
                 <div class="kpi-cards-container">
                     <!-- Total Projects Card -->
@@ -1951,6 +2244,7 @@
                     </div>
                     @endif
                 </div>
+                @endif
             </section>
         </main>
     </div>

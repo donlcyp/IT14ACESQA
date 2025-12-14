@@ -17,6 +17,11 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
+        // Check if user is QA role - show QA-specific dashboard
+        if ($user && $user->role === 'QA') {
+            return $this->qaDashboard($user);
+        }
+        
         // Check if user is an employee (but NOT a project manager)
         $employeeRecord = $user ? EmployeeList::where('user_id', $user->id)->first() : null;
         $isPM = $user ? Project::where('assigned_pm_id', $user->id)->exists() : false;
@@ -337,6 +342,303 @@ class DashboardController extends Controller
             'filter' => $filter,
             'year' => $year,
             'month' => $month,
+        ]);
+    }
+
+    /**
+     * QA Role Dashboard - Shows materials from assigned projects
+     */
+    private function qaDashboard($user)
+    {
+        // Get QA officer's employee record
+        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        
+        // Get projects assigned to this QA officer
+        $assignedProjects = collect();
+        if ($employeeRecord) {
+            $assignedProjects = $employeeRecord->projects()
+                ->where('archived', false)
+                ->with('client', 'assignedPM')
+                ->get();
+        }
+        
+        $projectIds = $assignedProjects->pluck('id');
+        
+        // Get materials from assigned projects
+        $allMaterials = Material::whereIn('project_id', $projectIds)->with('project')->get();
+        
+        // Count materials by QA status
+        $pendingMaterials = $allMaterials->filter(function($m) {
+            return !$m->qa_status || $m->qa_status === 'pending';
+        });
+        $approvedMaterials = $allMaterials->where('qa_status', 'passed');
+        $failedMaterials = $allMaterials->where('qa_status', 'failed');
+        $recheckMaterials = $allMaterials->where('qa_status', 'requires_recheck');
+        $needsReplacementMaterials = $allMaterials->where('needs_replacement', true);
+        
+        $qaSummary = [
+            'total_materials' => $allMaterials->count(),
+            'pending_count' => $pendingMaterials->count(),
+            'approved_count' => $approvedMaterials->count(),
+            'failed_count' => $failedMaterials->count(),
+            'recheck_count' => $recheckMaterials->count(),
+            'replacement_count' => $needsReplacementMaterials->count(),
+            'assigned_projects' => $assignedProjects->count(),
+        ];
+        
+        // Recent pending materials for quick access
+        $recentPending = $pendingMaterials->sortByDesc('created_at')->take(5);
+        $recentFailed = $failedMaterials->sortByDesc('qa_decision_at')->take(5);
+        
+        return view('dashboard', [
+            'isQA' => true,
+            'isEmployee' => false,
+            'qaSummary' => $qaSummary,
+            'assignedProjects' => $assignedProjects,
+            'recentPending' => $recentPending,
+            'recentFailed' => $recentFailed,
+            'summary' => [
+                'total_projects' => $assignedProjects->count(),
+                'ongoing_projects' => $assignedProjects->where('status', '!=', 'Completed')->count(),
+                'complete_projects' => $assignedProjects->where('status', 'Completed')->count(),
+                'delayed_projects' => 0,
+                'total_workers' => EmployeeList::count(),
+            ],
+            'activeProjects' => collect(),
+            'recentProjectRecords' => collect(),
+            'projectsToReturn' => collect(),
+            'todayAttendance' => null,
+            'recentAttendance' => collect(),
+        ]);
+    }
+
+    /**
+     * QA Materials Page - Shows all materials for QA inspection
+     */
+    public function qaMaterials(Request $request)
+    {
+        $user = auth()->user();
+        
+        if (!$user || $user->role !== 'QA') {
+            abort(403, 'Only Quality Assurance Officers can access this page.');
+        }
+        
+        // Get QA officer's employee record
+        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        
+        // Get projects assigned to this QA officer
+        $assignedProjects = collect();
+        if ($employeeRecord) {
+            $assignedProjects = $employeeRecord->projects()
+                ->where('archived', false)
+                ->with('client', 'assignedPM')
+                ->get();
+        }
+        
+        $projectIds = $assignedProjects->pluck('id');
+        
+        // Filter by status if provided
+        $statusFilter = $request->get('status', 'all');
+        
+        // Get materials from assigned projects
+        $materialsQuery = Material::whereIn('project_id', $projectIds)->with('project', 'qaInspector');
+        
+        // Apply status filter
+        if ($statusFilter === 'pending') {
+            $materialsQuery->where(function($q) {
+                $q->whereNull('qa_status')->orWhere('qa_status', 'pending');
+            });
+        } elseif ($statusFilter === 'approved') {
+            $materialsQuery->where('qa_status', 'passed');
+        } elseif ($statusFilter === 'failed') {
+            $materialsQuery->where('qa_status', 'failed');
+        } elseif ($statusFilter === 'recheck') {
+            $materialsQuery->where('qa_status', 'requires_recheck');
+        } elseif ($statusFilter === 'replacement') {
+            // Show only materials that need replacement AND either have no request or have a pending request
+            // Exclude approved/rejected replacements
+            $materialsQuery->where('needs_replacement', true)
+                ->where(function($q) {
+                    $q->where('replacement_requested', false)
+                      ->orWhere('replacement_status', 'pending');
+                });
+        }
+        
+        $materials = $materialsQuery->orderByDesc('created_at')->get();
+        
+        // Count for tabs
+        $allMaterials = Material::whereIn('project_id', $projectIds)->get();
+        $counts = [
+            'all' => $allMaterials->count(),
+            'pending' => $allMaterials->filter(fn($m) => !$m->qa_status || $m->qa_status === 'pending')->count(),
+            'approved' => $allMaterials->where('qa_status', 'passed')->count(),
+            'failed' => $allMaterials->where('qa_status', 'failed')->count(),
+            'recheck' => $allMaterials->where('qa_status', 'requires_recheck')->count(),
+            'replacement' => $allMaterials->where('needs_replacement', true)->filter(function($m) {
+                // Count only if no request OR request is pending (exclude approved/rejected)
+                return !$m->replacement_requested || $m->replacement_status === 'pending';
+            })->count(),
+        ];
+        
+        // Define failure reasons for dropdown
+        $failureReasons = [
+            'Damaged during delivery',
+            'Does not meet specifications',
+            'Wrong item delivered',
+            'Quality below standard',
+            'Expired or outdated',
+            'Incomplete quantity',
+            'Missing documentation',
+            'Failed safety inspection',
+            'Contaminated or defective',
+            'Other (specify in remarks)',
+        ];
+        
+        return view('qa-materials', [
+            'materials' => $materials,
+            'counts' => $counts,
+            'statusFilter' => $statusFilter,
+            'assignedProjects' => $assignedProjects,
+            'failureReasons' => $failureReasons,
+        ]);
+    }
+
+    /**
+     * Submit QA Decision (Approve/Fail)
+     */
+    public function submitQADecision(Request $request, Material $material)
+    {
+        $user = auth()->user();
+        
+        if (!$user || $user->role !== 'QA') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        $validated = $request->validate([
+            'decision' => 'required|in:approved,failed',
+            'failure_reason' => 'required_if:decision,failed|nullable|string',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+        
+        $material->qa_status = $validated['decision'] === 'approved' ? 'passed' : 'failed';
+        $material->qa_inspected_by = $user->id;
+        $material->qa_inspected_at = now();
+        $material->qa_decision_at = now();
+        $material->qa_remarks = $validated['remarks'] ?? null;
+        
+        if ($validated['decision'] === 'failed') {
+            $material->failure_reason = $validated['failure_reason'];
+            $material->needs_replacement = true;
+        } else {
+            $material->failure_reason = null;
+            $material->needs_replacement = false;
+        }
+        
+        $material->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => $validated['decision'] === 'approved' 
+                ? 'Material approved successfully!' 
+                : 'Material marked as failed. It has been added to the replacement list.',
+        ]);
+    }
+
+    /**
+     * Submit a replacement request for a failed material (QA role only).
+     */
+    public function requestReplacement(Request $request, Material $material)
+    {
+        $user = auth()->user();
+        
+        if (!$user || $user->role !== 'QA') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        // Ensure material needs replacement
+        if (!$material->needs_replacement) {
+            return response()->json(['success' => false, 'message' => 'This material does not require replacement'], 400);
+        }
+        
+        // Ensure not already requested
+        if ($material->replacement_requested) {
+            return response()->json(['success' => false, 'message' => 'Replacement has already been requested for this material'], 400);
+        }
+        
+        $validated = $request->validate([
+            'replacement_reason' => 'required|string|max:1000',
+        ]);
+        
+        $material->replacement_requested = true;
+        $material->replacement_requested_at = now();
+        $material->replacement_requested_by = $user->id;
+        $material->replacement_reason = $validated['replacement_reason'];
+        $material->replacement_status = 'pending';
+        $material->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Replacement request submitted successfully! Project managers will review your request.',
+        ]);
+    }
+
+    /**
+     * Get material details for modal view (QA role).
+     */
+    public function getMaterialDetails(Material $material)
+    {
+        $user = auth()->user();
+        
+        if (!$user || $user->role !== 'QA') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        
+        $material->load(['project', 'qaInspector', 'replacementRequester', 'replacementApprover']);
+        
+        // Calculate unit cost (per unit) and total amount
+        // Unit cost = material_cost + labor_cost (both are per unit)
+        $materialCost = $material->material_cost ?? $material->unit_price ?? 0;
+        $laborCost = $material->labor_cost ?? 0;
+        $unitCost = $materialCost + $laborCost;
+        $totalAmount = $unitCost * ($material->quantity ?? 1);
+        
+        return response()->json([
+            'success' => true,
+            'material' => [
+                'id' => $material->id,
+                'item_description' => $material->item_description ?? $material->material_name ?? 'Unnamed Item',
+                'item_no' => $material->item_no,
+                'category' => $material->category,
+                'quantity' => $material->quantity,
+                'unit' => $material->unit,
+                'unit_cost' => $unitCost,
+                'amount' => $totalAmount,
+                'qa_status' => $material->qa_status,
+                'failure_reason' => $material->failure_reason,
+                'qa_remarks' => $material->qa_remarks,
+                'qa_inspected_at' => $material->qa_inspected_at?->format('M d, Y h:i A'),
+                'qa_inspector' => [
+                    'name' => $material->qaInspector?->name
+                ],
+                'needs_replacement' => $material->needs_replacement,
+                'replacement_requested' => $material->replacement_requested,
+                'replacement_status' => $material->replacement_status,
+                'replacement_reason' => $material->replacement_reason,
+                'replacement_requested_at' => $material->replacement_requested_at?->format('M d, Y h:i A'),
+                'replacement_requester' => [
+                    'name' => $material->replacementRequester?->name
+                ],
+                'replacement_approved_at' => $material->replacement_approved_at?->format('M d, Y h:i A'),
+                'replacement_approver' => [
+                    'name' => $material->replacementApprover?->name
+                ],
+                'replacement_notes' => $material->replacement_notes,
+                'project' => [
+                    'id' => $material->project?->id,
+                    'project_name' => $material->project?->project_name ?? $material->project?->project_code,
+                    'location' => $material->project?->location,
+                ],
+            ],
         ]);
     }
 }
