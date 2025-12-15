@@ -22,6 +22,11 @@ class DashboardController extends Controller
             return $this->qaDashboard($user);
         }
         
+        // Check if user is FM role - redirect to FM dashboard
+        if ($user && $user->role === 'FM') {
+            return redirect()->route('fm.dashboard');
+        }
+        
         // Check if user is an employee (but NOT a project manager)
         $employeeRecord = $user ? EmployeeList::where('user_id', $user->id)->first() : null;
         $isPM = $user ? Project::where('assigned_pm_id', $user->id)->exists() : false;

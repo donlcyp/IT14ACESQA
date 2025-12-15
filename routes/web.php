@@ -74,6 +74,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/projects/{project}/replacements/pending', [App\Http\Controllers\ProjectsController::class, 'getPendingReplacements'])->name('projects.replacements.pending');
     });
 
+    // ===== FM ROLE ONLY: Finance Manager Dashboard =====
+    Route::middleware('role:FM')->group(function () {
+        Route::get('/fm-dashboard', [App\Http\Controllers\FinanceManagerController::class, 'index'])->name('fm.dashboard');
+        Route::get('/fm-replacement-approvals', [App\Http\Controllers\FinanceManagerController::class, 'replacementApprovals'])->name('fm.replacement-approvals');
+        Route::get('/fm-projects/{project}', [App\Http\Controllers\FinanceManagerController::class, 'viewProject'])->name('fm.project.view');
+        Route::get('/api/fm/project-stats', [App\Http\Controllers\FinanceManagerController::class, 'getProjectStats'])->name('api.fm.project-stats');
+    });
+
     // ===== Employee & Attendance (OWNER & PM only) =====
     Route::middleware('role:OWNER,PM')->group(function () {
         Route::get('/employee-attendance', [App\Http\Controllers\EmployeeAttendanceController::class, 'index'])->name('employee-attendance');

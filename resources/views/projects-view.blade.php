@@ -1587,10 +1587,11 @@
                                         // Define position hierarchy
                                         $positionHierarchy = [
                                             'Project Manager' => 1,
-                                            'Site Supervisor' => 2,
-                                            'Quality Assurance Officer' => 3,
-                                            'HR/Timekeeper' => 4,
-                                            'Construction Worker' => 5,
+                                            'Finance Manager' => 2,
+                                            'Site Supervisor' => 3,
+                                            'Quality Assurance Officer' => 4,
+                                            'HR/Timekeeper' => 5,
+                                            'Construction Worker' => 6,
                                         ];
                                         
                                         // Collect all employees with PM first (use different variable name to avoid JS conflict)
@@ -1658,10 +1659,11 @@
                                             // Define icon for hierarchy
                                             $hierarchyIcon = [
                                                 1 => 'fa-briefcase', // Project Manager
-                                                2 => 'fa-hard-hat', // Site Supervisor
-                                                3 => 'fa-clipboard-check', // QA Officer
-                                                4 => 'fa-clock', // HR/Timekeeper
-                                                5 => 'fa-user-tie', // Construction Worker
+                                                2 => 'fa-money-bill-wave', // Finance Manager
+                                                3 => 'fa-hard-hat', // Site Supervisor
+                                                4 => 'fa-clipboard-check', // QA Officer
+                                                5 => 'fa-clock', // HR/Timekeeper
+                                                6 => 'fa-user-tie', // Construction Worker
                                             ];
                                             $icon = $hierarchyIcon[$hierarchy] ?? 'fa-user';
                                         @endphp
@@ -1684,6 +1686,7 @@
                                                 @php
                                                     $positionTextColors = [
                                                         'Project Manager' => '#166534',
+                                                        'Finance Manager' => '#1e40af',
                                                         'Site Supervisor' => '#0369a1',
                                                         'Quality Assurance Officer' => '#6b21a8',
                                                         'HR/Timekeeper' => '#92400e',
@@ -4471,8 +4474,8 @@
             allEmployees.forEach(employee => {
                 const position = employee.position || 'Other';
                 
-                // Skip Project Managers entirely
-                if (position.toLowerCase().includes('project manager') || position.toLowerCase().includes('manager')) {
+                // Skip Project Managers entirely (but allow Finance Managers)
+                if (position.toLowerCase().includes('project manager')) {
                     return;
                 }
                 

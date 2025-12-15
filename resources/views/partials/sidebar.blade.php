@@ -288,6 +288,20 @@
             </a>
         @endif
 
+        <!-- FM: Replacement Approvals -->
+        @if(auth()->check() && auth()->user()->role === 'FM')
+            <a href="{{ route('fm.replacement-approvals') }}" class="nav-item {{ request()->routeIs('fm.replacement-approvals') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-exchange-alt"></i>
+                <span>Replacement Approvals</span>
+                @php
+                    $pendingCount = \App\Models\Material::where('replacement_requested', true)->where('replacement_status', 'pending')->count();
+                @endphp
+                @if($pendingCount > 0)
+                    <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">{{ $pendingCount }}</span>
+                @endif
+            </a>
+        @endif
+
         <!-- EMPLOYEE: My Attendance (for employees who have employee profile, excluding OWNER) -->
         @if(auth()->check() && auth()->user()->role !== 'OWNER' && \App\Models\EmployeeList::where('user_id', auth()->user()->id)->exists())
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
