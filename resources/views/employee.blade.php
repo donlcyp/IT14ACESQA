@@ -108,7 +108,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #16a34a);
+            background: linear-gradient(135deg, var(--header-bg), #1e40af);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -421,7 +421,6 @@
             font-size: 14px;
             font-weight: 700;
             letter-spacing: 0.05em;
-            text-transform: uppercase;
         }
         .employee-table tbody td {
             padding: 16px 16px;
