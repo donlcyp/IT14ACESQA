@@ -568,7 +568,6 @@
                   <th>User</th>
                   <th>Email</th>
                   <th>Action</th>
-                  <th>IP Address</th>
                   <th>Details</th>
                 </tr>
               </thead>
@@ -592,21 +591,33 @@
                     <td>
                       @php
                         $details = json_decode($log->details, true);
-                        $ip = $details['ip_address'] ?? 'N/A';
+                        $detailsText = '';
+                        
+                        if($log->action === 'LOGIN') {
+                          $detailsText = 'Signed in from ' . ($details['ip_address'] ?? 'Unknown');
+                        } elseif($log->action === 'LOGOUT') {
+                          $detailsText = 'Session ended';
+                        } elseif($log->action === 'UPDATE_MATERIAL') {
+                          $changes = $details['changes'] ?? [];
+                          $changedFields = [];
+                          if(is_array($changes)) {
+                            foreach($changes as $field => $value) {
+                              $changedFields[] = ucfirst(str_replace('_', ' ', $field));
+                            }
+                          }
+                          if(!empty($changedFields)) {
+                            $detailsText = 'Updated: ' . implode(', ', array_slice($changedFields, 0, 3));
+                            if(count($changedFields) > 3) {
+                              $detailsText .= ' +' . (count($changedFields) - 3) . ' more';
+                            }
+                          } else {
+                            $detailsText = 'Material record updated';
+                          }
+                        } else {
+                          $detailsText = 'User action recorded';
+                        }
                       @endphp
-                      {{ $ip }}
-                    </td>
-                    <td>
-                      @php
-                        $details = json_decode($log->details, true);
-                      @endphp
-                      @if($log->action === 'LOGIN')
-                        Signed in from {{ $details['ip_address'] ?? 'Unknown' }}
-                      @elseif($log->action === 'LOGOUT')
-                        Session ended
-                      @else
-                        {{ $log->details ?? 'No details' }}
-                      @endif
+                      {{ $detailsText }}
                     </td>
                   </tr>
                 @endforeach
