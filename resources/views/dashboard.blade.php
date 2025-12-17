@@ -1052,7 +1052,6 @@
         .project-card-info-label {
             font-size: 10px;
             font-weight: 700;
-            text-transform: uppercase;
             color: #9ca3af;
             margin-bottom: 4px;
             letter-spacing: 0.5px;
@@ -2172,16 +2171,16 @@
 
                     <!-- Historical / Completed Projects Section -->
                     @if(isset($historicalProjects) && $historicalProjects->count() > 0)
-                    <div class="dashboard-card full" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #86efac;">
+                    <div class="dashboard-card full" style="background: white; border: 1px solid #e5e7eb;">
                         <div class="dashboard-card-header">
                             <div>
-                                <div class="dashboard-card-title" style="color: #166534;">
+                                <div class="dashboard-card-title" style="color: #1e3a8a;">
                                     <i class="fas fa-history" style="margin-right: 8px;"></i>
                                     Historical Data - Completed Projects
                                 </div>
-                                <div class="dashboard-card-subtitle" style="color: #15803d;">Projects that have been successfully completed</div>
+                                <div class="dashboard-card-subtitle">Projects that have been successfully completed</div>
                             </div>
-                            <a class="view-link" href="{{ route('projects') }}?status=Completed" style="color: #166534;">
+                            <a class="view-link" href="{{ route('projects') }}?status=Completed">
                                 View all completed
                                 <i class="fas fa-arrow-right"></i>
                             </a>
@@ -2212,14 +2211,14 @@
                                         }
                                     }
                                 @endphp
-                                <a href="{{ route('projects.show', $project->id) }}" class="project-card" style="border-color: #86efac;">
+                                <a href="{{ route('projects.show', $project->id) }}" class="project-card" style="border-color: #93c5fd;">
                                     <div class="project-card-header">
-                                        <div class="project-card-title" style="color: #166534;">{{ $project->project_name ?? $project->project_code }}</div>
-                                        <span class="project-card-status" style="background: #166534; color: white;">
+                                        <div class="project-card-title" style="color: #1e3a8a;">{{ $project->project_name ?? $project->project_code }}</div>
+                                        <span class="project-card-status" style="background: #1e40af; color: white;">
                                             <i class="fas fa-check-circle"></i> Completed
                                         </span>
                                     </div>
-                                    <div class="project-card-info" style="border-top-color: #bbf7d0;">
+                                    <div class="project-card-info" style="border-top-color: #bfdbfe;">
                                         <div class="project-card-info-item">
                                             <div class="project-card-info-label">Completed</div>
                                             <div class="project-card-info-value">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'N/A' }}</div>

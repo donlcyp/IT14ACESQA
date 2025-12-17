@@ -288,18 +288,16 @@
     }
 
     thead {
-      background-color: #f9fafb;
-      border-bottom: 2px solid #e5e7eb;
+      background-color: #1e40af;
+      border-bottom: none;
     }
 
     th {
       padding: 15px 20px;
       text-align: left;
       font-weight: 600;
-      color: var(--gray-600);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: #ffffff;
+      font-size: 13px;
     }
 
     td {
@@ -334,12 +332,12 @@
     }
 
     .action-login {
-      background-color: #dbeafe;
+      background-color: transparent;
       color: #0369a1;
     }
 
     .action-logout {
-      background-color: #fecaca;
+      background-color: transparent;
       color: #991b1b;
     }
 

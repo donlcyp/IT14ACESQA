@@ -586,11 +586,11 @@
             text-transform: uppercase;
         }
         .project-status.ongoing {
-            background: #dbeafe;
+            background: transparent;
             color: #1e40af;
         }
         .project-status.completed {
-            background: #dcfce7;
+            background: transparent;
             color: #166534;
         }
 

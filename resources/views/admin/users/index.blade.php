@@ -255,18 +255,16 @@
     }
 
     thead {
-      background-color: #f9fafb;
-      border-bottom: 2px solid #e5e7eb;
+      background-color: #1e40af;
+      border-bottom: none;
     }
 
     th {
       padding: 15px 20px;
       text-align: left;
       font-weight: 600;
-      color: var(--gray-600);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: #ffffff;
+      font-size: 13px;
     }
 
     td {
@@ -299,8 +297,8 @@
     }
 
     .badge-role {
-      background-color: #dbeafe;
-      color: #0c4a6e;
+      background-color: transparent;
+      color: #1e40af;
     }
 
     .badge-verified {

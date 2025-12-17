@@ -262,15 +262,13 @@
         }
 
         .projects-table thead th {
-            background: #f8fafc;
-            color: #374151;
-            font-weight: 700;
+            background: #1e40af;
+            color: #ffffff;
+            font-weight: 600;
             padding: 16px 12px;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: none;
             font-size: 13px;
             text-align: left;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
         }
 
         .projects-table thead th:last-child {
