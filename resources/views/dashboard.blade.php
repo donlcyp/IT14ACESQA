@@ -1868,6 +1868,58 @@
                     </a>
                 </div>
 
+                <!-- Date Filter Section -->
+                @if(!isset($isEmployee) || !$isEmployee)
+                <div class="dashboard-card full" style="margin-bottom: 24px; padding: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-filter" style="color: var(--accent); font-size: 18px;"></i>
+                            <span style="font-weight: 600; color: var(--black-1);">Filter Dashboard Data</span>
+                        </div>
+                        <form method="GET" action="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <select name="filter_type" id="filterType" onchange="toggleCustomDates()" style="padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; color: var(--gray-700); min-width: 150px;">
+                                <option value="all" {{ ($filterType ?? 'all') === 'all' ? 'selected' : '' }}>All Time</option>
+                                <option value="this_month" {{ ($filterType ?? '') === 'this_month' ? 'selected' : '' }}>This Month</option>
+                                <option value="last_month" {{ ($filterType ?? '') === 'last_month' ? 'selected' : '' }}>Last Month</option>
+                                <option value="this_year" {{ ($filterType ?? '') === 'this_year' ? 'selected' : '' }}>This Year</option>
+                                <option value="last_year" {{ ($filterType ?? '') === 'last_year' ? 'selected' : '' }}>Last Year</option>
+                                <option value="custom" {{ ($filterType ?? '') === 'custom' ? 'selected' : '' }}>Custom Range</option>
+                            </select>
+                            <div id="customDateInputs" style="display: {{ ($filterType ?? '') === 'custom' ? 'flex' : 'none' }}; align-items: center; gap: 8px;">
+                                <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}" placeholder="From" style="padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                                <span style="color: var(--gray-500);">to</span>
+                                <input type="date" name="date_to" value="{{ $dateTo ?? '' }}" placeholder="To" style="padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                            </div>
+                            <button type="submit" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                <i class="fas fa-search"></i> Apply Filter
+                            </button>
+                            @if(($filterType ?? 'all') !== 'all')
+                            <a href="{{ route('dashboard') }}" style="padding: 10px 16px; background: #f3f4f6; color: var(--gray-700); border-radius: 8px; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                            @endif
+                        </form>
+                    </div>
+                    @if(($filterType ?? 'all') !== 'all')
+                    <div style="margin-top: 12px; padding: 10px 14px; background: #dbeafe; border-radius: 6px; font-size: 13px; color: #1e40af;">
+                        <i class="fas fa-info-circle"></i> 
+                        Showing data for: 
+                        @if(($filterType ?? '') === 'this_month')
+                            <strong>{{ \Carbon\Carbon::now()->format('F Y') }}</strong>
+                        @elseif(($filterType ?? '') === 'last_month')
+                            <strong>{{ \Carbon\Carbon::now()->subMonth()->format('F Y') }}</strong>
+                        @elseif(($filterType ?? '') === 'this_year')
+                            <strong>{{ \Carbon\Carbon::now()->format('Y') }}</strong>
+                        @elseif(($filterType ?? '') === 'last_year')
+                            <strong>{{ \Carbon\Carbon::now()->subYear()->format('Y') }}</strong>
+                        @elseif($dateFrom && $dateTo)
+                            <strong>{{ \Carbon\Carbon::parse($dateFrom)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($dateTo)->format('M d, Y') }}</strong>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+                @endif
+
                 <!-- Detailed Insights -->
                 <div class="dashboard-grid">
                     @if (isset($isEmployee) && $isEmployee)
@@ -2085,6 +2137,107 @@
                                 @endforelse
                             </div>
                     </div>
+
+                    <!-- Project Statistics Chart -->
+                    <div class="dashboard-card full">
+                        <div class="dashboard-card-header">
+                            <div>
+                                <div class="dashboard-card-title">Project Statistics</div>
+                                <div class="dashboard-card-subtitle">Monthly project creation and completion trends</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                            <!-- Projects Created vs Completed Chart -->
+                            <div style="background: #f9fafb; border-radius: 12px; padding: 20px;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 16px;">
+                                    <i class="fas fa-chart-line" style="color: var(--accent); margin-right: 8px;"></i>
+                                    Projects Created vs Completed (Last 6 Months)
+                                </h4>
+                                <div style="height: 250px;">
+                                    <canvas id="projectTrendChart"></canvas>
+                                </div>
+                            </div>
+                            <!-- Project Status Distribution -->
+                            <div style="background: #f9fafb; border-radius: 12px; padding: 20px;">
+                                <h4 style="font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 16px;">
+                                    <i class="fas fa-chart-pie" style="color: var(--accent); margin-right: 8px;"></i>
+                                    Current Project Status Distribution
+                                </h4>
+                                <div style="height: 250px;">
+                                    <canvas id="projectStatusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historical / Completed Projects Section -->
+                    @if(isset($historicalProjects) && $historicalProjects->count() > 0)
+                    <div class="dashboard-card full" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #86efac;">
+                        <div class="dashboard-card-header">
+                            <div>
+                                <div class="dashboard-card-title" style="color: #166534;">
+                                    <i class="fas fa-history" style="margin-right: 8px;"></i>
+                                    Historical Data - Completed Projects
+                                </div>
+                                <div class="dashboard-card-subtitle" style="color: #15803d;">Projects that have been successfully completed</div>
+                            </div>
+                            <a class="view-link" href="{{ route('projects') }}?status=Completed" style="color: #166534;">
+                                View all completed
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="project-cards-container">
+                            @foreach ($historicalProjects as $project)
+                                @php
+                                    // Get client name
+                                    if ($project->client) {
+                                        $clientName = $project->client->company_name ?? $project->client->name ?? 'N/A';
+                                    } else {
+                                        $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? '')) ?: 'N/A';
+                                    }
+                                    
+                                    // Calculate project duration
+                                    $duration = 'N/A';
+                                    if ($project->date_started && $project->date_ended) {
+                                        $days = \Carbon\Carbon::parse($project->date_started)->diffInDays(\Carbon\Carbon::parse($project->date_ended));
+                                        $duration = $days . ' days';
+                                    }
+                                    
+                                    // Calculate total spent
+                                    $totalSpent = 0;
+                                    if ($project->materials && $project->materials->count() > 0) {
+                                        foreach ($project->materials as $material) {
+                                            $totalSpent += (($material->material_cost ?? 0) + ($material->labor_cost ?? 0)) * ($material->quantity ?? 0);
+                                        }
+                                    }
+                                @endphp
+                                <a href="{{ route('projects.show', $project->id) }}" class="project-card" style="border-color: #86efac;">
+                                    <div class="project-card-header">
+                                        <div class="project-card-title" style="color: #166534;">{{ $project->project_name ?? $project->project_code }}</div>
+                                        <span class="project-card-status" style="background: #166534; color: white;">
+                                            <i class="fas fa-check-circle"></i> Completed
+                                        </span>
+                                    </div>
+                                    <div class="project-card-info" style="border-top-color: #bbf7d0;">
+                                        <div class="project-card-info-item">
+                                            <div class="project-card-info-label">Completed</div>
+                                            <div class="project-card-info-value">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'N/A' }}</div>
+                                        </div>
+                                        <div class="project-card-info-item">
+                                            <div class="project-card-info-label">Duration</div>
+                                            <div class="project-card-info-value">{{ $duration }}</div>
+                                        </div>
+                                        <div class="project-card-info-item">
+                                            <div class="project-card-info-label">Total Spent</div>
+                                            <div class="project-card-info-value">₱{{ number_format($totalSpent, 0) }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="dashboard-card full">
                         <div class="dashboard-card-header">
@@ -2380,6 +2533,155 @@
                     }
                 }
             });
+        }
+
+        // Toggle Custom Date Inputs
+        function toggleCustomDates() {
+            const filterType = document.getElementById('filter_type');
+            const customDates = document.getElementById('customDateInputs');
+            if (filterType && customDates) {
+                if (filterType.value === 'custom') {
+                    customDates.style.display = 'flex';
+                } else {
+                    customDates.style.display = 'none';
+                }
+            }
+        }
+
+        // Chart 4: Project Trend (Line Chart - Created vs Completed over 6 months)
+        @if(isset($monthlyStats) && count($monthlyStats) > 0)
+        if (document.getElementById('projectTrendChart')) {
+            const trendCtx = document.getElementById('projectTrendChart').getContext('2d');
+            const monthlyStats = @json($monthlyStats);
+            
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyStats.map(s => s.month_short),
+                    datasets: [
+                        {
+                            label: 'Projects Created',
+                            data: monthlyStats.map(s => s.created),
+                            borderColor: '#1e40af',
+                            backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#1e40af',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        },
+                        {
+                            label: 'Projects Completed',
+                            data: monthlyStats.map(s => s.completed),
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#059669',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+        @endif
+
+        // Chart 5: Project Status Distribution (Pie Chart)
+        if (document.getElementById('projectStatusChart')) {
+            const statusCtx = document.getElementById('projectStatusChart').getContext('2d');
+            const statusData = {
+                ongoing: {{ $summary['ongoing_projects'] ?? 0 }},
+                completed: {{ $summary['complete_projects'] ?? 0 }},
+                delayed: {{ $summary['delayed_projects'] ?? 0 }}
+            };
+            
+            // Only show statuses that have values > 0
+            const labels = [];
+            const data = [];
+            const colors = [];
+            
+            if (statusData.ongoing > 0) {
+                labels.push('Ongoing');
+                data.push(statusData.ongoing);
+                colors.push('#3b82f6'); // Blue
+            }
+            if (statusData.completed > 0) {
+                labels.push('Completed');
+                data.push(statusData.completed);
+                colors.push('#10b981'); // Green
+            }
+            if (statusData.delayed > 0) {
+                labels.push('Delayed');
+                data.push(statusData.delayed);
+                colors.push('#ef4444'); // Red
+            }
+            
+            // Only render if we have data
+            if (data.length > 0) {
+                new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: '#fff',
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                        return context.label + ': ' + context.raw + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         }
     </script>
 </body>

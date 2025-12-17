@@ -13,7 +13,7 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         
@@ -25,6 +25,26 @@ class DashboardController extends Controller
         // Check if user is FM role - redirect to FM dashboard
         if ($user && $user->role === 'FM') {
             return redirect()->route('fm.dashboard');
+        }
+        
+        // Get date filter parameters
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $filterType = $request->get('filter_type', 'all'); // all, this_month, this_year, custom
+        
+        // Set default date ranges based on filter type
+        if ($filterType === 'this_month') {
+            $dateFrom = Carbon::now()->startOfMonth()->format('Y-m-d');
+            $dateTo = Carbon::now()->endOfMonth()->format('Y-m-d');
+        } elseif ($filterType === 'this_year') {
+            $dateFrom = Carbon::now()->startOfYear()->format('Y-m-d');
+            $dateTo = Carbon::now()->endOfYear()->format('Y-m-d');
+        } elseif ($filterType === 'last_month') {
+            $dateFrom = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d');
+            $dateTo = Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d');
+        } elseif ($filterType === 'last_year') {
+            $dateFrom = Carbon::now()->subYear()->startOfYear()->format('Y-m-d');
+            $dateTo = Carbon::now()->subYear()->endOfYear()->format('Y-m-d');
         }
         
         // Check if user is an employee (but NOT a project manager)
@@ -91,17 +111,32 @@ class DashboardController extends Controller
             ));
         } else {
             // OWNER/PM VIEW - Show all projects
-            // You can add logic here to fetch dashboard data from models
             // Dashboard now uses live data instead of static placeholders.
+            
+            // Build base query with optional date filtering
+            $baseQuery = Project::where('archived', false);
+            
+            if ($dateFrom) {
+                $baseQuery->where(function($q) use ($dateFrom) {
+                    $q->whereDate('date_started', '>=', $dateFrom)
+                      ->orWhereDate('created_at', '>=', $dateFrom);
+                });
+            }
+            if ($dateTo) {
+                $baseQuery->where(function($q) use ($dateTo) {
+                    $q->whereDate('date_started', '<=', $dateTo)
+                      ->orWhereDate('created_at', '<=', $dateTo);
+                });
+            }
 
-            // Project summary
-            $totalProjects = Project::where('archived', false)->count();
+            // Project summary (filtered)
+            $totalProjects = (clone $baseQuery)->count();
 
-            $completeProjects = Project::where('archived', false)
+            $completeProjects = (clone $baseQuery)
                 ->where('status', 'Completed')
                 ->count();
 
-            $ongoingProjects = Project::where('archived', false)
+            $ongoingProjects = (clone $baseQuery)
                 ->where('status', '!=', 'Completed')
                 ->count();
 
@@ -109,21 +144,34 @@ class DashboardController extends Controller
                 'total_projects' => $totalProjects,
                 'complete_projects' => $completeProjects,
                 'ongoing_projects' => $ongoingProjects,
-                'delayed_projects' => Project::where('archived', false)
-                    ->whereNotNull('date_ended')
-                    ->whereRaw('date_ended < date_started OR date_ended > ?', [now()])
+                'delayed_projects' => (clone $baseQuery)
+                    ->whereNotNull('target_timeline')
+                    ->where('status', '!=', 'Completed')
+                    ->whereDate('target_timeline', '<', now())
                     ->count(),
                 'total_workers' => EmployeeList::count(),
                 'pending_approvals' => Material::where('status', 'pending')->count(),
-                'total_budget' => Project::where('archived', false)->sum('allocated_amount'),
+                'total_budget' => (clone $baseQuery)->sum('allocated_amount'),
             ];
 
-            // Active projects (latest 5) - all non-archived with client data
-            $activeProjects = Project::where('archived', false)
-                ->with('client', 'assignedPM')
+            // Active projects (ongoing, filtered) - latest 6
+            $activeProjects = (clone $baseQuery)
+                ->where('status', '!=', 'Completed')
+                ->with(['client', 'assignedPM', 'materials'])
                 ->orderByDesc('created_at')
-                ->take(5)
+                ->take(6)
                 ->get();
+            
+            // Historical/Completed projects (separate section) - latest 6
+            $historicalProjects = Project::where('archived', false)
+                ->where('status', 'Completed')
+                ->with(['client', 'assignedPM', 'materials'])
+                ->orderByDesc('date_ended')
+                ->take(6)
+                ->get();
+            
+            // Monthly project statistics for charts
+            $monthlyStats = $this->getMonthlyProjectStats();
 
             // Recent materials (latest 5)
             $recentProjectRecords = Material::with('project')
@@ -141,14 +189,53 @@ class DashboardController extends Controller
             return view('dashboard', compact(
                 'summary',
                 'activeProjects',
+                'historicalProjects',
+                'monthlyStats',
                 'recentProjectRecords',
                 'projectsToReturn',
                 'assignedProjects',
                 'todayAttendance',
                 'recentAttendance',
-                'isEmployee'
+                'isEmployee',
+                'dateFrom',
+                'dateTo',
+                'filterType'
             ));
         }
+    }
+    
+    /**
+     * Get monthly project statistics for charts
+     */
+    private function getMonthlyProjectStats()
+    {
+        $stats = [];
+        
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $monthStart = $month->copy()->startOfMonth();
+            $monthEnd = $month->copy()->endOfMonth();
+            
+            $created = Project::where('archived', false)
+                ->whereDate('created_at', '>=', $monthStart)
+                ->whereDate('created_at', '<=', $monthEnd)
+                ->count();
+                
+            $completed = Project::where('archived', false)
+                ->where('status', 'Completed')
+                ->whereDate('date_ended', '>=', $monthStart)
+                ->whereDate('date_ended', '<=', $monthEnd)
+                ->count();
+            
+            $stats[] = [
+                'month' => $month->format('M Y'),
+                'month_short' => $month->format('M'),
+                'created' => $created,
+                'completed' => $completed,
+            ];
+        }
+        
+        return $stats;
     }
 
     public function financeGraphs()
