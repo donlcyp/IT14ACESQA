@@ -27,6 +27,11 @@ class DashboardController extends Controller
             return redirect()->route('fm.dashboard');
         }
         
+        // Check if user is SS role - redirect to Site Supervisor dashboard
+        if ($user && $user->role === 'SS') {
+            return redirect()->route('ss.dashboard');
+        }
+        
         // Get date filter parameters
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');

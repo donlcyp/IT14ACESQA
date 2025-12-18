@@ -104,22 +104,32 @@
             overflow: hidden;
         }
 
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
         .header-menu {
-            display: none;
-            background: transparent;
+            background: none;
             border: none;
             color: white;
-            cursor: pointer;
             font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
         }
 
-        @media (max-width: 768px) {
-            .header-menu {
-                display: block;
-            }
+        .header-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-       .header-title {
+        .header-title {
             color: white;
             font-family: "Zen Dots", sans-serif;
             font-size: 24px;
@@ -1907,6 +1917,11 @@
                         $failedCount = $project->materials->where('qa_status', 'failed')->count();
                         $recheckCount = $project->materials->where('qa_status', 'requires_recheck')->count();
                         $totalItems = $project->materials->count();
+                        
+                        // Calculate progress bar percentages
+                        $passedPercent = $totalItems > 0 ? ($passedCount / $totalItems) * 100 : 0;
+                        $failedPercent = $totalItems > 0 ? ($failedCount / $totalItems) * 100 : 0;
+                        $recheckPercent = $totalItems > 0 ? ($recheckCount / $totalItems) * 100 : 0;
                     @endphp
 
                     <!-- QA Summary Cards -->
@@ -1938,13 +1953,13 @@
                         </div>
                         <div style="width: 100%; height: 12px; background: var(--gray-300); border-radius: 6px; overflow: hidden; display: flex;">
                             @if($passedCount > 0)
-                            <div style="width: {{ ($passedCount / $totalItems) * 100 }}%; background: #10b981; height: 100%;"></div>
+                            <div style="width: {{ $passedPercent }}%; background: #10b981; height: 100%;"></div>
                             @endif
                             @if($failedCount > 0)
-                            <div style="width: {{ ($failedCount / $totalItems) * 100 }}%; background: #ef4444; height: 100%;"></div>
+                            <div style="width: {{ $failedPercent }}%; background: #ef4444; height: 100%;"></div>
                             @endif
                             @if($recheckCount > 0)
-                            <div style="width: {{ ($recheckCount / $totalItems) * 100 }}%; background: #6366f1; height: 100%;"></div>
+                            <div style="width: {{ $recheckPercent }}%; background: #6366f1; height: 100%;"></div>
                             @endif
                         </div>
                         <div style="display: flex; gap: 20px; margin-top: 8px; font-size: 12px;">

@@ -1812,9 +1812,6 @@
                 <button onclick="switchViewTab('assigned')" id="tab-assigned" style="padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--accent); border-bottom: 3px solid var(--accent); transition: all 0.2s;">
                     <i class="fas fa-users"></i> Assigned Employees
                 </button>
-                <button onclick="switchViewTab('attendance')" id="tab-attendance" style="padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.2s;">
-                    <i class="fas fa-calendar-check"></i> Daily Attendance
-                </button>
             </div>
 
             <!-- Assigned Employees Tab -->
@@ -1824,30 +1821,8 @@
                 </div>
             </div>
 
-            <!-- Daily Attendance Tab -->
-            <div id="attendance-content" style="display: none; overflow-x: auto;">
-                <table class="attendance-table" style="min-width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Time In</th>
-                            <th>Time Out</th>
-                            <th style="min-width: 100px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendanceTableBody">
-                        <!-- Populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-
             <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                 <button class="btn btn-outline" onclick="closeViewModal()">Close</button>
-                <button class="btn btn-primary" onclick="viewAllProjectsAttendance()">
-                    <i class="fas fa-history"></i> View All
-                </button>
             </div>
         </div>
     </div>
@@ -2084,99 +2059,17 @@
                 });
             }
 
-            // Load attendance for assigned employees
-            loadAttendanceForEmployees(assignedEmployeeIds);
-
-            // Reset tab to assigned employees
-            switchViewTab('assigned');
-
+            // Show the modal
             document.getElementById('viewEmployeesModal').classList.add('active');
         }
 
         function switchViewTab(tabName) {
-            // Hide all tabs
-            document.getElementById('assigned-content').style.display = tabName === 'assigned' ? 'block' : 'none';
-            document.getElementById('attendance-content').style.display = tabName === 'attendance' ? 'block' : 'none';
-
-            // Update tab buttons
-            const assignedBtn = document.getElementById('tab-assigned');
-            const attendanceBtn = document.getElementById('tab-attendance');
-
-            if (tabName === 'assigned') {
-                assignedBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--accent); border-bottom: 3px solid var(--accent); transition: all 0.2s;';
-                attendanceBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.2s;';
-            } else {
-                assignedBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; transition: all 0.2s;';
-                attendanceBtn.style.cssText = 'padding: 10px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: var(--accent); border-bottom: 3px solid var(--accent); transition: all 0.2s;';
-            }
+            // Tab switching function removed - only assigned employees tab available
         }
 
         function loadAttendanceForEmployees(employeeIds) {
-            const tableBody = document.getElementById('attendanceTableBody');
-            tableBody.innerHTML = '';
-
-            if (employeeIds.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #6b7280;">No employees assigned to view attendance.</td></tr>';
-                return;
-            }
-
-            let hasRecords = false;
-            const attendanceRows = [];
-
-            // Collect all attendance records for assigned employees
-            employeeIds.forEach(employeeId => {
-                const employee = allEmployees.find(e => e.id === employeeId);
-                
-                if (employee) {
-                    console.log(`Employee: ${employee.f_name} ${employee.l_name}`, employee.attendance_records);
-                    
-                    if (employee.attendance_records && employee.attendance_records.length > 0) {
-                        employee.attendance_records.forEach(record => {
-                            hasRecords = true;
-                            const statusClass = getStatusClass(record.status);
-                            
-                            attendanceRows.push({
-                                employeeId: record.employee_id,
-                                name: `${record.first_name} ${record.last_name}`,
-                                status: record.status,
-                                statusClass: statusClass,
-                                date: record.attendance_date || '—',
-                                timeIn: record.time_in || '—',
-                                timeOut: record.time_out || '—'
-                            });
-                        });
-                    }
-                }
-            });
-
-            // Sort by date (newest first)
-            attendanceRows.sort((a, b) => {
-                if (a.date === '—' || b.date === '—') return 0;
-                return new Date(b.date) - new Date(a.date);
-            });
-
-            // Render rows
-            attendanceRows.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.name}</td>
-                    <td><span class="status-badge ${row.statusClass}">${row.status}</span></td>
-                    <td>${row.date}</td>
-                    <td>${row.timeIn}</td>
-                    <td>${row.timeOut}</td>
-                    <td>
-                        <button class="action-btn" onclick="openEditAttendanceModal(${row.employeeId}, '${row.name}', '${row.status}', '${row.timeIn}', '${row.timeOut}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
-
-            if (!hasRecords) {
-                console.warn('No attendance records found for employees:', employeeIds);
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: #6b7280;">No attendance records for assigned employees.</td></tr>';
-            }
+            // Attendance loading function removed - modal now displays only assigned employees list
+            // Attendance records are available in the allEmployees data if needed for future features
         }
 
         function getStatusClass(status) {

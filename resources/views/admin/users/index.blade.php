@@ -681,7 +681,7 @@
           <i class="fas fa-bars"></i>
         </button>
         <div class="header-title">
-          <i class="fas fa-users-gear"></i> User Management
+          <i class="fas fa-users-gear"></i> Personnel Management
         </div>
       </div>
 
@@ -690,11 +690,77 @@
         <!-- Page Header -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-user-gear"></i> Manage Users
+            <i class="fas fa-user-gear"></i> Personnel Directory
           </h1>
           <button onclick="openCreateUserModal()" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add New User
+            <i class="fas fa-plus"></i> Add Personnel
           </button>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="filter-section" style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+          <form method="GET" action="{{ route('admin.users.index') }}" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; flex: 1;">
+            <!-- Search Box -->
+            <div style="position: relative; flex: 1; min-width: 200px; max-width: 320px;">
+              <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 14px;"></i>
+              <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search by name or email..." 
+                style="width: 100%; padding: 11px 14px 11px 40px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;">
+            </div>
+            
+            <!-- Role Filter -->
+            <select name="role" style="padding: 11px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; min-width: 180px; background: white; cursor: pointer;">
+              <option value="">All Roles</option>
+              @foreach ($allRoles as $roleKey => $roleName)
+                <option value="{{ $roleKey }}" {{ ($filters['role'] ?? '') === $roleKey ? 'selected' : '' }}>{{ $roleName }}</option>
+              @endforeach
+            </select>
+            
+            <button type="submit" class="btn" style="background: var(--accent); color: white; border: none;">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+            
+            @if (!empty($filters['search']) || !empty($filters['role']))
+              <a href="{{ route('admin.users.index') }}" class="btn" style="background: #f3f4f6; color: #374151; text-decoration: none;">
+                <i class="fas fa-times"></i> Clear
+              </a>
+            @endif
+          </form>
+        </div>
+
+        <!-- Role Statistics Cards -->
+        @php
+          $roleCounts = \App\Models\User::selectRaw('role, COUNT(*) as count')
+            ->groupBy('role')
+            ->pluck('count', 'role')
+            ->toArray();
+          $totalUsers = array_sum($roleCounts);
+          
+          $roleStats = [
+            ['key' => 'PM', 'name' => 'Project Managers', 'icon' => 'fa-user-tie', 'color' => '#1e40af'],
+            ['key' => 'FM', 'name' => 'Finance Managers', 'icon' => 'fa-calculator', 'color' => '#059669'],
+            ['key' => 'HR', 'name' => 'HR/Timekeepers', 'icon' => 'fa-clock', 'color' => '#d97706'],
+            ['key' => 'SS', 'name' => 'Site Supervisors', 'icon' => 'fa-helmet-safety', 'color' => '#0891b2'],
+            ['key' => 'CW', 'name' => 'Construction Workers', 'icon' => 'fa-hard-hat', 'color' => '#6b7280'],
+          ];
+        @endphp
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); border-radius: 12px; padding: 20px; color: white; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);">
+            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 4px;">Total Personnel</div>
+            <div style="font-size: 28px; font-weight: 700;">{{ $totalUsers }}</div>
+          </div>
+          @foreach ($roleStats as $stat)
+            <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid {{ $stat['color'] }}; cursor: pointer; transition: all 0.2s;" onclick="window.location='{{ route('admin.users.index', ['role' => $stat['key']]) }}'">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">{{ $stat['name'] }}</div>
+                  <div style="font-size: 24px; font-weight: 700; color: {{ $stat['color'] }};">{{ $roleCounts[$stat['key']] ?? 0 }}</div>
+                </div>
+                <div style="width: 40px; height: 40px; background: {{ $stat['color'] }}15; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <i class="fas {{ $stat['icon'] }}" style="color: {{ $stat['color'] }}; font-size: 18px;"></i>
+                </div>
+              </div>
+            </div>
+          @endforeach
         </div>
 
         <!-- Flash Message -->
@@ -727,8 +793,30 @@
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->phone ?? 'N/A' }}</td>
                     <td>
-                      <span class="badge badge-role">
-                        {{ $user->role ?? 'N/A' }}
+                      @php
+                        $roleNames = [
+                          'OWNER' => 'Owner',
+                          'PM' => 'Project Manager',
+                          'FM' => 'Finance Manager',
+                          'HR' => 'HR/Timekeeper',
+                          'QA' => 'Quality Assurance',
+                          'SS' => 'Site Supervisor',
+                          'CW' => 'Construction Worker',
+                        ];
+                        $roleDisplay = $roleNames[$user->role] ?? $user->role ?? 'N/A';
+                        $roleColor = match($user->role) {
+                          'OWNER' => '#7c3aed',
+                          'PM' => '#1e40af',
+                          'FM' => '#059669',
+                          'HR' => '#d97706',
+                          'QA' => '#dc2626',
+                          'SS' => '#0891b2',
+                          'CW' => '#6b7280',
+                          default => '#374151'
+                        };
+                      @endphp
+                      <span class="badge badge-role" style="background: {{ $roleColor }}15; color: {{ $roleColor }}; border: 1px solid {{ $roleColor }}40;">
+                        {{ $roleDisplay }}
                       </span>
                     </td>
                     <td>{{ optional($user->created_at)->diffForHumans() ?? 'N/A' }}</td>
@@ -744,8 +832,8 @@
           @else
             <div class="empty-state">
               <i class="fas fa-inbox"></i>
-              <h3>No Users Found</h3>
-              <p>Start by creating your first user.</p>
+              <h3>No Personnel Found</h3>
+              <p>@if(!empty($filters['search']) || !empty($filters['role'])) Try adjusting your filters. @else Start by adding your first user. @endif</p>
             </div>
           @endif
         </div>
@@ -758,7 +846,7 @@
           @endphp
           <div class="pagination-container">
             <div class="pagination-info">
-              Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
+              Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} personnel
             </div>
             <div class="pagination-controls">
               @if ($users->onFirstPage())
@@ -837,8 +925,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <i class="fas fa-user-plus"></i>
-          Create User
+          Add Personnel
         </div>
+        <button class="modal-close" onclick="closeCreateUserModal()">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <form method="POST" action="{{ route('admin.users.store') }}" class="modal-body">
@@ -863,13 +954,24 @@
         </div>
 
         <div class="form-group-modal">
-          <label for="role">Role</label>
+          <label for="role">Role / Position</label>
           <select id="role" name="role" required>
+            @php
+              $roleLabels = [
+                'OWNER' => 'Owner (Full Access)',
+                'PM' => 'Project Manager',
+                'FM' => 'Finance Manager',
+                'HR' => 'HR/Timekeeper',
+                'QA' => 'Quality Assurance Officer',
+                'SS' => 'Site Supervisor',
+                'CW' => 'Construction Worker',
+              ];
+            @endphp
             @foreach ($roles as $r)
-              <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $r }}</option>
+              <option value="{{ $r }}" {{ old('role')===$r ? 'selected' : '' }}>{{ $roleLabels[$r] ?? $r }}</option>
             @endforeach
           </select>
-          <div class="form-help">OWNER has full access (hidden once assigned). PM = Project Manager. SS = Site Supervisor. FM = Finance Manager. HR = Human Resource/Timekeeper. QA = Quality Assurance Officer. CW = Construction Worker.</div>
+          <div class="form-help">Select the role/position for this personnel. Owner role is only available if no owner exists.</div>
           @error('role') <div class="error" style="color:#dc2626; font-size:12px; margin-top:6px;">{{ $message }}</div> @enderror
         </div>
 
@@ -894,9 +996,7 @@
         </div>
       </form>
     </div>
-  </div>
-
-  <script>
+  </div>  <script>
     function openCreateUserModal() {
       document.getElementById('createUserModal').classList.add('show');
       document.body.style.overflow = 'hidden';
@@ -956,8 +1056,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <i class="fas fa-user"></i>
-          User Details
+          Personnel Details
         </div>
+        <button class="modal-close" onclick="closeViewUserModal()">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <div class="modal-body">
@@ -975,7 +1078,7 @@
             <div class="detail-item-value" id="viewUserPhone">—</div>
           </div>
           <div class="detail-item">
-            <div class="detail-item-label">Role</div>
+            <div class="detail-item-label">Role / Position</div>
             <div class="detail-item-value" id="viewUserRole">—</div>
           </div>
           <div class="detail-item">
@@ -998,11 +1101,21 @@
   </div>
 
   <script>
+    const roleNames = {
+      'OWNER': 'Owner',
+      'PM': 'Project Manager',
+      'FM': 'Finance Manager',
+      'HR': 'HR/Timekeeper',
+      'QA': 'Quality Assurance',
+      'SS': 'Site Supervisor',
+      'CW': 'Construction Worker'
+    };
+
     function openViewUserModal(user) {
       document.getElementById('viewUserName').textContent = user.name || '—';
       document.getElementById('viewUserEmail').textContent = user.email || '—';
       document.getElementById('viewUserPhone').textContent = user.phone || '—';
-      document.getElementById('viewUserRole').textContent = user.role || 'N/A';
+      document.getElementById('viewUserRole').textContent = roleNames[user.role] || user.role || 'N/A';
       document.getElementById('viewUserId').textContent = user.id || '—';
       
       // Format created date
@@ -1041,4 +1154,3 @@
   </script>
 </body>
 </html>
-

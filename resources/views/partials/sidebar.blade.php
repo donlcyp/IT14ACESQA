@@ -209,11 +209,15 @@
     </div>
 
     <nav class="nav-menu">
-        <!-- Dashboard - Available to all roles -->
-        <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-home"></i>
-            <span>Dashboard</span>
-        </a>
+        <!-- Dashboard - Available to all roles (redirect to role-specific dashboard) -->
+        @if(auth()->check() && auth()->user()->role === 'SS')
+            {{-- SS users use their own dashboard link below --}}
+        @else
+            <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+        @endif
 
         <!-- OWNER: All menu items visible -->
         @if(auth()->check() && auth()->user()->role === 'OWNER')
@@ -225,18 +229,14 @@
                 <i class="nav-icon fas fa-archive"></i>
                 <span>Archives</span>
             </a>
-            <a href="{{ route('employee') }}" class="nav-item {{ request()->routeIs('employee') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-hard-hat"></i>
-                <span>Employee</span>
-            </a>
             <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-user-check"></i>
                 <span>Attendance</span>
             </a>
 
             <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-user-gear"></i>
-                <span>User Management</span>
+                <i class="nav-icon fas fa-users-gear"></i>
+                <span>Personnel</span>
             </a>
             <a href="{{ route('logs.index') }}" class="nav-item {{ request()->routeIs('logs.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-history"></i>
@@ -285,6 +285,34 @@
             <a href="{{ route('qa.materials') }}" class="nav-item {{ request()->routeIs('qa.materials') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-clipboard-check"></i>
                 <span>QA Materials</span>
+            </a>
+        @endif
+
+        <!-- SITE SUPERVISOR (SS): Site Operations -->
+        @if(auth()->check() && auth()->user()->role === 'SS')
+            <a href="{{ route('ss.dashboard') }}" class="nav-item {{ request()->routeIs('ss.dashboard') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-helmet-safety"></i>
+                <span>SS Dashboard</span>
+            </a>
+            <a href="{{ route('ss.projects') }}" class="nav-item {{ request()->routeIs('ss.projects', 'ss.project-view') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-folder-open"></i>
+                <span>My Projects</span>
+            </a>
+            <a href="{{ route('ss.progress-reports') }}" class="nav-item {{ request()->routeIs('ss.progress-reports*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-chart-line"></i>
+                <span>Daily Progress</span>
+            </a>
+            <a href="{{ route('ss.material-receipts') }}" class="nav-item {{ request()->routeIs('ss.material-receipts*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-truck"></i>
+                <span>Material Receipts</span>
+            </a>
+            <a href="{{ route('ss.issues') }}" class="nav-item {{ request()->routeIs('ss.issues*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-exclamation-triangle"></i>
+                <span>Issues & Incidents</span>
+            </a>
+            <a href="{{ route('ss.attendance') }}" class="nav-item {{ request()->routeIs('ss.attendance*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-user-check"></i>
+                <span>Attendance Verify</span>
             </a>
         @endif
 

@@ -1245,6 +1245,22 @@
             transition: width 0.3s ease;
         }
 
+        .finance-progress-fill.status-success {
+            background: linear-gradient(90deg, #1e40af, #60a5fa);
+        }
+
+        .finance-progress-fill.status-warning {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .finance-progress-fill.status-fail {
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+        }
+
+        .finance-progress-fill.status-info {
+            background: linear-gradient(90deg, #d1d5db, #e5e7eb);
+        }
+
         .finance-status {
             display: flex;
             justify-content: space-between;
@@ -1265,6 +1281,26 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+        }
+
+        .finance-status-badge.status-success {
+            background: rgba(30, 64, 175, 0.15);
+            color: #1e40af;
+        }
+
+        .finance-status-badge.status-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .finance-status-badge.status-fail {
+            background: rgba(220, 38, 38, 0.15);
+            color: #dc2626;
+        }
+
+        .finance-status-badge.status-info {
+            background: rgba(209, 213, 219, 0.15);
+            color: #d1d5db;
         }
 
         /* Attendance Card Styles */
@@ -1775,12 +1811,12 @@
                     </a>
 
                     <!-- Total Team Workers Card -->
-                    <a href="{{ route('employee') }}" class="kpi-card color-workers" title="View all employees">
+                    <a href="{{ route('admin.users.index') }}" class="kpi-card color-workers" title="View all personnel">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div>
                                 <div class="kpi-label">Team Workers</div>
                                 <div class="kpi-value">{{ number_format($summary['total_workers'] ?? 0) }}</div>
-                                <div class="kpi-subtitle">Active employees</div>
+                                <div class="kpi-subtitle">Active personnel</div>
                             </div>
                             <div class="kpi-icon">
                                 <i class="fas fa-users"></i>
@@ -2278,18 +2314,22 @@
                                     if ($projectBudget == 0) {
                                         $budgetStatus = 'info';
                                         $statusText = 'No Budget';
+                                        $statusClass = 'status-info';
                                         $statusColor = '#d1d5db';
                                     } elseif ($remainingBudget < 0) {
                                         $budgetStatus = 'fail';
                                         $statusText = 'Over Budget';
+                                        $statusClass = 'status-fail';
                                         $statusColor = '#dc2626';
                                     } elseif ($remainingBudget < ($projectBudget * 0.2)) {
                                         $budgetStatus = 'warning';
                                         $statusText = 'Critical';
+                                        $statusClass = 'status-warning';
                                         $statusColor = '#f59e0b';
                                     } else {
                                         $budgetStatus = 'success';
                                         $statusText = 'Healthy';
+                                        $statusClass = 'status-success';
                                         $statusColor = '#1e40af';
                                     }
                                 @endphp
@@ -2306,12 +2346,12 @@
                                             Spent: <strong>₱{{ number_format($totalSpent, 0) }}</strong> ({{ $percentageUsed }}%)
                                         </div>
                                         <div class="finance-progress-bar">
-                                            <div class="finance-progress-fill" style="width: {{ min($percentageUsed, 100) }}%; background: {{ $statusColor }};"></div>
+                                            <div class="finance-progress-fill {{ $statusClass }}" style="width: {{ min($percentageUsed, 100) }}%;"></div>
                                         </div>
                                     </div>
                                     <div class="finance-status">
                                         <span class="finance-status-label">Remaining</span>
-                                        <span class="finance-status-badge" style="background: {{ $statusColor }}20; color: {{ $statusColor }};">
+                                        <span class="finance-status-badge {{ $statusClass }}">
                                             {{ $statusText }}
                                         </span>
                                     </div>

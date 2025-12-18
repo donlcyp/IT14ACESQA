@@ -190,6 +190,32 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+    // ===== SITE SUPERVISOR (SS) ONLY: Site Operations =====
+    Route::middleware('role:SS')->group(function () {
+        // Dashboard
+        Route::get('/ss-dashboard', [App\Http\Controllers\SiteSupervisorController::class, 'index'])->name('ss.dashboard');
+
+        // Projects
+        Route::get('/ss-projects', [App\Http\Controllers\SiteSupervisorController::class, 'projects'])->name('ss.projects');
+        Route::get('/ss-projects/{project}', [App\Http\Controllers\SiteSupervisorController::class, 'viewProject'])->name('ss.project-view');
+
+        // Daily Progress Reports
+        Route::get('/ss-progress-reports', [App\Http\Controllers\SiteSupervisorController::class, 'progressReports'])->name('ss.progress-reports');
+        Route::post('/ss-progress-reports', [App\Http\Controllers\SiteSupervisorController::class, 'submitProgress'])->name('ss.progress-reports.store');
+
+        // Material Receipts
+        Route::get('/ss-material-receipts', [App\Http\Controllers\SiteSupervisorController::class, 'materialReceipts'])->name('ss.material-receipts');
+        Route::post('/ss-material-receipts/{material}/confirm', [App\Http\Controllers\SiteSupervisorController::class, 'confirmMaterialReceipt'])->name('ss.material-receipts.confirm');
+
+        // Issues & Incidents
+        Route::get('/ss-issues', [App\Http\Controllers\SiteSupervisorController::class, 'issues'])->name('ss.issues');
+        Route::post('/ss-issues', [App\Http\Controllers\SiteSupervisorController::class, 'submitIssue'])->name('ss.issues.store');
+
+        // Attendance Verification
+        Route::get('/ss-attendance', [App\Http\Controllers\SiteSupervisorController::class, 'attendanceVerification'])->name('ss.attendance');
+        Route::post('/ss-attendance/{attendance}/verify', [App\Http\Controllers\SiteSupervisorController::class, 'verifyAttendance'])->name('ss.attendance.verify');
+    });
+
     // ===== BUNDY CLOCK API ROUTES =====
     // These routes handle incoming data from bundy clock (time clock) devices
     // No authentication required - devices send data directly

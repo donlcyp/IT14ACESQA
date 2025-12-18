@@ -3,19 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\EmployeeList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
     /**
-     * Display a listing of users.
+     * Display a listing of users with filtering.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('name')->paginate(10);
+        $query = User::query();
+        
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+        
+        // Role filter
+        if ($request->filled('role')) {
+            $query->where('role', $request->input('role'));
+        }
+        
+        $users = $query->orderBy('name')->paginate(10)->withQueryString();
         $roles = $this->roles();
-        return view('admin.users.index', compact('users', 'roles'));
+        $allRoles = $this->allRolesForFilter();
+        $filters = $request->only(['search', 'role']);
+        
+        return view('admin.users.index', compact('users', 'roles', 'allRoles', 'filters'));
     }
 
     /**
@@ -65,5 +85,39 @@ class UserManagementController extends Controller
         }
 
         return $roles;
+    }
+    
+    /**
+     * Get all roles for filtering (including OWNER).
+     */
+    private function allRolesForFilter(): array
+    {
+        return [
+            'OWNER' => 'Owner',
+            'PM' => 'Project Manager',
+            'FM' => 'Finance Manager',
+            'HR' => 'HR/Timekeeper',
+            'QA' => 'Quality Assurance',
+            'SS' => 'Site Supervisor',
+            'CW' => 'Construction Worker',
+        ];
+    }
+    
+    /**
+     * Get role display name.
+     */
+    public static function getRoleDisplayName(string $role): string
+    {
+        $roleNames = [
+            'OWNER' => 'Owner',
+            'PM' => 'Project Manager',
+            'FM' => 'Finance Manager',
+            'HR' => 'HR/Timekeeper',
+            'QA' => 'Quality Assurance',
+            'SS' => 'Site Supervisor',
+            'CW' => 'Construction Worker',
+        ];
+        
+        return $roleNames[$role] ?? $role;
     }
 }
