@@ -882,7 +882,7 @@
                         </div>
                         @php
                             $currentUser = auth()->user();
-                            $isOwner = $currentUser && $currentUser->role === 'Owner';
+                            $canMarkComplete = $currentUser && in_array($currentUser->role, ['Owner', 'PM', 'FM']);
                             $allMaterials = $project->materials ?? collect();
                             $totalMaterialItems = $allMaterials->count();
                             // Progress based on QA status (passed materials)
@@ -890,16 +890,17 @@
                             $failedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'failed')->count();
                             $clearedItems = $passedMaterialItems + $failedMaterialItems;
                             $progressPercent = $totalMaterialItems > 0 ? round(($clearedItems / $totalMaterialItems) * 100, 1) : 0;
-                            $canComplete = $progressPercent >= 100 && $project->status !== 'Completed' && $project->pm_confirmed_at;
+                            $canComplete = $progressPercent >= 100 && $project->status !== 'Completed';
+                            $isCompleted = $project->status === 'Completed';
                         @endphp
-                        @if($isOwner && $project->status !== 'Completed')
-                            <button type="button" class="btn {{ $canComplete ? 'btn-green' : 'btn-secondary' }}" 
-                                    onclick="{{ $canComplete ? 'openCompleteProjectModal()' : 'showCannotCompleteMessage()' }}"
-                                    style="display: flex; align-items: center; gap: 8px; {{ !$canComplete ? 'opacity: 0.6; cursor: not-allowed;' : '' }}">
+                        @if($canMarkComplete && !$isCompleted && $progressPercent >= 100)
+                            <button type="button" class="btn btn-green" 
+                                    onclick="openCompleteProjectModal()"
+                                    style="display: flex; align-items: center; gap: 8px; animation: pulse-green 2s infinite;">
                                 <i class="fas fa-check-circle"></i>
                                 Mark as Complete
                             </button>
-                        @elseif($project->status === 'Completed')
+                        @elseif($isCompleted)
                             <span style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #dcfce7; color: #166534; border-radius: 8px; font-weight: 600; font-size: 14px;">
                                 <i class="fas fa-check-circle"></i> Project Completed
                             </span>
@@ -916,25 +917,73 @@
                     .badge-pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
                     .tabs { margin-top: 14px; border-bottom: 1px solid var(--gray-300); padding-bottom: 6px; }
                     .tab-button { margin-right: 8px; }
+                    
+                    /* Pulse animation for Mark as Complete button */
+                    @keyframes pulse-green {
+                        0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+                        70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+                        100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+                    }
+                    .btn-green {
+                        background: #16a34a !important;
+                        color: white !important;
+                        border: none;
+                    }
+                    .btn-green:hover {
+                        background: #15803d !important;
+                    }
                 </style>
+
+                @if($project->status === 'Completed')
+                <!-- Completed Project Banner -->
+                <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #16a34a; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 56px; height: 56px; background: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-trophy" style="font-size: 24px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; font-size: 18px; color: #166534; font-weight: 700;">
+                                <i class="fas fa-check-circle"></i> Project Successfully Completed
+                            </h3>
+                            <p style="margin: 4px 0 0; color: #15803d; font-size: 14px;">
+                                Completed on {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('F d, Y \a\t g:i A') : 'N/A' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="{{ route('pdf.project.download', $project->id) }}" class="btn" style="background: #166534; color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-file-pdf"></i> Download PDF Report
+                        </a>
+                        <a href="{{ route('csv.project.download', $project->id) }}" class="btn" style="background: white; color: #166534; border: 1px solid #16a34a; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </a>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Tabs -->
                 <div class="tabs">
-                    <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
-                    <button class="tab-button" onclick="switchTab('boq')">Bill of Quantity</button>
-                    <button class="tab-button" onclick="switchTab('finance')">Finance & Transactions</button>
-                    <button class="tab-button" onclick="switchTab('employees')">Team Workers</button>
-                    <button class="tab-button" onclick="switchTab('images')">Documentation</button>
-                    @if(auth()->user()->role === 'QA')
-                    <button class="tab-button" onclick="switchTab('qa-inspections')">
-                        <i class="fas fa-clipboard-check"></i> QA Inspections
-                    </button>
+                    @if($project->status !== 'Completed')
+                        <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+                        <button class="tab-button" onclick="switchTab('boq')">Bill of Quantity</button>
+                        <button class="tab-button" onclick="switchTab('finance')">Finance & Transactions</button>
+                        <button class="tab-button" onclick="switchTab('employees')">Team Workers</button>
+                        <button class="tab-button" onclick="switchTab('images')">Documentation</button>
+                        @if(auth()->user()->role === 'QA')
+                        <button class="tab-button" onclick="switchTab('qa-inspections')">
+                            <i class="fas fa-clipboard-check"></i> QA Inspections
+                        </button>
+                        @endif
+                        <button class="tab-button" onclick="switchTab('report')">Reports</button>
+                    @else
+                        <button class="tab-button active" onclick="switchTab('report')">
+                            <i class="fas fa-chart-bar"></i> Project Reports (Read Only)
+                        </button>
                     @endif
-                    <button class="tab-button" onclick="switchTab('report')">Reports</button>
                 </div>
 
                 <!-- Overview Tab -->
-                <div id="overview" class="tab-content active">
+                <div id="overview" class="tab-content {{ $project->status !== 'Completed' ? 'active' : '' }}">
                     <!-- Project Identification & Metadata -->
                     <div class="report-section">
                         <div class="report-title">Project Identification</div>
@@ -2066,7 +2115,7 @@
                 @endif
 
                 <!-- Reports Tab -->
-                <div id="report" class="tab-content">
+                <div id="report" class="tab-content {{ $project->status === 'Completed' ? 'active' : '' }}">
                     <!-- Reports Page - Formal, Printable System Outputs -->
                     <style>
                         .report-container { background: #fff; padding: 20px 24px 20px 24px; margin: 0 -24px; }

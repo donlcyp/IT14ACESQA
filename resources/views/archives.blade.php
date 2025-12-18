@@ -429,9 +429,79 @@
                 font-size: 14px;
             }
 
-            .audit-table thead th,
+            .audit-table thead {
+                display: none;
+            }
+
+            .audit-table tbody {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .audit-table tbody tr {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .audit-table tbody tr:last-child {
+                border-bottom: 1px solid #e5e7eb;
+            }
+
             .audit-table tbody td {
-                padding: 8px 12px;
+                padding: 8px 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .audit-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                min-width: 100px;
+                display: block;
+            }
+
+            .audit-table tbody td strong {
+                font-weight: 700;
+                color: #111827;
+            }
+
+            .audit-table tbody div {
+                flex-direction: column !important;
+                gap: 8px !important;
+                width: 100%;
+            }
+
+            .audit-table tbody .status-badge {
+                display: inline-block;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .audit-table tbody td::before {
+                min-width: 80px;
+                font-size: 12px;
+            }
+
+            .audit-table tbody td {
+                font-size: 13px;
+            }
+
+            .audit-button {
+                padding: 5px 10px !important;
+                font-size: 11px !important;
+            }
+
+            .toggle-btn {
+                padding: 5px 10px !important;
+                font-size: 11px !important;
             }
         }
 
@@ -571,10 +641,10 @@
                         <tbody>
                             @forelse ($projects as $project)
                                 <tr>
-                                    <td><strong>{{ $project->project_name }}</strong></td>
-                                    <td>{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</td>
-                                    <td>{{ $project->lead }}</td>
-                                    <td>
+                                    <td data-label="Project Name"><strong>{{ $project->project_name }}</strong></td>
+                                    <td data-label="Client">{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) }}</td>
+                                    <td data-label="Lead">{{ $project->lead }}</td>
+                                    <td data-label="Status">
                                         @php
                                             $archiveDisplayStatus = $project->status === 'On Track' ? 'Ongoing' : $project->status;
                                         @endphp
@@ -585,14 +655,14 @@
                                             @else background: #dbeafe; color: #1e40af; @endif
                                         ">{{ $archiveDisplayStatus }}</span>
                                     </td>
-                                    <td>
+                                    <td data-label="Archive Reason">
                                         <span class="status-badge" style="
                                             @if($project->archive_reason === 'Finished') background: #d1fae5; color: #065f46;
                                             @else background: #fee2e2; color: #991b1b; @endif
                                         ">{{ $project->archive_reason }}</span>
                                     </td>
-                                    <td>{{ $project->archived_at ? \Carbon\Carbon::parse($project->archived_at)->format('M d, Y') : '—' }}</td>
-                                    <td>
+                                    <td data-label="Archived Date">{{ $project->archived_at ? \Carbon\Carbon::parse($project->archived_at)->format('M d, Y') : '—' }}</td>
+                                    <td data-label="Action">
                                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                                             <form action="{{ route('projects.unarchive', $project) }}" method="POST" style="display:inline; margin:0;">
                                                 @csrf

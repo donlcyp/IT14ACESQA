@@ -788,21 +788,150 @@
             }
 
             .content-area {
-                padding: 20px;
+                padding: 15px;
+            }
+
+            .projects-header {
+                padding: 16px;
+                margin-bottom: 16px;
             }
 
             .projects-content {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .projects-title {
+                font-size: 20px;
+            }
+
+            .projects-actions {
+                width: 100%;
+            }
+
+            .projects-actions .projects-button-base {
+                flex: 1;
+                justify-content: center;
+            }
+
+            /* Mobile-friendly table layout */
+            .projects-table-card {
+                border-radius: 8px;
             }
 
             .projects-table {
+                font-size: 13px;
+            }
+
+            .projects-table thead {
+                display: none;
+            }
+
+            .projects-table tbody {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .projects-table tbody tr {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 12px;
+                background: #f9fafb;
+                gap: 8px;
+            }
+
+            .projects-table tbody tr:hover {
+                background: #ffffff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .projects-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 0;
+                border: none;
+                font-size: 13px;
+            }
+
+            .projects-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #6b7280;
+                min-width: 120px;
+            }
+
+            .projects-table tbody td:last-child::before {
+                content: "Actions";
+            }
+
+            .projects-table tbody td:last-child {
+                flex-direction: column;
+                align-items: stretch;
+                padding-top: 8px;
+                border-top: 1px solid #e5e7eb;
+                gap: 6px;
+            }
+
+            .projects-actions {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .projects-button-base {
+                padding: 8px 12px;
+                font-size: 12px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .projects-modal-content {
+                max-width: 95vw;
+                padding: 16px;
+            }
+
+            .projects-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .projects-modal-title {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 12px;
+            }
+
+            .projects-header {
+                padding: 12px;
+            }
+
+            .projects-title {
+                font-size: 18px;
+            }
+
+            .projects-button-base {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .projects-button-base i {
+                font-size: 11px;
+            }
+
+            .projects-table tbody td {
                 font-size: 12px;
             }
 
-            .projects-table thead th,
-            .projects-table tbody td {
-                padding: 8px 6px;
+            .projects-table tbody td::before {
+                min-width: 100px;
+                font-size: 12px;
             }
         }
 
@@ -974,22 +1103,22 @@
                                     data-name="{{ $project->project_code }}"
                                     data-status="{{ $project->status }}"
                                 >
-                                    <td>
+                                    <td data-label="Project Name">
                                         <a href="{{ route('projects.show', $project) }}" style="color: var(--accent); text-decoration: none;">
                                             {{ $project->project_name }}
                                         </a>
                                     </td>
-                                    <td>{{ $project->client_first_name ?: '—' }}</td>
-                                    <td>{{ $project->client_last_name ?: '—' }}</td>
-                                    <td>
+                                    <td data-label="First Name">{{ $project->client_first_name ?: '—' }}</td>
+                                    <td data-label="Last Name">{{ $project->client_last_name ?: '—' }}</td>
+                                    <td data-label="Status">
                                         <span class="status-badge {{ $badge['class'] }}">
                                             <i class="{{ $badge['icon'] }}"></i>
                                             {{ $displayStatus }}
                                         </span>
                                     </td>
-                                    <td>{{ $project->assignedPM?->name ?: '—' }}</td>
-                                    <td>{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
-                                    <td>
+                                    <td data-label="PM">{{ $project->assignedPM?->name ?: '—' }}</td>
+                                    <td data-label="Created">{{ optional($project->created_at)->diffForHumans() ?? 'Just now' }}</td>
+                                    <td data-label="Actions">
                                         <div class="projects-actions">
                                             <button
                                                 type="button"
@@ -1300,7 +1429,7 @@
                 <div class="projects-modal" id="editProjectModal" aria-hidden="true">
                     <div class="projects-modal-content" role="dialog" aria-modal="true">
                         <div class="projects-modal-header">
-                            <div class="projects-modal-title">Edit Project</div>
+                            <div class="projects-modal-title">Edit Project Details</div>
                             <button class="projects-modal-close" onclick="closeEditProjectModal()">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -1353,75 +1482,6 @@
                                         name="industry"
                                         placeholder="Enter industry"
                                     />
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label">Target Timeline</label>
-                                    <input
-                                        type="date"
-                                        class="projects-form-input"
-                                        id="editTargetTimeline"
-                                        name="target_timeline"
-                                    />
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label">Date Started</label>
-                                    <input
-                                        type="date"
-                                        class="projects-form-input"
-                                        id="editDateStarted"
-                                        name="date_started"
-                                    />
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label">Date Ended</label>
-                                    <input
-                                        type="date"
-                                        class="projects-form-input"
-                                        id="editDateEnded"
-                                        name="date_ended"
-                                    />
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label">Allocated Amount</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        class="projects-form-input"
-                                        id="editAllocatedAmount"
-                                        name="allocated_amount"
-                                        placeholder="Enter allocated budget"
-                                    />
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label">Status</label>
-                                    <select class="projects-form-select" id="editProjectStatus" name="status" required>
-                                        <option value="Ongoing">Ongoing</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
-                                    <div id="statusLockedMessage" style="display: none; color: #dc2626; font-size: 12px; margin-top: 6px;">
-                                        <i class="fas fa-lock"></i> This project status is locked and cannot be changed.
-                                    </div>
-                                </div>
-
-                                <div class="projects-form-group">
-                                    <label class="projects-form-label">Assigned PM</label>
-                                    <select
-                                        class="projects-form-input"
-                                        id="editAssignedPmId"
-                                        name="assigned_pm_id"
-                                    >
-                                        <option value="">-- Select a Project Manager --</option>
-                                        @foreach($projectManagers as $pm)
-                                            <option value="{{ $pm->id }}">
-                                                {{ $pm->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
                                 </div>
                             </div>
 
@@ -1522,12 +1582,6 @@
         const editDescription = document.getElementById('editDescription');
         const editLocation = document.getElementById('editLocation');
         const editIndustry = document.getElementById('editIndustry');
-        const editTargetTimeline = document.getElementById('editTargetTimeline');
-        const editDateStarted = document.getElementById('editDateStarted');
-        const editDateEnded = document.getElementById('editDateEnded');
-        const editAllocatedAmount = document.getElementById('editAllocatedAmount');
-        const editProjectStatus = document.getElementById('editProjectStatus');
-        const editAssignedPmId = document.getElementById('editAssignedPmId');
 
         // Employee Management Variables
         let currentProjectId = null;
@@ -1590,44 +1644,6 @@
                     if (editDescription) editDescription.value = data.description || '';
                     if (editLocation) editLocation.value = data.location || '';
                     if (editIndustry) editIndustry.value = data.industry || '';
-                    
-                    // Format dates for HTML date inputs (YYYY-MM-DD)
-                    const formatDateForInput = (dateString) => {
-                        if (!dateString) return '';
-                        const date = new Date(dateString);
-                        if (isNaN(date)) return '';
-                        return date.toISOString().split('T')[0];
-                    };
-                    
-                    if (editTargetTimeline) editTargetTimeline.value = formatDateForInput(data.target_timeline) || '';
-                    if (editDateStarted) editDateStarted.value = formatDateForInput(data.date_started) || '';
-                    if (editDateEnded) editDateEnded.value = formatDateForInput(data.date_ended) || '';
-                    if (editAllocatedAmount) editAllocatedAmount.value = data.allocated_amount || '';
-                    if (editProjectStatus) editProjectStatus.value = data.status || 'Ongoing';
-                    if (editAssignedPmId) editAssignedPmId.value = data.assigned_pm_id || '';
-
-                    // Disable status dropdown if project is Completed
-                    if (editProjectStatus && data.status === 'Completed') {
-                        editProjectStatus.disabled = true;
-                        editProjectStatus.style.opacity = '0.6';
-                        editProjectStatus.style.backgroundColor = '#f3f4f6';
-                        editProjectStatus.style.cursor = 'not-allowed';
-                        const statusLockedMsg = document.getElementById('statusLockedMessage');
-                        if (statusLockedMsg) {
-                            statusLockedMsg.style.display = 'block';
-                        }
-                    } else {
-                        if (editProjectStatus) {
-                            editProjectStatus.disabled = false;
-                            editProjectStatus.style.opacity = '1';
-                            editProjectStatus.style.backgroundColor = '';
-                            editProjectStatus.style.cursor = 'pointer';
-                        }
-                        const statusLockedMsg = document.getElementById('statusLockedMessage');
-                        if (statusLockedMsg) {
-                            statusLockedMsg.style.display = 'none';
-                        }
-                    }
 
                     if (editProjectModal) {
                         editProjectModal.classList.add('active');

@@ -127,33 +127,36 @@ class ProjectsController extends Controller
     public function complete(Project $project)
     {
         $user = auth()->user();
-        if (!$user || !in_array($user->role, ['Owner'])) {
+        if (!$user || !in_array($user->role, ['Owner', 'PM', 'FM'])) {
             abort(403);
-        }
-
-        // Require PM recommendation
-        if (empty($project->pm_confirmed_at)) {
-            return redirect()->back()->with('error', 'PM recommendation is required before completion.');
         }
 
         // Check materials clearance: all materials for the project must be Approved or Failed
         $materials = Material::where('project_id', $project->id)->get();
-
-        $blockers = $materials->where('status', '!=', 'Approved')
-            ->where('status', '!=', 'Fail')
-            ->count();
+        $totalMaterials = $materials->count();
         
-        if ($blockers > 0) {
-            return redirect()->back()->with('error', 'Not all materials are cleared (Approved/Failed).');
+        if ($totalMaterials === 0) {
+            return redirect()->back()->with('error', 'Cannot complete project with no materials/BOQ items.');
+        }
+
+        $clearedMaterials = $materials->filter(function($m) {
+            $qaStatus = strtolower($m->qa_status ?? '');
+            return $qaStatus === 'passed' || $qaStatus === 'failed';
+        })->count();
+        
+        $progressPercent = round(($clearedMaterials / $totalMaterials) * 100, 1);
+        
+        if ($progressPercent < 100) {
+            return redirect()->back()->with('error', 'Progress must be at 100% before completing. Current progress: ' . $progressPercent . '%');
         }
 
         // Mark completed
         $project->update([
             'status' => 'Completed',
-            'completed_date' => now()->toDateString(),
+            'date_ended' => now(),
         ]);
 
-        return redirect()->route('projects')->with('success', 'Project marked as Completed by Owner.');
+        return redirect()->route('projects.show', $project->id)->with('success', 'Project has been marked as Completed successfully!');
     }
 
     public function archives()
