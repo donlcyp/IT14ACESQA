@@ -216,6 +216,22 @@ Route::middleware('auth')->group(function () {
         Route::post('/ss-attendance/{attendance}/verify', [App\Http\Controllers\SiteSupervisorController::class, 'verifyAttendance'])->name('ss.attendance.verify');
     });
 
+    // ===== CONSTRUCTION WORKER (CW) ONLY: Worker Dashboard =====
+    Route::middleware('role:CW')->group(function () {
+        // Dashboard
+        Route::get('/cw-dashboard', [App\Http\Controllers\ConstructionWorkerController::class, 'index'])->name('cw.dashboard');
+        
+        // Tasks
+        Route::get('/cw-tasks', [App\Http\Controllers\ConstructionWorkerController::class, 'tasks'])->name('cw.tasks');
+        Route::post('/cw-tasks/{task}/complete', [App\Http\Controllers\ConstructionWorkerController::class, 'submitTaskCompletion'])->name('cw.tasks.complete');
+        
+        // Attendance
+        Route::get('/cw-attendance', [App\Http\Controllers\ConstructionWorkerController::class, 'attendance'])->name('cw.attendance');
+        
+        // Project View (read-only)
+        Route::get('/cw-projects/{project}', [App\Http\Controllers\ConstructionWorkerController::class, 'viewProject'])->name('cw.project.view');
+    });
+
     // ===== BUNDY CLOCK API ROUTES =====
     // These routes handle incoming data from bundy clock (time clock) devices
     // No authentication required - devices send data directly

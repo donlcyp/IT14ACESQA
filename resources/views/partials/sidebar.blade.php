@@ -198,8 +198,8 @@
 
     <nav class="nav-menu">
         <!-- Dashboard - Available to all roles (redirect to role-specific dashboard) -->
-        @if(auth()->check() && auth()->user()->role === 'SS')
-            {{-- SS users use their own dashboard link below --}}
+        @if(auth()->check() && in_array(auth()->user()->role, ['SS', 'CW', 'FM', 'HR']))
+            {{-- These roles use their own dashboard links below --}}
         @else
             <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-home"></i>
@@ -240,19 +240,31 @@
             </a>
         @endif
 
-        <!-- PROJECT MANAGER: Projects only -->
+        <!-- PROJECT MANAGER: Full project control -->
         @if(auth()->check() && auth()->user()->role === 'PM')
             <a href="{{ route('projects') }}" class="nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-tasks"></i>
                 <span>Projects</span>
             </a>
+            <a href="{{ route('archives') }}" class="nav-item {{ request()->routeIs('archives') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-archive"></i>
+                <span>Archives</span>
+            </a>
+            <a href="{{ route('employee-attendance') }}" class="nav-item {{ request()->routeIs('employee-attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-user-check"></i>
+                <span>Attendance</span>
+            </a>
+            <a href="{{ route('employee-attendance.history') }}" class="nav-item {{ request()->routeIs('employee-attendance.history') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-history"></i>
+                <span>Attendance History</span>
+            </a>
         @endif
 
         <!-- HR/TIMEKEEPER: Attendance Validation -->
         @if(auth()->check() && auth()->user()->role === 'HR')
-            <a href="{{ route('attendance-validation.dashboard') }}" class="nav-item {{ request()->routeIs('attendance-validation.*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-clipboard-check"></i>
-                <span>Attendance Validation</span>
+            <a href="{{ route('attendance-validation.dashboard') }}" class="nav-item {{ request()->routeIs('attendance-validation.dashboard') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <span>HR Dashboard</span>
             </a>
             <a href="{{ route('attendance-validation.index') }}" class="nav-item {{ request()->routeIs('attendance-validation.index') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-list-check"></i>
@@ -304,8 +316,12 @@
             </a>
         @endif
 
-        <!-- FM: Replacement Approvals -->
+        <!-- FM: Finance Manager Dashboard -->
         @if(auth()->check() && auth()->user()->role === 'FM')
+            <a href="{{ route('fm.dashboard') }}" class="nav-item {{ request()->routeIs('fm.dashboard') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <span>Finance Dashboard</span>
+            </a>
             <a href="{{ route('fm.replacement-approvals') }}" class="nav-item {{ request()->routeIs('fm.replacement-approvals') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-exchange-alt"></i>
                 <span>Replacement Approvals</span>
@@ -318,13 +334,29 @@
             </a>
         @endif
 
-        <!-- EMPLOYEE: My Attendance (for employees who have employee profile, excluding OWNER) -->
-        @if(auth()->check() && auth()->user()->role !== 'OWNER' && \App\Models\EmployeeList::where('user_id', auth()->user()->id)->exists())
+        <!-- CONSTRUCTION WORKER (CW): Worker Dashboard -->
+        @if(auth()->check() && auth()->user()->role === 'CW')
+            <a href="{{ route('cw.dashboard') }}" class="nav-item {{ request()->routeIs('cw.dashboard') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-hard-hat"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ route('cw.tasks') }}" class="nav-item {{ request()->routeIs('cw.tasks') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-tasks"></i>
+                <span>My Tasks</span>
+            </a>
+            <a href="{{ route('cw.attendance') }}" class="nav-item {{ request()->routeIs('cw.attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <span>My Attendance</span>
+            </a>
+        @endif
+
+        <!-- EMPLOYEE: My Attendance (for employees who have employee profile, excluding OWNER, SS, CW, HR) -->
+        @if(auth()->check() && !in_array(auth()->user()->role, ['OWNER', 'SS', 'CW', 'HR']) && \App\Models\EmployeeList::where('user_id', auth()->user()->id)->exists())
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span>My Attendance</span>
             </a>
-        @elseif(auth()->check() && auth()->user()->role !== 'OWNER')
+        @elseif(auth()->check() && !in_array(auth()->user()->role, ['OWNER', 'SS', 'CW', 'HR', 'FM']))
             <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span>Attendance</span>

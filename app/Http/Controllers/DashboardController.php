@@ -32,6 +32,16 @@ class DashboardController extends Controller
             return redirect()->route('ss.dashboard');
         }
         
+        // Check if user is CW role - redirect to Construction Worker dashboard
+        if ($user && $user->role === 'CW') {
+            return redirect()->route('cw.dashboard');
+        }
+        
+        // Check if user is HR role - redirect to Attendance Validation dashboard
+        if ($user && $user->role === 'HR') {
+            return redirect()->route('attendance-validation.dashboard');
+        }
+        
         // Get date filter parameters
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
