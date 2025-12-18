@@ -885,9 +885,10 @@
                             $isOwner = $currentUser && $currentUser->role === 'Owner';
                             $allMaterials = $project->materials ?? collect();
                             $totalMaterialItems = $allMaterials->count();
-                            $approvedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->status ?? 'pending') === 'approved')->count();
-                            $failedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->status ?? '') === 'fail')->count();
-                            $clearedItems = $approvedMaterialItems + $failedMaterialItems;
+                            // Progress based on QA status (passed materials)
+                            $passedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->qa_status ?? 'pending') === 'passed')->count();
+                            $failedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'failed')->count();
+                            $clearedItems = $passedMaterialItems + $failedMaterialItems;
                             $progressPercent = $totalMaterialItems > 0 ? round(($clearedItems / $totalMaterialItems) * 100, 1) : 0;
                             $canComplete = $progressPercent >= 100 && $project->status !== 'Completed' && $project->pm_confirmed_at;
                         @endphp
@@ -978,9 +979,9 @@
                             $allocatedBudget = $project->allocated_amount ?? 0;
                             $budgetUtilized = $allocatedBudget > 0 ? round(($totalExpenses / $allocatedBudget) * 100, 1) : 0;
                             
-                            // Calculate progress (based on approved BOQ items)
+                            // Calculate progress (based on QA passed materials)
                             $totalItems = $materials->count();
-                            $approvedItems = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'approved'; })->count();
+                            $approvedItems = $materials->filter(function($m) { return strtolower($m->qa_status ?? 'pending') === 'passed'; })->count();
                             $progressPercentage = $totalItems > 0 ? round(($approvedItems / $totalItems) * 100, 1) : 0;
                             
                             // Project health indicator (Green/Yellow/Red)
@@ -1254,9 +1255,6 @@
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
                                                         @endif
-                                                        <button class="btn" style="background: #e0e7ff; color: #4f46e5; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="viewBOQTasks({{ json_encode($material->item_description ?? '') }}, {{ $material->id }})">
-                                                            <i class="fas fa-tasks"></i>
-                                                        </button>
                                                         @if($project->status !== 'Completed')
                                                             <button type="button" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="confirmSingleDelete({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'this item') }}')">
                                                                 <i class="fas fa-trash"></i>
@@ -1320,23 +1318,23 @@
                                     return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
                                 });
                                 $approvedExpenses = $materials->filter(function($m) {
-                                    return strtolower($m->status ?? 'pending') === 'approved';
+                                    return strtolower($m->qa_status ?? 'pending') === 'passed';
                                 })->sum(function($m) {
                                     return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
                                 });
                                 $pendingExpenses = $materials->filter(function($m) {
-                                    return strtolower($m->status ?? 'pending') === 'pending';
+                                    return strtolower($m->qa_status ?? 'pending') === 'pending';
                                 })->sum(function($m) {
                                     return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
                                 });
                                 $failedExpenses = $materials->filter(function($m) {
-                                    return strtolower($m->status ?? 'pending') === 'failed';
+                                    return strtolower($m->qa_status ?? 'pending') === 'failed';
                                 })->sum(function($m) {
                                     return ($m->material_cost ?? 0) * ($m->quantity ?? 0) + ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
                                 });
-                                $approvedCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'approved'; })->count();
-                                $pendingCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'pending'; })->count();
-                                $failedCount = $materials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'failed'; })->count();
+                                $approvedCount = $materials->filter(function($m) { return strtolower($m->qa_status ?? 'pending') === 'passed'; })->count();
+                                $pendingCount = $materials->filter(function($m) { return strtolower($m->qa_status ?? 'pending') === 'pending'; })->count();
+                                $failedCount = $materials->filter(function($m) { return strtolower($m->qa_status ?? 'pending') === 'failed'; })->count();
                             @endphp
                             
                             <div class="info-item" style="border-left: 4px solid #a855f7;">
@@ -2138,6 +2136,9 @@
                                 <i class="fas fa-history"></i> Activity Log
                             </button>
                             @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
+                            <button class="report-nav-btn" onclick="switchReport('progress')">
+                                <i class="fas fa-tachometer-alt"></i> Progress Report
+                            </button>
                             <button class="report-nav-btn" onclick="switchReport('qa-failed')">
                                 <i class="fas fa-exclamation-triangle"></i> QA Failed Items
                             </button>
@@ -2179,10 +2180,10 @@
                                 $endDate = $project->date_ended ? \Carbon\Carbon::parse($project->date_ended) : null;
                                 $isDelayed = $targetDate && now()->gt($targetDate) && $project->status !== 'Completed';
                                 
-                                // Calculate progress (based on approved BOQ items - same as Overview)
+                                // Calculate progress (based on QA passed materials)
                                 $reportMaterials = $project->materials ?? collect();
                                 $totalItems = $reportMaterials->count();
-                                $approvedItems = $reportMaterials->filter(function($m) { return strtolower($m->status ?? 'pending') === 'approved'; })->count();
+                                $approvedItems = $reportMaterials->filter(function($m) { return strtolower($m->qa_status ?? 'pending') === 'passed'; })->count();
                                 $progress = $totalItems > 0 ? round(($approvedItems / $totalItems) * 100, 1) : 0;
                             @endphp
 
@@ -2398,8 +2399,8 @@
                                 $reportTotalMaterial = 0;
                                 $reportTotalLabor = 0;
                                 $reportGrandTotal = 0;
-                                $boqApprovedCount = $boqItems->filter(fn($m) => strtolower($m->status ?? 'pending') === 'approved')->count();
-                                $boqFailedCount = $boqItems->filter(fn($m) => strtolower($m->status ?? '') === 'fail')->count();
+                                $boqApprovedCount = $boqItems->filter(fn($m) => strtolower($m->qa_status ?? 'pending') === 'passed')->count();
+                                $boqFailedCount = $boqItems->filter(fn($m) => strtolower($m->qa_status ?? '') === 'failed')->count();
                                 $boqPendingCount = $boqItems->count() - $boqApprovedCount - $boqFailedCount;
                             @endphp
 
@@ -2597,22 +2598,37 @@
                                 $plannedEnd = $project->target_timeline ? \Carbon\Carbon::parse($project->target_timeline) : null;
                                 $actualEnd = $project->date_ended ? \Carbon\Carbon::parse($project->date_ended) : null;
                                 
+                                // Calculate planned duration
+                                $plannedDuration = 0;
+                                if ($plannedStart && $plannedEnd) {
+                                    $plannedDuration = (int) $plannedStart->diffInDays($plannedEnd);
+                                }
+                                
+                                // Calculate actual duration or elapsed days
+                                $actualDuration = 0;
+                                if ($plannedStart && $actualEnd) {
+                                    $actualDuration = (int) $plannedStart->diffInDays($actualEnd);
+                                } elseif ($plannedStart && $project->status !== 'Completed') {
+                                    $actualDuration = (int) $plannedStart->diffInDays(now());
+                                }
+                                
+                                // Calculate variance
                                 $varianceDays = 0;
                                 if ($plannedEnd && $actualEnd) {
-                                    $varianceDays = $plannedEnd->diffInDays($actualEnd, false);
+                                    $varianceDays = (int) $plannedEnd->diffInDays($actualEnd, false);
                                 } elseif ($plannedEnd && $project->status !== 'Completed') {
-                                    $varianceDays = $plannedEnd->diffInDays(now(), false);
+                                    $varianceDays = (int) $plannedEnd->diffInDays(now(), false);
                                 }
                             @endphp
 
                             <div class="report-summary">
                                 <div class="report-summary-item">
                                     <div class="report-summary-label">Planned Duration</div>
-                                    <div class="report-summary-value">{{ $plannedStart && $plannedEnd ? $plannedStart->diffInDays($plannedEnd) : '-' }} days</div>
+                                    <div class="report-summary-value">{{ $plannedDuration }} days</div>
                                 </div>
                                 <div class="report-summary-item">
                                     <div class="report-summary-label">Actual Duration</div>
-                                    <div class="report-summary-value">{{ $plannedStart && $actualEnd ? $plannedStart->diffInDays($actualEnd) : ($plannedStart ? $plannedStart->diffInDays(now()) : '-') }} days</div>
+                                    <div class="report-summary-value">{{ $actualDuration }} days</div>
                                 </div>
                                 <div class="report-summary-item">
                                     <div class="report-summary-label">Variance</div>
@@ -2852,6 +2868,267 @@
                                 <strong>Report Date:</strong> {{ now()->format('F d, Y h:i A') }}
                             </div>
                         </div>
+
+                        <!-- Progress Report (PM/FM/OWNER Only) -->
+                        @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
+                        <div id="report-progress" class="report-panel">
+                            <div class="report-header">
+                                <div>
+                                    <h3 class="report-header-title">Progress Report</h3>
+                                    <p class="report-header-subtitle">Real-time project progress metrics - Generated on {{ now()->format('F d, Y h:i A') }}</p>
+                                </div>
+                                <div class="report-actions">
+                                    <button class="report-action-btn print" onclick="window.print()">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                </div>
+                            </div>
+
+                            @php
+                                // Calculate progress metrics
+                                $materials = $project->materials ?? collect();
+                                $totalMaterials = $materials->count();
+                                $approvedMaterials = $materials->where('qa_status', 'passed')->count();
+                                $failedMaterials = $materials->where('qa_status', 'failed')->count();
+                                $pendingMaterials = $materials->where('qa_status', 'pending')->count();
+                                $recheckMaterials = $materials->where('qa_status', 'recheck')->count();
+                                
+                                $overallProgress = $totalMaterials > 0 ? round(($approvedMaterials / $totalMaterials) * 100, 1) : 0;
+                                
+                                // Timeline metrics
+                                $startDate = $project->date_started ? \Carbon\Carbon::parse($project->date_started) : null;
+                                $targetDate = $project->target_timeline ? \Carbon\Carbon::parse($project->target_timeline) : null;
+                                $now = \Carbon\Carbon::now();
+                                
+                                $totalDays = $startDate && $targetDate ? $startDate->diffInDays($targetDate) : 0;
+                                $elapsedDays = $startDate ? $startDate->diffInDays($now) : 0;
+                                $remainingDays = $targetDate ? max(0, $now->diffInDays($targetDate)) : 0;
+                                
+                                $timelineProgress = $totalDays > 0 ? round(($elapsedDays / $totalDays) * 100, 1) : 0;
+                                $isOnSchedule = !$targetDate || $now->lte($targetDate);
+                                
+                                // Budget metrics
+                                $allocatedBudget = $project->allocated_budget ?? 0;
+                                $totalExpenses = 0;
+                                
+                                if ($materials->count() > 0) {
+                                    $totalExpenses = $materials->sum(function($m) {
+                                        $materialCost = ($m->material_cost ?? 0) * ($m->quantity ?? 0);
+                                        $laborCost = ($m->labor_cost ?? 0) * ($m->quantity ?? 0);
+                                        return $materialCost + $laborCost;
+                                    });
+                                }
+                                
+                                $budgetUtilized = $allocatedBudget > 0 ? round(($totalExpenses / $allocatedBudget) * 100, 1) : 0;
+                                $budgetRemaining = max(0, $allocatedBudget - $totalExpenses);
+                                $isBudgetOverflow = $totalExpenses > $allocatedBudget;
+                                
+                                // Team metrics
+                                $assignedEmployees = $projectEmployees[$project->id] ?? [];
+                                $totalEmployees = count($assignedEmployees);
+                                
+                                // Task metrics
+                                $tasks = $project->updates()->where('type', 'task')->get() ?? collect();
+                                $completedTasks = $tasks->where('status', 'Completed')->count();
+                                $totalTasks = $tasks->count();
+                                $taskProgress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100, 1) : 0;
+                            @endphp
+
+                            <!-- Key Metrics Summary -->
+                            <div class="report-summary">
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Overall Progress</div>
+                                    <div class="report-summary-value" style="color: var(--accent);">{{ $overallProgress }}%</div>
+                                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 6px;">{{ $approvedMaterials }}/{{ $totalMaterials }} items approved</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Schedule Progress</div>
+                                    <div class="report-summary-value" style="color: {{ $isOnSchedule ? '#16a34a' : '#dc2626' }};">{{ $timelineProgress }}%</div>
+                                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 6px;">{{ $elapsedDays }} of {{ $totalDays }} days elapsed</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Budget Utilization</div>
+                                    <div class="report-summary-value" style="color: {{ $isBudgetOverflow ? '#dc2626' : '#16a34a' }};">{{ $budgetUtilized }}%</div>
+                                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 6px;">₱{{ number_format($totalExpenses, 2) }} spent</div>
+                                </div>
+                                <div class="report-summary-item">
+                                    <div class="report-summary-label">Task Completion</div>
+                                    <div class="report-summary-value" style="color: var(--accent);">{{ $taskProgress }}%</div>
+                                    <div style="font-size: 12px; color: var(--gray-600); margin-top: 6px;">{{ $completedTasks }}/{{ $totalTasks }} tasks completed</div>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Progress Breakdown -->
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px;">
+                                    <i class="fas fa-cube" style="color: var(--accent); margin-right: 8px;"></i> Material/BOQ Progress
+                                </h4>
+                                
+                                <!-- Progress bar for overall completion -->
+                                <div style="background: #f3f4f6; border-radius: 8px; overflow: hidden; height: 24px; margin-bottom: 16px;">
+                                    <div style="height: 100%; background: linear-gradient(90deg, var(--accent), #0369a1); width: {{ $overallProgress }}%; transition: width 0.3s; display: flex; align-items: center; justify-content: center;">
+                                        <span style="color: white; font-size: 12px; font-weight: 600;">{{ $overallProgress }}%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Status breakdown -->
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                                    <div style="background: #ecfdf5; padding: 12px; border-radius: 6px; border-left: 4px solid #10b981;">
+                                        <div style="font-size: 12px; color: #166534; font-weight: 600;">APPROVED</div>
+                                        <div style="font-size: 20px; font-weight: 700; color: #10b981; margin-top: 4px;">{{ $approvedMaterials }}</div>
+                                    </div>
+                                    <div style="background: #fef3c7; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                                        <div style="font-size: 12px; color: #92400e; font-weight: 600;">PENDING</div>
+                                        <div style="font-size: 20px; font-weight: 700; color: #f59e0b; margin-top: 4px;">{{ $pendingMaterials }}</div>
+                                    </div>
+                                    <div style="background: #fef2f2; padding: 12px; border-radius: 6px; border-left: 4px solid #dc2626;">
+                                        <div style="font-size: 12px; color: #991b1b; font-weight: 600;">FAILED</div>
+                                        <div style="font-size: 20px; font-weight: 700; color: #dc2626; margin-top: 4px;">{{ $failedMaterials }}</div>
+                                    </div>
+                                    <div style="background: #e0e7ff; padding: 12px; border-radius: 6px; border-left: 4px solid #6366f1;">
+                                        <div style="font-size: 12px; color: #3730a3; font-weight: 600;">RECHECK</div>
+                                        <div style="font-size: 20px; font-weight: 700; color: #6366f1; margin-top: 4px;">{{ $recheckMaterials }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timeline & Schedule -->
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px;">
+                                    <i class="fas fa-calendar-alt" style="color: var(--accent); margin-right: 8px;"></i> Timeline & Schedule
+                                </h4>
+                                
+                                <div class="report-details-grid">
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Start Date</div>
+                                        <div class="report-detail-value">{{ $startDate ? $startDate->format('F d, Y') : 'Not set' }}</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Target Completion</div>
+                                        <div class="report-detail-value">{{ $targetDate ? $targetDate->format('F d, Y') : 'Not set' }}</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Days Elapsed</div>
+                                        <div class="report-detail-value">{{ $elapsedDays }} / {{ $totalDays }} days</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Days Remaining</div>
+                                        <div class="report-detail-value" style="color: {{ $remainingDays > 0 ? '#16a34a' : '#dc2626' }};">
+                                            {{ $remainingDays > 0 ? $remainingDays . ' days' : 'Overdue' }}
+                                        </div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Schedule Status</div>
+                                        <div class="report-detail-value" style="color: {{ $isOnSchedule ? '#16a34a' : '#dc2626' }};">
+                                            <i class="fas fa-{{ $isOnSchedule ? 'check-circle' : 'exclamation-circle' }}"></i>
+                                            {{ $isOnSchedule ? 'On Schedule' : 'Delayed' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Timeline progress bar -->
+                                <div style="background: #f3f4f6; border-radius: 8px; overflow: hidden; height: 12px; margin-top: 16px;">
+                                    <div style="height: 100%; background: linear-gradient(90deg, #3b82f6, #1e40af); width: {{ min($timelineProgress, 100) }}%; transition: width 0.3s;"></div>
+                                </div>
+                                <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px; text-align: right;">{{ $timelineProgress }}% of timeline complete</div>
+                            </div>
+
+                            <!-- Budget Analysis -->
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px;">
+                                    <i class="fas fa-coins" style="color: var(--accent); margin-right: 8px;"></i> Budget Analysis
+                                </h4>
+                                
+                                <div class="report-details-grid">
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Allocated Budget</div>
+                                        <div class="report-detail-value">₱{{ number_format($allocatedBudget, 2) }}</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Total Expenses</div>
+                                        <div class="report-detail-value" style="color: {{ $isBudgetOverflow ? '#dc2626' : 'var(--black-1)' }};">₱{{ number_format($totalExpenses, 2) }}</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Remaining Budget</div>
+                                        <div class="report-detail-value" style="color: {{ $budgetRemaining < 0 ? '#dc2626' : '#16a34a' }};">₱{{ number_format($budgetRemaining, 2) }}</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Budget Utilization</div>
+                                        <div class="report-detail-value" style="color: {{ $isBudgetOverflow ? '#dc2626' : 'var(--black-1)' }};">{{ $budgetUtilized }}%</div>
+                                    </div>
+                                </div>
+
+                                <!-- Budget bar -->
+                                <div style="background: #f3f4f6; border-radius: 8px; overflow: hidden; height: 16px; margin-top: 16px;">
+                                    <div style="height: 100%; background: {{ $budgetUtilized > 100 ? '#dc2626' : ($budgetUtilized > 80 ? '#f59e0b' : '#10b981') }}; width: {{ min($budgetUtilized, 100) }}%; transition: width 0.3s;"></div>
+                                </div>
+                                @if($isBudgetOverflow)
+                                <div style="background: #fef2f2; padding: 12px; border-radius: 6px; margin-top: 12px; border-left: 4px solid #dc2626;">
+                                    <div style="font-size: 13px; color: #991b1b;">
+                                        <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                                        <strong>Budget Overflow:</strong> Project expenses exceed allocated budget by ₱{{ number_format($totalExpenses - $allocatedBudget, 2) }}
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- Team & Resources -->
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px;">
+                                    <i class="fas fa-users" style="color: var(--accent); margin-right: 8px;"></i> Team & Resources
+                                </h4>
+                                
+                                <div class="report-details-grid">
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Team Members Assigned</div>
+                                        <div class="report-detail-value">{{ $totalEmployees }} employee(s)</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Total Materials/BOQ Items</div>
+                                        <div class="report-detail-value">{{ $totalMaterials }} item(s)</div>
+                                    </div>
+                                    <div class="report-detail-item">
+                                        <div class="report-detail-label">Active Tasks</div>
+                                        <div class="report-detail-value">{{ $totalTasks }} task(s)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Summary Notes -->
+                            <div style="margin-top: 32px;">
+                                <h4 style="font-size: 16px; font-weight: 600; color: var(--black-1); margin-bottom: 16px;">
+                                    <i class="fas fa-list-check" style="color: var(--accent); margin-right: 8px;"></i> Progress Summary
+                                </h4>
+                                
+                                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent);">
+                                    <ul style="list-style: none; padding: 0; margin: 0;">
+                                        <li style="padding: 8px 0; font-size: 14px; color: var(--gray-700);">
+                                            <i class="fas fa-{{ $overallProgress >= 75 ? 'check-circle' : 'circle' }}" style="color: {{ $overallProgress >= 75 ? '#10b981' : '#9ca3af' }}; margin-right: 8px;"></i>
+                                            <strong>Material Progress:</strong> {{ $overallProgress }}% complete with {{ $approvedMaterials }} approved items
+                                        </li>
+                                        <li style="padding: 8px 0; font-size: 14px; color: var(--gray-700);">
+                                            <i class="fas fa-{{ $isOnSchedule ? 'check-circle' : 'exclamation-circle' }}" style="color: {{ $isOnSchedule ? '#10b981' : '#dc2626' }}; margin-right: 8px;"></i>
+                                            <strong>Schedule Status:</strong> {{ $isOnSchedule ? 'Project is on schedule' : 'Project is delayed by ' . abs($remainingDays) . ' day(s)' }}
+                                        </li>
+                                        <li style="padding: 8px 0; font-size: 14px; color: var(--gray-700);">
+                                            <i class="fas fa-{{ !$isBudgetOverflow ? 'check-circle' : 'exclamation-circle' }}" style="color: {{ !$isBudgetOverflow ? '#10b981' : '#dc2626' }}; margin-right: 8px;"></i>
+                                            <strong>Budget Status:</strong> {{ !$isBudgetOverflow ? '✓ Within budget' : '⚠ Exceeded budget' }} - {{ $budgetUtilized }}% utilized
+                                        </li>
+                                        <li style="padding: 8px 0; font-size: 14px; color: var(--gray-700);">
+                                            <i class="fas fa-{{ $failedMaterials == 0 ? 'check-circle' : 'exclamation-circle' }}" style="color: {{ $failedMaterials == 0 ? '#10b981' : '#dc2626' }}; margin-right: 8px;"></i>
+                                            <strong>Quality Status:</strong> {{ $failedMaterials }} item(s) failed QA inspection
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="report-footer">
+                                <strong>Last Updated:</strong> {{ now()->format('F d, Y h:i A') }}<br>
+                                <strong>Next Review Recommended:</strong> Within 3-5 business days<br>
+                                <p style="margin-top: 8px; font-size: 12px;">This report provides a comprehensive overview of project progress across all critical dimensions including materials, schedule, budget, and team performance.</p>
+                            </div>
+                        </div>
+                        @endif
 
                         <!-- 7. QA Failed Items Report (PM/FM/OWNER Only) -->
                         @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
@@ -3584,135 +3861,9 @@
         </div>
         @endif
 
-        <!-- BOQ Tasks Modal -->
-        <div id="boqTasksModal" class="modal" style="display: none;">
-            <div class="modal-content" style="max-width: 700px;">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="boqTasksTitle">Tasks for Item</h2>
-                    <button class="modal-close" onclick="closeBOQTasksModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+        <!-- BOQ Tasks Modal - REMOVED (SS handles tasks exclusively) -->
 
-                <div style="padding: 20px;">
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="margin: 0 0 10px 0; color: #1f2937;">Item Details:</h4>
-                        <div id="boqItemDetails" style="background: #f3f4f6; padding: 12px; border-radius: 6px; font-size: 14px; color: #374151;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        @if($project->status !== 'Completed')
-                            <button type="button" class="btn btn-primary" onclick="openAddTaskModal()" style="width: 100%; padding: 10px 16px;">
-                                <i class="fas fa-plus"></i> Add Task for This Item
-                            </button>
-                        @else
-                            <div style="width: 100%; padding: 10px 16px; background-color: #e5e7eb; color: #6b7280; border-radius: 6px; font-size: 14px; font-weight: 500; text-align: center;">
-                                <i class="fas fa-lock"></i> Project Completed - No additions allowed
-                            </div>
-                        @endif
-                    </div>
-
-                    <div>
-                        <h4 style="margin: 0 0 15px 0; color: #1f2937;">Related Project Tasks:</h4>
-                        
-                        <!-- Task Status Filter -->
-                        <div style="margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button type="button" class="task-filter-btn" data-filter="all" onclick="filterTasks('all')" 
-                                style="padding: 6px 14px; border: 2px solid var(--accent); background: var(--accent); color: white; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
-                                <i class="fas fa-check"></i> All Tasks
-                            </button>
-                            <button type="button" class="task-filter-btn" data-filter="ongoing" onclick="filterTasks('ongoing')"
-                                style="padding: 6px 14px; border: 2px solid #3b82f6; background: white; color: #3b82f6; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
-                                <i class="fas fa-hourglass-half"></i> Ongoing
-                            </button>
-                            <button type="button" class="task-filter-btn" data-filter="completed" onclick="filterTasks('completed')"
-                                style="padding: 6px 14px; border: 2px solid #1e40af; background: white; color: #1e40af; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
-                                <i class="fas fa-check-circle"></i> Completed
-                            </button>
-                        </div>
-
-                        <div id="boqTasksList" style="max-height: 400px; overflow-y: auto;">
-                            <div class="updates-timeline">
-                                @forelse($project->updates as $update)
-                                    <div class="timeline-item task-item" data-status="{{ strtolower($update->status === 'Completed' ? 'completed' : 'ongoing') }}" style="margin-bottom: 15px;">
-                                        <div class="timeline-marker" style="background-color: @if($update->status === 'Completed') #1e40af @else #3b82f6 @endif;"></div>
-                                        <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
-                                            <div class="timeline-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                                <div style="flex: 1;">
-                                                    <h5 style="margin: 0 0 5px 0; color: #1f2937;">{{ $update->title }}</h5>
-                                                </div>
-                                                <select onchange="updateTaskStatus({{ $update->id }}, this.value)" @if($update->status === 'Completed') disabled @endif style="background-color: @if($update->status === 'Completed') #dcfce7; color: #166534; @else #bfdbfe; color: #1e40af; @endif; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: @if($update->status === 'Completed') not-allowed; opacity: 0.6; @else pointer; @endif font-weight: 600;">
-                                                    <option value="ongoing" @if($update->status !== 'Completed') selected @endif>
-                                                        <i class="fas fa-hourglass-half"></i> Ongoing
-                                                    </option>
-                                                    <option value="completed" @if($update->status === 'Completed') selected @endif>
-                                                        <i class="fas fa-check-circle"></i> Completed
-                                                    </option>
-                                                </select>
-                                            </div>
-                                            <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">{{ $update->description }}</p>
-                                            <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
-                                                <i class="fas fa-calendar"></i> {{ $update->created_at->format('M d, Y') }}
-                                                <i class="fas fa-user" style="margin-left: 10px;"></i> {{ $update->updatedBy?->name ?? 'Unknown' }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <div style="text-align: center; padding: 20px; color: #9ca3af;">
-                                        <i class="fas fa-tasks" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
-                                        <p>No tasks available for this project yet.</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add Task Modal for BOQ Item -->
-        <div id="addTaskModal" class="modal" style="display: none;">
-            <div class="modal-content" style="max-width: 600px;">
-                <div class="modal-header">
-                    <h2 class="modal-title">Add Task for Item</h2>
-                    <button class="modal-close" onclick="closeAddTaskModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <form id="addTaskForm" method="POST" action="{{ route('projects.updates.store', $project->id) }}" onsubmit="return submitAddTaskForm(event)">
-                    @csrf
-                    <input type="hidden" id="currentBOQItemId" name="material_id" value="">
-                    <input type="hidden" id="currentBOQItemName" name="boq_item_name" value="">
-                    <input type="hidden" name="status" value="Ongoing">
-                    
-                    <div style="padding: 20px;">
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Task Title *</label>
-                            <input type="text" id="taskTitle" name="title" placeholder="Enter task title" required 
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px;">
-                        </div>
-
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Description *</label>
-                            <textarea id="taskDescription" name="description" placeholder="Enter task description" required rows="3"
-                                style="width: 100%; padding: 8px; border: 1px solid var(--gray-400); border-radius: 4px; font-size: 14px; font-family: 'Inter', sans-serif;"></textarea>
-                        </div>
-
-                        <div style="margin-bottom: 15px; padding: 12px; background: #f0f9ff; border-left: 4px solid #0369a1; border-radius: 4px;">
-                            <small style="color: #0369a1; display: block;">
-                                <i class="fas fa-info-circle"></i> This task will be linked to: <strong id="linkedItemDisplay"></strong>
-                            </small>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Add Task</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <!-- Add Task Modal for BOQ Item - REMOVED (SS handles tasks) -->
 
         <!-- Delete Confirmation Modal -->
         <div id="deleteConfirmModal" class="modal" style="display: none;">
@@ -5243,343 +5394,8 @@
             document.getElementById('boqLaborCost').value = laborCost.toFixed(2);
         }
 
-        // BOQ Tasks Modal Functions
-        let currentBOQItem = {
-            id: null,
-            description: null
-        };
-
-        function viewBOQTasks(itemDescription, materialId) {
-            try {
-                const modal = document.getElementById('boqTasksModal');
-                const title = document.getElementById('boqTasksTitle');
-                const details = document.getElementById('boqItemDetails');
-                
-                if (!modal) {
-                    showNotification('Tasks modal not found', 'error');
-                    console.error('boqTasksModal element not found');
-                    return;
-                }
-                
-                if (!title) {
-                    showNotification('Modal title element not found', 'error');
-                    console.error('boqTasksTitle element not found');
-                    return;
-                }
-                
-                if (!details) {
-                    showNotification('Modal details element not found', 'error');
-                    console.error('boqItemDetails element not found');
-                    return;
-                }
-                
-                // Store current BOQ item for task creation
-                currentBOQItem.id = materialId;
-                currentBOQItem.description = itemDescription;
-                
-                title.textContent = 'Tasks for: ' + (itemDescription || 'Unknown Item');
-                details.innerHTML = `
-                    <strong>Item Description:</strong><br>
-                    ${itemDescription || 'N/A'}<br><br>
-                    <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">
-                        <i class="fas fa-info-circle"></i> View all project tasks related to this BOQ item
-                    </div>
-                `;
-                
-                loadTasksForItem(materialId);
-                modal.style.display = 'flex';
-                console.log('BOQ Tasks modal opened for item:', itemDescription, 'ID:', materialId);
-            } catch (error) {
-                console.error('Error in viewBOQTasks:', error);
-                showNotification('Error opening tasks modal: ' + error.message, 'error');
-            }
-        }
-
-        function closeBOQTasksModal() {
-            const modal = document.getElementById('boqTasksModal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        function loadTasksForItem(materialId) {
-            const tasksList = document.getElementById('boqTasksList');
-            
-            if (!tasksList) {
-                console.error('boqTasksList element not found');
-                showNotification('Tasks list container not found', 'error');
-                return;
-            }
-            
-            // Show loading state
-            tasksList.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading tasks...</div>';
-            
-            // Filter the tasks based on material_id
-            fetch(`/projects/{{ $project->id }}/tasks?material_id=${materialId}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                console.log('Tasks fetch response status:', response.status);
-                if (!response.ok) throw new Error('Failed to load tasks (HTTP ' + response.status + ')');
-                return response.json();
-            })
-            .then(data => {
-                console.log('Tasks data received:', data);
-                if (data.tasks && data.tasks.length > 0) {
-                    let html = '<div class="updates-timeline">';
-                    
-                    data.tasks.forEach(task => {
-                        const taskStatus = task.status === 'Completed' ? 'completed' : 'ongoing';
-                        const statusBg = task.status === 'Completed' ? '#1e40af' : '#3b82f6';
-                        const statusBgColor = task.status === 'Completed' ? '#dcfce7' : '#bfdbfe';
-                        const statusTextColor = task.status === 'Completed' ? '#166534' : '#1e40af';
-                        
-                        html += `
-                            <div class="timeline-item task-item" data-status="${taskStatus}" style="margin-bottom: 15px;">
-                                <div class="timeline-marker" style="background-color: ${statusBg};"></div>
-                                <div class="timeline-content" style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 2px solid #e5e7eb;">
-                                    <div class="timeline-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                        <div style="flex: 1;">
-                                            <h5 style="margin: 0 0 5px 0; color: #1f2937;">${task.title}</h5>
-                                        </div>
-                                        <select onchange="updateTaskStatus(${task.id}, this.value)" ${task.status === 'Completed' ? 'disabled' : ''} style="background-color: ${statusBgColor}; color: ${statusTextColor}; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: ${task.status === 'Completed' ? 'not-allowed; opacity: 0.6;' : 'pointer;'} font-weight: 600; margin-left: 10px;">
-                                            <option value="ongoing" ${task.status !== 'Completed' ? 'selected' : ''}>
-                                                Ongoing
-                                            </option>
-                                            <option value="completed" ${task.status === 'Completed' ? 'selected' : ''}>
-                                                Completed
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">${task.description}</p>
-                                    <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
-                                        <i class="fas fa-calendar"></i> ${new Date(task.created_at).toLocaleDateString()}
-                                        <i class="fas fa-user" style="margin-left: 10px;"></i> ${task.updated_by_user?.name || 'Unknown'}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div>';
-                    tasksList.innerHTML = html;
-                    
-                    // Reset filter to 'all' after loading
-                    document.querySelectorAll('.task-filter-btn').forEach(btn => btn.style.background = 'white');
-                    document.querySelectorAll('.task-filter-btn').forEach(btn => btn.style.color = 'inherit');
-                    const allBtn = document.querySelector('.task-filter-btn[data-filter="all"]');
-                    if (allBtn) {
-                        allBtn.style.background = 'var(--accent)';
-                        allBtn.style.color = 'white';
-                    }
-                } else {
-                    tasksList.innerHTML = `
-                        <div style="text-align: center; padding: 20px; color: #9ca3af;">
-                            <i class="fas fa-tasks" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
-                            <p>No tasks assigned to this item yet. Click "Add Task for This Item" to create one.</p>
-                        </div>
-                    `;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading tasks:', error);
-                tasksList.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #dc2626;">
-                        <p>Error loading tasks. Please try again.</p>
-                    </div>
-                `;
-            });
-        }
-
-        function filterTasks(filter) {
-            // Update button styles
-            document.querySelectorAll('.task-filter-btn').forEach(btn => {
-                btn.style.background = 'white';
-                btn.style.color = btn.getAttribute('data-filter') === 'ongoing' ? '#3b82f6' : 
-                                   btn.getAttribute('data-filter') === 'completed' ? '#1e40af' : 'inherit';
-            });
-            
-            // Highlight active filter
-            const activeBtn = document.querySelector(`.task-filter-btn[data-filter="${filter}"]`);
-            if (activeBtn) {
-                if (filter === 'all') {
-                    activeBtn.style.background = 'var(--accent)';
-                    activeBtn.style.color = 'white';
-                } else if (filter === 'ongoing') {
-                    activeBtn.style.background = '#3b82f6';
-                    activeBtn.style.color = 'white';
-                } else if (filter === 'completed') {
-                    activeBtn.style.background = '#1e40af';
-                    activeBtn.style.color = 'white';
-                }
-            }
-            
-            // Filter task items
-            const taskItems = document.querySelectorAll('.task-item');
-            taskItems.forEach(item => {
-                if (filter === 'all') {
-                    item.style.display = 'block';
-                } else {
-                    const itemStatus = item.getAttribute('data-status');
-                    item.style.display = itemStatus === filter ? 'block' : 'none';
-                }
-            });
-        }
-
-        function updateTaskStatus(taskId, newStatus) {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (!csrfToken) {
-                showNotification('CSRF token not found', 'error');
-                return;
-            }
-
-            // Get the select element to check current status
-            const selectElement = event.target;
-            const currentStatus = selectElement.options[selectElement.selectedIndex === 1 ? 0 : 1].value;
-            
-            // Prevent changes from Completed status
-            if (selectElement.disabled) {
-                showNotification('This task is completed and cannot be changed', 'error');
-                return;
-            }
-
-            const statusValue = newStatus === 'completed' ? 'Completed' : 'Ongoing';
-
-            fetch(`/projects/{{ $project->id }}/updates/${taskId}`, {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    _token: csrfToken,
-                    status: statusValue
-                })
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to update task status');
-                return response.json();
-            })
-            .then(data => {
-                showNotification('Task status updated successfully', 'success');
-                // Reload the tasks list to reflect the change
-                setTimeout(() => {
-                    location.reload();
-                }, 500);
-            })
-            .catch(error => {
-                console.error('Error updating task status:', error);
-                showNotification('Failed to update task status', 'error');
-            });
-        }
-
-        function openAddTaskModal() {
-            const modal = document.getElementById('addTaskModal');
-            if (!modal) {
-                showNotification('Add task modal not found', 'error');
-                return;
-            }
-
-            // Set the hidden fields with current BOQ item info
-            document.getElementById('currentBOQItemId').value = currentBOQItem.id || '';
-            document.getElementById('currentBOQItemName').value = currentBOQItem.description || '';
-            document.getElementById('linkedItemDisplay').textContent = currentBOQItem.description || 'Unknown Item';
-            
-            // Reset form
-            document.getElementById('addTaskForm').reset();
-            
-            modal.style.display = 'flex';
-        }
-
-        function closeAddTaskModal() {
-            const modal = document.getElementById('addTaskModal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        function submitAddTaskForm(event) {
-            event.preventDefault();
-            
-            const title = document.getElementById('taskTitle').value.trim();
-            const description = document.getElementById('taskDescription').value.trim();
-            const boqItemName = document.getElementById('currentBOQItemName').value;
-            
-            if (!title) {
-                showNotification('Please enter a task title', 'error');
-                document.getElementById('taskTitle').focus();
-                return false;
-            }
-            
-            if (!description) {
-                showNotification('Please enter a task description', 'error');
-                document.getElementById('taskDescription').focus();
-                return false;
-            }
-            
-            const form = document.getElementById('addTaskForm');
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            
-            if (!csrfToken) {
-                showNotification('CSRF token not found. Please refresh the page.', 'error');
-                return false;
-            }
-            const formData = new FormData(form);
-            
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: formData
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers.get('content-type'));
-                
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        try {
-                            const json = JSON.parse(text);
-                            throw new Error(json.message || `Server error: ${response.status}`);
-                        } catch (e) {
-                            throw new Error(`Server error: ${response.status}`);
-                        }
-                    });
-                }
-                
-                return response.json();
-            })
-            .then(data => {
-                console.log('Response data:', data);
-                if (data.success) {
-                    showNotification('Task added successfully!', 'success');
-                    // Clear the form but keep modal open
-                    document.getElementById('addTaskForm').reset();
-                    document.getElementById('taskTitle').focus();
-                    
-                    // Reload only the tasks list for this item
-                    if (currentBOQItem && currentBOQItem.id) {
-                        loadTasksForItem(currentBOQItem.id);
-                    }
-                } else {
-                    showNotification('Error: ' + (data.message || 'Failed to add task'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred: ' + error.message, 'error');
-            });
-            
-            return false;
-        }
+        // Task management functions REMOVED - now handled by Site Supervisor (SS role)
+        // Task creation, viewing, and status updates are exclusively SS's responsibility
 
         // Bulk status helpers for Finance & Transactions
         // Complete Project Modal Functions

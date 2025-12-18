@@ -468,8 +468,8 @@
                     <a href="{{ route('ss.issues') }}" class="quick-action-btn secondary">
                         <i class="fas fa-exclamation-triangle"></i> Report Issue
                     </a>
-                    <a href="{{ route('ss.material-receipts') }}" class="quick-action-btn secondary">
-                        <i class="fas fa-truck"></i> Confirm Material Receipt
+                    <a href="{{ route('ss.attendance') }}" class="quick-action-btn secondary">
+                        <i class="fas fa-user-check"></i> Verify Attendance
                     </a>
                 </div>
 
@@ -511,13 +511,13 @@
                         <div class="kpi-subtitle">Site concerns pending</div>
                     </a>
 
-                    <a href="{{ route('ss.material-receipts') }}" class="kpi-card materials">
+                    <a href="{{ route('ss.attendance') }}" class="kpi-card materials">
                         <div class="kpi-icon">
-                            <i class="fas fa-boxes-stacked"></i>
+                            <i class="fas fa-user-check"></i>
                         </div>
-                        <div class="kpi-value">{{ $summary['materials_today'] ?? 0 }}</div>
-                        <div class="kpi-label">Materials Today</div>
-                        <div class="kpi-subtitle">Received today</div>
+                        <div class="kpi-value">{{ $summary['pending_verifications'] ?? 0 }}</div>
+                        <div class="kpi-label">Pending Verify</div>
+                        <div class="kpi-subtitle">Attendance to confirm</div>
                     </a>
                 </div>
 
@@ -620,29 +620,29 @@
                         </div>
                     </div>
 
-                    <!-- Pending Material Receipts -->
+                    <!-- Pending Attendance Verification -->
                     <div class="section-card">
                         <div class="section-header">
                             <span class="section-title">
-                                <i class="fas fa-truck"></i> Pending Material Receipts
+                                <i class="fas fa-user-check"></i> Pending Attendance Verification
                             </span>
-                            <a href="{{ route('ss.material-receipts') }}" class="view-all">View All →</a>
+                            <a href="{{ route('ss.attendance') }}" class="view-all">View All →</a>
                         </div>
                         <div class="section-body">
-                            @forelse($pendingMaterials ?? collect() as $material)
+                            @forelse($pendingVerifications ?? collect() as $record)
                                 <div class="list-item">
                                     <div class="list-item-main">
-                                        <div class="list-item-title">{{ Str::limit($material->item_description ?? $material->material_name ?? 'Material', 40) }}</div>
+                                        <div class="list-item-title">{{ $record->employee->fname ?? '' }} {{ $record->employee->lname ?? '' }}</div>
                                         <div class="list-item-subtitle">
-                                            {{ $material->project->project_name ?? 'Unknown' }} • Expected: {{ $material->delivery_date ? \Carbon\Carbon::parse($material->delivery_date)->format('M d') : 'TBD' }}
+                                            Time In: {{ $record->time_in ? \Carbon\Carbon::parse($record->time_in)->format('h:i A') : 'N/A' }}
                                         </div>
                                     </div>
                                     <span class="list-item-badge badge-pending">Pending</span>
                                 </div>
                             @empty
                                 <div class="empty-state">
-                                    <i class="fas fa-box-open"></i>
-                                    <p>No pending material receipts.</p>
+                                    <i class="fas fa-check-circle"></i>
+                                    <p>No pending attendance verifications.</p>
                                 </div>
                             @endforelse
                         </div>

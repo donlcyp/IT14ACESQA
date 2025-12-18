@@ -302,10 +302,6 @@
                 <i class="nav-icon fas fa-chart-line"></i>
                 <span>Daily Progress</span>
             </a>
-            <a href="{{ route('ss.material-receipts') }}" class="nav-item {{ request()->routeIs('ss.material-receipts*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-truck"></i>
-                <span>Material Receipts</span>
-            </a>
             <a href="{{ route('ss.issues') }}" class="nav-item {{ request()->routeIs('ss.issues*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-exclamation-triangle"></i>
                 <span>Issues & Incidents</span>

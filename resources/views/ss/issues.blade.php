@@ -17,7 +17,8 @@
             --sidebar-bg: #f8fafc;
             --header-bg: #1e40af;
             --main-bg: #f8fafc;
-
+            --danger: #dc2626;
+            --danger-dark: #b91c1c;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
             --gray-500: #667085;
@@ -100,7 +101,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: var(--gray-600);
+            color: var(--white);
+            background: var(--accent);
             text-decoration: none;
             font-weight: 500;
             font-size: 14px;
@@ -108,6 +110,12 @@
             border-radius: 8px;
             transition: all 0.2s;
             margin-bottom: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-dark);
         }
 
         .page-header h2 {
@@ -120,13 +128,35 @@
         }
 
         .page-header h2 i {
-            color: #dc2626;
+            color: var(--danger);
         }
 
         .page-header p {
             color: var(--gray-600);
             font-size: 14px;
             margin-top: 4px;
+        }
+
+        /* Project Info Bar */
+        .project-info-bar {
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .project-info-bar h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .project-info-bar p {
+            font-size: 13px;
+            opacity: 0.9;
         }
 
         /* Grid Layout */
@@ -142,23 +172,22 @@
             }
         }
 
-        /* Form Card */
-        .form-card {
+        /* Cards */
+        .card {
             background: white;
             border-radius: 12px;
             border: 1px solid #e5e7eb;
-            height: fit-content;
-            position: sticky;
-            top: 20px;
         }
 
-        .form-header {
+        .card-header {
             padding: 16px 20px;
             border-bottom: 1px solid #e5e7eb;
-            background: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .form-title {
+        .card-title {
             font-size: 16px;
             font-weight: 600;
             color: var(--black-1);
@@ -167,14 +196,15 @@
             gap: 8px;
         }
 
-        .form-title i {
-            color: #dc2626;
+        .card-title i {
+            color: var(--danger);
         }
 
-        .form-body {
+        .card-body {
             padding: 20px;
         }
 
+        /* Form Styles */
         .form-group {
             margin-bottom: 16px;
         }
@@ -188,7 +218,7 @@
         }
 
         .form-group label .required {
-            color: #dc2626;
+            color: var(--danger);
         }
 
         .form-control {
@@ -204,7 +234,7 @@
         .form-control:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
         }
 
         textarea.form-control {
@@ -217,6 +247,7 @@
             cursor: pointer;
         }
 
+        /* File Upload */
         .file-upload {
             border: 2px dashed #e5e7eb;
             border-radius: 8px;
@@ -227,7 +258,7 @@
         }
 
         .file-upload:hover {
-            border-color: #dc2626;
+            border-color: var(--danger);
             background: #fef2f2;
         }
 
@@ -246,6 +277,7 @@
             display: none;
         }
 
+        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -263,14 +295,15 @@
         }
 
         .btn-danger {
-            background: #dc2626;
+            background: var(--danger);
             color: white;
         }
+
         .btn-danger:hover {
-            filter: brightness(0.9);
+            background: var(--danger-dark);
         }
 
-        /* Priority Select */
+        /* Priority Options */
         .priority-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -311,35 +344,7 @@
             font-weight: 600;
         }
 
-        /* Issues List */
-        .section-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
-        }
-
-        .section-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--black-1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title i {
-            color: #dc2626;
-        }
-
+        /* Filter Tabs */
         .filter-tabs {
             display: flex;
             gap: 8px;
@@ -354,13 +359,19 @@
             background: #f3f4f6;
             color: var(--gray-600);
             border: none;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: #e5e7eb;
         }
 
         .filter-tab.active {
-            background: var(--accent);
+            background: var(--danger);
             color: white;
         }
 
+        /* Issue List */
         .issue-list {
             max-height: 600px;
             overflow-y: auto;
@@ -397,6 +408,7 @@
         .issue-badges {
             display: flex;
             gap: 6px;
+            flex-shrink: 0;
         }
 
         .badge {
@@ -420,6 +432,19 @@
             margin-bottom: 8px;
         }
 
+        .issue-task {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #eff6ff;
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+
         .issue-excerpt {
             font-size: 13px;
             color: var(--gray-600);
@@ -436,6 +461,7 @@
             color: var(--gray-600);
         }
 
+        /* Empty State */
         .empty-state {
             padding: 60px 20px;
             text-align: center;
@@ -448,11 +474,15 @@
             opacity: 0.4;
         }
 
+        /* Alerts */
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .alert-success {
@@ -465,6 +495,61 @@
             background: #fee2e2;
             color: #991b1b;
             border: 1px solid #fecaca;
+        }
+
+        /* No Project State */
+        .no-project-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .no-project-state i {
+            font-size: 64px;
+            color: var(--gray-400);
+            margin-bottom: 20px;
+        }
+
+        .no-project-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--black-1);
+            margin-bottom: 8px;
+        }
+
+        .no-project-state p {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        /* Task info display */
+        .task-info {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .task-info.visible {
+            display: block;
+        }
+
+        .task-info-label {
+            font-size: 11px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .task-info-value {
+            font-size: 14px;
+            color: var(--black-1);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -502,146 +587,180 @@
                         <i class="fas fa-exclamation-triangle"></i>
                         Issues & Incidents
                     </h2>
-                    <p>Report and track site issues, safety concerns, or delays</p>
+                    <p>Report and track site issues, safety concerns, or task-related problems</p>
                 </div>
 
-                <div class="main-grid">
-                    <!-- Report Form -->
-                    <div class="form-card">
-                        <div class="form-header">
-                            <h3 class="form-title">
-                                <i class="fas fa-flag"></i> Report New Issue
-                            </h3>
+                @if($project)
+                    <!-- Project Info Bar -->
+                    <div class="project-info-bar">
+                        <div>
+                            <h3>{{ $project->project_name ?? $project->project_code }}</h3>
+                            <p>{{ $project->location ?? 'Location not specified' }}</p>
                         </div>
-                        <div class="form-body">
-                            <form action="{{ route('ss.issues.store') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-
-                                <div class="form-group">
-                                    <label>Project <span class="required">*</span></label>
-                                    <select name="project_id" class="form-control" required>
-                                        <option value="">Select Project</option>
-                                        @foreach($projects ?? [] as $project)
-                                            <option value="{{ $project->id }}" {{ request('project') == $project->id ? 'selected' : '' }}>
-                                                {{ $project->project_name ?? $project->project_code }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Issue Title <span class="required">*</span></label>
-                                    <input type="text" name="title" class="form-control" placeholder="Brief description of the issue" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Category <span class="required">*</span></label>
-                                    <select name="category" class="form-control" required>
-                                        <option value="">Select Category</option>
-                                        <option value="safety">🦺 Safety Concern</option>
-                                        <option value="material">📦 Material Issue</option>
-                                        <option value="equipment">🔧 Equipment Problem</option>
-                                        <option value="weather">🌧️ Weather Delay</option>
-                                        <option value="manpower">👷 Manpower Issue</option>
-                                        <option value="quality">✅ Quality Issue</option>
-                                        <option value="delay">⏰ Schedule Delay</option>
-                                        <option value="other">📝 Other</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Priority Level <span class="required">*</span></label>
-                                    <div class="priority-options">
-                                        <label class="priority-option low">
-                                            <input type="radio" name="priority" value="low" required>
-                                            <div class="priority-label">🟢 Low</div>
-                                        </label>
-                                        <label class="priority-option medium">
-                                            <input type="radio" name="priority" value="medium">
-                                            <div class="priority-label">🟡 Medium</div>
-                                        </label>
-                                        <label class="priority-option high">
-                                            <input type="radio" name="priority" value="high">
-                                            <div class="priority-label">🔴 High</div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Detailed Description <span class="required">*</span></label>
-                                    <textarea name="description" class="form-control" placeholder="Provide full details of the issue, including location, affected work, and any immediate actions taken..." required></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Photos/Evidence</label>
-                                    <label class="file-upload">
-                                        <i class="fas fa-camera"></i>
-                                        <p>Click to upload photos (max 5)</p>
-                                        <input type="file" name="photos[]" accept="image/*" multiple>
-                                    </label>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Suggested Action</label>
-                                    <textarea name="suggested_action" class="form-control" rows="2" placeholder="What action do you recommend?"></textarea>
-                                </div>
-
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-flag"></i> Submit Issue Report
-                                </button>
-                            </form>
+                        <div style="text-align: right;">
+                            <div style="font-size: 24px; font-weight: 700;">{{ $issues->where('status', 'open')->count() }}</div>
+                            <div style="font-size: 12px; opacity: 0.9;">Open Issues</div>
                         </div>
                     </div>
 
-                    <!-- Issues List -->
-                    <div class="section-card">
-                        <div class="section-header">
-                            <span class="section-title">
-                                <i class="fas fa-list"></i> Reported Issues
-                            </span>
-                            <div class="filter-tabs">
-                                <button class="filter-tab active" onclick="filterIssues('all')">All</button>
-                                <button class="filter-tab" onclick="filterIssues('open')">Open</button>
-                                <button class="filter-tab" onclick="filterIssues('resolved')">Resolved</button>
+                    <div class="main-grid">
+                        <!-- Report Form -->
+                        <div class="card" style="height: fit-content;">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-flag"></i> Report New Issue
+                                </h3>
                             </div>
-                        </div>
-                        <div class="issue-list">
-                            @forelse($issues ?? [] as $issue)
-                                <div class="issue-item">
-                                    <div class="issue-header">
-                                        <div class="issue-title">{{ $issue->title }}</div>
-                                        <div class="issue-badges">
-                                            <span class="badge badge-{{ $issue->status ?? 'open' }}">
-                                                {{ ucfirst(str_replace('-', ' ', $issue->status ?? 'open')) }}
-                                            </span>
-                                            <span class="badge badge-{{ $issue->priority ?? 'medium' }}">
-                                                {{ ucfirst($issue->priority ?? 'medium') }}
-                                            </span>
+                            <div class="card-body">
+                                <form action="{{ route('ss.issues.store') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="project_id" value="{{ $project->id }}">
+
+                                    <div class="form-group">
+                                        <label>Related Task <span class="required">*</span></label>
+                                        <select name="task_id" class="form-control" required id="taskSelect">
+                                            <option value="">Select a task</option>
+                                            @foreach($tasks as $task)
+                                                <option value="{{ $task->id }}" 
+                                                        data-material="{{ $task->material->item_name ?? 'N/A' }}"
+                                                        data-description="{{ Str::limit($task->description, 100) }}">
+                                                    {{ $task->title }} ({{ $task->material->item_name ?? 'No Material' }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="task-info" id="taskInfo">
+                                            <div class="task-info-label">Material</div>
+                                            <div class="task-info-value" id="taskMaterial">-</div>
                                         </div>
                                     </div>
-                                    <div class="issue-meta">
-                                        {{ $issue->project->project_name ?? 'Unknown Project' }} • 
-                                        Reported {{ $issue->created_at->diffForHumans() }}
+
+                                    <div class="form-group">
+                                        <label>Issue Title <span class="required">*</span></label>
+                                        <input type="text" name="title" class="form-control" placeholder="Brief description of the issue" required>
                                     </div>
-                                    <div class="issue-excerpt">
-                                        {{ Str::limit($issue->description ?? '', 150) }}
+
+                                    <div class="form-group">
+                                        <label>Issue Type <span class="required">*</span></label>
+                                        <select name="issue_type" class="form-control" required>
+                                            <option value="">Select Type</option>
+                                            <option value="safety">🦺 Safety Concern</option>
+                                            <option value="material">📦 Material Defect/Issue</option>
+                                            <option value="equipment">🔧 Equipment Problem</option>
+                                            <option value="weather">🌧️ Weather Delay</option>
+                                            <option value="manpower">👷 Manpower Issue</option>
+                                            <option value="quality">✅ Quality Issue</option>
+                                            <option value="delay">⏰ Schedule Delay</option>
+                                            <option value="other">📝 Other</option>
+                                        </select>
                                     </div>
-                                    @if($issue->category)
-                                        <span class="issue-category">
-                                            {{ ucfirst($issue->category) }}
-                                        </span>
-                                    @endif
+
+                                    <div class="form-group">
+                                        <label>Priority Level <span class="required">*</span></label>
+                                        <div class="priority-options">
+                                            <label class="priority-option low">
+                                                <input type="radio" name="priority" value="low" required>
+                                                <div class="priority-label">🟢 Low</div>
+                                            </label>
+                                            <label class="priority-option medium">
+                                                <input type="radio" name="priority" value="medium">
+                                                <div class="priority-label">🟡 Medium</div>
+                                            </label>
+                                            <label class="priority-option high">
+                                                <input type="radio" name="priority" value="high">
+                                                <div class="priority-label">🔴 High</div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Detailed Description <span class="required">*</span></label>
+                                        <textarea name="description" class="form-control" placeholder="Provide full details of the issue, including specific location, affected work, and any immediate actions taken..." required></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Photos/Evidence</label>
+                                        <label class="file-upload">
+                                            <i class="fas fa-camera"></i>
+                                            <p id="photoLabel">Click to upload photos (max 5)</p>
+                                            <input type="file" name="photos[]" accept="image/*" multiple id="photoInput">
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Suggested Action</label>
+                                        <textarea name="notes" class="form-control" rows="2" placeholder="What action do you recommend to resolve this issue?"></textarea>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-flag"></i> Submit Issue Report
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Issues List -->
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <i class="fas fa-list"></i> Reported Issues
+                                </span>
+                                <div class="filter-tabs">
+                                    <button class="filter-tab active" data-filter="all">All</button>
+                                    <button class="filter-tab" data-filter="open">Open</button>
+                                    <button class="filter-tab" data-filter="in-progress">In Progress</button>
+                                    <button class="filter-tab" data-filter="resolved">Resolved</button>
                                 </div>
-                            @empty
-                                <div class="empty-state">
-                                    <i class="fas fa-check-circle"></i>
-                                    <h3>No Issues Reported</h3>
-                                    <p>Great! No issues have been reported yet. Use the form to report any site concerns.</p>
-                                </div>
-                            @endforelse
+                            </div>
+                            <div class="issue-list">
+                                @forelse($issues as $issue)
+                                    <div class="issue-item" data-status="{{ $issue->status ?? 'open' }}">
+                                        <div class="issue-header">
+                                            <div class="issue-title">{{ $issue->title }}</div>
+                                            <div class="issue-badges">
+                                                <span class="badge badge-{{ $issue->status ?? 'open' }}">
+                                                    {{ ucfirst(str_replace('-', ' ', $issue->status ?? 'open')) }}
+                                                </span>
+                                                <span class="badge badge-{{ $issue->priority ?? 'medium' }}">
+                                                    {{ ucfirst($issue->priority ?? 'medium') }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="issue-meta">
+                                            @if($issue->relatedTask)
+                                                <span class="issue-task">
+                                                    <i class="fas fa-tasks"></i> {{ $issue->relatedTask->title ?? 'Unknown Task' }}
+                                                </span>
+                                            @endif
+                                            <i class="fas fa-clock"></i> Reported {{ $issue->created_at->diffForHumans() }}
+                                        </div>
+                                        <div class="issue-excerpt">
+                                            {{ Str::limit($issue->description ?? '', 150) }}
+                                        </div>
+                                        @if($issue->issue_type)
+                                            <span class="issue-category">
+                                                {{ ucfirst(str_replace('-', ' ', $issue->issue_type)) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="empty-state">
+                                        <i class="fas fa-check-circle"></i>
+                                        <h3>No Issues Reported</h3>
+                                        <p>Great! No issues have been reported yet. Use the form to report any task-related concerns.</p>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                @else
+                    <!-- No Project Assigned -->
+                    <div class="no-project-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>No Project Assigned</h3>
+                        <p>You don't have any project assigned to you yet. Please contact your Project Manager.</p>
+                    </div>
+                @endif
             </section>
         </main>
     </div>
@@ -649,6 +768,23 @@
     @include('partials.sidebar-js')
 
     <script>
+        // Task select shows material info
+        const taskSelect = document.getElementById('taskSelect');
+        const taskInfo = document.getElementById('taskInfo');
+        const taskMaterial = document.getElementById('taskMaterial');
+
+        if (taskSelect) {
+            taskSelect.addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                if (selected.value) {
+                    taskMaterial.textContent = selected.dataset.material;
+                    taskInfo.classList.add('visible');
+                } else {
+                    taskInfo.classList.remove('visible');
+                }
+            });
+        }
+
         // Priority selection
         document.querySelectorAll('.priority-option').forEach(option => {
             option.addEventListener('click', function() {
@@ -658,23 +794,36 @@
         });
 
         // File upload feedback
-        document.querySelector('input[type="file"]').addEventListener('change', function() {
-            const count = this.files.length;
-            const label = this.closest('.file-upload').querySelector('p');
-            if (count > 0) {
-                label.textContent = count + ' file(s) selected';
-            } else {
-                label.textContent = 'Click to upload photos (max 5)';
-            }
-        });
+        const photoInput = document.getElementById('photoInput');
+        const photoLabel = document.getElementById('photoLabel');
 
-        function filterIssues(status) {
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.remove('active');
+        if (photoInput) {
+            photoInput.addEventListener('change', function() {
+                const count = this.files.length;
+                if (count > 0) {
+                    photoLabel.textContent = count + ' file(s) selected';
+                } else {
+                    photoLabel.textContent = 'Click to upload photos (max 5)';
+                }
             });
-            event.target.classList.add('active');
-            // Filter implementation would go here
         }
+
+        // Filter issues
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.issue-item').forEach(item => {
+                    if (filter === 'all' || item.dataset.status === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

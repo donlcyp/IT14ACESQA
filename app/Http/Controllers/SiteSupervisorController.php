@@ -15,15 +15,38 @@ use Illuminate\Support\Facades\Storage;
 class SiteSupervisorController extends Controller
 {
     /**
+     * Get the single assigned project for the current SS user
+     */
+    private function getAssignedProject()
+    {
+        $user = auth()->user();
+        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        
+        if (!$employeeRecord) {
+            return null;
+        }
+        
+        // SS handles one project at a time - get the most recent active project
+        return $employeeRecord->projects()
+            ->where('archived', false)
+            ->where('status', '!=', 'Completed')
+            ->with(['client', 'assignedPM', 'employees', 'materials'])
+            ->orderBy('date_started', 'desc')
+            ->first();
+    }
+    
+    /**
      * Site Supervisor Dashboard
      */
     public function index()
     {
         $user = auth()->user();
-        
-        // Get projects where this user is the Site Supervisor (assigned via employee)
         $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
         
+        // Get the assigned project
+        $assignedProject = $this->getAssignedProject();
+        
+        // Also get all assigned projects for reference
         $assignedProjects = collect();
         if ($employeeRecord) {
             $assignedProjects = $employeeRecord->projects()
@@ -35,52 +58,72 @@ class SiteSupervisorController extends Controller
         
         // Calculate KPI stats
         $today = Carbon::today();
+        $projectIds = $assignedProjects->pluck('id');
         
         // Get today's progress entries count
-        $todayProgressCount = ProjectUpdate::whereIn('project_id', $assignedProjects->pluck('id'))
+        $todayProgressCount = ProjectUpdate::whereIn('project_id', $projectIds)
             ->whereDate('created_at', $today)
+            ->where('type', 'progress')
             ->count();
         
-        // For now, pending issues count is 0 (will be stored in separate table when issues form is submitted)
-        $pendingIssuesCount = 0;
+        // Pending issues count
+        $pendingIssuesCount = ProjectUpdate::whereIn('project_id', $projectIds)
+            ->where('type', 'issue')
+            ->where('status', 'Open')
+            ->count();
         
-        // Materials received today
-        $materialsReceivedToday = Material::whereIn('project_id', $assignedProjects->pluck('id'))
-            ->whereDate('date_received', $today)
+        // Tasks count
+        $tasksCount = ProjectUpdate::whereIn('project_id', $projectIds)
+            ->where('type', 'task')
+            ->count();
+        
+        $completedTasksCount = ProjectUpdate::whereIn('project_id', $projectIds)
+            ->where('type', 'task')
+            ->where('status', 'Completed')
             ->count();
         
         // Get recent progress entries
-        $recentProgress = ProjectUpdate::whereIn('project_id', $assignedProjects->pluck('id'))
+        $recentProgress = ProjectUpdate::whereIn('project_id', $projectIds)
+            ->where('type', 'progress')
+            ->with(['project', 'material'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
+        // Get recent issues
+        $recentIssues = ProjectUpdate::whereIn('project_id', $projectIds)
+            ->where('type', 'issue')
             ->with('project')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
         
-        // Get recent issues (placeholder - will be from separate issues table when created)
-        $recentIssues = collect();
-        
-        // Get materials pending receipt confirmation
-        $pendingMaterials = Material::whereIn('project_id', $assignedProjects->pluck('id'))
-            ->whereNull('date_received')
-            ->with('project')
-            ->orderBy('created_at', 'asc')
-            ->take(10)
-            ->get();
+        // Get tasks for materials
+        $tasks = collect();
+        if ($assignedProject) {
+            $tasks = ProjectUpdate::where('project_id', $assignedProject->id)
+                ->where('type', 'task')
+                ->with('material')
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+        }
         
         $summary = [
             'assigned_projects' => $assignedProjects->count(),
-            'ongoing_tasks' => $assignedProjects->where('status', 'Ongoing')->count(),
+            'ongoing_tasks' => $tasksCount - $completedTasksCount,
+            'completed_tasks' => $completedTasksCount,
             'today_progress' => $todayProgressCount,
             'pending_issues' => $pendingIssuesCount,
-            'materials_today' => $materialsReceivedToday,
         ];
         
         return view('ss.dashboard', compact(
             'summary',
+            'assignedProject',
             'assignedProjects',
             'recentProgress',
             'recentIssues',
-            'pendingMaterials'
+            'tasks'
         ));
     }
     
@@ -123,38 +166,63 @@ class SiteSupervisorController extends Controller
         
         // Get project statistics
         $stats = [
+            'total_workers' => $project->employees->count(),
             'total_materials' => $project->materials->count(),
             'materials_received' => $project->materials->whereNotNull('date_received')->count(),
             'pending_materials' => $project->materials->whereNull('date_received')->count(),
-            'progress_entries' => $project->updates->count(),
-            'open_issues' => 0, // Placeholder - issues stored separately
+            'progress_entries' => $project->updates->where('type', 'progress')->count(),
+            'open_issues' => $project->updates->where('type', 'issue')->where('status', 'Open')->count(),
+            'total_tasks' => $project->updates->where('type', 'task')->count(),
         ];
         
-        return view('ss.project-view', compact('project', 'stats'));
+        // Get recent progress reports for this project
+        $recentProgress = $project->updates()
+            ->where('type', 'progress')
+            ->with(['updatedBy', 'material'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
+        // Get tasks for this project
+        $tasks = $project->updates()
+            ->where('type', 'task')
+            ->with(['updatedBy', 'material'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return view('ss.project-view', compact('project', 'stats', 'recentProgress', 'tasks'));
     }
     
     /**
-     * Daily Progress Reporting Page
+     * Daily Progress Reporting Page - Material Based
      */
     public function progressReports(Request $request)
     {
         $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        $assignedProject = $this->getAssignedProject();
         
-        $assignedProjects = collect();
-        if ($employeeRecord) {
-            $assignedProjects = $employeeRecord->projects()
-                ->where('archived', false)
-                ->with('materials')
-                ->get();
+        if (!$assignedProject) {
+            return redirect()->route('ss.dashboard')->with('error', 'You are not assigned to any active project.');
         }
         
-        // Get progress entries with filters
-        $query = ProjectUpdate::whereIn('project_id', $assignedProjects->pluck('id'))
-            ->with('project');
+        // Get materials for this project (for creating tasks)
+        $materials = $assignedProject->materials()->orderBy('item_description')->get();
         
-        if ($request->filled('project_id')) {
-            $query->where('project_id', $request->project_id);
+        // Get tasks created for this project's materials
+        $tasks = ProjectUpdate::where('project_id', $assignedProject->id)
+            ->where('type', 'task')
+            ->whereNotNull('material_id')
+            ->with('material')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Get progress reports with filters
+        $query = ProjectUpdate::where('project_id', $assignedProject->id)
+            ->where('type', 'progress')
+            ->with(['material', 'updatedBy']);
+        
+        if ($request->filled('material_id')) {
+            $query->where('material_id', $request->material_id);
         }
         
         if ($request->filled('date')) {
@@ -163,7 +231,48 @@ class SiteSupervisorController extends Controller
         
         $progressReports = $query->orderBy('created_at', 'desc')->paginate(15);
         
-        return view('ss.progress-reports', compact('assignedProjects', 'progressReports'));
+        // Pass as $project for the view
+        $project = $assignedProject;
+        
+        return view('ss.progress-reports', compact('project', 'materials', 'tasks', 'progressReports'));
+    }
+    
+    /**
+     * Create a task for a material
+     */
+    public function createTask(Request $request)
+    {
+        $user = auth()->user();
+        $assignedProject = $this->getAssignedProject();
+        
+        if (!$assignedProject) {
+            return back()->with('error', 'You are not assigned to any active project.');
+        }
+        
+        $validated = $request->validate([
+            'material_id' => 'required|exists:materials,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:2000',
+        ]);
+        
+        // Verify material belongs to the assigned project
+        $material = Material::find($validated['material_id']);
+        if (!$material || $material->project_id != $assignedProject->id) {
+            return back()->with('error', 'Invalid material selected.');
+        }
+        
+        ProjectUpdate::create([
+            'project_id' => $assignedProject->id,
+            'material_id' => $validated['material_id'],
+            'updated_by' => $user->id,
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'type' => 'task',
+            'status' => 'In Progress',
+        ]);
+        
+        return redirect()->route('ss.progress-reports')
+            ->with('success', 'Task created successfully for the material.');
     }
     
     /**
@@ -172,21 +281,23 @@ class SiteSupervisorController extends Controller
     public function submitProgress(Request $request)
     {
         $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        $assignedProject = $this->getAssignedProject();
+        
+        if (!$assignedProject) {
+            return back()->with('error', 'You are not assigned to any active project.');
+        }
         
         $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
+            'material_id' => 'nullable|exists:materials,id',
+            'task_id' => 'nullable|exists:project_updates,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:2000',
             'completion_percentage' => 'nullable|integer|min:0|max:100',
+            'workers_present' => 'nullable|integer|min:0',
+            'weather_condition' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:1000',
             'photos.*' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
-        
-        // Verify user is assigned to the project
-        if (!$employeeRecord || !$employeeRecord->projects()->where('projects.id', $validated['project_id'])->exists()) {
-            return back()->with('error', 'You are not assigned to this project.');
-        }
         
         // Handle photo uploads
         $photoPaths = [];
@@ -199,78 +310,33 @@ class SiteSupervisorController extends Controller
         
         // Create progress entry
         $update = ProjectUpdate::create([
-            'project_id' => $validated['project_id'],
+            'project_id' => $assignedProject->id,
+            'material_id' => $validated['material_id'] ?? null,
             'updated_by' => $user->id,
             'title' => $validated['title'],
             'description' => $validated['description'],
+            'type' => 'progress',
             'status' => 'In Progress',
+            'completion_percentage' => $validated['completion_percentage'] ?? 0,
+            'workers_present' => $validated['workers_present'] ?? null,
+            'weather_condition' => $validated['weather_condition'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'photos' => $photoPaths,
         ]);
+        
+        // Update task completion if task was selected
+        if (!empty($validated['task_id'])) {
+            $task = ProjectUpdate::find($validated['task_id']);
+            if ($task && $task->type === 'task') {
+                $completionPercent = $validated['completion_percentage'] ?? 0;
+                if ($completionPercent >= 100) {
+                    $task->update(['status' => 'Completed']);
+                }
+            }
+        }
         
         return redirect()->route('ss.progress-reports')
             ->with('success', 'Daily progress report submitted successfully.');
-    }
-    
-    /**
-     * Material Receipt Confirmation Page
-     */
-    public function materialReceipts(Request $request)
-    {
-        $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
-        
-        $assignedProjects = collect();
-        if ($employeeRecord) {
-            $assignedProjects = $employeeRecord->projects()
-                ->where('archived', false)
-                ->get();
-        }
-        
-        // Get materials with filters
-        $query = Material::whereIn('project_id', $assignedProjects->pluck('id'))
-            ->with('project');
-        
-        if ($request->filled('project_id')) {
-            $query->where('project_id', $request->project_id);
-        }
-        
-        $materials = $query->orderBy('created_at', 'desc')->paginate(15);
-        
-        // Calculate material stats
-        $stats = [
-            'pending' => Material::whereIn('project_id', $assignedProjects->pluck('id'))->whereNull('date_received')->count(),
-            'received' => Material::whereIn('project_id', $assignedProjects->pluck('id'))->whereNotNull('date_received')->count(),
-            'damaged' => 0, // Will track damaged materials
-        ];
-        
-        $projects = $assignedProjects;
-        
-        return view('ss.material-receipts', compact('assignedProjects', 'materials'));
-    }
-    
-    /**
-     * Confirm material receipt
-     */
-    public function confirmMaterialReceipt(Request $request, Material $material)
-    {
-        $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
-        
-        // Verify user is assigned to the project
-        if (!$employeeRecord || !$employeeRecord->projects()->where('projects.id', $material->project_id)->exists()) {
-            return back()->with('error', 'You are not authorized to confirm this material.');
-        }
-        
-        $validated = $request->validate([
-            'quantity_received' => 'required|numeric|min:0',
-            'condition' => 'required|in:Good,Damaged,Partial',
-            'receipt_notes' => 'nullable|string|max:500',
-        ]);
-        
-        $material->update([
-            'date_received' => now(),
-        ]);
-        
-        return back()->with('success', 'Material receipt confirmed successfully.');
     }
     
     /**
@@ -279,30 +345,43 @@ class SiteSupervisorController extends Controller
     public function issues(Request $request)
     {
         $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        $assignedProject = $this->getAssignedProject();
         
-        $assignedProjects = collect();
-        if ($employeeRecord) {
-            $assignedProjects = $employeeRecord->projects()
-                ->where('archived', false)
-                ->get();
+        if (!$assignedProject) {
+            return redirect()->route('ss.dashboard')->with('error', 'You are not assigned to any active project.');
         }
         
-        // Get updates (no type filter - schema doesn't have type column)
-        $query = ProjectUpdate::whereIn('project_id', $assignedProjects->pluck('id'))
-            ->with('project');
+        // Get materials and tasks for dropdown
+        $materials = $assignedProject->materials()->orderBy('item_description')->get();
+        $tasks = ProjectUpdate::where('project_id', $assignedProject->id)
+            ->where('type', 'task')
+            ->orderBy('title')
+            ->get();
         
-        if ($request->filled('project_id')) {
-            $query->where('project_id', $request->project_id);
-        }
+        // Get issues with filters
+        $query = ProjectUpdate::where('project_id', $assignedProject->id)
+            ->where('type', 'issue')
+            ->with(['material', 'updatedBy']);
         
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
         
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+        
         $issues = $query->orderBy('created_at', 'desc')->paginate(15);
         
-        return view('ss.issues', compact('assignedProjects', 'issues'));
+        // Pass as $project for the view
+        $project = $assignedProject;
+        
+        return view('ss.issues', [
+            'project' => $project,
+            'materials' => $materials,
+            'tasks' => $tasks,
+            'issues' => $issues
+        ]);
     }
     
     /**
@@ -311,21 +390,21 @@ class SiteSupervisorController extends Controller
     public function submitIssue(Request $request)
     {
         $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        $assignedProject = $this->getAssignedProject();
+        
+        if (!$assignedProject) {
+            return back()->with('error', 'You are not assigned to any active project.');
+        }
         
         $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
-            'issue_type' => 'required|in:delay,safety,material,quality,other',
+            'material_id' => 'nullable|exists:materials,id',
+            'task_id' => 'nullable|exists:project_updates,id',
+            'issue_type' => 'required|in:delay,safety,material,quality,weather,equipment,other',
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:2000',
             'priority' => 'required|in:low,medium,high,critical',
             'photos.*' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
-        
-        // Verify user is assigned to the project
-        if (!$employeeRecord || !$employeeRecord->projects()->where('projects.id', $validated['project_id'])->exists()) {
-            return back()->with('error', 'You are not assigned to this project.');
-        }
         
         // Handle photo uploads
         $photoPaths = [];
@@ -336,13 +415,25 @@ class SiteSupervisorController extends Controller
             }
         }
         
-        // Create issue entry - only use columns that exist in project_updates table
+        // Get material_id from task if task selected
+        $materialId = $validated['material_id'] ?? null;
+        if (!$materialId && !empty($validated['task_id'])) {
+            $task = ProjectUpdate::find($validated['task_id']);
+            $materialId = $task ? $task->material_id : null;
+        }
+        
+        // Create issue entry
         ProjectUpdate::create([
-            'project_id' => $validated['project_id'],
+            'project_id' => $assignedProject->id,
+            'material_id' => $materialId,
             'updated_by' => $user->id,
-            'title' => '[' . strtoupper($validated['issue_type']) . '] ' . $validated['title'],
+            'title' => $validated['title'],
             'description' => $validated['description'],
+            'type' => 'issue',
             'status' => 'Open',
+            'issue_type' => $validated['issue_type'],
+            'priority' => $validated['priority'],
+            'photos' => $photoPaths,
         ]);
         
         return redirect()->route('ss.issues')
@@ -350,76 +441,105 @@ class SiteSupervisorController extends Controller
     }
     
     /**
-     * Attendance Verification Page
+     * Attendance Verification Page - Single project, no project filter
      */
     public function attendanceVerification(Request $request)
     {
         $user = auth()->user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
+        $assignedProject = $this->getAssignedProject();
         
-        $projects = collect();
-        $projectEmployees = collect();
-        
-        if ($employeeRecord) {
-            $projects = $employeeRecord->projects()
-                ->where('archived', false)
-                ->with('employees')
-                ->get();
-            
-            // Get all employees from assigned projects
-            $employeeIds = $projects->flatMap(function($project) {
-                return $project->employees->pluck('id');
-            })->unique();
-            
-            $projectEmployees = EmployeeList::whereIn('id', $employeeIds)->get();
+        if (!$assignedProject) {
+            return redirect()->route('ss.dashboard')->with('error', 'You are not assigned to any active project.');
         }
+        
+        // Get employees assigned to this project only
+        $projectEmployees = $assignedProject->employees;
         
         // Get attendance records with filters
         $date = $request->filled('date') ? Carbon::parse($request->date) : Carbon::today();
         
         $attendanceQuery = EmployeeAttendance::whereIn('employee_id', $projectEmployees->pluck('id'))
             ->whereDate('date', $date)
-            ->with(['employee', 'employee.projects']);
-        
-        // Apply project filter if provided
-        if ($request->filled('project')) {
-            $projectId = $request->project;
-            $project = Project::find($projectId);
-            if ($project) {
-                $projectEmployeeIds = $project->employees->pluck('id');
-                $attendanceQuery->whereIn('employee_id', $projectEmployeeIds);
-            }
-        }
+            ->with(['employee', 'validator']);
         
         $attendance = $attendanceQuery->get();
+        
+        // Get pending verification requests (sent by HR)
+        $pendingVerifications = EmployeeAttendance::whereIn('employee_id', $projectEmployees->pluck('id'))
+            ->where('ss_verification_status', 'pending')
+            ->whereNotNull('punch_in_time')
+            ->with(['employee'])
+            ->orderBy('date', 'desc')
+            ->get();
+        
+        // Get verification history (already verified/denied records)
+        $verificationHistory = EmployeeAttendance::whereIn('employee_id', $projectEmployees->pluck('id'))
+            ->whereNotNull('ss_verification_status')
+            ->where('ss_verification_status', '!=', 'pending')
+            ->with(['employee'])
+            ->orderBy('ss_verified_at', 'desc')
+            ->limit(50)
+            ->get();
+        
+        // Pass as $project for the view
+        $project = $assignedProject;
         
         // Calculate stats
         $stats = [
             'total_today' => $attendance->count(),
-            'present' => $attendance->where('attendance_status', 'Present')->count(),
-            'late' => $attendance->where('is_late', true)->count(),
-            'verified' => $attendance->where('validation_status', 'approved')->count(),
-            'pending_verification' => $attendance->where('validation_status', 'pending')->count(),
+            'pending_verification' => $pendingVerifications->count(),
+            'verified' => $verificationHistory->where('ss_verification_status', 'verified')->count(),
+            'denied' => $verificationHistory->where('ss_verification_status', 'denied')->count(),
         ];
         
-        return view('ss.attendance-verification', compact('projects', 'projectEmployees', 'attendance', 'date', 'stats'));
+        return view('ss.attendance-verification', [
+            'project' => $project,
+            'projectEmployees' => $projectEmployees,
+            'pendingVerification' => $pendingVerifications,
+            'verificationHistory' => $verificationHistory,
+            'date' => $date,
+            'stats' => $stats
+        ]);
     }
     
     /**
-     * Verify employee attendance
+     * Verify employee attendance (called by SS to confirm worker presence)
      */
     public function verifyAttendance(Request $request, EmployeeAttendance $attendance)
     {
         $user = auth()->user();
+        $assignedProject = $this->getAssignedProject();
         
-        // Update attendance as verified by site supervisor
-        $attendance->update([
-            'validation_status' => 'approved',
-            'validated_by' => $user->id,
-            'validated_at' => now(),
-            'attendance_status' => 'Present',
-        ]);
+        if (!$assignedProject) {
+            return back()->with('error', 'You are not assigned to any active project.');
+        }
         
-        return back()->with('success', 'Attendance verification updated.');
+        // Verify the employee is in the assigned project
+        $projectEmployeeIds = $assignedProject->employees->pluck('id')->toArray();
+        if (!in_array($attendance->employee_id, $projectEmployeeIds)) {
+            return back()->with('error', 'This employee is not assigned to your project.');
+        }
+        
+        $action = $request->input('action', 'verify');
+        
+        if ($action === 'verify') {
+            $attendance->update([
+                'ss_verification_status' => 'verified',
+                'ss_verified_by' => $user->id,
+                'ss_verified_at' => now(),
+                'attendance_status' => 'Present',
+            ]);
+            $message = 'Worker attendance verified successfully.';
+        } else {
+            $attendance->update([
+                'ss_verification_status' => 'denied',
+                'ss_verified_by' => $user->id,
+                'ss_verified_at' => now(),
+                'attendance_status' => 'Absent',
+            ]);
+            $message = 'Worker attendance denied. HR will be notified.';
+        }
+        
+        return back()->with('success', $message);
     }
 }

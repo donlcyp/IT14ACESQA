@@ -17,7 +17,10 @@
             --sidebar-bg: #f8fafc;
             --header-bg: #1e40af;
             --main-bg: #f8fafc;
-
+            --success: #10b981;
+            --success-dark: #059669;
+            --danger: #dc2626;
+            --danger-dark: #b91c1c;
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
             --gray-500: #667085;
@@ -100,7 +103,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: var(--gray-600);
+            color: var(--white);
+            background: var(--accent);
             text-decoration: none;
             font-weight: 500;
             font-size: 14px;
@@ -108,6 +112,12 @@
             border-radius: 8px;
             transition: all 0.2s;
             margin-bottom: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-dark);
         }
 
         .page-header h2 {
@@ -129,10 +139,33 @@
             margin-top: 4px;
         }
 
+        /* Project Info Bar */
+        .project-info-bar {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .project-info-bar h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .project-info-bar p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Info Banner */
         .info-banner {
-            background: #dbeafe;
-            border: 1px solid #93c5fd;
-            color: #1e40af;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 24px;
@@ -146,41 +179,105 @@
             font-size: 18px;
         }
 
-        /* Filter Row */
-        .filter-row {
-            display: flex;
+        /* Summary Stats */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--black-1);
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+        }
+
+        .summary-card.pending {
+            background: #fef3c7;
+            border-color: #fcd34d;
+        }
+
+        .summary-card.pending .summary-value {
+            color: #92400e;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            display: flex;
             align-items: center;
+            gap: 8px;
         }
 
-        .filter-select {
-            padding: 10px 14px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            min-width: 180px;
+        .tab-btn:hover {
+            color: var(--accent);
         }
 
-        .date-input {
-            padding: 10px 14px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
         }
 
-        /* Section Card */
-        .section-card {
+        .tab-count {
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
             background: white;
             border-radius: 12px;
             border: 1px solid #e5e7eb;
             overflow: hidden;
         }
 
-        .section-header {
+        .card-header {
             padding: 16px 20px;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
@@ -188,7 +285,7 @@
             align-items: center;
         }
 
-        .section-title {
+        .card-title {
             font-size: 16px;
             font-weight: 600;
             color: var(--black-1);
@@ -197,20 +294,162 @@
             gap: 8px;
         }
 
-        .section-title i {
+        .card-title i {
             color: var(--accent);
         }
 
-        .count-badge {
-            background: var(--accent);
-            color: white;
+        /* Attendance Cards Grid */
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .attendance-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .attendance-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .attendance-card.pending {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .attendance-card.verified {
+            border-left: 4px solid #10b981;
+        }
+
+        .attendance-card.denied {
+            border-left: 4px solid #ef4444;
+        }
+
+        .attendance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .employee-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--black-1);
+            margin-bottom: 4px;
+        }
+
+        .employee-info p {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .verification-status {
             padding: 4px 10px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
         }
 
-        /* Table */
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-verified { background: #d1fae5; color: #065f46; }
+        .status-denied { background: #fee2e2; color: #991b1b; }
+
+        .attendance-times {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .time-block {
+            text-align: center;
+            flex: 1;
+        }
+
+        .time-label {
+            font-size: 10px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .time-value {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--black-1);
+        }
+
+        .attendance-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .attendance-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .att-present { background: #d1fae5; color: #065f46; }
+        .att-late { background: #fef3c7; color: #92400e; }
+        .att-absent { background: #fee2e2; color: #991b1b; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-verify {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-verify:hover {
+            background: var(--success-dark);
+        }
+
+        .btn-deny {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-deny:hover {
+            background: var(--danger-dark);
+        }
+
+        /* Table for history */
         .table-container {
             overflow-x: auto;
         }
@@ -247,66 +486,7 @@
             background: #f9fafb;
         }
 
-        .employee-name {
-            font-weight: 500;
-            color: var(--black-1);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .badge-present { background: #d1fae5; color: #065f46; }
-        .badge-absent { background: #fee2e2; color: #991b1b; }
-        .badge-late { background: #fef3c7; color: #92400e; }
-        .badge-pending { background: #e5e7eb; color: #4b5563; }
-        .badge-verified { background: #dbeafe; color: #1e40af; }
-
-        .time-text {
-            font-family: 'Source Code Pro', monospace;
-            font-size: 12px;
-        }
-
-        /* Action Button */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-        }
-
-        .btn-verify {
-            background: var(--accent);
-            color: white;
-        }
-        .btn-verify:hover {
-            filter: brightness(0.9);
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .verified-text {
-            color: #059669;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
+        /* Empty State */
         .empty-state {
             padding: 60px 20px;
             text-align: center;
@@ -319,11 +499,15 @@
             opacity: 0.4;
         }
 
+        /* Alerts */
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .alert-success {
@@ -338,34 +522,46 @@
             border: 1px solid #fecaca;
         }
 
-        /* Summary Stats */
-        .summary-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .summary-card {
-            background: white;
-            border-radius: 10px;
-            padding: 14px 16px;
-            border: 1px solid #e5e7eb;
+        /* No Project State */
+        .no-project-state {
             text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
         }
 
-        .summary-value {
-            font-size: 24px;
-            font-weight: 700;
+        .no-project-state i {
+            font-size: 64px;
+            color: var(--gray-400);
+            margin-bottom: 20px;
+        }
+
+        .no-project-state h3 {
+            font-size: 18px;
+            font-weight: 600;
             color: var(--black-1);
+            margin-bottom: 8px;
         }
 
-        .summary-label {
-            font-size: 11px;
-            color: var(--gray-600);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 4px;
+        .no-project-state p {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        /* Date Filter */
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
         }
     </style>
 </head>
@@ -403,148 +599,224 @@
                         <i class="fas fa-user-check"></i>
                         Attendance Verification
                     </h2>
-                    <p>Verify on-site attendance for workers in your assigned projects</p>
+                    <p>Verify worker presence on-site for your assigned project</p>
                 </div>
 
-                <div class="info-banner">
-                    <i class="fas fa-info-circle"></i>
-                    <span>As Site Supervisor, you can verify worker attendance to confirm their physical presence on-site. This helps HR validate attendance records.</span>
-                </div>
+                @if($project)
+                    <!-- Project Info Bar -->
+                    <div class="project-info-bar">
+                        <div>
+                            <h3>{{ $project->project_name ?? $project->project_code }}</h3>
+                            <p>{{ $project->location ?? 'Location not specified' }}</p>
+                        </div>
+                        <div class="date-filter">
+                            <span style="font-size: 13px; opacity: 0.9;">Date:</span>
+                            <input type="date" class="date-input" value="{{ request('date', date('Y-m-d')) }}" onchange="filterByDate(this.value)" style="background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); color: white;">
+                        </div>
+                    </div>
 
-                <!-- Summary Stats -->
-                <div class="summary-row">
-                    <div class="summary-card">
-                        <div class="summary-value">{{ $stats['total_today'] ?? 0 }}</div>
-                        <div class="summary-label">Total Today</div>
+                    <!-- Info Banner -->
+                    <div class="info-banner">
+                        <i class="fas fa-info-circle"></i>
+                        <span>HR sends verification requests when workers punch in. Confirm their physical presence on-site by clicking <strong>Verify</strong> or <strong>Deny</strong> if they're not actually present.</span>
                     </div>
-                    <div class="summary-card">
-                        <div class="summary-value">{{ $stats['present'] ?? 0 }}</div>
-                        <div class="summary-label">Present</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-value">{{ $stats['late'] ?? 0 }}</div>
-                        <div class="summary-label">Late</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-value">{{ $stats['verified'] ?? 0 }}</div>
-                        <div class="summary-label">Verified</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-value">{{ $stats['pending_verification'] ?? 0 }}</div>
-                        <div class="summary-label">Pending</div>
-                    </div>
-                </div>
 
-                <!-- Filters -->
-                <div class="filter-row">
-                    <select class="filter-select" onchange="filterAttendance()">
-                        <option value="">All Projects</option>
-                        @foreach($projects ?? [] as $project)
-                            <option value="{{ $project->id }}" {{ request('project') == $project->id ? 'selected' : '' }}>
-                                {{ $project->project_name ?? $project->project_code }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <input type="date" class="date-input" value="{{ request('date', date('Y-m-d')) }}" onchange="filterByDate(this.value)">
-                    <select class="filter-select" onchange="filterStatus(this.value)">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending Verification</option>
-                        <option value="verified">Verified</option>
-                    </select>
-                </div>
-
-                <!-- Attendance Table -->
-                <div class="section-card">
-                    <div class="section-header">
-                        <span class="section-title">
-                            <i class="fas fa-clipboard-list"></i> Attendance Records - {{ \Carbon\Carbon::parse(request('date', today()))->format('F d, Y') }}
-                        </span>
-                        <span class="count-badge">{{ count($attendance ?? []) }} records</span>
+                    <!-- Summary Stats -->
+                    <div class="summary-row">
+                        <div class="summary-card">
+                            <div class="summary-value">{{ $stats['total_today'] ?? 0 }}</div>
+                            <div class="summary-label">Total Records</div>
+                        </div>
+                        <div class="summary-card pending">
+                            <div class="summary-value">{{ $stats['pending_verification'] ?? 0 }}</div>
+                            <div class="summary-label">Pending Verification</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-value">{{ $stats['verified'] ?? 0 }}</div>
+                            <div class="summary-label">Verified</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-value">{{ $stats['denied'] ?? 0 }}</div>
+                            <div class="summary-label">Denied</div>
+                        </div>
                     </div>
-                    <div class="table-container">
-                        @if(isset($attendance) && count($attendance) > 0)
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Employee</th>
-                                        <th>Project</th>
-                                        <th>Time In</th>
-                                        <th>Time Out</th>
-                                        <th>Status</th>
-                                        <th>Verification</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($attendance as $record)
-                                        <tr>
-                                            <td>
-                                                <div class="employee-name">
-                                                    {{ $record->employee->fname ?? $record->f_name ?? '' }} {{ $record->employee->lname ?? $record->l_name ?? '' }}
+
+                    <!-- Tabs -->
+                    <div class="tabs-container">
+                        <button class="tab-btn active" onclick="switchTab('pending')">
+                            <i class="fas fa-clock"></i> Pending Verification
+                            @if(($stats['pending_verification'] ?? 0) > 0)
+                                <span class="tab-count">{{ $stats['pending_verification'] }}</span>
+                            @endif
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('history')">
+                            <i class="fas fa-history"></i> Verification History
+                        </button>
+                    </div>
+
+                    <!-- Pending Tab -->
+                    <div id="pending-tab" class="tab-content active">
+                        @if($pendingVerification->count() > 0)
+                            <div class="attendance-grid">
+                                @foreach($pendingVerification as $record)
+                                    <div class="attendance-card pending">
+                                        <div class="attendance-header">
+                                            <div class="employee-info">
+                                                <h4>
+                                                    {{ $record->employee->fname ?? $record->f_name ?? '' }} 
+                                                    {{ $record->employee->lname ?? $record->l_name ?? '' }}
+                                                </h4>
+                                                <p>{{ $record->employee->position ?? 'Construction Worker' }}</p>
+                                            </div>
+                                            <span class="verification-status status-pending">
+                                                <i class="fas fa-clock"></i> Pending
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="attendance-times">
+                                            <div class="time-block">
+                                                <div class="time-label">Time In</div>
+                                                <div class="time-value">
+                                                    {{ $record->time_in ? \Carbon\Carbon::parse($record->time_in)->format('h:i A') : '--:--' }}
                                                 </div>
-                                            </td>
-                                            <td>{{ $record->employee->projects->first()->project_name ?? 'N/A' }}</td>
-                                            <td>
-                                                <span class="time-text">
-                                                    {{ $record->time_in ? \Carbon\Carbon::parse($record->time_in)->format('h:i A') : '-' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="time-text">
-                                                    {{ $record->time_out ? \Carbon\Carbon::parse($record->time_out)->format('h:i A') : '-' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @php
-                                                    $status = strtolower($record->status ?? 'present');
-                                                    $badgeClass = match($status) {
-                                                        'present' => 'badge-present',
-                                                        'absent' => 'badge-absent',
-                                                        'late' => 'badge-late',
-                                                        default => 'badge-pending'
-                                                    };
-                                                @endphp
-                                                <span class="status-badge {{ $badgeClass }}">
-                                                    {{ ucfirst($status) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if($record->validation_status === 'approved')
-                                                    <span class="status-badge badge-verified">Verified</span>
-                                                @elseif($record->validation_status === 'rejected')
-                                                    <span class="status-badge badge-absent">Rejected</span>
-                                                @else
-                                                    <span class="status-badge badge-pending">Pending</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($record->validation_status !== 'approved')
-                                                    <form action="{{ route('ss.attendance.verify', $record->id) }}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-verify btn-sm">
-                                                            <i class="fas fa-check"></i> Verify
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <span class="verified-text">
-                                                        <i class="fas fa-check-circle"></i>
-                                                        {{ $record->validated_at ? \Carbon\Carbon::parse($record->validated_at)->format('h:i A') : '' }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            </div>
+                                            <div class="time-block">
+                                                <div class="time-label">Time Out</div>
+                                                <div class="time-value">
+                                                    {{ $record->time_out ? \Carbon\Carbon::parse($record->time_out)->format('h:i A') : '--:--' }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="attendance-meta">
+                                            @php
+                                                $status = strtolower($record->status ?? 'present');
+                                                $attClass = match($status) {
+                                                    'present' => 'att-present',
+                                                    'late' => 'att-late',
+                                                    'absent' => 'att-absent',
+                                                    default => 'att-present'
+                                                };
+                                            @endphp
+                                            <span class="attendance-status {{ $attClass }}">
+                                                {{ ucfirst($status) }}
+                                            </span>
+                                            <span style="font-size: 12px; color: var(--gray-500);">
+                                                <i class="fas fa-calendar"></i> {{ \Carbon\Carbon::parse($record->attendance_date ?? $record->created_at)->format('M d, Y') }}
+                                            </span>
+                                        </div>
+
+                                        <div class="action-buttons">
+                                            <form action="{{ route('ss.attendance.verify', $record->id) }}" method="POST" style="flex: 1;">
+                                                @csrf
+                                                <input type="hidden" name="action" value="verify">
+                                                <button type="submit" class="btn btn-verify" style="width: 100%;">
+                                                    <i class="fas fa-check"></i> Verify
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('ss.attendance.verify', $record->id) }}" method="POST" style="flex: 1;">
+                                                @csrf
+                                                <input type="hidden" name="action" value="deny">
+                                                <button type="submit" class="btn btn-deny" style="width: 100%;">
+                                                    <i class="fas fa-times"></i> Deny
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         @else
-                            <div class="empty-state">
-                                <i class="fas fa-calendar-check"></i>
-                                <h3>No Attendance Records</h3>
-                                <p>No attendance records found for the selected date and project.</p>
+                            <div class="card">
+                                <div class="empty-state">
+                                    <i class="fas fa-check-circle"></i>
+                                    <h3>All Caught Up!</h3>
+                                    <p>No pending attendance verifications at the moment.</p>
+                                </div>
                             </div>
                         @endif
                     </div>
-                </div>
+
+                    <!-- History Tab -->
+                    <div id="history-tab" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">
+                                    <i class="fas fa-history"></i> Verification History
+                                </span>
+                            </div>
+                            <div class="table-container">
+                                @if($verificationHistory->count() > 0)
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Employee</th>
+                                                <th>Date</th>
+                                                <th>Time In/Out</th>
+                                                <th>Attendance</th>
+                                                <th>Verification</th>
+                                                <th>Verified At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($verificationHistory as $record)
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ $record->employee->fname ?? $record->f_name ?? '' }} {{ $record->employee->lname ?? $record->l_name ?? '' }}</strong>
+                                                    </td>
+                                                    <td>{{ \Carbon\Carbon::parse($record->attendance_date ?? $record->created_at)->format('M d, Y') }}</td>
+                                                    <td style="font-family: 'Source Code Pro', monospace; font-size: 12px;">
+                                                        {{ $record->time_in ? \Carbon\Carbon::parse($record->time_in)->format('h:i A') : '--' }} - 
+                                                        {{ $record->time_out ? \Carbon\Carbon::parse($record->time_out)->format('h:i A') : '--' }}
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $status = strtolower($record->status ?? 'present');
+                                                            $attClass = match($status) {
+                                                                'present' => 'att-present',
+                                                                'late' => 'att-late',
+                                                                'absent' => 'att-absent',
+                                                                default => 'att-present'
+                                                            };
+                                                        @endphp
+                                                        <span class="attendance-status {{ $attClass }}">{{ ucfirst($status) }}</span>
+                                                    </td>
+                                                    <td>
+                                                        @if($record->ss_verification_status === 'verified')
+                                                            <span class="verification-status status-verified">
+                                                                <i class="fas fa-check"></i> Verified
+                                                            </span>
+                                                        @else
+                                                            <span class="verification-status status-denied">
+                                                                <i class="fas fa-times"></i> Denied
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td style="font-size: 12px; color: var(--gray-500);">
+                                                        {{ $record->ss_verified_at ? \Carbon\Carbon::parse($record->ss_verified_at)->format('M d, h:i A') : '-' }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <div class="empty-state">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        <h3>No History Yet</h3>
+                                        <p>Verification history will appear here once you verify or deny attendance records.</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                @else
+                    <!-- No Project Assigned -->
+                    <div class="no-project-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>No Project Assigned</h3>
+                        <p>You don't have any project assigned to you yet. Please contact your Project Manager.</p>
+                    </div>
+                @endif
             </section>
         </main>
     </div>
@@ -552,18 +824,20 @@
     @include('partials.sidebar-js')
 
     <script>
-        function filterAttendance() {
-            // Filter implementation
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
         }
 
+        // Date filter
         function filterByDate(date) {
             const url = new URL(window.location);
             url.searchParams.set('date', date);
             window.location = url;
-        }
-
-        function filterStatus(status) {
-            // Filter implementation
         }
     </script>
 </body>

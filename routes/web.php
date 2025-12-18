@@ -199,13 +199,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/ss-projects', [App\Http\Controllers\SiteSupervisorController::class, 'projects'])->name('ss.projects');
         Route::get('/ss-projects/{project}', [App\Http\Controllers\SiteSupervisorController::class, 'viewProject'])->name('ss.project-view');
 
-        // Daily Progress Reports
+        // Daily Progress Reports & Tasks
         Route::get('/ss-progress-reports', [App\Http\Controllers\SiteSupervisorController::class, 'progressReports'])->name('ss.progress-reports');
         Route::post('/ss-progress-reports', [App\Http\Controllers\SiteSupervisorController::class, 'submitProgress'])->name('ss.progress-reports.store');
-
-        // Material Receipts
-        Route::get('/ss-material-receipts', [App\Http\Controllers\SiteSupervisorController::class, 'materialReceipts'])->name('ss.material-receipts');
-        Route::post('/ss-material-receipts/{material}/confirm', [App\Http\Controllers\SiteSupervisorController::class, 'confirmMaterialReceipt'])->name('ss.material-receipts.confirm');
+        Route::post('/ss-tasks', [App\Http\Controllers\SiteSupervisorController::class, 'createTask'])->name('ss.tasks.store');
 
         // Issues & Incidents
         Route::get('/ss-issues', [App\Http\Controllers\SiteSupervisorController::class, 'issues'])->name('ss.issues');

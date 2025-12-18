@@ -97,11 +97,28 @@
         }
 
         .back-btn {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f3f4f6;
+            color: var(--accent);
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+            border-color: var(--accent);
+        }
+
+        .back-btn i {
+            font-size: 12px;
         }
 
         .badge-present { background: none; color: #065f46; }
@@ -413,8 +430,8 @@
                     <a href="{{ route('ss.issues', ['project' => $project->id]) }}" class="btn btn-secondary">
                         <i class="fas fa-exclamation-triangle"></i> Report Issue
                     </a>
-                    <a href="{{ route('ss.material-receipts', ['project' => $project->id]) }}" class="btn btn-secondary">
-                        <i class="fas fa-truck"></i> Material Receipts
+                    <a href="{{ route('ss.attendance') }}" class="btn btn-secondary">
+                        <i class="fas fa-user-check"></i> Verify Attendance
                     </a>
                 </div>
 
@@ -449,11 +466,22 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Client</span>
-                            <span class="info-value">{{ $project->client->company_name ?? 'N/A' }}</span>
+                            <span class="info-value">
+                                @if($project->client)
+                                    {{ $project->client->first_name ?? '' }} {{ $project->client->last_name ?? '' }}
+                                    @if($project->client->company_name)
+                                        ({{ $project->client->company_name }})
+                                    @endif
+                                @elseif($project->client_first_name || $project->client_last_name)
+                                    {{ $project->client_first_name ?? '' }} {{ $project->client_last_name ?? '' }}
+                                @else
+                                    N/A
+                                @endif
+                            </span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Location</span>
-                            <span class="info-value">{{ $project->site_location ?? 'Not specified' }}</span>
+                            <span class="info-value">{{ $project->location ?? 'Not specified' }}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Status</span>
@@ -466,17 +494,28 @@
                         <h3><i class="fas fa-calendar"></i> Timeline</h3>
                         <div class="info-row">
                             <span class="info-label">Start Date</span>
-                            <span class="info-value">{{ $project->start_date ? \Carbon\Carbon::parse($project->start_date)->format('M d, Y') : 'TBD' }}</span>
+                            <span class="info-value">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'TBD' }}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">End Date</span>
-                            <span class="info-value">{{ $project->end_date ? \Carbon\Carbon::parse($project->end_date)->format('M d, Y') : 'TBD' }}</span>
+                            <span class="info-value">
+                                @if($project->date_ended)
+                                    {{ \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') }}
+                                @elseif($project->target_timeline)
+                                    {{ \Carbon\Carbon::parse($project->target_timeline)->format('M d, Y') }} (Target)
+                                @else
+                                    TBD
+                                @endif
+                            </span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Duration</span>
                             <span class="info-value">
-                                @if($project->start_date && $project->end_date)
-                                    {{ \Carbon\Carbon::parse($project->start_date)->diffInDays(\Carbon\Carbon::parse($project->end_date)) }} days
+                                @php
+                                    $endDate = $project->date_ended ?? $project->target_timeline;
+                                @endphp
+                                @if($project->date_started && $endDate)
+                                    {{ \Carbon\Carbon::parse($project->date_started)->diffInDays(\Carbon\Carbon::parse($endDate)) }} days
                                 @else
                                     N/A
                                 @endif
@@ -485,10 +524,15 @@
                         <div class="info-row">
                             <span class="info-label">Days Remaining</span>
                             <span class="info-value">
-                                @if($project->end_date && \Carbon\Carbon::parse($project->end_date)->isFuture())
-                                    {{ \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($project->end_date)) }} days
-                                @elseif($project->end_date)
-                                    Overdue
+                                @php
+                                    $targetDate = $project->date_ended ?? $project->target_timeline;
+                                @endphp
+                                @if($targetDate && \Carbon\Carbon::parse($targetDate)->isFuture())
+                                    {{ \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($targetDate)) }} days
+                                @elseif($targetDate && $project->status !== 'Completed')
+                                    <span style="color: #dc2626;">Overdue</span>
+                                @elseif($project->status === 'Completed')
+                                    <span style="color: #059669;">Completed</span>
                                 @else
                                     N/A
                                 @endif
@@ -506,6 +550,19 @@
                     </div>
                     <div class="table-container">
                         @if($project->employees->count() > 0)
+                            @php
+                                // Sort employees: non-CW first, then CW, and remove duplicates
+                                $employees = $project->employees->unique('id');
+                                $nonCW = $employees->filter(function($e) {
+                                    $role = strtoupper($e->pivot->role_title ?? $e->position ?? 'Construction Worker');
+                                    return !in_array($role, ['CONSTRUCTION WORKER', 'CW']);
+                                });
+                                $cw = $employees->filter(function($e) {
+                                    $role = strtoupper($e->pivot->role_title ?? $e->position ?? 'Construction Worker');
+                                    return in_array($role, ['CONSTRUCTION WORKER', 'CW']);
+                                });
+                                $sortedEmployees = $nonCW->merge($cw);
+                            @endphp
                             <table>
                                 <thead>
                                     <tr>
@@ -515,25 +572,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($project->employees as $employee)
-                                    @php
-                                        $employees = $project->employees->all();
-                                        $nonCW = array_filter($employees, function($e) {
-                                            $role = strtoupper($e->pivot->role_title ?? $e->position ?? 'Construction Worker');
-                                            return !in_array($role, ['CONSTRUCTION WORKER', 'CW']);
-                                        });
-                                        $cw = array_filter($employees, function($e) {
-                                            $role = strtoupper($e->pivot->role_title ?? $e->position ?? 'Construction Worker');
-                                            return in_array($role, ['CONSTRUCTION WORKER', 'CW']);
-                                        });
-                                        $sorted = array_merge($nonCW, $cw);
-                                        // Remove duplicates by employee id
-                                        $sorted = array_values(array_reduce($sorted, function($carry, $item) {
-                                            $carry[$item->id] = $item;
-                                            return $carry;
-                                        }, []));
-                                    @endphp
-                                    @foreach($sorted as $employee)
+                                    @foreach($sortedEmployees as $employee)
                                         <tr>
                                             <td>
                                                 <strong>{{ $employee->f_name ?? '' }} {{ $employee->l_name ?? '' }}</strong>
@@ -562,7 +601,6 @@
                                             <td>{{ $employee->user->phone ?? $employee->user->contact_number ?? 'N/A' }}</td>
                                         </tr>
                                     @endforeach
-                                    @endforeach
                                 </tbody>
                             </table>
                         @else
@@ -580,8 +618,8 @@
                         <span class="section-title">
                             <i class="fas fa-boxes"></i> Project Materials
                         </span>
-                        <a href="{{ route('ss.material-receipts', ['project' => $project->id]) }}" style="font-size: 13px; color: var(--accent); text-decoration: none;">
-                            View Material Receipts →
+                        <a href="{{ route('ss.progress-reports') }}" style="font-size: 13px; color: var(--accent); text-decoration: none;">
+                            Manage Tasks →
                         </a>
                     </div>
                     <div class="table-container">

@@ -12,15 +12,26 @@ class ProjectUpdate extends Model
     protected $fillable = [
         'project_id',
         'updated_by',
+        'material_id',
         'title',
         'description',
         'status',
-        'material_id',
+        'type',
+        'completion_percentage',
+        'workers_present',
+        'weather_condition',
+        'photos',
+        'notes',
+        'priority',
+        'issue_type',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'photos' => 'array',
+        'completion_percentage' => 'integer',
+        'workers_present' => 'integer',
     ];
 
     /**
