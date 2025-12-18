@@ -874,7 +874,7 @@
     <!-- Request Replacement Modal -->
     <div id="requestReplacementModal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+            <div class="modal-header" style="background: #1e40af;">
                 <h3 class="modal-title" style="color: white;">
                     <i class="fas fa-exchange-alt"></i>
                     Request Replacement
@@ -885,9 +885,9 @@
             </div>
             <form id="requestReplacementForm" onsubmit="return submitReplacementRequest(event)">
                 <div style="padding: 20px;">
-                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-                        <div style="font-size: 11px; color: #991b1b; text-transform: uppercase; margin-bottom: 4px;">Requesting Replacement For</div>
-                        <div id="replacementMaterialName" style="font-weight: 600; color: #7f1d1d; font-size: 14px;"></div>
+                    <div style="background: #dbeafe; border: 1px solid #93c5fd; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 11px; color: #1e40af; text-transform: uppercase; margin-bottom: 4px;">Requesting Replacement For</div>
+                        <div id="replacementMaterialName" style="font-weight: 600; color: #1e3a8a; font-size: 14px;"></div>
                     </div>
 
                     <input type="hidden" id="replacementMaterialId" value="">
@@ -908,8 +908,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeRequestReplacementModal()">Cancel</button>
-                    <button type="submit" class="btn" style="background: #dc2626; color: white;">
+                    <button type="submit" class="btn" style="background: #1e40af; color: white;">
                         <i class="fas fa-paper-plane"></i> Submit Request
                     </button>
                 </div>

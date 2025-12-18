@@ -573,69 +573,20 @@
             padding: 0;
             width: 100%;
         }
-        
-        /* Reorder: Total Projects (1), Ongoing Projects (2), Team Workers (4 -> 3) */
-        .kpi-card:nth-child(4) {
-            grid-column: 1 / span 1;
-            grid-row: 2;
-            order: 3;
-        }
-
-        .kpi-card:nth-child(5) {
-            grid-column: 2 / span 1;
-            grid-row: 2;
-            order: 4;
-        }
-
-        .kpi-card:nth-child(3) {
-            grid-column: 3 / span 1;
-            grid-row: 1;
-            order: 2;
-        }
 
         @media (max-width: 1600px) {
             .kpi-cards-container {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 18px;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 16px;
                 margin-bottom: 28px;
-            }
-            
-            .kpi-card:nth-child(4) {
-                grid-column: 1 / span 1;
-                grid-row: 2;
-            }
-
-            .kpi-card:nth-child(5) {
-                grid-column: 2 / span 1;
-                grid-row: 2;
-            }
-
-            .kpi-card:nth-child(3) {
-                grid-column: 3 / span 1;
-                grid-row: 1;
             }
         }
         
         @media (max-width: 1200px) {
             .kpi-cards-container {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 16px;
                 margin-bottom: 24px;
-            }
-            
-            .kpi-card:nth-child(4) {
-                grid-column: 1 / span 1;
-                grid-row: 2;
-            }
-
-            .kpi-card:nth-child(5) {
-                grid-column: 2 / span 1;
-                grid-row: 2;
-            }
-
-            .kpi-card:nth-child(3) {
-                grid-column: 1 / span 1;
-                grid-row: 3;
             }
         }
         
@@ -644,21 +595,6 @@
                 grid-template-columns: 1fr;
                 gap: 14px;
                 margin-bottom: 20px;
-            }
-            
-            .kpi-card:nth-child(4) {
-                grid-column: 1;
-                grid-row: 3;
-            }
-
-            .kpi-card:nth-child(5) {
-                grid-column: 1;
-                grid-row: 5;
-            }
-
-            .kpi-card:nth-child(3) {
-                grid-column: 1;
-                grid-row: 4;
             }
         }
 
@@ -1619,8 +1555,8 @@
                         font-size: 11px;
                         font-weight: 600;
                     }
-                    .qa-status-badge.pending { background: #fef3c7; color: #92400e; }
-                    .qa-status-badge.failed { background: #fee2e2; color: #991b1b; }
+                    .qa-status-badge.pending { background: transparent; color: #92400e; }
+                    .qa-status-badge.failed { background: transparent; color: #991b1b; }
                 </style>
 
                 <!-- QA Dashboard Header -->
@@ -1778,7 +1714,7 @@
                                     Client: {{ $project->client->company_name ?? 'N/A' }}
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: {{ $project->status === 'Completed' ? '#d1fae5' : '#dbeafe' }}; color: {{ $project->status === 'Completed' ? '#065f46' : '#1e40af' }};">
+                                    <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: transparent; color: {{ $project->status === 'Completed' ? '#065f46' : '#1e40af' }};">
                                         {{ $project->status ?? 'Ongoing' }}
                                     </span>
                                     <span style="font-size: 12px; color: var(--gray-500);">

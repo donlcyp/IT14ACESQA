@@ -342,17 +342,17 @@
         }
 
         .status-badge.pending {
-            background: #fef3c7;
+            background: transparent;
             color: #92400e;
         }
 
         .status-badge.approved {
-            background: #dcfce7;
+            background: transparent;
             color: #166534;
         }
 
         .status-badge.rejected {
-            background: #fee2e2;
+            background: transparent;
             color: #991b1b;
         }
 
@@ -388,26 +388,26 @@
         }
 
         .reason-box {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
+            background: transparent;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 16px;
         }
 
         .reason-box.failure {
-            background: #fef2f2;
-            border-color: #fecaca;
+            background: transparent;
+            border-color: #e5e7eb;
         }
 
         .reason-box.approval {
-            background: #f0fdf4;
-            border-color: #86efac;
+            background: transparent;
+            border-color: #e5e7eb;
         }
 
         .reason-box.rejection {
-            background: #fef2f2;
-            border-color: #fecaca;
+            background: transparent;
+            border-color: #e5e7eb;
         }
 
         .reason-label {

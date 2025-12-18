@@ -168,7 +168,7 @@
 
             <!-- Content Area -->
             <section class="content-area">
-<div style="padding: 12px 16px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
+<div style="padding: 12px 16px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
     <h1 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700;">Validation Dashboard</h1>
     <p style="margin: 0; font-size: 13px; opacity: 0.9;">Real-time attendance validation statistics</p>
 </div>
@@ -193,9 +193,9 @@
         <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Approved so far</div>
     </div>
 
-    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #8b5cf6; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
+    <div style="background: white; padding: 12px; border-radius: 8px; border-left: 3px solid #1e40af; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
         <div style="font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 6px;">MONTH APPROVED</div>
-        <div style="font-size: 24px; font-weight: 700; color: #8b5cf6;">{{ $stats['approved_month'] }}</div>
+        <div style="font-size: 24px; font-weight: 700; color: #1e40af;">{{ $stats['approved_month'] }}</div>
         <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">This month</div>
     </div>
 

@@ -3,7 +3,7 @@
 @section('title', 'Attendance Validation - AJJ CRISBER Engineering Services')
 
 @section('content')
-<div style="padding: 12px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
+<div style="padding: 12px 16px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
     <h1 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700;">Attendance Validation</h1>
     <p style="margin: 0; font-size: 13px; opacity: 0.9;">Approve or reject employee punch-in records</p>
 </div>
@@ -136,9 +136,9 @@
         <div style="font-size: 10px; color: #9ca3af; margin-top: 4px;">See all rejected punch-ins</div>
     </a>
 
-    <a href="{{ route('attendance-validation.dashboard') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #8b5cf6; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">
+    <a href="{{ route('attendance-validation.dashboard') }}" style="background: white; padding: 10px 12px; border-radius: 8px; text-decoration: none; border-left: 3px solid #1e40af; box-shadow: 0 1px 2px rgba(0,0,0,0.08); transition: all 0.3s;">
         <div style="font-size: 10px; color: #6b7280; font-weight: 600; margin-bottom: 4px;">View Dashboard</div>
-        <div style="font-size: 16px; font-weight: 700; color: #8b5cf6;">Validation Stats</div>
+        <div style="font-size: 16px; font-weight: 700; color: #1e40af;">Validation Stats</div>
         <div style="font-size: 10px; color: #9ca3af; margin-top: 4px;">See full validation dashboard</div>
     </a>
 </div>
