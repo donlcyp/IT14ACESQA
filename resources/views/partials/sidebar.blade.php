@@ -161,23 +161,11 @@
 
     /* Sidebar Overlay/Backdrop */
     .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(15, 23, 42, 0.5);
-        z-index: 999;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        display: none;
+        display: none !important;
     }
 
     .sidebar-overlay.active {
-        opacity: 1;
-        pointer-events: auto;
-        display: block;
+        display: none !important;
     }
 
     /* Main Content */

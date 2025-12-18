@@ -45,7 +45,7 @@
         textarea{resize:vertical; min-height:100px; padding:10px 12px}
         .input:focus, textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(22,163,74,.12)}
         .btn{width:100%; height:46px; border-radius:10px; border:1px solid var(--btn-dark); background:var(--btn-dark); color:#fff; font-weight:700; cursor:pointer; box-shadow:0 6px 14px rgba(2,6,23,.18);}
-        .btn:hover{background:var(--btn-dark-hover)}
+        .btn:hover{filter:brightness(0.9)}
         .success-message{margin:10px 0; padding:12px 14px; border:1px solid #86efac; background:#dcfce7; color:#166534; border-radius:8px; font-size:13px}
         .error-message{margin:10px 0; padding:12px 14px; border:1px solid #fecaca; background:#fef2f2; color:#991b1b; border-radius:8px; font-size:13px}
         .info-box{margin:16px 0; padding:12px 14px; border:1px solid #bfdbfe; background:#eff6ff; color:#1e40af; border-radius:8px; font-size:13px; line-height:1.5}

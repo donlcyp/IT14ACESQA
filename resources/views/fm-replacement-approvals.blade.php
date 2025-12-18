@@ -149,12 +149,6 @@
             transition: all 0.2s;
         }
 
-        .back-btn:hover {
-            background: var(--gray-100);
-            border-color: #059669;
-            color: #059669;
-        }
-
         /* Stats Cards */
         .stats-row {
             display: grid;
@@ -244,11 +238,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .tab:hover {
-            border-color: #059669;
-            color: #059669;
         }
 
         .tab.active {
@@ -454,27 +443,24 @@
             background: #10b981;
             color: white;
         }
-
         .btn-approve:hover {
-            background: #059669;
+            filter: brightness(0.9);
         }
 
         .btn-reject {
             background: #ef4444;
             color: white;
         }
-
         .btn-reject:hover {
-            background: #dc2626;
+            filter: brightness(0.9);
         }
 
         .btn-view {
             background: #e0e7ff;
             color: var(--accent);
         }
-
         .btn-view:hover {
-            background: #c7d2fe;
+            filter: brightness(0.95);
         }
 
         .btn:disabled {
@@ -981,7 +967,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-view" onclick="closeActionModal()">Cancel</button>
                     <button type="submit" class="btn" id="submitBtn">
                         <i class="fas fa-check"></i> Approve
                     </button>

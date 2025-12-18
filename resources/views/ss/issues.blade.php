@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #0891b2;
-            --accent-dark: #0e7490;
-            --accent-light: #22d3ee;
+            --accent: #1e40af;
+            --accent-dark: #1e3a8a;
+            --accent-light: #3b82f6;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
-            --header-bg: #0891b2;
-            --main-bg: #f0fdfa;
+            --header-bg: #1e40af;
+            --main-bg: #f8fafc;
 
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
@@ -58,7 +58,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #0e7490);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -110,11 +110,6 @@
             margin-bottom: 12px;
         }
 
-        .back-btn:hover {
-            background: white;
-            color: var(--accent);
-        }
-
         .page-header h2 {
             font-size: 24px;
             font-weight: 700;
@@ -160,7 +155,7 @@
         .form-header {
             padding: 16px 20px;
             border-bottom: 1px solid #e5e7eb;
-            background: #fef2f2;
+            background: none;
         }
 
         .form-title {
@@ -271,9 +266,8 @@
             background: #dc2626;
             color: white;
         }
-
         .btn-danger:hover {
-            background: #b91c1c;
+            filter: brightness(0.9);
         }
 
         /* Priority Select */

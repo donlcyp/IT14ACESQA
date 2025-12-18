@@ -266,9 +266,8 @@
             background: var(--accent);
             color: white;
         }
-
         .btn-primary:hover {
-            background: #1e3a8a;
+            filter: brightness(0.9);
         }
 
         .btn-secondary {
@@ -276,18 +275,16 @@
             color: var(--gray-700);
             border: 1px solid #d1d5db;
         }
-
         .btn-secondary:hover {
-            background: #e5e7eb;
+            filter: brightness(0.95);
         }
 
         .btn-danger {
             background: #fee2e2;
             color: #991b1b;
         }
-
         .btn-danger:hover {
-            background: #fecaca;
+            filter: brightness(0.95);
         }
 
         .btn-sm {

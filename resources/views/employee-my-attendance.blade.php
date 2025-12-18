@@ -225,18 +225,16 @@
             background: #1e40af;
             color: white;
         }
-
         .punch-btn-in:hover:not(:disabled) {
-            background: #1e3a8a;
+            filter: brightness(0.9);
         }
 
         .punch-btn-out {
             background: #dc2626;
             color: white;
         }
-
         .punch-btn-out:hover:not(:disabled) {
-            background: #b91c1c;
+            filter: brightness(0.9);
         }
 
         .punch-btn:disabled {

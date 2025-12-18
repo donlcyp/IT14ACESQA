@@ -46,7 +46,7 @@
         .row{display:flex; align-items:center; justify-content:space-between; margin:6px 0 16px}
         .remember{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--gray-600)}
         .btn{width:100%; height:46px; border-radius:10px; border:1px solid var(--btn-dark); background:var(--btn-dark); color:#fff; font-weight:700; cursor:pointer; box-shadow:0 6px 14px rgba(2,6,23,.18);}
-        .btn:hover{background:var(--btn-dark-hover)}
+        .btn:hover{filter:brightness(0.9)}
         .error{margin-top:10px; color:#b91c1c; font-size:14px}
         .error-summary{margin:10px 0; padding:10px 12px; border:1px solid #fecaca; background:#fef2f2; color:#7f1d1d; border-radius:8px; font-size:13px}
         .footer{margin-top:14px; text-align:center; font-size:12px; color:var(--gray-600)}

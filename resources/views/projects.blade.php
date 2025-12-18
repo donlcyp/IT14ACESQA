@@ -203,11 +203,9 @@
         }
         
         .projects-button-base:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-            border-color: #d1d5db;
+            filter: brightness(0.95);
         }
-        
+
         .projects-button-base:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
@@ -232,9 +230,7 @@
         }
 
         .projects-button-base.primary:hover {
-            background: #1e3a8a;
-            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.3);
-            transform: translateY(-2px);
+            filter: brightness(0.9);
         }
         
         .projects-button-base.primary:focus {
@@ -457,10 +453,6 @@
             height: 32px;
         }
 
-        .projects-modal-close:hover {
-            background: #f3f4f6;
-        }
-
         .projects-form-group {
             margin-bottom: 20px;
         }
@@ -570,9 +562,6 @@
             align-items: center;
             justify-content: center;
         }
-        .modal-close:hover {
-            color: #111827;
-        }
         .info-banner {
             display: flex;
             gap: 12px;
@@ -658,16 +647,12 @@
             color: #374151;
         }
         .btn-outline:hover {
-            background: #e5e7eb;
+            filter: brightness(0.95);
         }
         .btn-green {
             background: var(--accent);
             color: #ffffff;
         }
-        .btn-green:hover {
-            background: #1e3a8a;
-        }
-
         .projects-btn {
             padding: 12px 24px;
             border-radius: 8px;
@@ -687,18 +672,16 @@
             color: #374151;
             border: 1px solid #d1d5db;
         }
-
         .projects-btn-secondary:hover {
-            background: #f9fafb;
+            filter: brightness(0.95);
         }
 
         .projects-btn-primary {
             background: var(--accent);
             color: #ffffff;
         }
-
         .projects-btn-primary:hover {
-            background: #1e3a8a;
+            filter: brightness(0.9);
         }
 
         .alert {
@@ -762,10 +745,6 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
-            background: #f3f4f6;
-            color: #111827;
-        }
         .page-btn:active:not(.disabled):not(.ellipsis) {
             transform: scale(0.95);
         }
@@ -786,9 +765,6 @@
         .page-btn.ellipsis {
             cursor: default;
             pointer-events: none;
-        }
-        .page-btn.ellipsis:hover {
-            background: transparent;
         }
         @media (max-width: 640px) {
             .page-btn {
@@ -890,9 +866,8 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-
         .error-modal-button:hover {
-            background-color: #991b1b;
+            filter: brightness(0.9);
         }
 
         @keyframes slideInUp {
@@ -1312,7 +1287,6 @@
                             </div>
 
                             <div class="projects-modal-footer">
-                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeProjectModal()">Cancel</button>
                                 <button type="submit" class="projects-btn projects-btn-primary">
                                     <i class="fas fa-save"></i>
                                     <span>Save Project</span>
@@ -1452,7 +1426,6 @@
                             </div>
 
                             <div class="projects-modal-footer">
-                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeEditProjectModal()">Cancel</button>
                                 <button type="submit" class="projects-btn projects-btn-primary">
                                     <i class="fas fa-save"></i>
                                     <span>Save Changes</span>
@@ -1488,7 +1461,6 @@
                             </div>
 
                             <div class="projects-modal-footer">
-                                <button type="button" class="projects-btn projects-btn-secondary" onclick="closeArchiveModal()">Cancel</button>
                                 <button type="submit" class="projects-btn" style="background: #dc2626; color: white;">
                                     <i class="fas fa-archive"></i>
                                     <span>Archive</span>
@@ -1529,7 +1501,6 @@
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                    <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
                     <button class="btn btn-green" onclick="saveEmployeeAssignments()">
                         <i class="fas fa-save"></i> Save Changes
                     </button>

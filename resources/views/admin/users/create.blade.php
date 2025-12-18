@@ -153,11 +153,8 @@
       color: #fff;
       min-width: 120px;
     }
-    
     .btn-primary:hover {
-      background: #1e3a8a;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+      filter: brightness(0.9);
     }
     
     .btn-secondary { 
@@ -165,10 +162,8 @@
       color: #111827;
       text-decoration: none;
     }
-    
     .btn-secondary:hover {
-      background: #e5e7eb;
-      transform: translateY(-2px);
+      filter: brightness(0.95);
     }
     
     @media (max-width: 768px) {

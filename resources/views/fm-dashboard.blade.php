@@ -185,9 +185,8 @@
             background: #059669;
             color: white;
         }
-
         .action-btn.primary:hover {
-            background: #047857;
+            filter: brightness(0.9);
         }
 
         .action-btn.secondary {
@@ -195,11 +194,8 @@
             color: var(--gray-700);
             border: 1px solid var(--gray-300);
         }
-
         .action-btn.secondary:hover {
-            background: var(--gray-100);
-            border-color: #059669;
-            color: #059669;
+            filter: brightness(0.95);
         }
 
         .action-btn.danger {
@@ -207,9 +203,8 @@
             color: #dc2626;
             border: 1px solid #fecaca;
         }
-
         .action-btn.danger:hover {
-            background: #fee2e2;
+            filter: brightness(0.95);
         }
 
         /* KPI Cards */
@@ -456,9 +451,8 @@
             align-items: center;
             gap: 4px;
         }
-
         .view-btn:hover {
-            background: #c7d2fe;
+            filter: brightness(0.95);
         }
 
         /* Empty State */

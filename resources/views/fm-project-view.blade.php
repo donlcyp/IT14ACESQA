@@ -160,12 +160,6 @@
             transition: all 0.2s;
         }
 
-        .back-btn:hover {
-            background: var(--gray-100);
-            border-color: #059669;
-            color: #059669;
-        }
-
         /* Financial Summary Cards */
         .finance-grid {
             display: grid;
@@ -424,18 +418,16 @@
             background: #10b981;
             color: white;
         }
-
         .btn-approve:hover {
-            background: #059669;
+            filter: brightness(0.9);
         }
 
         .btn-reject {
             background: #ef4444;
             color: white;
         }
-
         .btn-reject:hover {
-            background: #dc2626;
+            filter: brightness(0.9);
         }
 
         /* Info Grid */
@@ -591,9 +583,8 @@
             background: var(--gray-300);
             color: var(--gray-700);
         }
-
         .btn-secondary:hover {
-            background: var(--gray-400);
+            filter: brightness(0.95);
         }
 
         /* Toast */
@@ -890,7 +881,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeActionModal()">Cancel</button>
                     <button type="submit" class="btn" id="submitBtn">
                         <i class="fas fa-check"></i> Approve
                     </button>

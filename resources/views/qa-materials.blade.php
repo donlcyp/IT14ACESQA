@@ -173,12 +173,6 @@
             transition: all 0.2s;
         }
 
-        .back-btn:hover {
-            background: var(--sidebar-bg);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
         /* Status Tabs */
         .status-tabs {
             display: flex;
@@ -205,11 +199,6 @@
             align-items: center;
             gap: 8px;
             text-decoration: none;
-        }
-
-        .status-tab:hover {
-            border-color: var(--accent);
-            color: var(--accent);
         }
 
         .status-tab.active {
@@ -345,18 +334,16 @@
             background: var(--accent);
             color: white;
         }
-
         .action-btn.inspect:hover {
-            background: #1e3a8a;
+            filter: brightness(0.9);
         }
 
         .action-btn.view {
             background: #e0e7ff;
             color: var(--accent);
         }
-
         .action-btn.view:hover {
-            background: #778de3ff;
+            filter: brightness(0.95);
         }
 
         .failure-reason {
@@ -438,10 +425,6 @@
             padding: 4px;
         }
 
-        .modal-close:hover {
-            color: var(--black-1);
-        }
-
         .modal-body {
             padding: 24px;
         }
@@ -498,10 +481,6 @@
             transition: all 0.2s;
         }
 
-        .decision-btn:hover {
-            border-color: var(--accent);
-        }
-
         .decision-btn.selected.approve {
             border-color: #10b981;
             background: #d1fae5;
@@ -545,18 +524,16 @@
             background: var(--gray-300);
             color: var(--gray-700);
         }
-
         .btn-secondary:hover {
-            background: #c0c5cc;
+            filter: brightness(0.95);
         }
 
         .btn-primary {
             background: var(--accent);
             color: white;
         }
-
         .btn-primary:hover {
-            background: #1e3a8a;
+            filter: brightness(0.9);
         }
 
         .material-info-box {
@@ -838,7 +815,6 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeInspectModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-check"></i> Submit Decision
                     </button>
@@ -864,9 +840,6 @@
                     <i class="fas fa-spinner fa-spin" style="font-size: 32px;"></i>
                     <p style="margin-top: 12px;">Loading details...</p>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeViewDetailsModal()">Close</button>
             </div>
         </div>
     </div>

@@ -222,12 +222,16 @@
             box-shadow: var(--shadow-xs);
             font-weight: 500;
         }
-        .btn:hover { filter: brightness(0.97); }
+        .btn:hover {
+            filter: brightness(0.95);
+        }
         .btn-primary {
             background: var(--accent);
             color: #ffffff;
         }
-        .btn-primary:hover { filter: brightness(0.93); }
+        .btn-primary:hover {
+            filter: brightness(0.9);
+        }
         .btn-outline {
             border: 1px solid #d1d5db;
             background: #ffffff;
@@ -383,10 +387,6 @@
             transition: all 0.2s ease;
             user-select: none;
             text-decoration: none;
-        }
-        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
-            background: #f3f4f6;
-            color: #111827;
         }
         .page-btn.active {
             background: var(--accent);

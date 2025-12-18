@@ -117,7 +117,7 @@ class SiteSupervisorController extends Controller
             return redirect()->route('ss.dashboard')->with('error', 'You are not assigned to this project.');
         }
         
-        $project->load(['client', 'assignedPM', 'employees', 'materials', 'updates' => function($q) {
+        $project->load(['client', 'assignedPM', 'employees.user', 'materials', 'updates' => function($q) {
             $q->orderBy('created_at', 'desc');
         }]);
         
@@ -357,17 +357,17 @@ class SiteSupervisorController extends Controller
         $user = auth()->user();
         $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
         
-        $assignedProjects = collect();
+        $projects = collect();
         $projectEmployees = collect();
         
         if ($employeeRecord) {
-            $assignedProjects = $employeeRecord->projects()
+            $projects = $employeeRecord->projects()
                 ->where('archived', false)
                 ->with('employees')
                 ->get();
             
             // Get all employees from assigned projects
-            $employeeIds = $assignedProjects->flatMap(function($project) {
+            $employeeIds = $projects->flatMap(function($project) {
                 return $project->employees->pluck('id');
             })->unique();
             
@@ -377,12 +377,32 @@ class SiteSupervisorController extends Controller
         // Get attendance records with filters
         $date = $request->filled('date') ? Carbon::parse($request->date) : Carbon::today();
         
-        $attendance = EmployeeAttendance::whereIn('employee_id', $projectEmployees->pluck('id'))
+        $attendanceQuery = EmployeeAttendance::whereIn('employee_id', $projectEmployees->pluck('id'))
             ->whereDate('date', $date)
-            ->with('employee')
-            ->get();
+            ->with(['employee', 'employee.projects']);
         
-        return view('ss.attendance-verification', compact('assignedProjects', 'projectEmployees', 'attendance', 'date'));
+        // Apply project filter if provided
+        if ($request->filled('project')) {
+            $projectId = $request->project;
+            $project = Project::find($projectId);
+            if ($project) {
+                $projectEmployeeIds = $project->employees->pluck('id');
+                $attendanceQuery->whereIn('employee_id', $projectEmployeeIds);
+            }
+        }
+        
+        $attendance = $attendanceQuery->get();
+        
+        // Calculate stats
+        $stats = [
+            'total_today' => $attendance->count(),
+            'present' => $attendance->where('attendance_status', 'Present')->count(),
+            'late' => $attendance->where('is_late', true)->count(),
+            'verified' => $attendance->where('validation_status', 'approved')->count(),
+            'pending_verification' => $attendance->where('validation_status', 'pending')->count(),
+        ];
+        
+        return view('ss.attendance-verification', compact('projects', 'projectEmployees', 'attendance', 'date', 'stats'));
     }
     
     /**
@@ -392,14 +412,12 @@ class SiteSupervisorController extends Controller
     {
         $user = auth()->user();
         
-        $validated = $request->validate([
-            'verified' => 'required|boolean',
-            'verification_notes' => 'nullable|string|max:500',
-        ]);
-        
-        // Update only fields that exist in the schema
+        // Update attendance as verified by site supervisor
         $attendance->update([
-            'status' => $validated['verified'] ? 'Present' : 'Absent',
+            'validation_status' => 'approved',
+            'validated_by' => $user->id,
+            'validated_at' => now(),
+            'attendance_status' => 'Present',
         ]);
         
         return back()->with('success', 'Attendance verification updated.');

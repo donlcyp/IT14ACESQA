@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #0891b2;
-            --accent-dark: #0e7490;
-            --accent-light: #22d3ee;
+            --accent: #1e40af;
+            --accent-dark: #1e3a8a;
+            --accent-light: #3b82f6;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
-            --header-bg: #0891b2;
-            --main-bg: #f0fdfa;
+            --header-bg: #1e40af;
+            --main-bg: #f8fafc;
 
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
@@ -58,7 +58,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #0e7490);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -108,11 +108,6 @@
             border-radius: 8px;
             transition: all 0.2s;
             margin-bottom: 12px;
-        }
-
-        .back-btn:hover {
-            background: white;
-            color: var(--accent);
         }
 
         .page-header h2 {
@@ -273,9 +268,9 @@
             font-weight: 600;
         }
 
-        .badge-pending { background: #fef3c7; color: #92400e; }
-        .badge-received { background: #d1fae5; color: #065f46; }
-        .badge-damaged { background: #fee2e2; color: #991b1b; }
+        .badge-pending { background: none; color: #92400e; }
+        .badge-received { background: none; color: #065f46; }
+        .badge-damaged { background: none; color: #991b1b; }
 
         /* Action Button */
         .btn {
@@ -296,9 +291,8 @@
             background: var(--accent);
             color: white;
         }
-
         .btn-confirm:hover {
-            background: var(--accent-dark);
+            filter: brightness(0.9);
         }
 
         .btn-sm {
@@ -445,9 +439,8 @@
             color: var(--gray-700);
             border: 1px solid #e5e7eb;
         }
-
         .btn-secondary:hover {
-            background: #f9fafb;
+            filter: brightness(0.95);
         }
     </style>
 </head>
@@ -646,7 +639,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-confirm">
                         <i class="fas fa-check"></i> Confirm Receipt
                     </button>

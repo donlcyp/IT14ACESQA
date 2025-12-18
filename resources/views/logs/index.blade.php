@@ -208,21 +208,16 @@
       background-color: var(--accent);
       color: white;
     }
-
     .btn-primary:hover {
-      background-color: #1e3a8a;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(22, 163, 74, 0.2);
+      filter: brightness(0.9);
     }
 
     .btn-secondary {
       background-color: #e5e7eb;
       color: var(--gray-700);
     }
-
     .btn-secondary:hover {
-      background-color: #d1d5db;
-      transform: translateY(-2px);
+      filter: brightness(0.95);
     }
 
     /* Filter Card */
@@ -388,11 +383,6 @@
       color: #374151;
       text-decoration: underline;
     }
-    a.page-btn:hover {
-      color: #111827;
-      text-decoration: underline;
-      background: transparent;
-    }
     span.page-btn {
       text-decoration: none;
       color: #374151;
@@ -461,11 +451,6 @@
       font-weight: 600;
       margin-top: 20px;
       transition: all 0.3s ease;
-    }
-
-    .back-link:hover {
-      transform: translateX(-5px);
-      color: #1e3a8a;
     }
 
     /* Responsive */

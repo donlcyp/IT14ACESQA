@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #0891b2;
-            --accent-dark: #0e7490;
-            --accent-light: #22d3ee;
+            --accent: #1e40af;
+            --accent-dark: #1e3a8a;
+            --accent-light: #3b82f6;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
-            --header-bg: #0891b2;
-            --main-bg: #f0fdfa;
+            --header-bg: #1e40af;
+            --main-bg: #f8fafc;
 
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
@@ -63,7 +63,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #0e7490);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -271,7 +271,7 @@
             font-weight: 600;
         }
 
-        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-pending { background: none; color: #92400e; }
         .badge-open { background: #fee2e2; color: #991b1b; }
         .badge-resolved { background: #d1fae5; color: #065f46; }
         .badge-progress { background: #dbeafe; color: #1e40af; }
@@ -337,10 +337,8 @@
             text-decoration: none;
             transition: all 0.2s;
         }
-
         .quick-action-btn:hover {
-            background: var(--accent-dark);
-            transform: translateY(-1px);
+            filter: brightness(0.9);
         }
 
         .quick-action-btn.secondary {
@@ -348,10 +346,8 @@
             color: var(--gray-700);
             border: 1px solid #e5e7eb;
         }
-
         .quick-action-btn.secondary:hover {
-            background: #f9fafb;
-            border-color: var(--accent);
+            filter: brightness(0.95);
         }
 
         /* Project Card */
@@ -391,7 +387,7 @@
             font-weight: 600;
         }
 
-        .status-ongoing { background: #dbeafe; color: #1e40af; }
+            .status-ongoing { background: none; color: #1e40af; }
         .status-completed { background: #d1fae5; color: #065f46; }
 
         .project-card-info {

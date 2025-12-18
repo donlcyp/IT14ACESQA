@@ -242,9 +242,6 @@
         .btn-blue  { background: var(--accent); border-color: var(--accent); color:#fff; }
         .btn-green { background: var(--accent); border-color: var(--accent); color:#fff; }
         .btn-red   { background: var(--accent); border-color: var(--accent); color:#fff; }
-        .btn-blue:hover  { background: #1e3a8a; }
-        .btn-green:hover { background: #15803d; }
-        .btn-red:hover   { background: #15803d; }
         .search-box {
             position: relative;
             width: 320px;
@@ -285,13 +282,11 @@
             cursor: pointer;
             box-shadow: var(--shadow-xs);
         }
-        .btn:hover { background: #f9fafb; }
         .btn-primary {
             background: var(--accent);
             border-color: var(--accent);
             color: #fff;
         }
-        .btn-primary:hover { background: #15803d; }
 
         /* Employee Cards */
         .employee-cards {
@@ -377,7 +372,6 @@
             justify-content: flex-end;
         }
         .btn-success { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .btn-success:hover { filter: brightness(0.95); }
 
         @media (max-width: 1024px) {
             .grid.cols-5, .grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -627,11 +621,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .action-btn:hover {
-            background: var(--accent);
-            color: #ffffff;
-            border-color: var(--accent);
-        }
         .action-btn.disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -856,7 +845,6 @@
             box-shadow: var(--shadow-xs);
             font-weight: 500;
         }
-        .btn:hover { filter: brightness(0.97); }
         .btn-outline {
             border: 1px solid #d1d5db;
             background: #ffffff;
@@ -865,7 +853,6 @@
             background: var(--accent);
             color: #ffffff;
         }
-        .btn-green:hover { filter: brightness(0.93); }
         .btn-red {
             background: #dc2626;
             color: #ffffff;
@@ -925,7 +912,7 @@
             box-shadow: var(--shadow-xs);
         }
         .attendance-actions .btn-save:hover {
-            filter: brightness(0.93);
+            filter: brightness(0.9);
         }
 
         /* Badge Styles - Enhanced with backgrounds */
@@ -1046,10 +1033,6 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .page-btn:hover:not(.disabled):not(.active):not(.ellipsis) {
-            background: #f3f4f6;
-            color: #111827;
-        }
         .page-btn:active:not(.disabled):not(.ellipsis) {
             transform: scale(0.95);
         }
@@ -1070,9 +1053,6 @@
         .page-btn.ellipsis {
             cursor: default;
             pointer-events: none;
-        }
-        .page-btn.ellipsis:hover {
-            background: transparent;
         }
 
         /* Quick Punch Employee Cards */
@@ -1165,9 +1145,6 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-        }
-        .role-filter-btn:hover {
-            background: #f9fafb;
         }
         .role-filter-btn.active {
             background: var(--accent);
@@ -1286,15 +1263,9 @@
             background: #16a34a;
             color: white;
         }
-        .punch-card-btn.btn-in:hover:not(:disabled) {
-            background: #15803d;
-        }
         .punch-card-btn.btn-out {
             background: #dc2626;
             color: white;
-        }
-        .punch-card-btn.btn-out:hover:not(:disabled) {
-            background: #b91c1c;
         }
         .punch-card-btn:disabled {
             opacity: 0.5;
@@ -1712,7 +1683,6 @@
                         <thead>
                             <tr>
                                 <th>Project Name</th>
-                                <th>Client</th>
                                 <th>Project Lead</th>
                                 <th>Status</th>
                                 <th>Employees Assigned</th>
@@ -1723,7 +1693,6 @@
                             @forelse ($projects as $project)
                                 <tr>
                                     <td><strong>{{ $project->project_name }}</strong></td>
-                                    <td>{{ $project->client_full_name }}</td>
                                     <td>{{ $project->lead_full_name }}</td>
                                     <td>
                                         <span class="project-status {{ strtolower($project->status) }}">
@@ -1743,7 +1712,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" style="text-align:center; padding: 24px; color: #6b7280;">
+                                    <td colspan="5" style="text-align:center; padding: 24px; color: #6b7280;">
                                         No projects available. Create a project from the Projects page to get started.
                                     </td>
                                 </tr>
@@ -1789,7 +1758,6 @@
             </div>
 
             <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <button class="btn btn-outline" onclick="closeEditAttendanceModal()">Cancel</button>
                 <button class="btn btn-green" onclick="saveAttendanceEdit()">
                     <i class="fas fa-save"></i> Save
                 </button>
@@ -1819,10 +1787,6 @@
                 <div id="employeesView" style="display: flex; flex-direction: column; gap: 8px;">
                     <!-- Populated by JavaScript -->
                 </div>
-            </div>
-
-            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <button class="btn btn-outline" onclick="closeViewModal()">Close</button>
             </div>
         </div>
     </div>
@@ -1881,10 +1845,6 @@
                     <!-- Populated by JavaScript -->
                 </tbody>
             </table>
-
-            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <button class="btn btn-outline" onclick="closeAllProjectsAttendanceModal()">Close</button>
-            </div>
         </div>
     </div>
 

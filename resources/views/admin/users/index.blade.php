@@ -115,7 +115,7 @@
 
     /* Header Styles */
     .header {
-      background: linear-gradient(135deg, var(--header-bg), #1e40af);
+      background: #1e40af;
       padding: 20px 30px;
       display: flex;
       align-items: center;
@@ -207,11 +207,8 @@
       background-color: var(--accent);
       color: white;
     }
-
     .btn-primary:hover {
-      background-color: #15803d;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(22, 163, 74, 0.2);
+      filter: brightness(0.9);
     }
 
     /* Flash Message */
@@ -377,11 +374,6 @@
       color: #374151;
       text-decoration: underline;
     }
-    a.page-btn:hover {
-      color: #111827;
-      text-decoration: underline;
-      background: transparent;
-    }
     span.page-btn {
       text-decoration: none;
       color: #374151;
@@ -422,11 +414,6 @@
       transition: all 0.3s ease;
     }
 
-    .back-link:hover {
-      transform: translateX(-5px);
-      color: #15803d;
-    }
-
     /* Action Buttons */
     .btn-action {
       display: inline-flex;
@@ -442,10 +429,8 @@
       transition: all 0.2s ease;
       cursor: pointer;
     }
-
     .btn-action:hover {
-      background-color: #15803d;
-      transform: scale(1.1);
+      filter: brightness(0.9);
     }
 
     /* Responsive */
@@ -554,12 +539,6 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
-    }
-
-    .modal-close:hover {
-      color: #111827;
-      background: #f3f4f6;
-      border-radius: 6px;
     }
 
     .modal-body {
@@ -681,7 +660,7 @@
           <i class="fas fa-bars"></i>
         </button>
         <div class="header-title">
-          <i class="fas fa-users-gear"></i> Personnel Management
+          AJJ CRISBER Engineering Services
         </div>
       </div>
 
@@ -744,9 +723,9 @@
           ];
         @endphp
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-          <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); border-radius: 12px; padding: 20px; color: white; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);">
-            <div style="font-size: 13px; opacity: 0.9; margin-bottom: 4px;">Total Personnel</div>
-            <div style="font-size: 28px; font-weight: 700;">{{ $totalUsers }}</div>
+          <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #1e40af;">
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Total Personnel</div>
+            <div style="font-size: 24px; font-weight: 700; color: #1e40af;">{{ $totalUsers }}</div>
           </div>
           @foreach ($roleStats as $stat)
             <div style="background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid {{ $stat['color'] }}; cursor: pointer; transition: all 0.2s;" onclick="window.location='{{ route('admin.users.index', ['role' => $stat['key']]) }}'">
@@ -815,7 +794,7 @@
                           default => '#374151'
                         };
                       @endphp
-                      <span class="badge badge-role" style="background: {{ $roleColor }}15; color: {{ $roleColor }}; border: 1px solid {{ $roleColor }}40;">
+                      <span class="badge badge-role" style="background: transparent; color: {{ $roleColor }}; border: none;">
                         {{ $roleDisplay }}
                       </span>
                     </td>
@@ -990,9 +969,6 @@
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> Create
           </button>
-          <button type="button" onclick="closeCreateUserModal()" class="btn btn-secondary">
-            <i class="fas fa-times"></i> Cancel
-          </button>
         </div>
       </form>
     </div>
@@ -1090,12 +1066,6 @@
             <div class="detail-item-value" id="viewUserId">—</div>
           </div>
         </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" onclick="closeViewUserModal()" class="btn btn-secondary">
-          <i class="fas fa-times"></i> Close
-        </button>
       </div>
     </div>
   </div>

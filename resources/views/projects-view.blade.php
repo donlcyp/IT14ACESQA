@@ -167,10 +167,6 @@
             font-size: 14px;
         }
 
-        .back-button-nav:hover {
-            background: #15803d;
-        }
-
         .projects-header {
             background: white;
             border-radius: 8px;
@@ -418,18 +414,16 @@
             background: var(--accent);
             color: white;
         }
-
         .btn-primary:hover {
-            background: #15803d;
+            filter: brightness(0.9);
         }
 
         .btn-secondary {
             background: var(--gray-400);
             color: var(--black-1);
         }
-
         .btn-secondary:hover {
-            background: var(--gray-300);
+            filter: brightness(0.95);
         }
 
         .report-section {
@@ -496,10 +490,6 @@
         .filter-btn.active {
             background: var(--accent);
             color: white;
-            border-color: var(--accent);
-        }
-
-        .filter-btn:hover {
             border-color: var(--accent);
         }
 
@@ -666,9 +656,6 @@
             align-items: center;
             justify-content: center;
         }
-        .modal-close:hover {
-            color: #111827;
-        }
         .info-banner {
             display: flex;
             gap: 12px;
@@ -754,14 +741,14 @@
             color: #374151;
         }
         .btn-outline:hover {
-            background: #e5e7eb;
+            filter: brightness(0.95);
         }
         .btn-green {
             background: var(--accent);
             color: #ffffff;
         }
         .btn-green:hover {
-            background: #15803d;
+            filter: brightness(0.9);
         }
     </style>
 </head>
@@ -869,7 +856,6 @@
                         padding: 4px;
                     }
 
-                    #notificationModal .modal-close:hover { color: #111827; }
                     #notificationModal .modal-footer { display: none !important; }
                     #notificationMessage { font-size: 13px; color: #1f2937; margin: 0; }
 
@@ -1891,7 +1877,6 @@
                         .qa-status-badge.failed { color: #991b1b; }
                         .qa-status-badge.requires_recheck { background: #e0e7ff; color: #3730a3; }
                         .qa-inspect-btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
-                        .qa-inspect-btn:hover { background: #1e3a8a; transform: translateY(-1px); }
                         .qa-bulk-actions { display: none; padding: 16px; background: var(--sidebar-bg); border-radius: 8px; margin-bottom: 20px; align-items: center; gap: 16px; flex-wrap: wrap; }
                         .qa-bulk-actions.show { display: flex; }
                         .qa-rating { display: flex; gap: 4px; }
@@ -2089,7 +2074,6 @@
                         .report-container { background: #fff; padding: 20px 24px 20px 24px; margin: 0 -24px; }
                         .report-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px 0; margin-left: -24px; margin-right: -24px; padding: 20px 24px 20px 24px; border-bottom: 1px solid var(--gray-300); }
                         .report-nav-btn { padding: 12px 20px; border: 1px solid var(--gray-300); background: #fff; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--gray-700); transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
-                        .report-nav-btn:hover { background: var(--sidebar-bg); border-color: var(--accent); }
                         .report-nav-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
                         .report-nav-btn i { font-size: 14px; }
                         .report-panel { display: none; padding: 8px 0; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
@@ -2099,13 +2083,9 @@
                         .report-header-subtitle { font-size: 13px; color: var(--gray-600); margin-top: 6px; }
                         .report-actions { display: flex; gap: 10px; flex-wrap: wrap; }
                         .report-action-btn { padding: 10px 16px; border: 1px solid var(--gray-300); background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--gray-700); transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
-                        .report-action-btn:hover { background: var(--sidebar-bg); }
                         .report-action-btn.pdf { color: #dc2626; border-color: #fecaca; }
-                        .report-action-btn.pdf:hover { background: #fef2f2; }
                         .report-action-btn.excel { color: #166534; border-color: #bbf7d0; }
-                        .report-action-btn.excel:hover { background: #f0fdf4; }
                         .report-action-btn.print { color: var(--accent); border-color: #bfdbfe; }
-                        .report-action-btn.print:hover { background: #eff6ff; }
                         .report-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
                         .report-table th { background: var(--sidebar-bg); padding: 14px 16px; text-align: left; font-weight: 600; color: var(--black-1); border-bottom: 2px solid var(--gray-300); }
                         .report-table td { padding: 14px 16px; border-bottom: 1px solid var(--gray-300); color: var(--gray-700); line-height: 1.5; }
@@ -3187,7 +3167,6 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="closeReplacementActionModal()">Cancel</button>
                         <button type="submit" class="btn" id="replacementActionSubmitBtn" style="background: #10b981; color: white;">
                             <i class="fas fa-check"></i> Approve Replacement
                         </button>
@@ -3348,11 +3327,6 @@
                                     transition: all 0.2s;
                                     color: #374151;
                                 }
-                                .category-preset-btn:hover {
-                                    border-color: var(--accent);
-                                    background: #eff6ff;
-                                    color: var(--accent);
-                                }
                                 .category-preset-btn.active {
                                     background: var(--accent);
                                     color: white;
@@ -3389,11 +3363,6 @@
                                     cursor: pointer;
                                     transition: all 0.2s;
                                     color: #374151;
-                                }
-                                .template-btn:hover {
-                                    border-color: var(--accent);
-                                    background: #eff6ff;
-                                    color: var(--accent);
                                 }
                             </style>
                         </div>
@@ -3480,7 +3449,6 @@
                     </div>
 
                     <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeBOQModal()">Cancel</button>
                         <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Save BOQ Item</button>
                     </div>
                 </form>
@@ -3559,7 +3527,6 @@
                     </div>
 
                     <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
-                        <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeQAInspectModal()">Cancel</button>
                         <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px;">
                             <i class="fas fa-clipboard-check"></i> Submit Inspection
                         </button>
@@ -3608,7 +3575,6 @@
                     </div>
 
                     <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
-                        <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeBulkQAModal()">Cancel</button>
                         <button type="submit" class="btn btn-primary" style="padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
                             <i class="fas fa-check-double"></i> Apply to Selected
                         </button>
@@ -3742,7 +3708,6 @@
                     </div>
 
                     <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;" onclick="closeAddTaskModal()">Cancel</button>
                         <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Add Task</button>
                     </div>
                 </form>
@@ -3768,7 +3733,6 @@
                     </div>
                 </div>
                 <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--gray-400); display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" class="btn" style="background: var(--gray-400); color: var(--black-1); padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="closeDeleteModal()">Cancel</button>
                     <button type="button" id="confirmDeleteBtn" class="btn" style="background: #dc2626; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="executeDelete()">
                         <i class="fas fa-trash"></i> Delete
                     </button>
@@ -3854,7 +3818,6 @@
                     </div>
                 </div>
                 <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-300); display: flex; justify-content: flex-end; gap: 12px;">
-                    <button type="button" class="btn" style="background: var(--gray-200); color: var(--gray-700); padding: 10px 20px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeFailureReasonModal()">Cancel</button>
                     <button type="button" class="btn" style="background: #dc2626; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="submitFailureReason()">
                         <i class="fas fa-check"></i> Confirm Failure
                     </button>
@@ -3919,7 +3882,6 @@
                     </div>
                 </div>
                 <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--gray-300); display: flex; justify-content: flex-end; gap: 12px;">
-                    <button type="button" class="btn" style="background: var(--gray-200); color: var(--gray-700); padding: 10px 20px; border: 1px solid var(--gray-300); border-radius: 6px; cursor: pointer; font-weight: 500;" onclick="closeCompleteProjectModal()">Cancel</button>
                     <form action="{{ route('projects.complete', $project->id) }}" method="POST" style="margin: 0;">
                         @csrf
                         <button type="submit" class="btn" style="background: #16a34a; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px;">
@@ -3961,7 +3923,6 @@
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: flex-end; padding: 15px 20px; border-top: 1px solid #e5e7eb;">
-                    <button class="btn btn-outline" onclick="closeEmployeeModal()">Cancel</button>
                     <button class="btn btn-green" onclick="saveEmployeeAssignments()">
                         <i class="fas fa-save"></i> Save Changes
                     </button>

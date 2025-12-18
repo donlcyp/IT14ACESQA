@@ -76,11 +76,6 @@
     </div>
 
     <style>
-        .page-btn:hover:not(.disabled):not(.active) {
-            background: #f3f4f6 !important;
-            border-color: #d1d5db !important;
-        }
-        
         .page-btn.active {
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }

@@ -220,9 +220,8 @@
             gap: 8px;
             transition: opacity 0.2s ease;
         }
-
         .audit-button:hover {
-            opacity: 0.9;
+            filter: brightness(0.9);
         }
 
         .audit-button.primary {
@@ -327,9 +326,7 @@
             transition: all 0.2s ease;
         }
         .toggle-btn:hover {
-            background: #3b82f6;
-            border-color: #3b82f6;
-            color: white;
+            filter: brightness(0.95);
         }
 
         /* Tables */
@@ -474,7 +471,6 @@
           border-radius: 50%;
           transition: background 0.2s;
         }
-        .modal-close:hover { background: #f0f0f0; }
         .modal-title {
           font-size: 20px;
           font-weight: 600;
@@ -496,9 +492,9 @@
         .button-group { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
         .btn { padding: 10px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
         .btn-cancel { background: white; color: #666; border: 1px solid #d0d0d0; }
-        .btn-cancel:hover { background: #f9f9f9; }
+        .btn-cancel:hover { filter: brightness(0.95); }
         .btn-add { background: #0066cc; color: white; border: none; }
-        .btn-add:hover { background: #0055aa; }
+        .btn-add:hover { filter: brightness(0.9); }
         .input-wrapper { position: relative; }
         .calendar-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #999; }
         .input-wrapper input { padding-right: 36px; }

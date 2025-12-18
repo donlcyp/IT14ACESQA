@@ -373,14 +373,12 @@
             transition: all 0.3s ease;
         }
         
-        .btn:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        
         .btn:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+        .btn:hover {
+            filter: brightness(0.95);
         }
         .btn-outline {
             border: 1px solid #d1d5db;
@@ -390,11 +388,8 @@
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(30, 64, 175, 0.2);
         }
-        
         .btn-green:hover {
-            background: #1e3a8a;
-            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.3);
-            transform: translateY(-2px);
+            filter: brightness(0.9);
         }
         
         .btn-green:focus {
@@ -499,20 +494,17 @@
             cursor: pointer;
             box-shadow: var(--shadow-xs);
         }
-        .btn:hover { background: #f9fafb; }
         .btn-primary {
             background: var(--accent);
             border-color: var(--accent);
             color: #fff;
         }
-        .btn-primary:hover { background: #15803d; }
 
         .btn-success {
             background: var(--accent);
             border-color: var(--accent);
             color: #fff;
         }
-        .btn-success:hover { background: #15803d; }
 
         /* Employee Cards */
         .employee-cards {
@@ -598,7 +590,6 @@
             justify-content: flex-end;
         }
         .btn-success { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .btn-success:hover { filter: brightness(0.95); }
 
         @media (max-width: 1024px) {
             .grid.cols-5, .grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -787,11 +778,6 @@
             color: #374151;
             text-decoration: underline !important;
         }
-        a.page-btn:hover {
-            color: #111827;
-            text-decoration: underline !important;
-            background: transparent !important;
-        }
         /* Spans - no underline */
         span.page-btn {
             text-decoration: none;
@@ -822,9 +808,6 @@
         .page-btn.ellipsis {
             cursor: default;
             pointer-events: none;
-        }
-        .page-btn.ellipsis:hover {
-            background: transparent;
         }
         @media (max-width: 640px) {
             .page-btn {
@@ -1030,7 +1013,6 @@
                     </div>
                 </div>
                 <div class="form-actions" style="margin-top: 24px;">
-                    <button type="button" class="btn btn-outline" id="cancelEmployeeModal">Cancel</button>
                     <button type="submit" class="btn btn-green"><i class="fas fa-save"></i> Save Employee</button>
                 </div>
             </form>

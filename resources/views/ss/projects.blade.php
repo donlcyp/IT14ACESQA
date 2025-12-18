@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #0891b2;
-            --accent-dark: #0e7490;
-            --accent-light: #22d3ee;
+            --accent: #1e40af;
+            --accent-dark: #1e3a8a;
+            --accent-light: #3b82f6;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
-            --header-bg: #0891b2;
-            --main-bg: #f0fdfa;
+            --header-bg: #1e40af;
+            --main-bg: #f8fafc;
 
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
@@ -61,7 +61,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #0e7490);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -134,11 +134,6 @@
             transition: all 0.2s;
         }
 
-        .back-btn:hover {
-            background: white;
-            color: var(--accent);
-        }
-
         /* Projects Grid */
         .projects-grid {
             display: grid;
@@ -189,8 +184,8 @@
             white-space: nowrap;
         }
 
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-ongoing { background: #dbeafe; color: #1e40af; }
+        .status-pending { background: none; color: #92400e; }
+        .status-ongoing { background: none; color: #1e40af; }
         .status-completed { background: #d1fae5; color: #065f46; }
 
         .project-card-body {
@@ -248,9 +243,8 @@
             background: var(--accent);
             color: white;
         }
-
         .btn-primary:hover {
-            background: var(--accent-dark);
+            filter: brightness(0.9);
         }
 
         .btn-secondary {
@@ -258,10 +252,8 @@
             color: var(--gray-700);
             border: 1px solid #e5e7eb;
         }
-
         .btn-secondary:hover {
-            background: #f9fafb;
-            border-color: var(--accent);
+            filter: brightness(0.95);
         }
 
         .empty-state {

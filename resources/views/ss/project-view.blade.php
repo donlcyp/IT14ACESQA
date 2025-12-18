@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --accent: #0891b2;
-            --accent-dark: #0e7490;
-            --accent-light: #22d3ee;
+            --accent: #1e40af;
+            --accent-dark: #1e3a8a;
+            --accent-light: #3b82f6;
             --white: #ffffff;
             --sidebar-bg: #f8fafc;
-            --header-bg: #0891b2;
-            --main-bg: #f0fdfa;
+            --header-bg: #1e40af;
+            --main-bg: #f8fafc;
 
             --gray-300: #d0d5dd;
             --gray-400: #e9e9e9;
@@ -58,7 +58,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #0e7490);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -97,23 +97,18 @@
         }
 
         .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-600);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            margin-bottom: 12px;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
-        .back-btn:hover {
-            background: white;
-            color: var(--accent);
-        }
+        .badge-present { background: none; color: #065f46; }
+        .badge-absent { background: none; color: #991b1b; }
+        .badge-late { background: none; color: #92400e; }
+        .badge-pending { background: none; color: #4b5563; }
+        .badge-verified { background: none; color: #1e40af; }
 
         .page-header h2 {
             font-size: 24px;
@@ -297,11 +292,18 @@
             border-radius: 8px;
             font-size: 11px;
             font-weight: 600;
+            background: none;
+            border: none;
         }
 
-        .role-ss { background: #cffafe; color: #0e7490; }
-        .role-cw { background: #e5e7eb; color: #4b5563; }
-        .role-other { background: #e0e7ff; color: #4338ca; }
+        /* Hierarchy: SS > PM > FM > HR > QA > CW > Other */
+        .role-ss { color: #1e40af; font-weight: 700; }
+        .role-pm { color: #0e7490; font-weight: 700; }
+        .role-fm { color: #92400e; font-weight: 600; }
+        .role-hr { color: #991b1b; font-weight: 600; }
+        .role-qa { color: #4338ca; font-weight: 600; }
+        .role-cw { color: #4b5563; font-weight: 500; }
+        .role-other { color: #64748b; font-weight: 500; }
 
         .empty-state {
             padding: 40px 20px;
@@ -341,9 +343,8 @@
             background: var(--accent);
             color: white;
         }
-
         .btn-primary:hover {
-            background: var(--accent-dark);
+            filter: brightness(0.9);
         }
 
         .btn-secondary {
@@ -351,10 +352,8 @@
             color: var(--gray-700);
             border: 1px solid #e5e7eb;
         }
-
         .btn-secondary:hover {
-            background: #f9fafb;
-            border-color: var(--accent);
+            filter: brightness(0.95);
         }
 
         .read-only-notice {
@@ -517,23 +516,52 @@
                                 </thead>
                                 <tbody>
                                     @foreach($project->employees as $employee)
+                                    @php
+                                        $employees = $project->employees->all();
+                                        $nonCW = array_filter($employees, function($e) {
+                                            $role = strtoupper($e->pivot->role_title ?? $e->position ?? 'Construction Worker');
+                                            return !in_array($role, ['CONSTRUCTION WORKER', 'CW']);
+                                        });
+                                        $cw = array_filter($employees, function($e) {
+                                            $role = strtoupper($e->pivot->role_title ?? $e->position ?? 'Construction Worker');
+                                            return in_array($role, ['CONSTRUCTION WORKER', 'CW']);
+                                        });
+                                        $sorted = array_merge($nonCW, $cw);
+                                        // Remove duplicates by employee id
+                                        $sorted = array_values(array_reduce($sorted, function($carry, $item) {
+                                            $carry[$item->id] = $item;
+                                            return $carry;
+                                        }, []));
+                                    @endphp
+                                    @foreach($sorted as $employee)
                                         <tr>
                                             <td>
-                                                <strong>{{ $employee->fname ?? '' }} {{ $employee->lname ?? '' }}</strong>
+                                                <strong>{{ $employee->f_name ?? '' }} {{ $employee->l_name ?? '' }}</strong>
                                             </td>
                                             <td>
                                                 @php
-                                                    $role = $employee->role ?? $employee->position ?? 'CW';
-                                                    $roleClass = match(strtoupper($role)) {
+                                                    $role = strtoupper($employee->pivot->role_title ?? $employee->position ?? 'Construction Worker');
+                                                    $roleMap = [
                                                         'SS' => 'role-ss',
+                                                        'SITE SUPERVISOR' => 'role-ss',
+                                                        'PM' => 'role-pm',
+                                                        'PROJECT MANAGER' => 'role-pm',
+                                                        'FM' => 'role-fm',
+                                                        'FINANCE MANAGER' => 'role-fm',
+                                                        'HR' => 'role-hr',
+                                                        'HR/TIMEKEEPER' => 'role-hr',
+                                                        'QUALITY ASSURANCE OFFICER' => 'role-qa',
+                                                        'QA' => 'role-qa',
+                                                        'CONSTRUCTION WORKER' => 'role-cw',
                                                         'CW' => 'role-cw',
-                                                        default => 'role-other'
-                                                    };
+                                                    ];
+                                                    $roleClass = $roleMap[$role] ?? 'role-other';
                                                 @endphp
-                                                <span class="role-badge {{ $roleClass }}">{{ $role }}</span>
+                                                <span class="role-badge {{ $roleClass }}">{{ ucwords(strtolower($role)) }}</span>
                                             </td>
-                                            <td>{{ $employee->contact_number ?? $employee->phone ?? 'N/A' }}</td>
+                                            <td>{{ $employee->user->phone ?? $employee->user->contact_number ?? 'N/A' }}</td>
                                         </tr>
+                                    @endforeach
                                     @endforeach
                                 </tbody>
                             </table>
