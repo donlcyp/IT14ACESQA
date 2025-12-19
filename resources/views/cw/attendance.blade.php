@@ -738,7 +738,10 @@
 
                 if (data.success) {
                     showNotification(data.message, 'success');
-                    checkPunchStatus();
+                    // Redirect to dashboard after successful punch-in
+                    setTimeout(() => {
+                        window.location.href = '{{ route("cw.dashboard") }}';
+                    }, 1500);
                 } else {
                     showNotification(data.message || 'Failed to punch in', 'error');
                     punchInBtn.disabled = false;

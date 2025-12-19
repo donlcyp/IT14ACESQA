@@ -722,6 +722,17 @@
             loadEmployeePunchStatus();
         });
 
+        // Determine dashboard URL based on user role
+        @php
+            $dashboardUrl = match(Auth::user()->role ?? '') {
+                'FM' => route('fm.dashboard'),
+                'SS' => route('ss.dashboard'),
+                'CW' => route('cw.dashboard'),
+                default => route('dashboard'),
+            };
+        @endphp
+        const dashboardUrl = '{{ $dashboardUrl }}';
+
         function performEmployeePunchIn() {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             
@@ -745,13 +756,17 @@
             .then(data => {
                 if (data.success) {
                     showNotification('✓ Punch In Successful!', data.message, 'success');
-                    loadEmployeePunchStatus();
                     
                     if (data.is_late) {
                         setTimeout(() => {
                             showNotification('⚠️ Late Notice', `You are ${data.late_minutes} minutes late`, 'warning');
                         }, 500);
                     }
+                    
+                    // Redirect to dashboard after successful punch-in
+                    setTimeout(() => {
+                        window.location.href = dashboardUrl;
+                    }, 1500);
                 } else {
                     showNotification('Error', data.message || 'Failed to punch in', 'error');
                 }
