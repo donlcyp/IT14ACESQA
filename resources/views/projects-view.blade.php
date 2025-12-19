@@ -936,26 +936,24 @@
 
                 @if($project->status === 'Completed')
                 <!-- Completed Project Banner -->
-                <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 2px solid #16a34a; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-                    <div style="display: flex; align-items: center; gap: 16px;">
-                        <div style="width: 56px; height: 56px; background: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-trophy" style="font-size: 24px; color: white;"></i>
-                        </div>
+                <div style="background: white; border: 1px solid var(--gray-300); border-left: 4px solid #10b981; border-radius: 8px; padding: 18px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-check-circle" style="font-size: 20px; color: #10b981;"></i>
                         <div>
-                            <h3 style="margin: 0; font-size: 18px; color: #166534; font-weight: 700;">
-                                <i class="fas fa-check-circle"></i> Project Successfully Completed
+                            <h3 style="margin: 0; font-size: 15px; color: var(--black-1); font-weight: 600;">
+                                Project Successfully Completed
                             </h3>
-                            <p style="margin: 4px 0 0; color: #15803d; font-size: 14px;">
+                            <p style="margin: 2px 0 0; color: var(--gray-600); font-size: 13px;">
                                 Completed on {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('F d, Y \a\t g:i A') : 'N/A' }}
                             </p>
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <a href="{{ route('pdf.project.download', $project->id) }}" class="btn" style="background: #166534; color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-file-pdf"></i> Download PDF Report
+                        <a href="{{ route('pdf.project.download', $project->id) }}" class="btn" style="background: white; color: var(--black-1); border: 1px solid var(--gray-300); padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-file-pdf"></i> PDF
                         </a>
-                        <a href="{{ route('csv.project.download', $project->id) }}" class="btn" style="background: white; color: #166534; border: 1px solid #16a34a; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-file-csv"></i> Export CSV
+                        <a href="{{ route('csv.project.download', $project->id) }}" class="btn" style="background: white; color: var(--black-1); border: 1px solid var(--gray-300); padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-file-csv"></i> CSV
                         </a>
                     </div>
                 </div>
@@ -2370,34 +2368,197 @@
                                     <div class="report-locked-text">The Accomplishment Report is only available after project completion.<br>Current Status: <strong>{{ $project->status }}</strong></div>
                                 </div>
                             @else
+                                @php
+                                    // Calculate accomplishment metrics
+                                    $accMaterials = $project->materials ?? collect();
+                                    $accTotalItems = $accMaterials->count();
+                                    $accPassedItems = $accMaterials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'passed')->count();
+                                    $accFailedItems = $accMaterials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'failed')->count();
+                                    
+                                    $accTotalExpenses = $accMaterials->sum(function($m) {
+                                        return (($m->material_cost ?? 0) + ($m->labor_cost ?? 0)) * ($m->quantity ?? 0);
+                                    });
+                                    $accAllocatedBudget = $project->allocated_amount ?? 0;
+                                    $accBudgetUtilization = $accAllocatedBudget > 0 ? round(($accTotalExpenses / $accAllocatedBudget) * 100, 1) : 0;
+                                    $accBudgetRemaining = max(0, $accAllocatedBudget - $accTotalExpenses);
+                                    
+                                    $accCompletedTasks = $project->updates ? $project->updates->where('status', 'Completed')->count() : 0;
+                                    $accTotalTasks = $project->updates ? $project->updates->count() : 0;
+                                    
+                                    $accTeamCount = $project->employees->count() + ($project->assignedPM ? 1 : 0);
+                                    
+                                    // Calculate duration
+                                    $accDuration = 0;
+                                    if ($project->date_started && $project->date_ended) {
+                                        $accDuration = \Carbon\Carbon::parse($project->date_started)->diffInDays(\Carbon\Carbon::parse($project->date_ended));
+                                    }
+                                @endphp
+
                                 <div class="report-notice">
                                     <i class="fas fa-check-circle" style="color: #166534;"></i>
                                     <div class="report-notice-text" style="color: #166534;">Project completed on {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('F d, Y') : 'N/A' }}</div>
                                 </div>
 
-                                <table class="report-table">
+                                <!-- Project Summary Section -->
+                                <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-info-circle" style="color: var(--accent);"></i> Project Information
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; border-left: 3px solid var(--accent);">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Project Name</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->project_name ?? $project->project_code }}</div>
+                                    </div>
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; border-left: 3px solid #7c3aed;">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Client</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->client?->company_name ?? trim($project->client_first_name . ' ' . $project->client_last_name) ?: 'N/A' }}</div>
+                                    </div>
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; border-left: 3px solid #0369a1;">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Project Manager</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->assignedPM?->name ?? 'Unassigned' }}</div>
+                                    </div>
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; border-left: 3px solid #be185d;">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Location</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->location ?? 'N/A' }}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Timeline Section -->
+                                <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-calendar-alt" style="color: var(--accent);"></i> Project Timeline
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Start Date</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'N/A' }}</div>
+                                    </div>
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Target Date</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'N/A' }}</div>
+                                    </div>
+                                    <div style="background: #dcfce7; padding: 12px; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 11px; color: #166534; text-transform: uppercase;">Completion Date</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: #166534; margin-top: 2px;">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'N/A' }}</div>
+                                    </div>
+                                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px; text-align: center;">
+                                        <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Duration</div>
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $accDuration }} days</div>
+                                    </div>
+                                </div>
+
+                                <!-- Key Accomplishments Summary -->
+                                <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-trophy" style="color: #f59e0b;"></i> Key Accomplishments
+                                </h4>
+                                <div class="report-summary" style="margin-bottom: 20px;">
+                                    <div class="report-summary-item" style="border-left: 3px solid #16a34a;">
+                                        <div class="report-summary-label">BOQ Items Completed</div>
+                                        <div class="report-summary-value" style="color: #16a34a;">{{ $accPassedItems }}/{{ $accTotalItems }}</div>
+                                        <div style="font-size: 12px; color: var(--gray-600);">{{ $accTotalItems > 0 ? round(($accPassedItems / $accTotalItems) * 100) : 0 }}% QA Passed</div>
+                                    </div>
+                                    <div class="report-summary-item" style="border-left: 3px solid #0369a1;">
+                                        <div class="report-summary-label">Tasks Completed</div>
+                                        <div class="report-summary-value" style="color: #0369a1;">{{ $accCompletedTasks }}/{{ $accTotalTasks }}</div>
+                                        <div style="font-size: 12px; color: var(--gray-600);">{{ $accTotalTasks > 0 ? round(($accCompletedTasks / $accTotalTasks) * 100) : 0 }}% Done</div>
+                                    </div>
+                                    <div class="report-summary-item" style="border-left: 3px solid #7c3aed;">
+                                        <div class="report-summary-label">Team Members</div>
+                                        <div class="report-summary-value" style="color: #7c3aed;">{{ $accTeamCount }}</div>
+                                        <div style="font-size: 12px; color: var(--gray-600);">Workers Assigned</div>
+                                    </div>
+                                    <div class="report-summary-item" style="border-left: 3px solid #be185d;">
+                                        <div class="report-summary-label">Budget Utilization</div>
+                                        <div class="report-summary-value" style="color: #be185d;">{{ $accBudgetUtilization }}%</div>
+                                        <div style="font-size: 12px; color: var(--gray-600);">₱{{ number_format($accBudgetRemaining, 2) }} Remaining</div>
+                                    </div>
+                                </div>
+
+                                <!-- Financial Summary -->
+                                <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-peso-sign" style="color: #16a34a;"></i> Financial Summary
+                                </h4>
+                                <table class="report-table" style="margin-bottom: 20px;">
                                     <thead>
                                         <tr>
-                                            <th style="width: 30%;">Field</th>
-                                            <th>Value</th>
+                                            <th style="width: 40%;">Description</th>
+                                            <th class="text-right">Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><strong>Project Name</strong></td>
-                                            <td>{{ $project->project_name ?? $project->project_code }}</td>
+                                            <td>Allocated Budget</td>
+                                            <td class="text-right">₱{{ number_format($accAllocatedBudget, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Expenses (Materials + Labor)</td>
+                                            <td class="text-right">₱{{ number_format($accTotalExpenses, 2) }}</td>
+                                        </tr>
+                                        <tr style="background: #f9fafb;">
+                                            <td><strong>Remaining Budget</strong></td>
+                                            <td class="text-right" style="color: {{ $accBudgetRemaining > 0 ? '#16a34a' : '#dc2626' }}; font-weight: 600;">₱{{ number_format($accBudgetRemaining, 2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
 
-                                <h4 style="margin: 24px 0 12px; font-size: 15px; color: var(--black-1);">Tasks Completed</h4>
+                                <!-- Scope of Work Completed -->
+                                <h4 style="margin: 20px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-clipboard-list" style="color: var(--accent);"></i> Scope of Work Completed
+                                </h4>
+                                <table class="report-table" style="margin-bottom: 20px;">
+                                    <thead>
+                                        <tr>
+                                            <th>Item Description</th>
+                                            <th class="text-center" style="width: 60px;">Qty</th>
+                                            <th class="text-center" style="width: 80px;">Unit</th>
+                                            <th class="text-right" style="width: 100px;">Amount</th>
+                                            <th class="text-center" style="width: 80px;">QA Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($accMaterials->take(10) as $item)
+                                            @php
+                                                $itemAmount = (($item->material_cost ?? 0) + ($item->labor_cost ?? 0)) * ($item->quantity ?? 0);
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $item->item_description ?? $item->material_name ?? 'N/A' }}</td>
+                                                <td class="text-center">{{ $item->quantity ?? 0 }}</td>
+                                                <td class="text-center">{{ $item->unit ?? '-' }}</td>
+                                                <td class="text-right">₱{{ number_format($itemAmount, 2) }}</td>
+                                                <td class="text-center">
+                                                    @if(strtolower($item->qa_status ?? '') === 'passed')
+                                                        <span style="color: #16a34a; font-weight: 500;"><i class="fas fa-check-circle"></i> Passed</span>
+                                                    @elseif(strtolower($item->qa_status ?? '') === 'failed')
+                                                        <span style="color: #dc2626; font-weight: 500;"><i class="fas fa-times-circle"></i> Failed</span>
+                                                    @else
+                                                        <span style="color: #6b7280;">Pending</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" style="text-align: center; color: var(--gray-500);">No items recorded</td>
+                                            </tr>
+                                        @endforelse
+                                        @if($accMaterials->count() > 10)
+                                            <tr>
+                                                <td colspan="5" style="text-align: center; color: var(--gray-500); font-style: italic;">
+                                                    ... and {{ $accMaterials->count() - 10 }} more items (see full BOQ report)
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+
+                                <!-- Tasks Completed -->
+                                <h4 style="margin: 24px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-tasks" style="color: #0369a1;"></i> Tasks Completed
+                                </h4>
                                 <table class="report-table">
                                     <thead>
                                         <tr>
                                             <th>Task</th>
-                                            <th>Date Completed</th>
+                                            <th style="width: 120px;">Date Completed</th>
                                             <th>Remarks</th>
-                                            <th>Updated By</th>
+                                            <th style="width: 120px;">Updated By</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -2416,8 +2577,45 @@
                                     </tbody>
                                 </table>
 
+                                <!-- Team Members -->
+                                <h4 style="margin: 24px 0 12px; font-size: 14px; color: var(--black-1); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-users" style="color: #7c3aed;"></i> Project Team
+                                </h4>
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Role</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if($project->assignedPM)
+                                            <tr style="background: #f0fdf4;">
+                                                <td><strong>{{ $project->assignedPM->name }}</strong></td>
+                                                <td>Project Manager</td>
+                                                <td>PM</td>
+                                            </tr>
+                                        @endif
+                                        @forelse($project->employees as $emp)
+                                            <tr>
+                                                <td>{{ trim($emp->f_name . ' ' . $emp->l_name) ?: 'N/A' }}</td>
+                                                <td>{{ $emp->position ?? 'N/A' }}</td>
+                                                <td>{{ $emp->user?->role ?? 'Worker' }}</td>
+                                            </tr>
+                                        @empty
+                                            @if(!$project->assignedPM)
+                                            <tr>
+                                                <td colspan="3" style="text-align: center; color: var(--gray-500);">No team members assigned</td>
+                                            </tr>
+                                            @endif
+                                        @endforelse
+                                    </tbody>
+                                </table>
+
                                 <div class="report-footer">
-                                    <strong>Approved By:</strong> {{ $project->assignedPM?->name ?? 'Project Manager' }}<br>
+                                    <strong>Prepared By:</strong> {{ $project->assignedPM?->name ?? 'Project Manager' }}<br>
+                                    <strong>Approved By:</strong> General Manager<br>
                                     <strong>Completion Date:</strong> {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('F d, Y') : 'N/A' }}
                                 </div>
                             @endif

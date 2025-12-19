@@ -29,55 +29,43 @@ class PDFController extends Controller
             $pdf->SetAuthor('ACES AJJ CRISBER');
             $pdf->SetTitle('Accomplishment Report - ' . $project->project_name);
             $pdf->SetSubject('Project Accomplishment Report');
+            $pdf->SetMargins(15, 15, 15);
             
             $pdf->AddPage();
+            
+            // ===== HEADER SECTION =====
+            $pdf->SetFont('helvetica', 'B', 18);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell(0, 10, 'ACES AJJ CRISBER', 0, 1, 'C');
+            
             $pdf->SetFont('helvetica', '', 10);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell(0, 5, 'AJJ CRISBER ENGINEERING SERVICES', 0, 1, 'C');
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->Cell(0, 4, 'Fire Protection | Sanitary Plumbing | Fire Alarm | Design & Build', 0, 1, 'C');
             
-            // Company Header Section
-            $pdf->SetFont('helvetica', 'B', 14);
-            $pdf->SetTextColor(196, 30, 58); // Company red color
-            $pdf->Cell(0, 8, 'ACES AJJ CRISBER', 0, 1, 'L');
-            
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(0, 4, 'AJJ CRISBER ENGINEERING SERVICES', 0, 1, 'L');
-            
-            $pdf->SetFont('helvetica', '', 7);
-            $pdf->SetTextColor(100, 100, 100);
-            $pdf->Cell(0, 3, 'Fire Protection, Sanitary Plumbing, Fire Alarm | Design & Build, Design Estimate, Supervision, Maintenance', 0, 1, 'L');
-            
-            // Professional Header with Line
-            $pdf->Ln(2);
-            $pdf->SetLineWidth(0.8);
-            $pdf->SetDrawColor(196, 30, 58);
-            $pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
+            $pdf->Ln(3);
+            $pdf->SetLineWidth(0.5);
+            $pdf->SetDrawColor(209, 213, 219);
+            $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
             $pdf->Ln(6);
             
-            $pdf->SetFont('helvetica', 'B', 16);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(0, 10, 'ACCOMPLISHMENT REPORT', 0, 1, 'C');
-            
-            $pdf->SetFont('helvetica', '', 11);
-            $pdf->SetTextColor(80, 80, 80);
-            $pdf->Cell(0, 6, $project->project_name, 0, 1, 'C');
+            // Document Title
+            $pdf->SetFont('helvetica', 'B', 14);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell(0, 8, 'PROJECT ACCOMPLISHMENT REPORT', 0, 1, 'C');
             
             $pdf->SetFont('helvetica', '', 9);
-            $pdf->SetTextColor(100, 100, 100);
-            $pdf->Cell(0, 5, 'Report Generated: ' . now()->format('F d, Y'), 0, 1, 'C');
-            
-            $pdf->SetLineWidth(0.8);
-            $pdf->SetDrawColor(196, 30, 58);
-            $pdf->Line(10, $pdf->GetY() + 2, 200, $pdf->GetY() + 2);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell(0, 5, 'Document Generated: ' . now()->format('F d, Y \a\t h:i A'), 0, 1, 'C');
             $pdf->Ln(8);
             
-            // PROJECT DETAILS SECTION with border
-            $pdf->SetFont('helvetica', 'B', 11);
-            $pdf->SetTextColor(255, 255, 255);
-            $pdf->SetFillColor(41, 84, 159);
-            $pdf->Cell(0, 8, '  PROJECT DETAILS', 0, 1, 'L', true);
-            
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->SetTextColor(0, 0, 0);
+            // ===== PROJECT INFORMATION SECTION =====
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->SetTextColor(55, 65, 81);
+            $pdf->SetFillColor(243, 244, 246);
+            $pdf->Cell(0, 7, ' PROJECT INFORMATION', 0, 1, 'L', true);
+            $pdf->Ln(2);
             
             // Get client name
             $clientName = 'N/A';
@@ -87,264 +75,371 @@ class PDFController extends Controller
                 $clientName = trim(($project->client_first_name ?? '') . ' ' . ($project->client_last_name ?? ''));
             }
             
-            // Left and Right columns
-            $pdf->SetX(15);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->SetTextColor(41, 84, 159);
-            $pdf->Cell(45, 6, 'Project Name:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
             $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(55, 6, $project->project_name, 0, 0, 'L');
+            $pdf->SetTextColor(31, 41, 55);
             
-            $pdf->SetTextColor(41, 84, 159);
+            // Project details in two columns
+            $leftX = 15;
+            $rightX = 110;
+            $labelWidth = 35;
+            $valueWidth = 55;
+            
+            $pdf->SetX($leftX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Project Name:', 0, 0, 'L');
             $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(30, 6, 'Status:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, $project->pm_status ?? $project->status ?? 'N/A', 0, 1, 'L');
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->project_name, 0, 0, 'L');
             
-            $pdf->SetX(15);
-            $pdf->SetTextColor(41, 84, 159);
+            $pdf->SetX($rightX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Project Code:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->project_code ?? 'N/A', 0, 1, 'L');
+            
+            $pdf->SetX($leftX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Client:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $clientName, 0, 0, 'L');
+            
+            $pdf->SetX($rightX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Location:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->location ?? 'N/A', 0, 1, 'L');
+            
+            $pdf->SetX($leftX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Project Manager:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->assignedPM?->name ?? 'N/A', 0, 0, 'L');
+            
+            $pdf->SetX($rightX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Project Type:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->project_type ?? 'N/A', 0, 1, 'L');
+            
+            $pdf->Ln(4);
+            
+            // ===== PROJECT TIMELINE SECTION =====
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->SetTextColor(55, 65, 81);
+            $pdf->SetFillColor(243, 244, 246);
+            $pdf->Cell(0, 7, ' PROJECT TIMELINE', 0, 1, 'L', true);
+            $pdf->Ln(2);
+            
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            
+            $pdf->SetX($leftX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Start Date:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->date_started ? $project->date_started->format('F d, Y') : 'N/A', 0, 0, 'L');
+            
+            $pdf->SetX($rightX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Target Date:', 0, 0, 'L');
+            $pdf->SetFont('helvetica', '', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($valueWidth, 5, $project->target_timeline ? $project->target_timeline->format('F d, Y') : 'N/A', 0, 1, 'L');
+            
+            $pdf->SetX($leftX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Completion Date:', 0, 0, 'L');
             $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Client:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(55, 6, $clientName, 0, 0, 'L');
+            $pdf->SetTextColor(22, 163, 74);
+            $pdf->Cell($valueWidth, 5, $project->date_ended ? $project->date_ended->format('F d, Y') : 'N/A', 0, 0, 'L');
             
-            $pdf->SetTextColor(41, 84, 159);
+            $pdf->SetX($rightX);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($labelWidth, 5, 'Status:', 0, 0, 'L');
             $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(30, 6, 'Start Date:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, $project->date_started ? $project->date_started->format('M d, Y') : 'N/A', 0, 1, 'L');
+            $pdf->SetTextColor($project->status === 'Completed' ? 22 : 31, $project->status === 'Completed' ? 163 : 41, $project->status === 'Completed' ? 74 : 55);
+            $pdf->Cell($valueWidth, 5, $project->status ?? 'N/A', 0, 1, 'L');
             
-            $pdf->SetX(15);
-            $pdf->SetTextColor(41, 84, 159);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Location:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(55, 6, $project->location ?? 'N/A', 0, 0, 'L');
+            // Calculate duration
+            if ($project->date_started && $project->date_ended) {
+                $duration = $project->date_started->diffInDays($project->date_ended);
+                $pdf->SetX($leftX);
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(107, 114, 128);
+                $pdf->Cell($labelWidth, 5, 'Total Duration:', 0, 0, 'L');
+                $pdf->SetFont('helvetica', '', 9);
+                $pdf->SetTextColor(31, 41, 55);
+                $pdf->Cell($valueWidth, 5, $duration . ' days', 0, 1, 'L');
+            }
             
-            $pdf->SetTextColor(41, 84, 159);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(30, 6, 'End Date:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, $project->date_ended ? $project->date_ended->format('M d, Y') : 'N/A', 0, 1, 'L');
+            $pdf->Ln(4);
             
-            $pdf->SetX(15);
-            $pdf->SetTextColor(41, 84, 159);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Project Manager:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(55, 6, $project->assignedPM?->name ?? 'N/A', 0, 0, 'L');
-            
-            $pdf->SetTextColor(41, 84, 159);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(30, 6, 'Target Date:', 0, 0, 'L');
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'N/A', 0, 1, 'L');
-            
-            $pdf->Ln(6);
-            
-            // BUDGET SECTION
-            $pdf->SetFont('helvetica', 'B', 11);
-            $pdf->SetTextColor(255, 255, 255);
-            $pdf->SetFillColor(41, 84, 159);
-            $pdf->Cell(0, 8, 'BUDGET INFORMATION', 0, 1, 'L', true);
+            // ===== FINANCIAL SUMMARY SECTION =====
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->SetTextColor(55, 65, 81);
+            $pdf->SetFillColor(243, 244, 246);
+            $pdf->Cell(0, 7, ' FINANCIAL SUMMARY', 0, 1, 'L', true);
+            $pdf->Ln(2);
             
             $usedAmount = $project->getEffectiveUsedAmount();
             $allocatedAmount = $project->allocated_amount ?? 0;
-            
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->SetTextColor(0, 0, 0);
-            $pdf->SetFillColor(240, 245, 250);
-            
-            $pdf->SetX(15);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Allocated Budget:', 0, 0, 'L', true);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, 'PHP ' . number_format($allocatedAmount, 2), 0, 1, 'L', true);
-            
-            $pdf->SetX(15);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Amount Used:', 0, 0, 'L', false);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, 'PHP ' . number_format($usedAmount, 2), 0, 1, 'L', false);
-            
-            $pdf->SetX(15);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Remaining Budget:', 0, 0, 'L', true);
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, 'PHP ' . number_format(max(0, $allocatedAmount - $usedAmount), 2), 0, 1, 'L', true);
-            
-            $pdf->SetX(15);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(45, 6, 'Budget Utilized:', 0, 0, 'L', false);
+            $remaining = max(0, $allocatedAmount - $usedAmount);
             $percentUsed = $allocatedAmount > 0 ? ($usedAmount / $allocatedAmount * 100) : 0;
+            
+            // Financial metrics in a table format
+            $pdf->SetFillColor(249, 250, 251);
+            $colWidth = 45;
+            
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell($colWidth, 5, 'Allocated Budget', 1, 0, 'C', true);
+            $pdf->Cell($colWidth, 5, 'Amount Used', 1, 0, 'C', true);
+            $pdf->Cell($colWidth, 5, 'Remaining', 1, 0, 'C', true);
+            $pdf->Cell($colWidth, 5, 'Utilization', 1, 1, 'C', true);
+            
+            $pdf->SetFont('helvetica', 'B', 9);
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell($colWidth, 6, 'PHP ' . number_format($allocatedAmount, 2), 1, 0, 'C');
+            $pdf->Cell($colWidth, 6, 'PHP ' . number_format($usedAmount, 2), 1, 0, 'C');
+            $pdf->SetTextColor($remaining > 0 ? 22 : 220, $remaining > 0 ? 163 : 38, $remaining > 0 ? 74 : 38);
+            $pdf->Cell($colWidth, 6, 'PHP ' . number_format($remaining, 2), 1, 0, 'C');
+            $pdf->SetTextColor($percentUsed <= 100 ? 22 : 220, $percentUsed <= 100 ? 163 : 38, $percentUsed <= 100 ? 74 : 38);
+            $pdf->Cell($colWidth, 6, number_format($percentUsed, 1) . '%', 1, 1, 'C');
+            
+            $pdf->Ln(4);
+            
+            // ===== SCOPE OF WORK / ACCOMPLISHMENTS =====
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->SetTextColor(55, 65, 81);
+            $pdf->SetFillColor(243, 244, 246);
+            $pdf->Cell(0, 7, ' SCOPE OF WORK ACCOMPLISHED', 0, 1, 'L', true);
+            $pdf->Ln(2);
+            
+            // Calculate BOQ statistics
+            $materials = $project->materials ?? collect();
+            $totalItems = $materials->count();
+            $passedItems = $materials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'passed')->count();
+            $failedItems = $materials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'failed')->count();
+            
+            if ($totalItems > 0) {
+                $pdf->SetFont('helvetica', '', 9);
+                $pdf->SetTextColor(31, 41, 55);
+                
+                $pdf->SetX($leftX);
+                $pdf->Cell(0, 5, 'Total BOQ Items: ' . $totalItems . ' | QA Passed: ' . $passedItems . ' | QA Failed: ' . $failedItems, 0, 1, 'L');
+                $pdf->Ln(2);
+                
+                // List key materials/scope items
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetTextColor(107, 114, 128);
+                $pdf->Cell(80, 5, 'Item Description', 1, 0, 'L', true);
+                $pdf->Cell(20, 5, 'Qty', 1, 0, 'C', true);
+                $pdf->Cell(20, 5, 'Unit', 1, 0, 'C', true);
+                $pdf->Cell(30, 5, 'Amount', 1, 0, 'R', true);
+                $pdf->Cell(30, 5, 'QA Status', 1, 1, 'C', true);
+                
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(31, 41, 55);
+                $totalAmount = 0;
+                $displayCount = 0;
+                
+                foreach ($materials->take(15) as $material) {
+                    $itemTotal = (($material->material_cost ?? 0) + ($material->labor_cost ?? 0)) * ($material->quantity ?? 0);
+                    $totalAmount += $itemTotal;
+                    $displayCount++;
+                    
+                    $qaStatus = ucfirst($material->qa_status ?? 'Pending');
+                    $itemName = $material->item_description ?? $material->material_name ?? 'N/A';
+                    
+                    $pdf->Cell(80, 5, substr($itemName, 0, 45), 1, 0, 'L');
+                    $pdf->Cell(20, 5, $material->quantity ?? 0, 1, 0, 'C');
+                    $pdf->Cell(20, 5, $material->unit ?? '-', 1, 0, 'C');
+                    $pdf->Cell(30, 5, number_format($itemTotal, 2), 1, 0, 'R');
+                    
+                    // Color code QA status
+                    if (strtolower($qaStatus) === 'passed') {
+                        $pdf->SetTextColor(22, 163, 74);
+                    } elseif (strtolower($qaStatus) === 'failed') {
+                        $pdf->SetTextColor(220, 38, 38);
+                    } else {
+                        $pdf->SetTextColor(107, 114, 128);
+                    }
+                    $pdf->Cell(30, 5, $qaStatus, 1, 1, 'C');
+                    $pdf->SetTextColor(31, 41, 55);
+                }
+                
+                if ($totalItems > 15) {
+                    $pdf->SetFont('helvetica', 'I', 8);
+                    $pdf->SetTextColor(107, 114, 128);
+                    $pdf->Cell(0, 5, '... and ' . ($totalItems - 15) . ' more items (see full BOQ report)', 0, 1, 'L');
+                }
+            } else {
+                $pdf->SetFont('helvetica', 'I', 9);
+                $pdf->SetTextColor(107, 114, 128);
+                $pdf->Cell(0, 5, 'No items recorded in Bill of Quantities', 0, 1, 'L');
+            }
+            
+            $pdf->Ln(4);
+            
+            // ===== TASKS / ACTIVITIES COMPLETED =====
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->SetTextColor(55, 65, 81);
+            $pdf->SetFillColor(243, 244, 246);
+            $pdf->Cell(0, 7, ' TASKS & ACTIVITIES COMPLETED', 0, 1, 'L', true);
+            $pdf->Ln(2);
+            
             $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, number_format($percentUsed, 2) . '%', 0, 1, 'L', false);
-            
-            $pdf->Ln(6);
-            
-            // DAILY ACTIVITIES/ACCOMPLISHMENTS SECTION
-            $pdf->SetFont('helvetica', 'B', 11);
-            $pdf->SetTextColor(255, 255, 255);
-            $pdf->SetFillColor(41, 84, 159);
-            $pdf->Cell(0, 8, 'DAILY ACTIVITIES / TASKS / ACCOMPLISHMENTS / LEARNINGS', 0, 1, 'L', true);
-            
-            $pdf->SetFont('helvetica', '', 9);
-            $pdf->SetTextColor(0, 0, 0);
+            $pdf->SetTextColor(31, 41, 55);
             
             if ($project->updates && $project->updates->count() > 0) {
                 $completedUpdates = $project->updates->where('status', 'Completed');
+                $allUpdates = $project->updates;
+                
+                $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(107, 114, 128);
+                $pdf->Cell(0, 5, 'Total Tasks: ' . $allUpdates->count() . ' | Completed: ' . $completedUpdates->count(), 0, 1, 'L');
+                $pdf->Ln(2);
+                
                 if ($completedUpdates->count() > 0) {
-                    $pdf->SetFillColor(240, 245, 250);
-                    foreach ($completedUpdates as $update) {
-                        $pdf->SetX(15);
-                        $pdf->SetFont('helvetica', 'B', 9);
-                        $pdf->SetTextColor(41, 84, 159);
-                        $pdf->Cell(0, 6, '• ' . $update->title . ' (' . $update->created_at->format('M d, Y') . ')', 0, 1, 'L');
-                        
-                        $pdf->SetX(20);
-                        $pdf->SetFont('helvetica', '', 8);
-                        $pdf->SetTextColor(0, 0, 0);
-                        $pdf->MultiCell(0, 5, $update->description, 0, 'L');
-                        $pdf->Ln(2);
+                    $pdf->SetFont('helvetica', 'B', 8);
+                    $pdf->SetFillColor(249, 250, 251);
+                    $pdf->Cell(70, 5, 'Task', 1, 0, 'L', true);
+                    $pdf->Cell(60, 5, 'Description', 1, 0, 'L', true);
+                    $pdf->Cell(25, 5, 'Completed', 1, 0, 'C', true);
+                    $pdf->Cell(25, 5, 'By', 1, 1, 'C', true);
+                    
+                    $pdf->SetFont('helvetica', '', 8);
+                    $pdf->SetTextColor(31, 41, 55);
+                    
+                    foreach ($completedUpdates->take(10) as $update) {
+                        $pdf->Cell(70, 5, substr($update->title, 0, 40), 1, 0, 'L');
+                        $pdf->Cell(60, 5, substr($update->description ?? '-', 0, 35), 1, 0, 'L');
+                        $pdf->Cell(25, 5, $update->updated_at->format('M d, Y'), 1, 0, 'C');
+                        $pdf->Cell(25, 5, substr($update->updatedBy?->name ?? 'System', 0, 12), 1, 1, 'C');
+                    }
+                    
+                    if ($completedUpdates->count() > 10) {
+                        $pdf->SetFont('helvetica', 'I', 8);
+                        $pdf->SetTextColor(107, 114, 128);
+                        $pdf->Cell(0, 5, '... and ' . ($completedUpdates->count() - 10) . ' more completed tasks', 0, 1, 'L');
                     }
                 } else {
-                    $pdf->SetX(15);
-                    $pdf->SetFont('helvetica', '', 9);
-                    $pdf->SetTextColor(100, 100, 100);
-                    $pdf->Cell(0, 6, 'No completed tasks', 0, 1, 'L');
+                    $pdf->SetFont('helvetica', 'I', 9);
+                    $pdf->SetTextColor(107, 114, 128);
+                    $pdf->Cell(0, 5, 'No completed tasks recorded', 0, 1, 'L');
                 }
             } else {
-                $pdf->SetX(15);
-                $pdf->SetFont('helvetica', '', 9);
-                $pdf->SetTextColor(100, 100, 100);
-                $pdf->Cell(0, 6, 'No activities recorded', 0, 1, 'L');
+                $pdf->SetFont('helvetica', 'I', 9);
+                $pdf->SetTextColor(107, 114, 128);
+                $pdf->Cell(0, 5, 'No tasks recorded for this project', 0, 1, 'L');
             }
             
-            // Add page for Bill of Quantity if exists
-            if ($project->materials && $project->materials->count() > 0) {
-                $pdf->AddPage();
-                $pdf->SetFont('helvetica', 'B', 11);
-                $pdf->SetTextColor(255, 255, 255);
-                $pdf->SetFillColor(41, 84, 159);
-                $pdf->Cell(0, 8, 'BILL OF QUANTITY', 0, 1, 'L', true);
-                $pdf->SetFont('helvetica', '', 8);
-                
-                $pdf->SetFillColor(200, 220, 240);
-                $pdf->SetFont('helvetica', 'B', 8);
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->Cell(50, 6, 'Item', 1, 0, 'L', true);
-                $pdf->Cell(20, 6, 'Unit', 1, 0, 'L', true);
-                $pdf->Cell(18, 6, 'Qty', 1, 0, 'C', true);
-                $pdf->Cell(28, 6, 'Material', 1, 0, 'R', true);
-                $pdf->Cell(25, 6, 'Labor', 1, 0, 'R', true);
-                $pdf->Cell(28, 6, 'Total', 1, 1, 'R', true);
-                
-                $pdf->SetFont('helvetica', '', 7);
-                $pdf->SetFillColor(255, 255, 255);
-                $totalBOQ = 0;
-                $fill = false;
-                foreach ($project->materials as $material) {
-                    $itemTotal = ($material->material_cost + $material->labor_cost) * $material->quantity;
-                    $totalBOQ += $itemTotal;
-                    
-                    if ($fill) $pdf->SetFillColor(240, 245, 250);
-                    else $pdf->SetFillColor(255, 255, 255);
-                    
-                    $itemName = $material->item_description ?? $material->material_name ?? $material->name ?? 'N/A';
-                    $pdf->Cell(50, 6, substr($itemName, 0, 30), 1, 0, 'L', $fill);
-                    $pdf->Cell(20, 6, substr($material->unit, 0, 10), 1, 0, 'L', $fill);
-                    $pdf->Cell(18, 6, $material->quantity, 1, 0, 'C', $fill);
-                    $pdf->Cell(28, 6, 'PHP ' . number_format($material->material_cost, 2), 1, 0, 'R', $fill);
-                    $pdf->Cell(25, 6, 'PHP ' . number_format($material->labor_cost, 2), 1, 0, 'R', $fill);
-                    $pdf->Cell(28, 6, 'PHP ' . number_format($itemTotal, 2), 1, 1, 'R', $fill);
-                    
-                    $fill = !$fill;
-                }
-                
-                $pdf->SetFont('helvetica', 'B', 8);
-                $pdf->SetFillColor(200, 220, 240);
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->Cell(50, 6, '', 1, 0, 'L', true);
-                $pdf->Cell(20, 6, '', 1, 0, 'L', true);
-                $pdf->Cell(18, 6, '', 1, 0, 'C', true);
-                $pdf->Cell(28, 6, '', 1, 0, 'R', true);
-                $pdf->Cell(25, 6, 'TOTAL:', 1, 0, 'R', true);
-                $pdf->Cell(28, 6, 'PHP ' . number_format($totalBOQ, 2), 1, 1, 'R', true);
-            }
-            
-            // Add page for Employees if exist
+            // ===== TEAM MEMBERS SECTION =====
             if ($project->employees && $project->employees->count() > 0) {
                 $pdf->AddPage();
-                $pdf->SetFont('helvetica', 'B', 11);
-                $pdf->SetTextColor(255, 255, 255);
-                $pdf->SetFillColor(41, 84, 159);
-                $pdf->Cell(0, 8, 'ASSIGNED EMPLOYEES (' . $project->employees->count() . ')', 0, 1, 'L', true);
-                $pdf->SetFont('helvetica', '', 9);
                 
-                $pdf->SetFillColor(200, 220, 240);
-                $pdf->SetFont('helvetica', 'B', 9);
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->Cell(60, 7, 'Name', 1, 0, 'L', true);
-                $pdf->Cell(50, 7, 'Position', 1, 0, 'L', true);
-                $pdf->Cell(30, 7, 'Role', 1, 1, 'L', true);
+                $pdf->SetFont('helvetica', 'B', 10);
+                $pdf->SetTextColor(55, 65, 81);
+                $pdf->SetFillColor(243, 244, 246);
+                $pdf->Cell(0, 7, ' PROJECT TEAM (' . ($project->employees->count() + 1) . ' Members)', 0, 1, 'L', true);
+                $pdf->Ln(2);
+                
+                $pdf->SetFont('helvetica', 'B', 8);
+                $pdf->SetFillColor(249, 250, 251);
+                $pdf->SetTextColor(107, 114, 128);
+                $pdf->Cell(50, 5, 'Name', 1, 0, 'L', true);
+                $pdf->Cell(45, 5, 'Position', 1, 0, 'L', true);
+                $pdf->Cell(35, 5, 'Role', 1, 0, 'L', true);
+                $pdf->Cell(50, 5, 'Contact', 1, 1, 'L', true);
                 
                 $pdf->SetFont('helvetica', '', 8);
+                $pdf->SetTextColor(31, 41, 55);
+                
+                // Add Project Manager first
+                if ($project->assignedPM) {
+                    $pdf->SetFillColor(236, 253, 245);
+                    $pdf->Cell(50, 5, $project->assignedPM->name ?? 'N/A', 1, 0, 'L', true);
+                    $pdf->Cell(45, 5, 'Project Manager', 1, 0, 'L', true);
+                    $pdf->Cell(35, 5, 'PM', 1, 0, 'L', true);
+                    $pdf->Cell(50, 5, $project->assignedPM->email ?? '-', 1, 1, 'L', true);
+                }
+                
                 $pdf->SetFillColor(255, 255, 255);
-                $fill = false;
                 foreach ($project->employees as $emp) {
                     $firstName = $emp->f_name ?? '';
                     $lastName = $emp->l_name ?? '';
                     $name = trim("{$firstName} {$lastName}") ?: 'N/A';
                     
-                    $position = $emp->position ?? 'N/A';
-                    $role = $emp->user?->role ?? 'N/A';
-                    
-                    if ($fill) $pdf->SetFillColor(240, 245, 250);
-                    else $pdf->SetFillColor(255, 255, 255);
-                    
-                    $pdf->Cell(60, 7, substr($name, 0, 30), 1, 0, 'L', $fill);
-                    $pdf->Cell(50, 7, substr($position, 0, 25), 1, 0, 'L', $fill);
-                    $pdf->Cell(30, 7, $role, 1, 1, 'L', $fill);
-                    
-                    $fill = !$fill;
+                    $pdf->Cell(50, 5, substr($name, 0, 28), 1, 0, 'L');
+                    $pdf->Cell(45, 5, substr($emp->position ?? 'N/A', 0, 25), 1, 0, 'L');
+                    $pdf->Cell(35, 5, $emp->user?->role ?? 'Worker', 1, 0, 'L');
+                    $pdf->Cell(50, 5, $emp->user?->email ?? '-', 1, 1, 'L');
                 }
             }
             
-            // Add signature/approval section on last page
+            // ===== SIGNATURE SECTION =====
             $pdf->Ln(15);
+            $pdf->SetLineWidth(0.3);
+            $pdf->SetDrawColor(209, 213, 219);
+            $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+            $pdf->Ln(10);
+            
             $pdf->SetFont('helvetica', '', 9);
-            $pdf->SetTextColor(0, 0, 0);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell(90, 6, 'Prepared by:', 0, 0, 'L');
+            $pdf->Cell(90, 6, 'Approved by:', 0, 1, 'L');
             
-            // Two columns for signatures
-            $pdf->Cell(90, 8, 'Submitted by:', 0, 0, 'L');
-            $pdf->Cell(90, 8, 'Approved by:', 0, 1, 'L');
+            $pdf->Ln(12);
             
-            $pdf->Ln(15);
-            
-            $pdf->Cell(90, 5, '___________________________', 0, 0, 'C');
-            $pdf->Cell(90, 5, '___________________________', 0, 1, 'C');
+            $pdf->SetLineWidth(0.3);
+            $pdf->SetDrawColor(31, 41, 55);
+            $pdf->Line(15, $pdf->GetY(), 85, $pdf->GetY());
+            $pdf->Line(115, $pdf->GetY(), 185, $pdf->GetY());
+            $pdf->Ln(2);
             
             $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->Cell(90, 5, 'CRISBEN B. BERIONG', 0, 0, 'C');
-            $pdf->Cell(90, 5, '', 0, 1, 'C');
+            $pdf->SetTextColor(31, 41, 55);
+            $pdf->Cell(90, 5, $project->assignedPM?->name ?? 'Project Manager', 0, 0, 'C');
+            $pdf->Cell(90, 5, 'CRISBEN B. BERIONG', 0, 1, 'C');
             
             $pdf->SetFont('helvetica', '', 8);
-            $pdf->Cell(90, 5, 'General Manager', 0, 0, 'C');
-            $pdf->Cell(90, 5, 'Date: _______________', 0, 1, 'C');
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell(90, 4, 'Project Manager', 0, 0, 'C');
+            $pdf->Cell(90, 4, 'General Manager', 0, 1, 'C');
             
-            // Footer text
-            $pdf->Ln(10);
+            $pdf->Ln(8);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(107, 114, 128);
+            $pdf->Cell(90, 4, 'Date: _______________', 0, 0, 'C');
+            $pdf->Cell(90, 4, 'Date: _______________', 0, 1, 'C');
+            
+            // Footer
+            $pdf->Ln(15);
+            $pdf->SetLineWidth(0.3);
+            $pdf->SetDrawColor(209, 213, 219);
+            $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+            $pdf->Ln(3);
+            
             $pdf->SetFont('helvetica', '', 7);
-            $pdf->SetTextColor(150, 150, 150);
-            $pdf->Cell(0, 5, 'This document is computer-generated by ACES AJJ CRISBER Engineering Services Management System.', 0, 1, 'C');
+            $pdf->SetTextColor(156, 163, 175);
+            $pdf->Cell(0, 4, 'This document is computer-generated by ACES AJJ CRISBER Engineering Services Management System.', 0, 1, 'C');
+            $pdf->Cell(0, 4, 'Document ID: RPT-' . $project->id . '-' . now()->format('YmdHis'), 0, 1, 'C');
             
             return $pdf->Output('accomplishment-report-' . $projectId . '.pdf', 'D');
         } catch (\Exception $e) {
