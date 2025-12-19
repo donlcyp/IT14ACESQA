@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'bundy-clock-auth' => \App\Http\Middleware\BundyClockAuth::class,
+            'require-punch-in' => \App\Http\Middleware\RequirePunchIn::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

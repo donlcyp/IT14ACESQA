@@ -17,13 +17,16 @@ Route::post('/support', [\App\Http\Controllers\SupportController::class, 'submit
 
 // Protected application routes
 Route::middleware('auth')->group(function () {
-    Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/finance-graphs', [App\Http\Controllers\DashboardController::class, 'financeGraphs'])->name('finance-graphs');
-    Route::get('/api/spending-trend', [App\Http\Controllers\DashboardController::class, 'getSpendingTrend'])->name('api.spending-trend');
+    // Dashboard routes - require punch-in for restricted roles
+    Route::middleware('require-punch-in')->group(function () {
+        Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index']);
+        Route::get('/finance-graphs', [App\Http\Controllers\DashboardController::class, 'financeGraphs'])->name('finance-graphs');
+        Route::get('/api/spending-trend', [App\Http\Controllers\DashboardController::class, 'getSpendingTrend'])->name('api.spending-trend');
+    });
 
     // ===== SHARED ROUTES: OWNER & PROJECT MANAGER =====
-    Route::middleware('role:OWNER,PM')->group(function () {
+    Route::middleware(['role:OWNER,PM', 'require-punch-in'])->group(function () {
         // Projects
         Route::get('/projects', [App\Http\Controllers\ProjectsController::class, 'index'])->name('projects');
         Route::get('/api/projects/{project}', [App\Http\Controllers\ProjectsController::class, 'getProject'])->name('api.projects.get');
@@ -68,14 +71,14 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== SHARED ROUTES: OWNER, PM & FM (Replacement Approvals) =====
-    Route::middleware('role:OWNER,PM,FM')->group(function () {
+    Route::middleware(['role:OWNER,PM,FM', 'require-punch-in'])->group(function () {
         // Material Replacement Request Processing
         Route::post('/materials/{material}/replacement/process', [App\Http\Controllers\ProjectsController::class, 'processReplacementRequest'])->name('materials.replacement.process');
         Route::get('/projects/{project}/replacements/pending', [App\Http\Controllers\ProjectsController::class, 'getPendingReplacements'])->name('projects.replacements.pending');
     });
 
     // ===== FM ROLE ONLY: Finance Manager Dashboard =====
-    Route::middleware('role:FM')->group(function () {
+    Route::middleware(['role:FM', 'require-punch-in'])->group(function () {
         Route::get('/fm-dashboard', [App\Http\Controllers\FinanceManagerController::class, 'index'])->name('fm.dashboard');
         Route::get('/fm-replacement-approvals', [App\Http\Controllers\FinanceManagerController::class, 'replacementApprovals'])->name('fm.replacement-approvals');
         Route::get('/fm-projects/{project}', [App\Http\Controllers\FinanceManagerController::class, 'viewProject'])->name('fm.project.view');
@@ -150,7 +153,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/punch-status', [App\Http\Controllers\EmployeeAttendanceController::class, 'getPunchStatusEmployee'])->name('punch.status.employee');
 
     // ===== QA ROLE ONLY: Quality Assurance Inspections =====
-    Route::middleware('role:QA')->group(function () {
+    Route::middleware(['role:QA', 'require-punch-in'])->group(function () {
         Route::get('/qa-materials', [App\Http\Controllers\DashboardController::class, 'qaMaterials'])->name('qa.materials');
         Route::post('/qa-materials/{material}/decision', [App\Http\Controllers\DashboardController::class, 'submitQADecision'])->name('qa.materials.decision');
         Route::post('/qa-materials/{material}/request-replacement', [App\Http\Controllers\DashboardController::class, 'requestReplacement'])->name('qa.materials.request-replacement');
@@ -171,7 +174,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== HR/TIMEKEEPER ONLY: Attendance Validation =====
-    Route::middleware('role:HR')->group(function () {
+    Route::middleware(['role:HR', 'require-punch-in'])->group(function () {
         Route::prefix('attendance-validation')->name('attendance-validation.')->group(function () {
             // Dashboard and main views
             Route::get('/', [App\Http\Controllers\AttendanceValidationController::class, 'index'])->name('index');
@@ -191,7 +194,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== SITE SUPERVISOR (SS) ONLY: Site Operations =====
-    Route::middleware('role:SS')->group(function () {
+    Route::middleware(['role:SS', 'require-punch-in'])->group(function () {
         // Dashboard
         Route::get('/ss-dashboard', [App\Http\Controllers\SiteSupervisorController::class, 'index'])->name('ss.dashboard');
 
@@ -214,12 +217,15 @@ Route::middleware('auth')->group(function () {
     });
 
     // ===== CONSTRUCTION WORKER (CW) ONLY: Worker Dashboard =====
+    // CW Attendance - accessible without punch-in (so they can punch in)
     Route::middleware('role:CW')->group(function () {
+        Route::get('/cw-attendance', [App\Http\Controllers\ConstructionWorkerController::class, 'attendance'])->name('cw.attendance');
+    });
+    
+    // CW routes that require punch-in
+    Route::middleware(['role:CW', 'require-punch-in'])->group(function () {
         // Dashboard
         Route::get('/cw-dashboard', [App\Http\Controllers\ConstructionWorkerController::class, 'index'])->name('cw.dashboard');
-        
-        // Attendance
-        Route::get('/cw-attendance', [App\Http\Controllers\ConstructionWorkerController::class, 'attendance'])->name('cw.attendance');
         
         // Project View (read-only)
         Route::get('/cw-projects/{project}', [App\Http\Controllers\ConstructionWorkerController::class, 'viewProject'])->name('cw.project.view');
