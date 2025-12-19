@@ -470,7 +470,7 @@
 
         <main class="main-content">
             <header class="header">
-                <button class="header-menu" id="menuToggle" aria-label="Toggle sidebar">
+                <button class="header-menu" id="headerMenu" aria-label="Toggle sidebar">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
