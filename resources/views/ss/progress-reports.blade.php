@@ -137,7 +137,7 @@
 
         /* Project Info Bar */
         .project-info-bar {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
             padding: 16px 20px;
             border-radius: 12px;
@@ -987,7 +987,7 @@
                         <select name="material_id" class="form-control" required>
                             <option value="">Select material to create task for</option>
                             @foreach($materials ?? [] as $material)
-                                <option value="{{ $material->id }}">{{ $material->item_name }} ({{ $material->unit ?? 'N/A' }})</option>
+                                <option value="{{ $material->id }}">{{ $material->item_description ?? $material->material_name ?? 'Material' }} ({{ $material->unit ?? $material->unit_of_measure ?? '' }})</option>
                             @endforeach
                         </select>
                     </div>

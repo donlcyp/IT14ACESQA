@@ -3,7 +3,7 @@
 @section('title', 'Attendance Review - AJJ CRISBER Engineering Services')
 
 @section('content')
-<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+<div style="padding: 20px; background: #1e40af; color: white; margin-bottom: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
     <div>
         <h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 700;">Attendance Review</h1>
         <p style="margin: 0; font-size: 14px; opacity: 0.9;">{{ $attendance->f_name }} {{ $attendance->l_name }} - {{ $attendance->date->format('F d, Y') }}</p>
@@ -43,7 +43,7 @@
 
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                    <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; border-left: 3px solid #0ea5e9;">
+                    <div style="padding: 12px; border-radius: 6px; border-left: 3px solid #0ea5e9;">
                         <div style="font-size: 11px; color: #0369a1; font-weight: 600;">LATE STATUS</div>
                         @if($attendance->is_late)
                             <div style="font-size: 18px; font-weight: 700; color: #991b1b;">LATE</div>
@@ -56,7 +56,7 @@
                         @endif
                     </div>
 
-                    <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; border-left: 3px solid #0369a1;">
+                    <div style="padding: 12px; border-radius: 6px; border-left: 3px solid #0369a1;">
                         <div style="font-size: 11px; color: #065f46; font-weight: 600;">PUNCH OUT</div>
                         @if($attendance->punch_out_time)
                             <div style="font-size: 18px; font-weight: 700; color: #065f46;">{{ $attendance->punch_out_time->format('H:i:s') }}</div>
@@ -67,7 +67,7 @@
                         @endif
                     </div>
 
-                    <div style="background: #fdf2f8; padding: 12px; border-radius: 6px; border-left: 3px solid #ec4899;">
+                    <div style="padding: 12px; border-radius: 6px; border-left: 3px solid #ec4899;">
                         <div style="font-size: 11px; color: #831843; font-weight: 600;">VALIDATION STATUS</div>
                         <div style="font-size: 18px; font-weight: 700; color: #be123c;">{{ $attendance->getValidationStatusLabel() }}</div>
                         <div style="font-size: 12px; color: #be185d; margin-top: 5px;">Pending your decision</div>
@@ -92,7 +92,7 @@
                     </thead>
                     <tbody>
                         @foreach($recentRecords as $record)
-                            <tr style="border-bottom: 1px solid #e5e7eb; {{ $record->id == $attendance->id ? 'background: #fef3c7;' : '' }}">
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
                                 <td style="padding: 10px; color: #1f2937; font-size: 14px;">{{ $record->date->format('Y-m-d') }}</td>
                                 <td style="padding: 10px; color: #1f2937; font-size: 14px;">{{ $record->punch_in_time ? $record->punch_in_time->format('H:i') : '—' }}</td>
                                 <td style="padding: 10px; color: #1f2937; font-size: 14px;">{{ $record->punch_out_time ? $record->punch_out_time->format('H:i') : '—' }}</td>

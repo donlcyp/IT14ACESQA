@@ -278,6 +278,12 @@
                 <i class="nav-icon fas fa-times-circle"></i>
                 <span>Rejected</span>
             </a>
+            @if(\App\Models\EmployeeList::where('user_id', auth()->user()->id)->exists())
+                <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-calendar-check"></i>
+                    <span>My Attendance</span>
+                </a>
+            @endif
         @endif
 
         <!-- QA: Materials Inspection (QA Role Only) -->
@@ -309,6 +315,10 @@
             <a href="{{ route('ss.attendance') }}" class="nav-item {{ request()->routeIs('ss.attendance*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-user-check"></i>
                 <span>Attendance Verify</span>
+            </a>
+            <a href="{{ route('my-attendance') }}" class="nav-item {{ request()->routeIs('my-attendance') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <span>My Attendance</span>
             </a>
         @endif
 

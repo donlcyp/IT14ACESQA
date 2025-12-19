@@ -1747,7 +1747,7 @@
                             <div style="background: white; border: 1px solid var(--gray-300); border-radius: 12px; padding: 20px; transition: all 0.2s;">
                                 <div style="font-weight: 600; color: var(--black-1); margin-bottom: 8px;">{{ $project->project_name ?? $project->project_code }}</div>
                                 <div style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px;">
-                                    Client: {{ $project->client->company_name ?? 'N/A' }}
+                                    Client: {{ $project->client_name ?? 'N/A' }}
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: transparent; color: {{ $project->status === 'Completed' ? '#065f46' : '#1e40af' }};">

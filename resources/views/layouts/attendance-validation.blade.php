@@ -67,7 +67,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: #1e40af;
             padding: 20px 30px;
             display: flex;
             align-items: center;

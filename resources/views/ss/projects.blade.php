@@ -357,16 +357,16 @@
                                 </div>
                                 <div class="project-card-body">
                                     <div class="project-info">
-                                        <strong>Client:</strong> {{ $project->client->company_name ?? 'N/A' }}
+                                        <strong>Client:</strong> {{ $project->client_name ?? 'N/A' }}
                                     </div>
                                     <div class="project-info">
-                                        <strong>Location:</strong> {{ Str::limit($project->site_location ?? 'Not specified', 40) }}
+                                        <strong>Location:</strong> {{ Str::limit($project->location ?? 'Not specified', 40) }}
                                     </div>
                                     <div class="project-info">
                                         <strong>Duration:</strong> 
-                                        {{ $project->start_date ? \Carbon\Carbon::parse($project->start_date)->format('M d, Y') : 'TBD' }} 
+                                        {{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'TBD' }} 
                                         - 
-                                        {{ $project->end_date ? \Carbon\Carbon::parse($project->end_date)->format('M d, Y') : 'TBD' }}
+                                        {{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'TBD' }}
                                     </div>
                                     <div class="project-meta">
                                         <span><i class="fas fa-users"></i> {{ $project->employees->count() }} Workers</span>

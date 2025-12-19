@@ -122,7 +122,15 @@ class Project extends Model
 
     public function getClientNameAttribute()
     {
-        return $this->client?->company_name ?? 'N/A';
+        // Prefer the related Client's company_name when available
+        if ($this->client && !empty($this->client->company_name)) {
+            return $this->client->company_name;
+        }
+
+        // Fallback to the snapshot fields stored on the projects table
+        $fullName = trim(($this->client_first_name ?? '') . ' ' . ($this->client_last_name ?? ''));
+
+        return $fullName !== '' ? $fullName : 'N/A';
     }
 
     public function getLeadAttribute()

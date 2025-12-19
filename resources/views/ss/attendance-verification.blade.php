@@ -141,7 +141,7 @@
 
         /* Project Info Bar */
         .project-info-bar {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
             padding: 16px 20px;
             border-radius: 12px;
@@ -163,9 +163,9 @@
 
         /* Info Banner */
         .info-banner {
-            background: #fef3c7;
-            border: 1px solid #fcd34d;
-            color: #92400e;
+            background: #ffffffff;
+            border: 1px solid #e5e7eb;
+            color: #000000ff;
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 24px;
@@ -210,12 +210,12 @@
         }
 
         .summary-card.pending {
-            background: #fef3c7;
-            border-color: #fcd34d;
+            background: #ffffffff;
+            border: 1px solid #e5e7eb;
         }
 
         .summary-card.pending .summary-value {
-            color: #92400e;
+            color: #000000ff;
         }
 
         /* Tabs */

@@ -139,7 +139,7 @@
 
         /* Project Info Bar */
         .project-info-bar {
-            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            background: var(--accent);
             color: white;
             padding: 16px 20px;
             border-radius: 12px;
@@ -197,7 +197,7 @@
         }
 
         .card-title i {
-            color: var(--danger);
+            color: var(--accent);
         }
 
         .card-body {
@@ -295,12 +295,12 @@
         }
 
         .btn-danger {
-            background: var(--danger);
+            background: var(--accent);
             color: white;
         }
 
         .btn-danger:hover {
-            background: var(--danger-dark);
+            background: var(--accent-dark);
         }
 
         /* Priority Options */
@@ -367,7 +367,7 @@
         }
 
         .filter-tab.active {
-            background: var(--danger);
+            background: var(--accent);
             color: white;
         }
 

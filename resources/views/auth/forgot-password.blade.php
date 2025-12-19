@@ -19,7 +19,7 @@
         }
         .container{min-height:100vh; display:grid; grid-template-columns: 1fr 1fr; }
         .hero{
-            background: #0369a1;
+            background: var(--accent);
             display:flex; align-items:flex-end; padding:48px; color:#ecfdf5;
         }
         .hero-inner{max-width:520px}

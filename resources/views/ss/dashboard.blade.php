@@ -541,7 +541,7 @@
                                         </span>
                                     </div>
                                     <div class="project-card-info">
-                                        Client: {{ $project->client->company_name ?? 'N/A' }}
+                                        Client: {{ $project->client_name ?? 'N/A' }}
                                     </div>
                                     <div class="project-card-meta">
                                         <span><i class="fas fa-users"></i> {{ $project->employees->count() }} workers</span>
