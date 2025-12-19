@@ -496,7 +496,7 @@ class EmployeeAttendanceController extends Controller
                 ->firstOrFail();
 
             // Check if not punched in
-            if ($attendance->punch_in_time === null) {
+            if ($attendance->punch_in_time === null && $attendance->time_in === null) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Please punch in first'
@@ -504,17 +504,20 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Check if already punched out
-            if ($attendance->punch_out_time !== null) {
+            if ($attendance->punch_out_time !== null || $attendance->time_out !== null) {
+                $outTime = $attendance->punch_out_time ?? $attendance->time_out;
                 return response()->json([
                     'success' => false,
-                    'message' => 'Already punched out at ' . $attendance->punch_out_time->format('H:i:s')
+                    'message' => 'Already punched out at ' . $outTime->format('H:i:s')
                 ], 422);
             }
 
             $punchOutTime = now();
-            $hoursWorked = $punchOutTime->diffInMinutes($attendance->punch_in_time) / 60;
+            $punchInTime = $attendance->punch_in_time ?? $attendance->time_in;
+            $hoursWorked = $punchInTime ? $punchOutTime->diffInMinutes($punchInTime) / 60 : 0;
 
             $attendance->update([
+                'time_out' => $punchOutTime,
                 'punch_out_time' => $punchOutTime,
                 'attendance_status' => 'Present', // Mark as officially present after punch out
             ]);
@@ -606,6 +609,7 @@ class EmployeeAttendanceController extends Controller
 
             // Update attendance record
             $attendance->update([
+                'time_in' => $punchTime,
                 'punch_in_time' => $punchTime,
                 'is_late' => $isLate,
                 'late_minutes' => $lateMinutes,
@@ -684,7 +688,7 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Check if not punched in
-            if ($attendance->punch_in_time === null) {
+            if ($attendance->punch_in_time === null && $attendance->time_in === null) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Please punch in first'
@@ -692,17 +696,20 @@ class EmployeeAttendanceController extends Controller
             }
 
             // Check if already punched out
-            if ($attendance->punch_out_time !== null) {
+            if ($attendance->punch_out_time !== null || $attendance->time_out !== null) {
+                $outTime = $attendance->punch_out_time ?? $attendance->time_out;
                 return response()->json([
                     'success' => false,
-                    'message' => 'Already punched out at ' . $attendance->punch_out_time->format('H:i:s')
+                    'message' => 'Already punched out at ' . $outTime->format('H:i:s')
                 ], 422);
             }
 
             $punchOutTime = now();
-            $hoursWorked = $punchOutTime->diffInMinutes($attendance->punch_in_time) / 60;
+            $punchInTime = $attendance->punch_in_time ?? $attendance->time_in;
+            $hoursWorked = $punchInTime ? $punchOutTime->diffInMinutes($punchInTime) / 60 : 0;
 
             $attendance->update([
+                'time_out' => $punchOutTime,
                 'punch_out_time' => $punchOutTime,
                 'attendance_status' => 'Present', // Mark as officially present after punch out
             ]);
@@ -769,8 +776,12 @@ class EmployeeAttendanceController extends Controller
 
             return response()->json([
                 'punch_status' => $attendance->getPunchStatus(),
-                'punch_in_time' => $attendance->punch_in_time ? $attendance->punch_in_time->format('H:i:s') : null,
-                'punch_out_time' => $attendance->punch_out_time ? $attendance->punch_out_time->format('H:i:s') : null,
+                'punched_in' => ($attendance->punch_in_time || $attendance->time_in) ? true : false,
+                'punched_out' => ($attendance->punch_out_time || $attendance->time_out) ? true : false,
+                'time_in' => $attendance->punch_in_time ? $attendance->punch_in_time->format('H:i:s') : ($attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i:s') : null),
+                'time_out' => $attendance->punch_out_time ? $attendance->punch_out_time->format('H:i:s') : ($attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i:s') : null),
+                'punch_in_time' => $attendance->punch_in_time ? $attendance->punch_in_time->format('H:i:s') : ($attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i:s') : null),
+                'punch_out_time' => $attendance->punch_out_time ? $attendance->punch_out_time->format('H:i:s') : ($attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i:s') : null),
                 'is_late' => $attendance->is_late,
                 'late_minutes' => $attendance->late_minutes,
                 'grace_period_applied' => $attendance->grace_period_applied,

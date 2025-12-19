@@ -512,29 +512,27 @@
                         </div>
                         <div class="attendance-item">
                             <label>Time In</label>
-                            <span>{{ $todayAttendance && $todayAttendance->time_in ? \Carbon\Carbon::parse($todayAttendance->time_in)->format('h:i A') : '--:--' }}</span>
+                            <span>{{ $todayAttendance && ($todayAttendance->time_in || $todayAttendance->punch_in_time) ? \Carbon\Carbon::parse($todayAttendance->time_in ?? $todayAttendance->punch_in_time)->format('h:i A') : '--:--' }}</span>
                         </div>
                         <div class="attendance-item">
                             <label>Time Out</label>
-                            <span>{{ $todayAttendance && $todayAttendance->time_out ? \Carbon\Carbon::parse($todayAttendance->time_out)->format('h:i A') : '--:--' }}</span>
+                            <span>{{ $todayAttendance && ($todayAttendance->time_out || $todayAttendance->punch_out_time) ? \Carbon\Carbon::parse($todayAttendance->time_out ?? $todayAttendance->punch_out_time)->format('h:i A') : '--:--' }}</span>
                         </div>
                         <div class="attendance-item">
-                            @if(!$todayAttendance || !$todayAttendance->time_in)
-                                <form action="{{ route('punch.in.employee') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="punch-btn in">
-                                        <i class="fas fa-sign-in-alt"></i> Punch In
-                                    </button>
-                                </form>
-                            @elseif(!$todayAttendance->time_out)
-                                <form action="{{ route('punch.out.employee') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="punch-btn out">
-                                        <i class="fas fa-sign-out-alt"></i> Punch Out
-                                    </button>
-                                </form>
+                            @php
+                                $hasPunchedIn = $todayAttendance && ($todayAttendance->time_in || $todayAttendance->punch_in_time);
+                                $hasPunchedOut = $todayAttendance && ($todayAttendance->time_out || $todayAttendance->punch_out_time);
+                            @endphp
+                            @if(!$hasPunchedIn)
+                                <button type="button" class="punch-btn in" onclick="doPunchIn()">
+                                    <i class="fas fa-sign-in-alt"></i> Punch In
+                                </button>
+                            @elseif(!$hasPunchedOut)
+                                <button type="button" class="punch-btn out" onclick="doPunchOut()">
+                                    <i class="fas fa-sign-out-alt"></i> Punch Out
+                                </button>
                             @else
-                                <span style="color: rgba(255,255,255,0.9); font-size: 14px;">✓ Completed</span>
+                                <span style="color: var(--success); font-size: 14px; font-weight: 600;">✓ Completed</span>
                             @endif
                         </div>
                     </div>
@@ -654,13 +652,18 @@
                                 </thead>
                                 <tbody>
                                     @foreach($recentAttendance as $record)
+                                        @php
+                                            $timeIn = $record->time_in ?? $record->punch_in_time;
+                                            $timeOut = $record->time_out ?? $record->punch_out_time;
+                                            $status = $record->attendance_status ?? $record->status ?? 'Idle';
+                                        @endphp
                                         <tr style="border-bottom: 1px solid #e5e7eb;">
                                             <td style="padding: 12px;">{{ \Carbon\Carbon::parse($record->date)->format('M d, Y (D)') }}</td>
-                                            <td style="padding: 12px;">{{ $record->time_in ? \Carbon\Carbon::parse($record->time_in)->format('h:i A') : '--' }}</td>
-                                            <td style="padding: 12px;">{{ $record->time_out ? \Carbon\Carbon::parse($record->time_out)->format('h:i A') : '--' }}</td>
+                                            <td style="padding: 12px;">{{ $timeIn ? \Carbon\Carbon::parse($timeIn)->format('h:i A') : '--' }}</td>
+                                            <td style="padding: 12px;">{{ $timeOut ? \Carbon\Carbon::parse($timeOut)->format('h:i A') : '--' }}</td>
                                             <td style="padding: 12px;">
-                                                <span class="project-status {{ $record->status === 'Present' ? 'status-completed' : 'status-ongoing' }}">
-                                                    {{ $record->status }}
+                                                <span class="project-status {{ in_array($status, ['Present', 'On Site']) ? 'status-completed' : 'status-ongoing' }}">
+                                                    {{ $status }}
                                                 </span>
                                             </td>
                                         </tr>
@@ -680,5 +683,69 @@
     </div>
 
     @include('partials.sidebar-js')
+
+    <script>
+        async function doPunchIn() {
+            const btn = event.target.closest('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('{{ route("punch.in.employee") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to punch in');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
+            }
+        }
+
+        async function doPunchOut() {
+            const btn = event.target.closest('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('{{ route("punch.out.employee") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to punch out');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
+                }
+            } catch (error) {
+                alert('An error occurred. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
+            }
+        }
+    </script>
 </body>
 </html>
