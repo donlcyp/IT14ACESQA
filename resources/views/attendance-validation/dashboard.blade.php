@@ -67,7 +67,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -168,7 +168,7 @@
 
             <!-- Content Area -->
             <section class="content-area">
-<div style="padding: 12px 16px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; margin-bottom: 16px; border-radius: 8px;">
+<div style="padding: 12px 16px; background: #1e40af; color: white; margin-bottom: 16px; border-radius: 8px;">
     <h1 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700;">Validation Dashboard</h1>
     <p style="margin: 0; font-size: 13px; opacity: 0.9;">Real-time attendance validation statistics</p>
 </div>

@@ -15,12 +15,11 @@
         *{box-sizing:border-box}
         body{
             margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--gray-800);
-            background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            background: var(--bg-1);
         }
         .container{min-height:100vh; display:grid; grid-template-columns: 1fr 1fr; }
         .hero{
-            background: radial-gradient(1000px 600px at 10% 20%, rgba(30,64,175,.25), transparent 60%),
-                        linear-gradient(135deg, #0369a1, #1e40af);
+            background: #0369a1;
             display:flex; align-items:flex-end; padding:48px; color:#ecfdf5;
         }
         .hero-inner{max-width:520px}

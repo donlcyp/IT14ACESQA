@@ -64,7 +64,7 @@ class ConstructionWorkerController extends Controller
             'days_worked_this_month' => $employeeRecord ? EmployeeAttendance::where('employee_id', $employeeRecord->id)
                 ->whereMonth('date', Carbon::now()->month)
                 ->whereYear('date', Carbon::now()->year)
-                ->where('status', 'Present')
+                ->where('attendance_status', 'Present')
                 ->count() : 0,
         ];
         
@@ -79,40 +79,6 @@ class ConstructionWorkerController extends Controller
         ));
     }
     
-    /**
-     * View assigned tasks
-     */
-    public function tasks(Request $request)
-    {
-        $user = Auth::user();
-        $employeeRecord = EmployeeList::where('user_id', $user->id)->first();
-        
-        $tasks = collect();
-        $assignedProjects = collect();
-        
-        if ($employeeRecord) {
-            $assignedProjects = $employeeRecord->projects()
-                ->where('archived', false)
-                ->get();
-            
-            $query = ProjectUpdate::whereIn('project_id', $assignedProjects->pluck('id'))
-                ->with('project');
-            
-            // Filter by project
-            if ($request->filled('project_id')) {
-                $query->where('project_id', $request->project_id);
-            }
-            
-            // Filter by status
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
-            }
-            
-            $tasks = $query->orderBy('created_at', 'desc')->paginate(15);
-        }
-        
-        return view('cw.tasks', compact('tasks', 'assignedProjects'));
-    }
     
     /**
      * View personal attendance history

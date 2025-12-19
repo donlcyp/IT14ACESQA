@@ -70,7 +70,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -378,27 +378,27 @@
         }
 
         .badge-on-site {
-            background: #dcfce7;
+            background: transparent;
             color: #166534;
         }
 
         .badge-absent {
-            background: #fee2e2;
+            background: transparent;
             color: #991b1b;
         }
 
         .badge-on-leave {
-            background: #fef3c7;
+            background: transparent;
             color: #92400e;
         }
 
         .badge-idle {
-            background: #dbeafe;
+            background: transparent;
             color: #1e40af;
         }
 
         .badge-present {
-            background: #dcfce7;
+            background: transparent;
             color: #166534;
         }
 

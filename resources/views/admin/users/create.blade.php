@@ -11,7 +11,7 @@
     body.sidebar-open { margin-left: 280px; }
     
     .top-header { 
-      background: linear-gradient(135deg, #1e40af, #1e3a8a); 
+      background: #1e40af; 
       color: #fff; 
       padding: 16px 24px; 
       display: flex; 

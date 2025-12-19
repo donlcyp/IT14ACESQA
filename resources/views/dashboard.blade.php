@@ -104,7 +104,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -121,7 +121,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: transparent;
         }
 
         .header-menu {
@@ -168,7 +168,7 @@
         .content-area {
             flex: 1;
             padding: 40px;
-            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            background: transparent;
             max-width: 1800px;
             margin: 0 auto;
             width: 100%;
@@ -599,7 +599,7 @@
         }
 
         .kpi-card {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border-radius: 12px;
             padding: 22px;
             box-shadow: 0 1px 3px rgba(30, 64, 175, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -657,32 +657,32 @@
         }
 
         .kpi-card.color-projects {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-ongoing {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-completed {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-workers {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-budget {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
         .kpi-card.color-delayed {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: transparent;
             border: 1px solid rgba(30, 64, 175, 0.2);
         }
 
@@ -889,7 +889,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, transparent, rgba(30, 64, 175, 0.05));
+            background: transparent;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
@@ -1053,7 +1053,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            background: #1e40af;
             transform: scaleX(0);
             transform-origin: left;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1240,25 +1240,25 @@
 
         .finance-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #1e40af, #60a5fa);
+            background: #1e40af;
             border-radius: 4px;
             transition: width 0.3s ease;
         }
 
         .finance-progress-fill.status-success {
-            background: linear-gradient(90deg, #1e40af, #60a5fa);
+            background: #1e40af;
         }
 
         .finance-progress-fill.status-warning {
-            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            background: #f59e0b;
         }
 
         .finance-progress-fill.status-fail {
-            background: linear-gradient(90deg, #dc2626, #ef4444);
+            background: #dc2626;
         }
 
         .finance-progress-fill.status-info {
-            background: linear-gradient(90deg, #d1d5db, #e5e7eb);
+            background: #d1d5db;
         }
 
         .finance-status {

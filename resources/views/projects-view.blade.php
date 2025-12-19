@@ -94,7 +94,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -111,7 +111,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: transparent;
         }
 
         .header-menu {
@@ -281,7 +281,7 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: linear-gradient(135deg, var(--accent), #1e3a8a);
+            background: var(--accent);
             border-radius: 12px 0 0 12px;
         }
 
@@ -451,7 +451,7 @@
         }
 
         .stat-item {
-            background: linear-gradient(135deg, var(--accent), #1e3a8a);
+            background: var(--accent);
             color: white;
             padding: 15px;
             border-radius: 8px;
@@ -508,7 +508,7 @@
             top: 40px;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, #1e40af, #3b82f6, #9ca3af);
+            background: #1e40af;
         }
 
         .timeline-item {
@@ -660,7 +660,7 @@
             display: flex;
             gap: 12px;
             padding: 12px;
-            background: #fef3c7;
+            background: transparent;
             border-left: 4px solid #f59e0b;
             border-radius: 4px;
             align-items: flex-start;
@@ -901,7 +901,7 @@
                                 Mark as Complete
                             </button>
                         @elseif($isCompleted)
-                            <span style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #dcfce7; color: #166534; border-radius: 8px; font-weight: 600; font-size: 14px;">
+                            <span style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: transparent; color: #166534; border-radius: 8px; font-weight: 600; font-size: 14px;">
                                 <i class="fas fa-check-circle"></i> Project Completed
                             </span>
                         @endif
@@ -1298,12 +1298,12 @@
                                                 <td style="padding: 12px; color: var(--gray-700);">
                                                     <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
                                                         @if($project->status !== 'Completed')
-                                                            <button class="btn" style="background: #dbeafe; color: #0369a1; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="editBOQItem({{ $material->id }})">
+                                                            <button class="btn" style="background: transparent; color: #0369a1; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="editBOQItem({{ $material->id }})">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
                                                         @endif
                                                         @if($project->status !== 'Completed')
-                                                            <button type="button" class="btn" style="background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="confirmSingleDelete({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'this item') }}')">
+                                                            <button type="button" class="btn" style="background: transparent; color: #991b1b; padding: 6px 10px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" onclick="confirmSingleDelete({{ $material->id }}, '{{ addslashes($material->item_description ?? $material->material_name ?? 'this item') }}')">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         @endif
@@ -1815,8 +1815,8 @@
                             <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
                                 <span style="font-size: 13px; color: var(--gray-600);">Filter by type:</span>
                                 <button type="button" class="btn" style="background: var(--sidebar-bg); color: var(--black-1); padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('all')">All</button>
-                                <button type="button" class="btn" style="background: #dbeafe; color: #1e3a8a; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('image')">Images</button>
-                                <button type="button" class="btn" style="background: #fee2e2; color: #b91c1c; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('pdf')">PDF</button>
+                                <button type="button" class="btn" style="background: transparent; color: #1e3a8a; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('image')">Images</button>
+                                <button type="button" class="btn" style="background: transparent; color: #b91c1c; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('pdf')">PDF</button>
                                 <button type="button" class="btn" style="background: #e0f2fe; color: #0369a1; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('excel')">XLS/XLSX</button>
                                 <button type="button" class="btn" style="background: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px;" onclick="filterDocuments('other')">Other</button>
                             </div>
@@ -1840,7 +1840,7 @@
                                                     </button>
                                                 </div>
                                             @else
-                                                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #e5e7eb, #d1d5db);">
+                                                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6;">
                                                     @if(str_contains($mimeType, 'pdf'))
                                                         <i class="fas fa-file-pdf" style="font-size: 48px; color: #dc2626; margin-bottom: 10px;"></i>
                                                     @elseif(str_contains($mimeType, 'word') || str_contains($doc->file_name, 'docx') || str_contains($doc->file_name, 'doc'))
@@ -1884,7 +1884,7 @@
                         @else
                             <div class="images-grid">
                                 <div class="image-card">
-                                    <div style="height: 200px; background: linear-gradient(135deg, var(--accent), #1e3a8a); display: flex; align-items: center; justify-content: center; color: white; border-radius: 6px 6px 0 0;">
+                                    <div style="height: 200px; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; border-radius: 6px 6px 0 0;">
                                         <i class="fas fa-image fa-3x" style="opacity: 0.3;"></i>
                                     </div>
                                     <div class="image-info">
@@ -1917,10 +1917,10 @@
                         .qa-table td { padding: 14px 12px; border-bottom: 1px solid var(--gray-300); color: var(--gray-700); vertical-align: middle; }
                         .qa-table tr:hover { background: #fafafa; }
                         .qa-status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-                        .qa-status-badge.pending { background: #fef3c7; color: #92400e; }
-                        .qa-status-badge.passed { background: #d1fae5; color: #065f46; }
-                        .qa-status-badge.failed { color: #991b1b; }
-                        .qa-status-badge.requires_recheck { background: #e0e7ff; color: #3730a3; }
+                        .qa-status-badge.pending { background: transparent; color: #92400e; }
+                        .qa-status-badge.passed { background: transparent; color: #065f46; }
+                        .qa-status-badge.failed { color: #991b1b; background: transparent; }
+                        .qa-status-badge.requires_recheck { background: transparent; color: #3730a3; }
                         .qa-inspect-btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
                         .qa-bulk-actions { display: none; padding: 16px; background: var(--sidebar-bg); border-radius: 8px; margin-bottom: 20px; align-items: center; gap: 16px; flex-wrap: wrap; }
                         .qa-bulk-actions.show { display: flex; }
@@ -2298,7 +2298,7 @@
                                 </h4>
                                 <div style="display: flex; flex-direction: column; gap: 12px;">
                                     @foreach($failedItems as $failedItem)
-                                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
+                                    <div style="background: transparent; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
                                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                                             <div style="font-weight: 600; color: #991b1b;">{{ $failedItem->item_description ?? 'N/A' }}</div>
                                             <span style="background: #dc2626; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">FAILED</span>
@@ -2435,7 +2435,7 @@
                                         <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase;">Target Date</div>
                                         <div style="font-size: 14px; font-weight: 600; color: var(--black-1); margin-top: 2px;">{{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'N/A' }}</div>
                                     </div>
-                                    <div style="background: #dcfce7; padding: 12px; border-radius: 6px; text-align: center;">
+                                    <div style="background: transparent; padding: 12px; border-radius: 6px; text-align: center;">
                                         <div style="font-size: 11px; color: #166534; text-transform: uppercase;">Completion Date</div>
                                         <div style="font-size: 14px; font-weight: 600; color: #166534; margin-top: 2px;">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'N/A' }}</div>
                                     </div>
@@ -2725,7 +2725,7 @@
                                                 default => '#f3f4f6'
                                             };
                                         @endphp
-                                        <tr style="{{ $itemStatus === 'fail' || $itemStatus === 'failed' ? 'background: #fef2f2;' : '' }}">
+                                        <tr style="{{ $itemStatus === 'fail' || $itemStatus === 'failed' ? 'background: transparent;' : '' }}">
                                             <td class="text-center">{{ $item->item_no ?? ($index + 1) }}</td>
                                             <td>
                                                 <div style="white-space: pre-wrap; line-height: 1.5;">{!! nl2br(e($item->item_description)) !!}</div>
@@ -2778,7 +2778,7 @@
                                 </h4>
                                 <div style="display: flex; flex-direction: column; gap: 12px;">
                                     @foreach($boqFailedItems as $boqFailedItem)
-                                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
+                                    <div style="background: transparent; border: 1px solid #fecaca; border-radius: 8px; padding: 16px;">
                                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                                             <div style="font-weight: 600; color: #991b1b;">{{ $boqFailedItem->item_description ?? 'N/A' }}</div>
                                             <span style="background: #dc2626; color: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">FAILED</span>
@@ -3213,26 +3213,26 @@
                                 
                                 <!-- Progress bar for overall completion -->
                                 <div style="background: #f3f4f6; border-radius: 8px; overflow: hidden; height: 24px; margin-bottom: 16px;">
-                                    <div style="height: 100%; background: linear-gradient(90deg, var(--accent), #0369a1); width: {{ $overallProgress }}%; transition: width 0.3s; display: flex; align-items: center; justify-content: center;">
+                                    <div style="height: 100%; background: var(--accent); width: {{ $overallProgress }}%; transition: width 0.3s; display: flex; align-items: center; justify-content: center;">
                                         <span style="color: white; font-size: 12px; font-weight: 600;">{{ $overallProgress }}%</span>
                                     </div>
                                 </div>
 
                                 <!-- Status breakdown -->
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
-                                    <div style="background: #ecfdf5; padding: 12px; border-radius: 6px; border-left: 4px solid #10b981;">
+                                    <div style="background: transparent; padding: 12px; border-radius: 6px; border-left: 4px solid #10b981;">
                                         <div style="font-size: 12px; color: #166534; font-weight: 600;">APPROVED</div>
                                         <div style="font-size: 20px; font-weight: 700; color: #10b981; margin-top: 4px;">{{ $approvedMaterials }}</div>
                                     </div>
-                                    <div style="background: #fef3c7; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                                    <div style="background: transparent; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
                                         <div style="font-size: 12px; color: #92400e; font-weight: 600;">PENDING</div>
                                         <div style="font-size: 20px; font-weight: 700; color: #f59e0b; margin-top: 4px;">{{ $pendingMaterials }}</div>
                                     </div>
-                                    <div style="background: #fef2f2; padding: 12px; border-radius: 6px; border-left: 4px solid #dc2626;">
+                                    <div style="background: transparent; padding: 12px; border-radius: 6px; border-left: 4px solid #dc2626;">
                                         <div style="font-size: 12px; color: #991b1b; font-weight: 600;">FAILED</div>
                                         <div style="font-size: 20px; font-weight: 700; color: #dc2626; margin-top: 4px;">{{ $failedMaterials }}</div>
                                     </div>
-                                    <div style="background: #e0e7ff; padding: 12px; border-radius: 6px; border-left: 4px solid #6366f1;">
+                                    <div style="background: transparent; padding: 12px; border-radius: 6px; border-left: 4px solid #6366f1;">
                                         <div style="font-size: 12px; color: #3730a3; font-weight: 600;">RECHECK</div>
                                         <div style="font-size: 20px; font-weight: 700; color: #6366f1; margin-top: 4px;">{{ $recheckMaterials }}</div>
                                     </div>
@@ -3275,7 +3275,7 @@
 
                                 <!-- Timeline progress bar -->
                                 <div style="background: #f3f4f6; border-radius: 8px; overflow: hidden; height: 12px; margin-top: 16px;">
-                                    <div style="height: 100%; background: linear-gradient(90deg, #3b82f6, #1e40af); width: {{ min($timelineProgress, 100) }}%; transition: width 0.3s;"></div>
+                                    <div style="height: 100%; background: #1e40af; width: {{ min($timelineProgress, 100) }}%; transition: width 0.3s;"></div>
                                 </div>
                                 <div style="font-size: 12px; color: var(--gray-600); margin-top: 8px; text-align: right;">{{ $timelineProgress }}% of timeline complete</div>
                             </div>
@@ -3656,7 +3656,7 @@
         @if(in_array(auth()->user()->role, ['OWNER', 'PM', 'FM']))
         <div id="replacementActionModal" class="modal" style="display: none;">
             <div class="modal-content" style="max-width: 500px;">
-                <div class="modal-header" id="replacementActionHeader" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="modal-header" id="replacementActionHeader" style="background: #10b981;">
                     <h2 class="modal-title" id="replacementActionTitle" style="color: white;">
                         <i class="fas fa-check-circle"></i> Approve Replacement
                     </h2>
@@ -3720,22 +3720,22 @@
                 const infoBox = document.getElementById('replacementActionInfo');
 
                 if (action === 'approve') {
-                    header.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    header.style.background = '#10b981';
                     title.innerHTML = '<i class="fas fa-check-circle"></i> Approve Replacement';
                     submitBtn.innerHTML = '<i class="fas fa-check"></i> Approve Replacement';
                     submitBtn.style.background = '#10b981';
                     notesLabel.textContent = 'Approval Notes (Optional)';
                     warning.style.display = 'none';
-                    infoBox.style.background = '#dcfce7';
+                    infoBox.style.background = 'transparent';
                     infoBox.style.borderColor = '#86efac';
                 } else {
-                    header.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    header.style.background = '#ef4444';
                     title.innerHTML = '<i class="fas fa-times-circle"></i> Reject Replacement';
                     submitBtn.innerHTML = '<i class="fas fa-times"></i> Reject Request';
                     submitBtn.style.background = '#ef4444';
                     notesLabel.textContent = 'Rejection Reason';
                     warning.style.display = 'block';
-                    infoBox.style.background = '#fee2e2';
+                    infoBox.style.background = 'transparent';
                     infoBox.style.borderColor = '#fecaca';
                 }
 
@@ -3983,7 +3983,7 @@
         @if(auth()->user()->role === 'QA')
         <div id="qaInspectModal" class="modal" style="display: none;">
             <div class="modal-content" style="max-width: 550px;">
-                <div class="modal-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white;">
+                <div class="modal-header" style="background: #1e40af; color: white;">
                     <h2 class="modal-title" style="color: white;">
                         <i class="fas fa-clipboard-check"></i> QA Inspection
                     </h2>
@@ -4062,7 +4062,7 @@
         <!-- QA Bulk Inspection Modal -->
         <div id="qaBulkModal" class="modal" style="display: none;">
             <div class="modal-content" style="max-width: 500px;">
-                <div class="modal-header" style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white;">
+                <div class="modal-header" style="background: #1e40af; color: white;">
                     <h2 class="modal-title" style="color: white;">
                         <i class="fas fa-check-double"></i> Bulk QA Inspection
                     </h2>

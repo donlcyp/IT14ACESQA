@@ -71,7 +71,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: var(--header-bg);
             padding: 16px 20px;
             display: flex;
             align-items: center;
@@ -88,7 +88,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: transparent;
         }
 
         .header-menu {
@@ -826,7 +826,7 @@
     <!-- View Details Modal -->
     <div id="viewDetailsModal" class="modal">
         <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--accent), #1e3a8a);">
+            <div class="modal-header" style="background: var(--accent);">
                 <h3 class="modal-title" style="color: white;">
                     <i class="fas fa-info-circle"></i>
                     Material Details
@@ -1019,13 +1019,13 @@
                     let statusColor = '#6b7280';
                     
                     if (material.qa_status === 'passed') {
-                        statusBadge = '<span style="background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-check-circle"></i> Passed</span>';
+                        statusBadge = '<span style="background: transparent; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-check-circle"></i> Passed</span>';
                     } else if (material.qa_status === 'failed') {
-                        statusBadge = '<span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-times-circle"></i> Failed</span>';
+                        statusBadge = '<span style="background: transparent; color: #991b1b; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-times-circle"></i> Failed</span>';
                     } else if (material.qa_status === 'requires_recheck') {
-                        statusBadge = '<span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-redo"></i> Requires Recheck</span>';
+                        statusBadge = '<span style="background: transparent; color: #92400e; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-redo"></i> Requires Recheck</span>';
                     } else {
-                        statusBadge = '<span style="background: #e5e7eb; color: #374151; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-clock"></i> Pending</span>';
+                        statusBadge = '<span style="background: transparent; color: #374151; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-clock"></i> Pending</span>';
                     }
 
                     let replacementSection = '';

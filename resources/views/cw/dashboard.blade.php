@@ -50,37 +50,65 @@
 
         /* Header Styles */
         .header {
-            background: var(--white);
-            padding: 16px 24px;
+            background: var(--primary);
+            padding: 20px 30px;
             display: flex;
             align-items: center;
-            gap: 16px;
-            border-bottom: 1px solid #e5e7eb;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: transparent;
         }
 
         .header-menu {
             background: none;
             border: none;
-            font-size: 20px;
-            color: var(--dark);
+            color: white;
+            font-size: 24px;
             cursor: pointer;
             padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
         }
 
         .header-menu:hover {
-            color: var(--primary);
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--dark);
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         @media (max-width: 768px) {
-            .header-title { font-size: 16px; }
+            .header {
+                padding: 16px 20px;
+                gap: 16px;
+            }
+            
+            .header-menu {
+                display: block;
+            }
         }
 
+        .header-title {
+            color: white;
+            font-family: "Zen Dots", sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 18px;
+            }
+        }
         /* Content Area */
         .content-area {
             padding: 24px;
@@ -169,10 +197,10 @@
             font-size: 20px;
         }
 
-        .kpi-card.projects .kpi-icon { background: #dbeafe; color: #1e40af; }
-        .kpi-card.active .kpi-icon { background: #d1fae5; color: #065f46; }
-        .kpi-card.tasks .kpi-icon { background: #fef3c7; color: #92400e; }
-        .kpi-card.days .kpi-icon { background: #e0e7ff; color: #4338ca; }
+        .kpi-card.projects .kpi-icon { background: transparent; color: #1e40af; }
+        .kpi-card.active .kpi-icon { background: transparent; color: #065f46; }
+        .kpi-card.tasks .kpi-icon { background: transparent; color: #92400e; }
+        .kpi-card.days .kpi-icon { background: transparent; color: #4338ca; }
 
         .kpi-info h4 {
             font-size: 24px;
@@ -220,44 +248,64 @@
 
         /* Attendance Status Card */
         .attendance-status {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white);
+            background: white;
+            border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         .attendance-status h3 {
             font-size: 18px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .attendance-status h3 i {
+            color: var(--primary);
+            font-size: 20px;
         }
 
         .attendance-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 16px;
         }
 
         .attendance-item {
             text-align: center;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            padding: 16px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .attendance-item:hover {
+            background: #f3f4f6;
+            border-color: var(--primary);
         }
 
         .attendance-item label {
-            font-size: 12px;
-            opacity: 0.9;
+            font-size: 11px;
+            opacity: 0.7;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .attendance-item span {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
+            color: var(--dark);
         }
 
         .punch-btn {
@@ -272,6 +320,8 @@
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
+            width: 100%;
+            justify-content: center;
         }
 
         .punch-btn.in {
@@ -279,14 +329,21 @@
             color: var(--white);
         }
 
+        .punch-btn.in:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
         .punch-btn.out {
             background: var(--warning);
             color: var(--white);
         }
 
-        .punch-btn:hover {
+        .punch-btn.out:hover {
+            background: #d97706;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
         /* Project List */
@@ -329,12 +386,12 @@
         }
 
         .status-ongoing {
-            background: #fef3c7;
+            background: transparent;
             color: #92400e;
         }
 
         .status-completed {
-            background: #d1fae5;
+            background: transparent;
             color: #065f46;
         }
 
@@ -419,10 +476,10 @@
 
         <main class="main-content">
             <header class="header">
-                <button class="header-menu" id="menuToggle" aria-label="Toggle sidebar">
+                <button class="header-menu" id="headerMenu">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="header-title">Worker Dashboard</h1>
+                <h1 class="header-title">AJJ CRISBER Engineering Services</h1>
             </header>
 
             <div class="content-area">
@@ -451,7 +508,7 @@
                     <div class="attendance-info">
                         <div class="attendance-item">
                             <label>Status</label>
-                            <span>{{ $todayAttendance ? ucfirst($todayAttendance->status) : 'Not Recorded' }}</span>
+                            <span>{{ $todayAttendance ? ucfirst($todayAttendance->attendance_status) : 'Not Recorded' }}</span>
                         </div>
                         <div class="attendance-item">
                             <label>Time In</label>
@@ -520,9 +577,6 @@
                     <div class="section-card">
                         <div class="section-header">
                             <h3 class="section-title"><i class="fas fa-folder-open"></i> My Projects</h3>
-                            <a href="{{ route('cw.tasks') }}" class="view-btn">
-                                View All <i class="fas fa-arrow-right"></i>
-                            </a>
                         </div>
                         <div class="section-body" style="padding: 0;">
                             @if($assignedProjects->count() > 0)

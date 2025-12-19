@@ -3,7 +3,7 @@
 @section('title', 'Approved Records - AJJ CRISBER Engineering Services')
 
 @section('content')
-<div style="padding: 20px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; margin-bottom: 30px; border-radius: 10px;">
+<div style="padding: 20px; background: #1e40af; color: white; margin-bottom: 30px; border-radius: 10px;">
     <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 700;">Approved Attendance Records</h1>
     <p style="margin: 0; font-size: 16px; opacity: 0.9;">All approved punch-in records</p>
 </div>

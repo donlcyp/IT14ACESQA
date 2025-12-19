@@ -108,7 +108,7 @@
 
         /* Header Styles */
         .header {
-            background: linear-gradient(135deg, var(--header-bg), #1e40af);
+            background: var(--header-bg);
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -125,7 +125,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: transparent;
         }
 
         .header-menu {
@@ -158,7 +158,7 @@
             max-width: 1600px;
             margin: 0 auto;
             width: 100%;
-            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            background: transparent;
             border-left: 1px solid #e2e8f0;
             border-right: 1px solid #e2e8f0;
             border-bottom: 1px solid #e2e8f0;
@@ -435,9 +435,9 @@
             font-size: 12px;
             font-weight: 600;
         }
-        .status-on-site { background: #dcfce7; color: #166534; }
-        .status-on-leave { background: #fef3c7; color: #92400e; }
-        .status-absent { background: #fee2e2; color: #991b1b; }
+        .status-on-site { background: transparent; color: #166534; }
+        .status-on-leave { background: transparent; color: #92400e; }
+        .status-absent { background: transparent; color: #991b1b; }
 
         .alert {
             padding: 12px 16px;

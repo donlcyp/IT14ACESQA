@@ -336,10 +336,6 @@
                 <i class="nav-icon fas fa-hard-hat"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{{ route('cw.tasks') }}" class="nav-item {{ request()->routeIs('cw.tasks') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-tasks"></i>
-                <span>My Tasks</span>
-            </a>
             <a href="{{ route('cw.attendance') }}" class="nav-item {{ request()->routeIs('cw.attendance') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span>My Attendance</span>

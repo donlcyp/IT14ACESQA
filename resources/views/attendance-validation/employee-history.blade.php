@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+<div style="padding: 20px; background: #667eea; color: white; margin-bottom: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
     <div>
         <h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 700;">{{ $employee->f_name }} {{ $employee->l_name }}</h1>
         <p style="margin: 0; font-size: 14px; opacity: 0.9;">Position: {{ $employee->position ?? 'N/A' }} - Validation History</p>

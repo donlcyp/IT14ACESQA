@@ -218,10 +218,6 @@ Route::middleware('auth')->group(function () {
         // Dashboard
         Route::get('/cw-dashboard', [App\Http\Controllers\ConstructionWorkerController::class, 'index'])->name('cw.dashboard');
         
-        // Tasks
-        Route::get('/cw-tasks', [App\Http\Controllers\ConstructionWorkerController::class, 'tasks'])->name('cw.tasks');
-        Route::post('/cw-tasks/{task}/complete', [App\Http\Controllers\ConstructionWorkerController::class, 'submitTaskCompletion'])->name('cw.tasks.complete');
-        
         // Attendance
         Route::get('/cw-attendance', [App\Http\Controllers\ConstructionWorkerController::class, 'attendance'])->name('cw.attendance');
         

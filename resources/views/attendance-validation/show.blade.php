@@ -98,7 +98,7 @@
                                 <td style="padding: 10px; color: #1f2937; font-size: 14px;">{{ $record->punch_out_time ? $record->punch_out_time->format('H:i') : '—' }}</td>
                                 <td style="padding: 10px; text-align: center; font-size: 12px;">
                                     @if($record->validation_status === 'pending')
-                                        <span style="display: inline-block; background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-weight: 600;">Pending</span>
+                                        <span style="display: inline-block; background: transparent; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-weight: 600;">Pending</span>
                                     @elseif($record->validation_status === 'approved')
                                         <span style="display: inline-block; background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: 600;">Approved</span>
                                     @else
