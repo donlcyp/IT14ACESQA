@@ -577,7 +577,7 @@
                         $detailsText = '';
                         
                         if($log->action === 'LOGIN') {
-                          $detailsText = 'Signed in from ' . ($details['ip_address'] ?? 'Unknown');
+                          $detailsText = 'User signed in successfully';
                         } elseif($log->action === 'LOGOUT') {
                           $detailsText = 'Session ended';
                         } elseif($log->action === 'UPDATE_MATERIAL') {
