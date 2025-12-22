@@ -511,17 +511,17 @@
         }
 
         .status-badge.success {
-            background-color: transparent;
+            
             color: #047857;
         }
 
         .status-badge.warning {
-            background-color: transparent;
+            
             color: #a16207;
         }
 
         .status-badge.info {
-            background-color: transparent;
+            
             color: #1d4ed8;
         }
 
@@ -1750,7 +1750,7 @@
                                     Client: {{ $project->client_name ?? 'N/A' }}
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: transparent; color: {{ $project->status === 'Completed' ? '#065f46' : '#1e40af' }};">
+                                    <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; color: {{ $project->status === 'Completed' ? '#065f46' : '#1e40af' }};">
                                         {{ $project->status ?? 'Ongoing' }}
                                     </span>
                                     <span style="font-size: 12px; color: var(--gray-500);">
@@ -2186,7 +2186,7 @@
                                 <a href="{{ route('projects.show', $project->id) }}" class="project-card" style="border-color: #93c5fd;">
                                     <div class="project-card-header">
                                         <div class="project-card-title" style="color: #1e3a8a;">{{ $project->project_name ?? $project->project_code }}</div>
-                                        <span class="project-card-status" style="background: #1e40af; color: white;">
+                                        <span class="project-card-status" style="color: white;">
                                             <i class="fas fa-check-circle"></i> Completed
                                         </span>
                                     </div>
@@ -2553,7 +2553,6 @@
                             backgroundColor: 'rgba(5, 150, 105, 0.1)',
                             fill: true,
                             tension: 0.3,
-                            pointBackgroundColor: '#059669',
                             pointBorderColor: '#fff',
                             pointBorderWidth: 2,
                             pointRadius: 5

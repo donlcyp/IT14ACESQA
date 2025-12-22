@@ -882,16 +882,21 @@
                         </div>
                         @php
                             $currentUser = auth()->user();
-                            $canMarkComplete = $currentUser && in_array($currentUser->role, ['Owner', 'PM', 'FM']);
+                            // Allow Owner, PM, FM roles, or the specifically assigned PM for this project
+                            $isAssignedPM = $currentUser && $project->assigned_pm_id == $currentUser->id;
+                            $canMarkComplete = $currentUser && (in_array($currentUser->role, ['OWNER', 'PM', 'FM']) || $isAssignedPM);
                             $allMaterials = $project->materials ?? collect();
                             $totalMaterialItems = $allMaterials->count();
-                            // Progress based on QA status (passed materials)
+                            // Progress based on QA status (cleared = passed + failed materials)
                             $passedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->qa_status ?? 'pending') === 'passed')->count();
                             $failedMaterialItems = $allMaterials->filter(fn($m) => strtolower($m->qa_status ?? '') === 'failed')->count();
                             $clearedItems = $passedMaterialItems + $failedMaterialItems;
-                            $progressPercent = $totalMaterialItems > 0 ? round(($clearedItems / $totalMaterialItems) * 100, 1) : 0;
+                            // Progress is 100% if all items are cleared, or if there are no materials (empty project)
+                            $progressPercent = $totalMaterialItems > 0 ? round(($clearedItems / $totalMaterialItems) * 100, 1) : 100;
                             $canComplete = $progressPercent >= 100 && $project->status !== 'Completed';
                             $isCompleted = $project->status === 'Completed';
+                            // Alias for the modal
+                            $approvedMaterialItems = $passedMaterialItems;
                         @endphp
                         @if($canMarkComplete && !$isCompleted && $progressPercent >= 100)
                             <button type="button" class="btn btn-green" 
@@ -904,6 +909,11 @@
                             <span style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: transparent; color: #166534; border-radius: 8px; font-weight: 600; font-size: 14px;">
                                 <i class="fas fa-check-circle"></i> Project Completed
                             </span>
+                        @else
+                            {{-- Debug: Show why button isn't visible --}}
+                            @if($currentUser && !$canMarkComplete)
+                                <span style="display: none;"><!-- Debug: Role '{{ $currentUser->role }}' cannot mark complete --></span>
+                            @endif
                         @endif
                     </div>
                     <div class="header-divider"></div>
@@ -1026,10 +1036,12 @@
                             $allocatedBudget = $project->allocated_amount ?? 0;
                             $budgetUtilized = $allocatedBudget > 0 ? round(($totalExpenses / $allocatedBudget) * 100, 1) : 0;
                             
-                            // Calculate progress (based on QA passed materials)
+                            // Calculate progress (based on QA cleared materials - passed + failed)
                             $totalItems = $materials->count();
                             $approvedItems = $materials->filter(function($m) { return strtolower($m->qa_status ?? 'pending') === 'passed'; })->count();
-                            $progressPercentage = $totalItems > 0 ? round(($approvedItems / $totalItems) * 100, 1) : 0;
+                            $failedItems = $materials->filter(function($m) { return strtolower($m->qa_status ?? '') === 'failed'; })->count();
+                            $clearedItemsTotal = $approvedItems + $failedItems;
+                            $progressPercentage = $totalItems > 0 ? round(($clearedItemsTotal / $totalItems) * 100, 1) : 100;
                             
                             // Project health indicator (Green/Yellow/Red)
                             $healthScore = 'green';
