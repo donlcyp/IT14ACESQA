@@ -1127,21 +1127,46 @@
                         
                         <!-- Timeline Section -->
                         <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--gray-300);">
-                            <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--black-1);">Timeline</h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--black-1);">Timeline</h3>
+                                @if($project->status !== 'Completed' && (auth()->user()->role === 'OWNER' || auth()->user()->role === 'PM' || auth()->user()->role === 'FM' || auth()->user()->id === $project->assigned_pm_id))
+                                <button type="button" onclick="openEditProjectDetailsModal()" style="background: #0369a1; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s;">
+                                    <i class="fas fa-edit"></i> Edit Details
+                                </button>
+                                @endif
+                            </div>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
                                 <div>
                                     <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Start Date</div>
-                                    <div style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started' }}</div>
+                                    <div id="displayStartDate" style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('M d, Y') : 'Not started' }}</div>
                                 </div>
                                 <div>
                                     <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Target Completion</div>
-                                    <div style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'Not set' }}</div>
+                                    <div id="displayTargetTimeline" style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'Not set' }}</div>
                                 </div>
                                 <div>
                                     <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Actual/Expected End</div>
-                                    <div style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'In progress' }}</div>
+                                    <div id="displayDateEnded" style="font-size: 14px; font-weight: 600; color: var(--black-1);">{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('M d, Y') : 'In progress' }}</div>
                                 </div>
                             </div>
+                            
+                            @if($project->note_remarks)
+                            <!-- Change History / Remarks -->
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+                                <div style="font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                                    <i class="fas fa-history" style="margin-right: 4px;"></i> Change History / Remarks
+                                </div>
+                                <div style="background: #f9fafb; border: 1px solid var(--gray-200); border-radius: 6px; padding: 12px; max-height: 150px; overflow-y: auto;">
+                                    @foreach(array_reverse(explode("\n", $project->note_remarks)) as $remark)
+                                        @if(trim($remark))
+                                        <div style="font-size: 13px; color: var(--gray-700); padding: 6px 0; {{ !$loop->last ? 'border-bottom: 1px solid var(--gray-200);' : '' }}">
+                                            {!! nl2br(e(trim($remark))) !!}
+                                        </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -3825,6 +3850,120 @@
         </script>
         @endif
 
+        <!-- Edit Project Details Modal -->
+        <div id="editProjectDetailsModal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header" style="background: #0369a1; color: white;">
+                    <h2 class="modal-title" style="color: white;">
+                        <i class="fas fa-edit"></i> Edit Project Details
+                    </h2>
+                    <button class="modal-close" onclick="closeEditProjectDetailsModal()" style="color: white;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="editProjectDetailsForm" method="POST" action="{{ route('projects.update', $project->id) }}">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div style="padding: 24px;">
+                        <!-- Current Project Info -->
+                        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                            <div style="font-size: 12px; color: #0369a1; text-transform: uppercase; margin-bottom: 6px;">Project</div>
+                            <div style="font-weight: 600; color: #0c4a6e; font-size: 15px;">{{ $project->project_name }}</div>
+                        </div>
+
+                        <!-- Hidden fields to preserve existing data -->
+                        <input type="hidden" name="project_name" value="{{ $project->project_name }}">
+                        <input type="hidden" name="status" value="{{ $project->status }}">
+
+                        <!-- Date Extension Section -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
+                                <i class="fas fa-calendar-plus" style="color: #0369a1; margin-right: 6px;"></i>
+                                Extend Target Completion Date
+                            </label>
+                            <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
+                                Current target: <strong>{{ $project->target_timeline ? $project->target_timeline->format('M d, Y') : 'Not set' }}</strong>
+                            </p>
+                            <input 
+                                type="date" 
+                                id="editTargetTimeline" 
+                                name="target_timeline" 
+                                value="{{ $project->target_timeline ? $project->target_timeline->format('Y-m-d') : '' }}"
+                                style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                                min="{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('Y-m-d') : '' }}"
+                            >
+                            <p style="font-size: 12px; color: #9ca3af; margin-top: 6px;">
+                                <i class="fas fa-info-circle"></i> Set a new target completion date for the project.
+                            </p>
+                        </div>
+
+                        <!-- Start Date -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
+                                <i class="fas fa-calendar-alt" style="color: #16a34a; margin-right: 6px;"></i>
+                                Start Date
+                            </label>
+                            <input 
+                                type="date" 
+                                id="editDateStarted" 
+                                name="date_started" 
+                                value="{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('Y-m-d') : '' }}"
+                                style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                            >
+                        </div>
+
+                        <!-- Expected End Date -->
+                        <div style="margin-bottom: 10px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
+                                <i class="fas fa-calendar-check" style="color: #7c3aed; margin-right: 6px;"></i>
+                                Expected End Date
+                            </label>
+                            <input 
+                                type="date" 
+                                id="editDateEnded" 
+                                name="date_ended" 
+                                value="{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format('Y-m-d') : '' }}"
+                                style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box;"
+                                min="{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format('Y-m-d') : '' }}"
+                            >
+                            <p style="font-size: 12px; color: #9ca3af; margin-top: 6px;">
+                                <i class="fas fa-info-circle"></i> Leave empty if project is still in progress.
+                            </p>
+                        </div>
+
+                        <!-- Reason for Changes (Optional) -->
+                        <div style="margin-bottom: 10px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
+                                <i class="fas fa-comment-alt" style="color: #f59e0b; margin-right: 6px;"></i>
+                                Reason for Changes <span style="font-weight: 400; color: #9ca3af;">(Optional)</span>
+                            </label>
+                            <textarea 
+                                id="editNoteRemarks" 
+                                name="note_remarks" 
+                                rows="3"
+                                placeholder="Enter reason for changes (e.g., date extension due to weather delays, scope change, etc.)"
+                                style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical; font-family: inherit;"
+                            ></textarea>
+                            <p style="font-size: 12px; color: #9ca3af; margin-top: 6px;">
+                                <i class="fas fa-info-circle"></i> Document the reason for any changes. This will be saved in the change history.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
+                        <button type="button" class="btn" onclick="closeEditProjectDetailsModal()" style="padding: 10px 20px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 24px; background: #0369a1; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- BOQ Item Modal -->
         <div id="boqModal" class="modal" style="display: none;">
             <div class="modal-content" style="max-width: 750px;">
@@ -6005,6 +6144,130 @@
                 console.error('Error:', error);
                 showNotification('An error occurred during bulk inspection', 'error');
             });
+        }
+
+        // Edit Project Details Modal Functions
+        // Store original date values for comparison
+        const originalProjectDates = {
+            dateStarted: '{{ $project->date_started ? \Carbon\Carbon::parse($project->date_started)->format("Y-m-d") : "" }}',
+            targetTimeline: '{{ $project->target_timeline ? $project->target_timeline->format("Y-m-d") : "" }}',
+            dateEnded: '{{ $project->date_ended ? \Carbon\Carbon::parse($project->date_ended)->format("Y-m-d") : "" }}'
+        };
+
+        function openEditProjectDetailsModal() {
+            const modal = document.getElementById('editProjectDetailsModal');
+            if (modal) {
+                // Clear the reason field when opening
+                const noteRemarks = document.getElementById('editNoteRemarks');
+                if (noteRemarks) {
+                    noteRemarks.value = '';
+                    noteRemarks.style.borderColor = '#d1d5db';
+                }
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeEditProjectDetailsModal() {
+            const modal = document.getElementById('editProjectDetailsModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close edit project details modal when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('editProjectDetailsModal');
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeEditProjectDetailsModal();
+                    }
+                });
+            }
+
+            // Validate date fields
+            const editForm = document.getElementById('editProjectDetailsForm');
+            if (editForm) {
+                // Add date change listeners to show reason is required
+                const dateFields = ['editDateStarted', 'editTargetTimeline', 'editDateEnded'];
+                dateFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('change', function() {
+                            checkDateChanges();
+                        });
+                    }
+                });
+
+                editForm.addEventListener('submit', function(e) {
+                    const startDate = document.getElementById('editDateStarted').value;
+                    const targetDate = document.getElementById('editTargetTimeline').value;
+                    const endDate = document.getElementById('editDateEnded').value;
+                    const noteRemarks = document.getElementById('editNoteRemarks');
+                    const reason = noteRemarks ? noteRemarks.value.trim() : '';
+
+                    if (startDate && targetDate) {
+                        if (new Date(targetDate) < new Date(startDate)) {
+                            e.preventDefault();
+                            showNotification('Target completion date cannot be before start date', 'error');
+                            return false;
+                        }
+                    }
+
+                    if (startDate && endDate) {
+                        if (new Date(endDate) < new Date(startDate)) {
+                            e.preventDefault();
+                            showNotification('Expected end date cannot be before start date', 'error');
+                            return false;
+                        }
+                    }
+
+                    // Check if any date field was changed
+                    const dateStartedChanged = startDate !== originalProjectDates.dateStarted;
+                    const targetTimelineChanged = targetDate !== originalProjectDates.targetTimeline;
+                    const dateEndedChanged = endDate !== originalProjectDates.dateEnded;
+                    const anyDateChanged = dateStartedChanged || targetTimelineChanged || dateEndedChanged;
+
+                    // Require reason if any date was changed
+                    if (anyDateChanged && !reason) {
+                        e.preventDefault();
+                        showNotification('Please provide a reason for changing the date(s). This is required for audit purposes.', 'error');
+                        if (noteRemarks) {
+                            noteRemarks.focus();
+                            noteRemarks.style.borderColor = '#ef4444';
+                        }
+                        return false;
+                    }
+                });
+            }
+        });
+
+        // Check if any date has changed and update UI
+        function checkDateChanges() {
+            const startDate = document.getElementById('editDateStarted').value;
+            const targetDate = document.getElementById('editTargetTimeline').value;
+            const endDate = document.getElementById('editDateEnded').value;
+            const noteRemarks = document.getElementById('editNoteRemarks');
+            const reasonLabel = noteRemarks ? noteRemarks.parentElement.querySelector('label') : null;
+
+            const dateStartedChanged = startDate !== originalProjectDates.dateStarted;
+            const targetTimelineChanged = targetDate !== originalProjectDates.targetTimeline;
+            const dateEndedChanged = endDate !== originalProjectDates.dateEnded;
+            const anyDateChanged = dateStartedChanged || targetTimelineChanged || dateEndedChanged;
+
+            if (noteRemarks && reasonLabel) {
+                if (anyDateChanged) {
+                    // Mark reason as required
+                    noteRemarks.style.borderColor = '#f59e0b';
+                    reasonLabel.innerHTML = '<i class="fas fa-comment-alt" style="color: #f59e0b; margin-right: 6px;"></i>Reason for Changes <span style="color: #ef4444; font-weight: 600;">* Required</span>';
+                    noteRemarks.setAttribute('placeholder', 'REQUIRED: Enter reason for date change (e.g., weather delays, scope change, client request, etc.)');
+                } else {
+                    // Mark reason as optional
+                    noteRemarks.style.borderColor = '#d1d5db';
+                    reasonLabel.innerHTML = '<i class="fas fa-comment-alt" style="color: #f59e0b; margin-right: 6px;"></i>Reason for Changes <span style="font-weight: 400; color: #9ca3af;">(Optional)</span>';
+                    noteRemarks.setAttribute('placeholder', 'Enter reason for changes (e.g., date extension due to weather delays, scope change, etc.)');
+                }
+            }
         }
 
     </script>

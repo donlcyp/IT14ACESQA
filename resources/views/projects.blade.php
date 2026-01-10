@@ -1438,6 +1438,7 @@
                         <form id="editProjectForm" method="POST">
                             @csrf
                             @method('PUT')
+                            <input type="hidden" id="editProjectStatus" name="status" value="Ongoing">
                             <div class="projects-form-grid">
                                 <div class="projects-form-group">
                                     <label class="projects-form-label">Project Name</label>
@@ -1482,6 +1483,49 @@
                                         name="industry"
                                         placeholder="Enter industry"
                                     />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Start Date</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editDateStarted"
+                                        name="date_started"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Target Completion (Date Extension)</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editTargetTimeline"
+                                        name="target_timeline"
+                                    />
+                                    <small style="color: #6b7280; font-size: 11px; margin-top: 4px; display: block;">Extend or set project deadline</small>
+                                </div>
+
+                                <div class="projects-form-group">
+                                    <label class="projects-form-label">Expected End Date</label>
+                                    <input
+                                        type="date"
+                                        class="projects-form-input"
+                                        id="editDateEnded"
+                                        name="date_ended"
+                                    />
+                                </div>
+
+                                <div class="projects-form-group projects-form-full">
+                                    <label class="projects-form-label">Reason for Changes</label>
+                                    <textarea
+                                        class="projects-form-input"
+                                        id="editNoteRemarks"
+                                        name="note_remarks"
+                                        placeholder="Enter reason for editing (e.g., date extension due to weather delays, scope change, etc.)"
+                                        rows="3"
+                                    ></textarea>
+                                    <small style="color: #6b7280; font-size: 11px; margin-top: 4px; display: block;">Document the reason for any changes made</small>
                                 </div>
                             </div>
 
@@ -1582,6 +1626,15 @@
         const editDescription = document.getElementById('editDescription');
         const editLocation = document.getElementById('editLocation');
         const editIndustry = document.getElementById('editIndustry');
+        const editDateStarted = document.getElementById('editDateStarted');
+        const editTargetTimeline = document.getElementById('editTargetTimeline');
+        const editDateEnded = document.getElementById('editDateEnded');
+        const editNoteRemarks = document.getElementById('editNoteRemarks');
+
+        // Store original date values for comparison
+        let originalDateStarted = '';
+        let originalTargetTimeline = '';
+        let originalDateEnded = '';
 
         // Employee Management Variables
         let currentProjectId = null;
@@ -1644,6 +1697,27 @@
                     if (editDescription) editDescription.value = data.description || '';
                     if (editLocation) editLocation.value = data.location || '';
                     if (editIndustry) editIndustry.value = data.industry || '';
+                    
+                    // Populate date fields and store original values
+                    if (editDateStarted) {
+                        editDateStarted.value = data.date_started ? data.date_started.split('T')[0] : '';
+                        originalDateStarted = editDateStarted.value;
+                    }
+                    if (editTargetTimeline) {
+                        editTargetTimeline.value = data.target_timeline ? data.target_timeline.split('T')[0] : '';
+                        originalTargetTimeline = editTargetTimeline.value;
+                    }
+                    if (editDateEnded) {
+                        editDateEnded.value = data.date_ended ? data.date_ended.split('T')[0] : '';
+                        originalDateEnded = editDateEnded.value;
+                    }
+                    
+                    // Set status field
+                    const statusField = document.getElementById('editProjectStatus');
+                    if (statusField) statusField.value = data.status || 'Ongoing';
+                    
+                    // Clear note remarks for new entry (user should provide fresh reason for this edit)
+                    if (editNoteRemarks) editNoteRemarks.value = '';
 
                     if (editProjectModal) {
                         editProjectModal.classList.add('active');
@@ -1726,6 +1800,7 @@
                     // Validate date conflict
                     const dateStarted = editDateStarted.value;
                     const dateEnded = editDateEnded.value;
+                    const targetTimeline = editTargetTimeline.value;
 
                     if (dateStarted && dateEnded) {
                         const startDate = new Date(dateStarted);
@@ -1734,6 +1809,26 @@
                         if (startDate > endDate) {
                             event.preventDefault();
                             showErrorModal('Date Started cannot be after Date Ended. Please select valid dates.', 'Invalid Dates');
+                            return false;
+                        }
+                    }
+
+                    // Check if any date field was changed
+                    const dateStartedChanged = dateStarted !== originalDateStarted;
+                    const targetTimelineChanged = targetTimeline !== originalTargetTimeline;
+                    const dateEndedChanged = dateEnded !== originalDateEnded;
+                    const anyDateChanged = dateStartedChanged || targetTimelineChanged || dateEndedChanged;
+
+                    // Require reason if any date was changed
+                    if (anyDateChanged) {
+                        const reason = editNoteRemarks ? editNoteRemarks.value.trim() : '';
+                        if (!reason) {
+                            event.preventDefault();
+                            showErrorModal('Please provide a reason for changing the date(s). This is required for audit purposes.', 'Reason Required');
+                            if (editNoteRemarks) {
+                                editNoteRemarks.focus();
+                                editNoteRemarks.style.borderColor = '#ef4444';
+                            }
                             return false;
                         }
                     }

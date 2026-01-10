@@ -308,6 +308,7 @@ class ProjectsController extends Controller
             'allocated_amount' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'in:Ongoing,Completed'],
             'assigned_pm_id' => ['nullable', 'exists:users,id'],
+            'note_remarks' => ['nullable', 'string', 'max:2000'],
         ], [
             'date_ended.after_or_equal' => 'Date Ended must be on or after Date Started.',
         ]);
@@ -317,18 +318,57 @@ class ProjectsController extends Controller
             return redirect()->back()->with('error', 'Project status is locked. Completed projects cannot be changed to Ongoing.');
         }
 
-        $project->update([
+        // Build update data, only including fields that were actually submitted
+        $updateData = [
             'project_name' => $validated['project_name'],
-            'description' => $validated['description'] ?? null,
-            'location' => $validated['location'] ?? null,
-            'industry' => $validated['industry'] ?? null,
-            'target_timeline' => $validated['target_timeline'] ?? null,
-            'date_started' => $validated['date_started'] ?? null,
-            'date_ended' => $validated['date_ended'] ?? null,
-            'allocated_amount' => $validated['allocated_amount'] ?? null,
             'status' => $validated['status'],
-            'assigned_pm_id' => $validated['assigned_pm_id'] ?? null,
-        ]);
+        ];
+
+        // Only update these fields if they were actually provided in the request
+        if ($request->has('description')) {
+            $updateData['description'] = $validated['description'] ?? $project->description;
+        }
+        if ($request->has('location')) {
+            $updateData['location'] = $validated['location'] ?? $project->location;
+        }
+        if ($request->has('industry')) {
+            $updateData['industry'] = $validated['industry'] ?? $project->industry;
+        }
+        if ($request->has('target_timeline')) {
+            $updateData['target_timeline'] = $validated['target_timeline'] ?? $project->target_timeline;
+        }
+        if ($request->has('date_started')) {
+            $updateData['date_started'] = $validated['date_started'] ?? $project->date_started;
+        }
+        if ($request->has('date_ended')) {
+            $updateData['date_ended'] = $validated['date_ended'] ?? $project->date_ended;
+        }
+        if ($request->has('allocated_amount')) {
+            $updateData['allocated_amount'] = $validated['allocated_amount'] ?? $project->allocated_amount;
+        }
+        if ($request->has('assigned_pm_id')) {
+            $updateData['assigned_pm_id'] = $validated['assigned_pm_id'] ?? $project->assigned_pm_id;
+        }
+        if ($request->has('note_remarks') && !empty($validated['note_remarks'])) {
+            // Append new reason with timestamp to existing remarks
+            $timestamp = now()->format('M d, Y h:i A');
+            $user = auth()->user()->name ?? 'Unknown';
+            $newRemark = "[{$timestamp}] ({$user}): {$validated['note_remarks']}";
+            
+            if ($project->note_remarks) {
+                $updateData['note_remarks'] = $project->note_remarks . "\n" . $newRemark;
+            } else {
+                $updateData['note_remarks'] = $newRemark;
+            }
+        }
+
+        $project->update($updateData);
+
+        // Check if request came from the project details page and redirect accordingly
+        $referer = $request->headers->get('referer');
+        if ($referer && str_contains($referer, '/projects/' . $project->id)) {
+            return redirect()->route('projects.show', $project->id)->with('success', 'Project details updated successfully.');
+        }
 
         return redirect()->route('projects')->with('success', 'Project updated successfully.');
     }
